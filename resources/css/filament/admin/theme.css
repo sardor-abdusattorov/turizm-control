@@ -1,0 +1,115 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@source '../../../../vendor/bezhansalleh/filament-language-switch/resources/views/**/*.blade.php';
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/livewire/**/*';
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--primary-400)) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--primary-400));
+    border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--primary-500));
+}
+
+.dark * {
+    scrollbar-color: rgb(var(--primary-500)) transparent;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--primary-500));
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--primary-400));
+}
+
+.fi-fo-rich-editor.fullscreen {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: white !important;
+    overflow: hidden !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+.fi-fo-rich-editor.fullscreen * {
+    max-height: none !important;
+}
+
+.fi-fo-rich-editor.fullscreen > *:not(.fi-fo-rich-editor-toolbar) {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+.fi-fo-rich-editor.fullscreen .fi-fo-rich-editor-toolbar {
+    flex: 0 0 auto !important;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: white;
+    border-bottom: 1px solid rgb(229, 231, 235);
+    padding: 0.5rem 1rem;
+}
+
+.fi-fo-rich-editor.fullscreen .ProseMirror,
+.fi-fo-rich-editor.fullscreen [contenteditable="true"],
+.fi-fo-rich-editor.fullscreen .tiptap {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    overflow-y: auto !important;
+    padding: 2rem 3rem !important;
+    background: white !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    max-width: none !important;
+}
+
+.dark .fi-fo-rich-editor.fullscreen,
+.dark .fi-fo-rich-editor.fullscreen .fi-fo-rich-editor-toolbar,
+.dark .fi-fo-rich-editor.fullscreen .ProseMirror,
+.dark .fi-fo-rich-editor.fullscreen [contenteditable="true"],
+.dark .fi-fo-rich-editor.fullscreen .tiptap {
+    background: rgb(24, 24, 27) !important;
+    color: rgb(244, 244, 245);
+}
+
+.dark .fi-fo-rich-editor.fullscreen .fi-fo-rich-editor-toolbar {
+    border-bottom-color: rgb(63, 63, 70);
+}
+.fi-fo-rich-editor.fullscreen .fi-fo-rich-editor-main{
+    max-width: 100%;
+}
+.fi-fo-rich-editor.fullscreen .fi-fo-rich-editor-content {
+    max-width: 100%;
+}
+.ck.ck-editor__editable_inline {
+    min-height: 400px;
+    height: auto;
+    max-height: none;
+}

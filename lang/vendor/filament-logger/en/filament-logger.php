@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'nav.group' => 'Administration',
+    'nav.log.label' => 'Activity Log',
+    'nav.log.icon' => 'heroicon-o-clipboard-document-list',
+
+    'resource.label.log' => 'Activity log',
+    'resource.label.logs' => 'Activity logs',
+    'resource.label.user' => 'User',
+    'resource.label.subject' => 'Subject',
+    'resource.label.subject_type' => 'Subject type',
+    'resource.label.description' => 'Description',
+    'resource.label.type' => 'Type',
+    'resource.label.event' => 'Event',
+    'resource.label.risk' => 'Risk',
+    'resource.label.logged_at' => 'Logged at',
+    'resource.label.properties' => 'Properties',
+    'resource.label.old' => 'Old',
+    'resource.label.new' => 'New',
+    'resource.label.old_value' => 'Old value',
+    'resource.label.new_value' => 'New value',
+    'resource.label.properties_hint' => 'Can be key or value',
+    'resource.label.old_attributes' => 'Old attribute or value: ',
+    'resource.label.new_attributes' => 'New attribute or value: ',
+
+    'tabs.all' => 'All activity',
+    'tabs.high_risk' => 'High risk',
+    'tabs.destructive' => 'Deletes',
+    'tabs.auth_issues' => 'Auth issues',
+    'tabs.failed_logins' => 'Failed logins',
+    'tabs.destructive_recent' => 'Recent destructive',
+    'tabs.auth_anomalies' => 'Auth anomalies',
+
+    'dates.today' => 'Today',
+    'dates.last_24_hours' => 'Last 24 hours',
+    'dates.last_7_days' => 'Last 7 days',
+    'dates.last_30_days' => 'Last 30 days',
+    'dates.this_month' => 'This month',
+];

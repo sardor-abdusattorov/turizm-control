@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'nav.group' => 'Administratsiya',
+    'nav.log.label' => 'Faollik jurnali',
+    'nav.log.icon' => 'heroicon-o-clipboard-document-list',
+
+    'resource.label.log' => 'Jurnal yozuvi',
+    'resource.label.logs' => 'Faollik jurnali',
+    'resource.label.user' => 'Foydalanuvchi',
+    'resource.label.subject' => 'Obyekt',
+    'resource.label.subject_type' => 'Obyekt turi',
+    'resource.label.description' => 'Tavsif',
+    'resource.label.type' => 'Turi',
+    'resource.label.event' => 'Hodisa',
+    'resource.label.risk' => 'Xavf',
+    'resource.label.logged_at' => 'Vaqt',
+    'resource.label.properties' => 'Xususiyatlar',
+    'resource.label.old' => 'Edi',
+    'resource.label.new' => 'Bo‘ldi',
+    'resource.label.old_value' => 'Eski qiymat',
+    'resource.label.new_value' => 'Yangi qiymat',
+    'resource.label.properties_hint' => 'Kalit yoki qiymat',
+    'resource.label.old_attributes' => 'Eski atribut yoki qiymat: ',
+    'resource.label.new_attributes' => 'Yangi atribut yoki qiymat: ',
+
+    'tabs.all' => 'Barcha faollik',
+    'tabs.high_risk' => 'Yuqori xavf',
+    'tabs.destructive' => 'O‘chirishlar',
+    'tabs.auth_issues' => 'Avtorizatsiya muammolari',
+    'tabs.failed_logins' => 'Muvaffaqiyatsiz kirishlar',
+    'tabs.destructive_recent' => 'So‘nggi o‘chirishlar',
+    'tabs.auth_anomalies' => 'Avtorizatsiya anomaliyalari',
+
+    'dates.today' => 'Bugun',
+    'dates.last_24_hours' => 'Oxirgi 24 soat',
+    'dates.last_7_days' => 'Oxirgi 7 kun',
+    'dates.last_30_days' => 'Oxirgi 30 kun',
+    'dates.this_month' => 'Shu oy',
+];
