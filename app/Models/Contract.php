@@ -167,4 +167,44 @@ class Contract extends Model
 
         $this->update(['status' => self::STATUS_DRAFT]);
     }
+
+    /**
+     * Build the suggested approval chain for a manager: take their
+     * defaultRecipients, group by department code, and emit them in the
+     * order configured in settings.approval.flow. Used as the default
+     * value for the create wizard's approver repeater.
+     *
+     * @return array<int, array{user_id: int}>
+     */
+    public static function suggestApproverChain(?User $user = null): array
+    {
+        $user ??= auth()->user();
+
+        if (! $user) {
+            return [];
+        }
+
+        $flow = Department::approvalFlow();
+
+        $recipientIds = $user->defaultRecipients()
+            ->where('users.status', User::STATUS_ACTIVE)
+            ->pluck('users.id');
+
+        $recipients = User::query()
+            ->whereIn('id', $recipientIds)
+            ->whereHas('department', fn ($q) => $q->approvers())
+            ->with('department')
+            ->get()
+            ->groupBy(fn (User $u) => $u->department?->code);
+
+        $chain = [];
+
+        foreach ($flow as $code) {
+            foreach ($recipients->get($code, collect()) as $recipient) {
+                $chain[] = ['user_id' => $recipient->id];
+            }
+        }
+
+        return $chain;
+    }
 }

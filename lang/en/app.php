@@ -72,6 +72,10 @@ return [
         'contract_number' => 'Contract No.',
         'amount' => 'Amount',
         'responsible' => 'Responsible',
+        'contract_step_basic' => 'Basic information',
+        'contract_step_approvers' => 'Approval chain',
+        'approval_chain' => 'Approval chain',
+        'approver' => 'Approver',
 
         'department' => 'Department',
         'department_single' => 'Department',
@@ -134,6 +138,7 @@ return [
         'cancel' => 'Cancel',
         'logout_other_sessions' => 'Log Out Other Browser Sessions',
         'add_department' => 'Add department',
+        'add_approver' => 'Add approver',
     ],
     'message' => [
         'profile_updated' => 'Profile updated successfully',
@@ -148,6 +153,8 @@ return [
         'seo_og_image' => 'Recommended size: 1200x630px. PNG or JPEG format.',
         'seo_indexing_enabled' => 'If disabled, meta robots noindex, nofollow will be added',
         'approval_flow' => 'Order of departments that contracts pass through during approval. Drag rows to reorder.',
+        'approval_chain' => 'Pre-filled from your default approvers ordered by the system approval flow. You can add, remove, or reorder them per contract.',
+        'contract_step_approvers' => 'Pick the people who will approve this contract, in order.',
     ],
     'status' => [
         'active' => 'Active',

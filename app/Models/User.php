@@ -118,4 +118,40 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
         return $grouped;
     }
+
+    /**
+     * Active users from approver departments, grouped by department,
+     * shaped for use as Select options inside the contract approver
+     * repeater.
+     *
+     * @return array<string, array<int, string>>
+     */
+    public static function approverOptionsForChain(): array
+    {
+        $users = static::query()
+            ->where('status', self::STATUS_ACTIVE)
+            ->whereHas('department', fn ($q) => $q->approvers())
+            ->with(['department', 'position'])
+            ->orderBy('id')
+            ->get();
+
+        $grouped = [];
+
+        foreach ($users as $user) {
+            $departmentName = $user->department?->name ?? __('app.label.no_department');
+
+            if (! isset($grouped[$departmentName])) {
+                $grouped[$departmentName] = [];
+            }
+
+            $positionName = $user->position?->name;
+            $label = $positionName
+                ? "{$user->name} · {$positionName}"
+                : $user->name;
+
+            $grouped[$departmentName][$user->id] = $label;
+        }
+
+        return $grouped;
+    }
 }
