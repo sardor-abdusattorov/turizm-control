@@ -59,7 +59,7 @@ class ProfileSettings extends Page implements HasForms, HasActions
         $this->profileForm->fill([
             'name' => $user->name,
             'email' => $user->email,
-            'image' => $user->image,
+            'avatar_url' => $user->avatar_url,
             'telegram_chat_id' => $user->telegram_chat_id,
             'department_id' => $user->department_id,
             'position_id' => $user->position_id,
@@ -77,7 +77,7 @@ class ProfileSettings extends Page implements HasForms, HasActions
                     ->description(__('app.label.personal_information_description'))
                     ->aside()
                     ->schema([
-                        ImageUpload::make('users')
+                        ImageUpload::make('users', 'avatar_url')
                             ->label(__('app.label.profile_image')),
 
                         TextInput::make('name')
@@ -176,7 +176,7 @@ class ProfileSettings extends Page implements HasForms, HasActions
             $user->update([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'image' => $data['image'] ?? null,
+                'avatar_url' => $data['avatar_url'] ?? null,
                 'telegram_chat_id' => $data['telegram_chat_id'] ?? null,
                 'department_id' => $data['department_id'],
                 'position_id' => $data['position_id'],

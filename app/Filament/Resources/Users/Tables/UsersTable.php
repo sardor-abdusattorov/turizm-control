@@ -20,13 +20,11 @@ class UsersTable
     {
         return $table
             ->columns([
-                ImageColumn::make('image')
-                    ->label(__('app.label.image'))
+                ImageColumn::make('avatar_url')
+                    ->label(__('app.label.profile_image'))
                     ->disk('public')
-                    ->square()
-                    ->imageHeight(75)
-                    ->disk('public')
-                    ->defaultImageUrl(asset('images/no_image.png')),
+                    ->circular()
+                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name='.urlencode($record->name).'&color=7F9CF5&background=EBF4FF'),
 
                 TextColumn::make('name')
                     ->label(__('app.label.name'))

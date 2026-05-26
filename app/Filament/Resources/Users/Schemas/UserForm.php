@@ -35,7 +35,8 @@ class UserForm
                             ->label(__('app.label.telegram_chat_id'))
                             ->maxLength(255),
 
-                        ImageUpload::make('users'),
+                        ImageUpload::make('users', 'avatar_url')
+                            ->label(__('app.label.profile_image')),
                     ])
                     ->columns(1),
 
