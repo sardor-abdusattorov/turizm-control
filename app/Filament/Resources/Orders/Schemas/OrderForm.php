@@ -22,7 +22,7 @@ class OrderForm
             ->components([
                 Section::make(__('app.label.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
                                 Select::make('order_type_id')
                                     ->label(__('app.label.order_type_single'))

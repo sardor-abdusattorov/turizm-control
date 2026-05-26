@@ -84,7 +84,7 @@ class ProfileSettings extends Page implements HasForms, HasActions
                         ImageUpload::make('users', 'avatar_url')
                             ->label(__('app.label.profile_image')),
 
-                        Grid::make(2)
+                        Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('app.label.name'))
@@ -104,7 +104,7 @@ class ProfileSettings extends Page implements HasForms, HasActions
                             ->helperText(__('app.label.telegram_chat_id_help'))
                             ->maxLength(255),
 
-                        Grid::make(2)
+                        Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
                                 Select::make('department_id')
                                     ->label(__('app.label.department'))

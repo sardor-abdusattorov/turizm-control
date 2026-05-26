@@ -42,7 +42,7 @@ class ContactForm
                                     ->rows(2),
                             ]),
 
-                        Grid::make(2)
+                        Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
                                 TextInput::make('inn')
                                     ->label(__('app.label.inn'))
