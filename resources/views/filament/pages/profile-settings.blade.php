@@ -29,16 +29,23 @@
             {{ __('app.label.browser_sessions_description') }}
         </x-slot>
 
-        @php($sessions = $this->getSessions())
+        @php
+            $sessions = $this->getSessions();
+            $sessionsCount = count($sessions);
+        @endphp
 
         <div class="space-y-4">
             <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ __('app.label.browser_sessions_info') }}
             </p>
 
-            @if(count($sessions) > 0)
+            @if ($sessionsCount === 0)
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ __('app.label.no_other_sessions') }}
+                </p>
+            @else
                 <div class="space-y-4">
-                    @foreach($sessions as $session)
+                    @foreach ($sessions as $session)
                         @php
                             $platform = strtolower($session['platform']);
                             $isDesktop = str_contains($platform, 'windows')
@@ -47,6 +54,7 @@
                             $sessionIcon = $isDesktop
                                 ? 'heroicon-o-computer-desktop'
                                 : 'heroicon-o-device-phone-mobile';
+                            $isCurrent = $session['is_current_device'];
                         @endphp
 
                         <div class="flex items-center gap-4">
@@ -60,7 +68,8 @@
                             <div class="flex-1">
                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                     {{ $session['platform'] }} — {{ $session['browser'] }}
-                                    @if($session['is_current_device'])
+
+                                    @if ($isCurrent)
                                         <span class="ml-2 text-success-600 dark:text-success-400 font-semibold">
                                             {{ __('app.label.this_device') }}
                                         </span>
@@ -75,15 +84,11 @@
                     @endforeach
                 </div>
 
-                @if(count($sessions) > 1)
+                @if ($sessionsCount > 1)
                     <div class="mt-4 flex justify-end">
                         {{ $this->logoutOtherSessionsAction }}
                     </div>
                 @endif
-            @else
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ __('app.label.no_other_sessions') }}
-                </p>
             @endif
         </div>
     </x-filament::section>
