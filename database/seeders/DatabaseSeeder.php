@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             CurrencySeeder::class,
             OrderTypeSeeder::class,
             UserSeeder::class,
+            TestUsersSeeder::class,
         ]);
     }
 }

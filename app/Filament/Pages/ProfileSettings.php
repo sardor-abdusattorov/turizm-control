@@ -124,6 +124,7 @@ class ProfileSettings extends Page implements HasForms, HasActions
                             ->helperText(__('app.label.default_recipients_help'))
                             ->multiple()
                             ->options($this->getGroupedRecipientOptions())
+                            ->allowHtml()
                             ->searchable()
                             ->preload(),
                     ])
@@ -359,22 +360,42 @@ class ProfileSettings extends Page implements HasForms, HasActions
         ];
     }
 
+    /**
+     * Active users from approver departments only, grouped by department,
+     * with avatar markup so the Select can show photo + name.
+     *
+     * @return array<string, array<int, string>>
+     */
     protected function getGroupedRecipientOptions(): array
     {
         $users = User::query()
             ->where('status', 1)
             ->where('id', '!=', Auth::id())
-            ->with('department')
+            ->whereHas('department', fn ($q) => $q->approvers())
+            ->with(['department', 'position'])
             ->get();
 
         $grouped = [];
 
         foreach ($users as $user) {
             $departmentName = $user->department?->name ?? __('app.label.no_department');
-            if (!isset($grouped[$departmentName])) {
+
+            if (! isset($grouped[$departmentName])) {
                 $grouped[$departmentName] = [];
             }
-            $grouped[$departmentName][$user->id] = $user->name;
+
+            $avatarUrl = $user->getFilamentAvatarUrl()
+                ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF';
+
+            $positionName = $user->position?->name;
+            $positionSuffix = $positionName ? ' · '.e($positionName) : '';
+
+            $grouped[$departmentName][$user->id] = sprintf(
+                '<div class="flex items-center gap-2"><img src="%s" class="w-6 h-6 rounded-full object-cover" alt=""><span>%s%s</span></div>',
+                e($avatarUrl),
+                e($user->name),
+                $positionSuffix
+            );
         }
 
         return $grouped;

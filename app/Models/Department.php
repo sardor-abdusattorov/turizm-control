@@ -28,6 +28,13 @@ class Department extends Model
     const STATUS_ACTIVE = 1;
 
     /**
+     * Department codes that participate in the approval workflow.
+     *
+     * @var array<int, string>
+     */
+    public const APPROVER_CODES = ['legal', 'financial', 'accounting', 'direction'];
+
+    /**
      * Get available statuses
      */
     public static function getStatuses(): array
@@ -55,11 +62,11 @@ class Department extends Model
     }
 
     /**
-     * Check if this is an approver department (Legal, Financial, Accounting)
+     * Check if this is an approver department (Legal, Financial, Accounting, Direction)
      */
     public function isApproverDepartment(): bool
     {
-        return in_array($this->code, ['legal', 'financial', 'accounting']);
+        return in_array($this->code, self::APPROVER_CODES, true);
     }
 
     /**
@@ -67,7 +74,7 @@ class Department extends Model
      */
     public function scopeApprovers($query)
     {
-        return $query->whereIn('code', ['legal', 'financial', 'accounting']);
+        return $query->whereIn('code', self::APPROVER_CODES);
     }
 
     /**
