@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Filament\Resources\Clients;
+namespace App\Filament\Resources\Contacts;
 
-use App\Filament\Resources\Clients\Pages\CreateClient;
-use App\Filament\Resources\Clients\Pages\EditClient;
-use App\Filament\Resources\Clients\Pages\ListClients;
-use App\Filament\Resources\Clients\Pages\ViewClient;
-use App\Filament\Resources\Clients\Schemas\ClientForm;
-use App\Filament\Resources\Clients\Tables\ClientsTable;
-use App\Models\Client;
+use App\Filament\Resources\Contacts\Pages\CreateContact;
+use App\Filament\Resources\Contacts\Pages\EditContact;
+use App\Filament\Resources\Contacts\Pages\ListContacts;
+use App\Filament\Resources\Contacts\Pages\ViewContact;
+use App\Filament\Resources\Contacts\Schemas\ContactForm;
+use App\Filament\Resources\Contacts\Tables\ContactsTable;
+use App\Models\Contact;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class ClientResource extends Resource
+class ContactResource extends Resource
 {
-    protected static ?string $model = Client::class;
+    protected static ?string $model = Contact::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice;
 
@@ -28,12 +28,12 @@ class ClientResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('app.label.client_single');
+        return __('app.label.contact_single');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('app.label.client_plural');
+        return __('app.label.contact_plural');
     }
 
     public static function getNavigationSort(): int
@@ -50,12 +50,12 @@ class ClientResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return ClientForm::configure($schema);
+        return ContactForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return ClientsTable::configure($table);
+        return ContactsTable::configure($table);
     }
 
     public static function getRelations(): array
@@ -66,10 +66,10 @@ class ClientResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListClients::route('/'),
-            'create' => CreateClient::route('/create'),
-            'view' => ViewClient::route('/{record}'),
-            'edit' => EditClient::route('/{record}/edit'),
+            'index' => ListContacts::route('/'),
+            'create' => CreateContact::route('/create'),
+            'view' => ViewContact::route('/{record}'),
+            'edit' => EditContact::route('/{record}/edit'),
         ];
     }
 }

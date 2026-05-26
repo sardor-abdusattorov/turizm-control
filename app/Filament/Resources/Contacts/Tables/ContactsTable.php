@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Clients\Tables;
+namespace App\Filament\Resources\Contacts\Tables;
 
-use App\Models\Client;
+use App\Models\Contact;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -13,7 +13,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-class ClientsTable
+class ContactsTable
 {
     public static function configure(Table $table): Table
     {
@@ -21,19 +21,19 @@ class ClientsTable
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('type')
-                    ->label(__('app.label.client_type'))
+                    ->label(__('app.label.contact_type'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state) => Client::getTypes()[$state] ?? $state)
-                    ->color(fn (string $state) => Client::getTypeColors()[$state] ?? 'gray')
+                    ->formatStateUsing(fn (string $state) => Contact::getTypes()[$state] ?? $state)
+                    ->color(fn (string $state) => Contact::getTypeColors()[$state] ?? 'gray')
                     ->sortable(),
 
                 TextColumn::make('name')
-                    ->label(__('app.label.client_name'))
+                    ->label(__('app.label.contact_name'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('inn')
-                    ->label(__('app.label.inn'))
+                    ->label(__('app.label.tax_id'))
                     ->searchable()
                     ->toggleable(),
 
@@ -65,12 +65,12 @@ class ClientsTable
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->label(__('app.label.client_type'))
-                    ->options(Client::getTypes()),
+                    ->label(__('app.label.contact_type'))
+                    ->options(Contact::getTypes()),
 
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
-                    ->options(Client::getStatuses()),
+                    ->options(Contact::getStatuses()),
             ])
             ->recordActions([
                 ViewAction::make(),

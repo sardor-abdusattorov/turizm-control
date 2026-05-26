@@ -3,7 +3,8 @@
 namespace App\Filament\Resources\Contracts\Schemas;
 
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
-use App\Models\Client;
+use App\Filament\Resources\Contacts\Schemas\ContactForm;
+use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\Currency;
 use App\Models\OrderType;
@@ -33,12 +34,14 @@ class ContractForm
                                     ->searchable()
                                     ->preload(),
 
-                                Select::make('client_id')
-                                    ->label(__('app.label.client_single'))
-                                    ->options(Client::getActive())
+                                Select::make('contact_id')
+                                    ->label(__('app.label.contact_single'))
+                                    ->options(Contact::getActive())
                                     ->required()
                                     ->searchable()
-                                    ->preload(),
+                                    ->preload()
+                                    ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema))
+                                    ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey()),
                             ]),
 
                         TranslatableTabs::make()

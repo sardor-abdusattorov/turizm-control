@@ -15,7 +15,7 @@ class Contract extends Model
     protected $fillable = [
         'number',
         'order_type_id',
-        'client_id',
+        'contact_id',
         'currency_id',
         'responsible_id',
         'title',
@@ -96,9 +96,9 @@ class Contract extends Model
         return $this->belongsTo(OrderType::class);
     }
 
-    public function client(): BelongsTo
+    public function contact(): BelongsTo
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(Contact::class);
     }
 
     public function currency(): BelongsTo

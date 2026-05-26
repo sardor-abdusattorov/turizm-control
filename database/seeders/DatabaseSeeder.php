@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             CurrencySeeder::class,
             OrderTypeSeeder::class,
-            ClientSeeder::class,
+            ContactSeeder::class,
             UserSeeder::class,
             TestUsersSeeder::class,
             OrdersSeeder::class,

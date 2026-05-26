@@ -43,8 +43,8 @@ class ContractsTable
                     ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('client.name')
-                    ->label(__('app.label.client_single'))
+                TextColumn::make('contact.name')
+                    ->label(__('app.label.contact_single'))
                     ->searchable()
                     ->sortable(),
 
@@ -82,9 +82,9 @@ class ContractsTable
                     ->searchable()
                     ->preload(),
 
-                SelectFilter::make('client_id')
-                    ->label(__('app.label.client_single'))
-                    ->relationship('client', 'name')
+                SelectFilter::make('contact_id')
+                    ->label(__('app.label.contact_single'))
+                    ->relationship('contact', 'name')
                     ->searchable()
                     ->preload(),
 

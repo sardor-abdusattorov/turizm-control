@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('number', 50)->unique();
             $table->foreignId('order_type_id')->constrained()->restrictOnDelete();
-            $table->foreignId('client_id')->constrained()->restrictOnDelete();
+            $table->foreignId('contact_id')->constrained()->restrictOnDelete();
             $table->foreignId('currency_id')->constrained()->restrictOnDelete();
             $table->foreignId('responsible_id')->constrained('users')->cascadeOnDelete();
             $table->json('title');

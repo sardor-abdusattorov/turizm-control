@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
-class Client extends Model
+class Contact extends Model
 {
     use HasTranslations;
 
@@ -46,8 +46,8 @@ class Client extends Model
     public static function getTypes(): array
     {
         return [
-            self::TYPE_LEGAL => __('app.client.type.legal'),
-            self::TYPE_INDIVIDUAL => __('app.client.type.individual'),
+            self::TYPE_LEGAL => __('app.contact.type.legal'),
+            self::TYPE_INDIVIDUAL => __('app.contact.type.individual'),
         ];
     }
 
@@ -65,7 +65,7 @@ class Client extends Model
     }
 
     /**
-     * Active clients as id => localized name pairs (for Select::options).
+     * Active contacts as id => localized name pairs (for Select::options).
      *
      * @return array<int, string>
      */

@@ -2,16 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\Client;
+use App\Models\Contact;
 use Illuminate\Database\Seeder;
 
-class ClientSeeder extends Seeder
+class ContactSeeder extends Seeder
 {
     public function run(): void
     {
         $clients = [
             [
-                'type' => Client::TYPE_LEGAL,
+                'type' => Contact::TYPE_LEGAL,
                 'name' => [
                     'ru' => 'ООО «Олтин Водий»',
                     'uz' => "\"Oltin Vodiy\" MChJ",
@@ -28,7 +28,7 @@ class ClientSeeder extends Seeder
                 'contact_person' => 'Aziz Karimov',
             ],
             [
-                'type' => Client::TYPE_LEGAL,
+                'type' => Contact::TYPE_LEGAL,
                 'name' => [
                     'ru' => 'ЧП «Шёлковый путь»',
                     'uz' => "\"Ipak yo'li\" XK",
@@ -45,7 +45,7 @@ class ClientSeeder extends Seeder
                 'contact_person' => 'Bobur Yusupov',
             ],
             [
-                'type' => Client::TYPE_LEGAL,
+                'type' => Contact::TYPE_LEGAL,
                 'name' => [
                     'ru' => 'АО «Бухара Тур»',
                     'uz' => "\"Buxoro Tour\" AJ",
@@ -62,7 +62,7 @@ class ClientSeeder extends Seeder
                 'contact_person' => 'Sevara Rakhimova',
             ],
             [
-                'type' => Client::TYPE_INDIVIDUAL,
+                'type' => Contact::TYPE_INDIVIDUAL,
                 'name' => [
                     'ru' => 'Усманов Жасур Алишерович',
                     'uz' => 'Usmonov Jasur Alisherovich',
@@ -80,7 +80,7 @@ class ClientSeeder extends Seeder
         ];
 
         foreach ($clients as $data) {
-            Client::firstOrCreate(
+            Contact::firstOrCreate(
                 ['inn' => $data['inn']],
                 array_merge($data, ['status' => true])
             );

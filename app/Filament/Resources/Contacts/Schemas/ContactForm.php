@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Clients\Schemas;
+namespace App\Filament\Resources\Contacts\Schemas;
 
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
-use App\Models\Client;
+use App\Models\Contact;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -13,7 +13,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
-class ClientForm
+class ContactForm
 {
     public static function configure(Schema $schema): Schema
     {
@@ -23,9 +23,9 @@ class ClientForm
                 Section::make(__('app.label.basic_information'))
                     ->schema([
                         Radio::make('type')
-                            ->label(__('app.label.client_type'))
-                            ->options(Client::getTypes())
-                            ->default(Client::TYPE_LEGAL)
+                            ->label(__('app.label.contact_type'))
+                            ->options(Contact::getTypes())
+                            ->default(Contact::TYPE_LEGAL)
                             ->required()
                             ->inline()
                             ->live(),
@@ -33,9 +33,7 @@ class ClientForm
                         TranslatableTabs::make()
                             ->schema([
                                 TextInput::make('name')
-                                    ->label(fn (Get $get) => $get('type') === Client::TYPE_INDIVIDUAL
-                                        ? __('app.label.full_name')
-                                        : __('app.label.client_name'))
+                                    ->label(__('app.label.contact_name'))
                                     ->required()
                                     ->maxLength(255),
 
@@ -47,16 +45,15 @@ class ClientForm
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('inn')
-                                    ->label(fn (Get $get) => $get('type') === Client::TYPE_INDIVIDUAL
-                                        ? __('app.label.pinfl')
-                                        : __('app.label.inn'))
-                                    ->required(fn (Get $get) => $get('type') === Client::TYPE_LEGAL)
+                                    ->label(__('app.label.tax_id'))
+                                    ->helperText(__('app.label.tax_id_helper'))
+                                    ->required(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                                     ->unique(ignoreRecord: true)
                                     ->maxLength(30),
 
                                 TextInput::make('contact_person')
                                     ->label(__('app.label.contact_person'))
-                                    ->visible(fn (Get $get) => $get('type') === Client::TYPE_LEGAL)
+                                    ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                                     ->maxLength(255),
 
                                 TextInput::make('phone')

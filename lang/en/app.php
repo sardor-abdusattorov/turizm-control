@@ -50,12 +50,17 @@ return [
         'order_type_plural' => 'Order Types',
         'order_file' => 'Order File',
 
-        // Clients
-        'client_single' => 'Client',
-        'client_plural' => 'Clients',
-        'client_name' => 'Client Name',
-        'inn' => 'TIN',
+        // Contacts (counterparties — legal entities and individuals)
+        'contact_single' => 'Contact',
+        'contact_plural' => 'Contacts',
+        'contact_name' => 'Name',
+        'contact_type' => 'Type',
         'contact_person' => 'Contact Person',
+        'tax_id' => 'Tax ID',
+        'tax_id_helper' => 'TIN for legal entities, PINFL for individuals',
+        'inn' => 'TIN',
+        'pinfl' => 'PINFL',
+        'full_name' => 'Full Name',
         'phone' => 'Phone',
 
         // Contracts
@@ -150,6 +155,12 @@ return [
             'approved' => 'Approved',
             'rejected' => 'Rejected',
             'archived' => 'Archived',
+        ],
+    ],
+    'contact' => [
+        'type' => [
+            'legal' => 'Legal Entity',
+            'individual' => 'Individual',
         ],
     ],
 ];
