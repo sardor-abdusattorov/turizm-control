@@ -18,6 +18,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Support\Enums\Alignment;
 use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
@@ -83,17 +84,20 @@ class ProfileSettings extends Page implements HasForms, HasActions
                         ImageUpload::make('users', 'avatar_url')
                             ->label(__('app.label.profile_image')),
 
-                        TextInput::make('name')
-                            ->label(__('app.label.name'))
-                            ->required()
-                            ->maxLength(255),
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label(__('app.label.name'))
+                                    ->required()
+                                    ->maxLength(255),
 
-                        TextInput::make('email')
-                            ->label(__('app.label.email'))
-                            ->email()
-                            ->required()
-                            ->unique('users', 'email', ignorable: Auth::user())
-                            ->maxLength(255),
+                                TextInput::make('email')
+                                    ->label(__('app.label.email'))
+                                    ->email()
+                                    ->required()
+                                    ->unique('users', 'email', ignorable: Auth::user())
+                                    ->maxLength(255),
+                            ]),
 
                         TextInput::make('telegram_chat_id')
                             ->label(__('app.label.telegram_chat_id'))
@@ -122,7 +126,14 @@ class ProfileSettings extends Page implements HasForms, HasActions
                             ->options($this->getGroupedRecipientOptions())
                             ->searchable()
                             ->preload(),
-                    ]),
+                    ])
+                    ->footerActions([
+                        Action::make('save_profile')
+                            ->label(__('app.action.update'))
+                            ->color('primary')
+                            ->submit('updateProfile'),
+                    ])
+                    ->footerActionsAlignment(Alignment::End),
             ])
             ->statePath('profileData');
     }
@@ -157,7 +168,14 @@ class ProfileSettings extends Page implements HasForms, HasActions
                             ->same('password')
                             ->revealable()
                             ->autocomplete('new-password'),
-                    ]),
+                    ])
+                    ->footerActions([
+                        Action::make('save_password')
+                            ->label(__('app.action.update'))
+                            ->color('primary')
+                            ->submit('updatePassword'),
+                    ])
+                    ->footerActionsAlignment(Alignment::End),
             ])
             ->statePath('passwordData');
     }
