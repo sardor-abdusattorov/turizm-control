@@ -1,0 +1,189 @@
+<?php
+
+namespace App\Filament\Pages;
+
+use App\Models\Contract;
+use App\Models\ContractTemplate;
+use BackedEnum;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+
+class ContractEditor extends Page implements HasForms
+{
+    use InteractsWithForms;
+
+    protected string $view = 'filament.pages.contract-editor';
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+
+    protected static bool $shouldRegisterNavigation = false;
+
+    protected static ?string $slug = 'contracts/{record}/editor';
+
+    public Contract $record;
+
+    public ?ContractTemplate $template = null;
+
+    /**
+     * Form state, shape: { ru: {field_key: value}, uz: {...}, en: {...} }
+     *
+     * @var array<string, array<string, scalar|null>>
+     */
+    public array $formData = [];
+
+    public string $previewLocale = 'ru';
+
+    /**
+     * @var array<int, string>
+     */
+    protected array $supportedLocales = ['ru', 'uz', 'en'];
+
+    public function mount(string|int $record): void
+    {
+        $this->record = Contract::with(['orderType', 'contact', 'currency'])->findOrFail($record);
+
+        abort_unless($this->record->canBeEditedBy(), 403);
+
+        $this->template = ContractTemplate::defaultForOrderType($this->record->order_type_id);
+
+        $stored = $this->record->getTranslations('data') ?: [];
+
+        $initial = [];
+        foreach ($this->supportedLocales as $locale) {
+            $initial[$locale] = $stored[$locale] ?? [];
+        }
+
+        $this->formData = $initial;
+        $this->previewLocale = in_array(app()->getLocale(), $this->supportedLocales, true)
+            ? app()->getLocale()
+            : 'ru';
+
+        $this->form->fill($initial);
+    }
+
+    public function getTitle(): string
+    {
+        return __('app.label.contract_editor').': '.$this->record->number;
+    }
+
+    public function getSubheading(): ?string
+    {
+        return $this->record->getTranslation('title', app()->getLocale());
+    }
+
+    public function form(Schema $schema): Schema
+    {
+        if (! $this->template) {
+            return $schema->components([])->statePath('formData');
+        }
+
+        $fields = is_array($this->template->fields) ? $this->template->fields : [];
+
+        $tabs = [];
+
+        foreach ($this->supportedLocales as $locale) {
+            $localeFields = [];
+
+            foreach ($fields as $field) {
+                $name = $field['name'] ?? null;
+                $label = $field['label'] ?? $name;
+                $type = $field['type'] ?? 'text';
+                $required = (bool) ($field['required'] ?? false);
+
+                if (! $name) {
+                    continue;
+                }
+
+                $statePath = "{$locale}.{$name}";
+
+                $localeFields[] = match ($type) {
+                    'textarea' => Textarea::make($statePath)
+                        ->label($label)
+                        ->rows(3)
+                        ->required($required)
+                        ->live(debounce: 500),
+                    'number' => TextInput::make($statePath)
+                        ->label($label)
+                        ->numeric()
+                        ->required($required)
+                        ->live(debounce: 500),
+                    'date' => DatePicker::make($statePath)
+                        ->label($label)
+                        ->native(false)
+                        ->displayFormat('d.m.Y')
+                        ->required($required)
+                        ->live(),
+                    default => TextInput::make($statePath)
+                        ->label($label)
+                        ->required($required)
+                        ->live(debounce: 500),
+                };
+            }
+
+            $tabs[] = Tab::make(strtoupper($locale))->schema($localeFields);
+        }
+
+        return $schema
+            ->components([
+                Tabs::make()->tabs($tabs),
+            ])
+            ->statePath('formData');
+    }
+
+    public function save(): void
+    {
+        $state = $this->form->getState();
+
+        $clean = [];
+        foreach ($this->supportedLocales as $locale) {
+            $clean[$locale] = $state[$locale] ?? [];
+        }
+
+        $this->record->setTranslations('data', $clean);
+        $this->record->save();
+
+        Notification::make()
+            ->title(__('app.message.contract_data_saved'))
+            ->success()
+            ->send();
+    }
+
+    public function setPreviewLocale(string $locale): void
+    {
+        if (in_array($locale, $this->supportedLocales, true)) {
+            $this->previewLocale = $locale;
+        }
+    }
+
+    /**
+     * Render the template body with the current form values substituted
+     * into {{placeholder}} tokens, for the currently selected preview
+     * locale.
+     */
+    public function renderPreview(): string
+    {
+        if (! $this->template) {
+            return '<p class="text-gray-500 italic">'
+                .e(__('app.message.no_template_for_type'))
+                .'</p>';
+        }
+
+        $values = $this->formData[$this->previewLocale] ?? [];
+
+        return $this->template->render($values, $this->previewLocale);
+    }
+
+    public function getSupportedLocales(): array
+    {
+        return $this->supportedLocales;
+    }
+}

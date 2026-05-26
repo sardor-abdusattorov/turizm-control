@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Contracts\Tables;
 
+use App\Filament\Pages\ContractEditor;
 use App\Models\Contract;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -213,6 +214,12 @@ class ContractsTable
                                 ->success()
                                 ->send();
                         }),
+
+                    Action::make('editDocument')
+                        ->label(__('app.action.edit_document'))
+                        ->icon('heroicon-o-document-text')
+                        ->url(fn (Contract $record) => ContractEditor::getUrl(['record' => $record]))
+                        ->visible(fn (Contract $record) => $record->canBeEditedBy()),
 
                     ViewAction::make(),
 

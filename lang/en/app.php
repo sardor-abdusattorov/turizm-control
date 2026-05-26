@@ -73,6 +73,10 @@ return [
         'amount' => 'Amount',
         'responsible' => 'Responsible',
 
+        // Contract editor
+        'contract_editor' => 'Contract Editor',
+        'preview' => 'Preview',
+
         // Contract templates
         'contract_template_single' => 'Contract Template',
         'contract_template_plural' => 'Contract Templates',
@@ -166,6 +170,8 @@ return [
         'return_for_revision' => 'Return for revision',
         'archive' => 'Archive',
         'add_field' => 'Add field',
+        'edit_document' => 'Edit document',
+        'save' => 'Save',
     ],
     'message' => [
         'profile_updated' => 'Profile updated successfully',
@@ -180,6 +186,8 @@ return [
         'contract_returned' => 'Contract returned for revision',
         'contract_archived' => 'Contract archived',
         'approval_state_reset' => 'Editing reset the approval chain — please submit the contract for approval again',
+        'contract_data_saved' => 'Contract data saved',
+        'no_template_for_type' => 'No active template found for this contract type. Create one under Resources → Contract Templates.',
     ],
     'helper' => [
         'metrics_yandex' => 'Insert Yandex Metrica tracking code here',
