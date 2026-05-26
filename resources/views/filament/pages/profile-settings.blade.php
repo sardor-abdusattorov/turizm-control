@@ -39,17 +39,20 @@
             @if(count($sessions) > 0)
                 <div class="space-y-4">
                     @foreach($sessions as $session)
+                        @php
+                            $platform = strtolower($session['platform']);
+                            $isDesktop = str_contains($platform, 'windows')
+                                || str_contains($platform, 'mac')
+                                || str_contains($platform, 'linux');
+                            $sessionIcon = $isDesktop
+                                ? 'heroicon-o-computer-desktop'
+                                : 'heroicon-o-device-phone-mobile';
+                        @endphp
+
                         <div class="flex items-center gap-4">
                             <div class="flex-shrink-0">
-                                @php
-                                    $platform = strtolower($session['platform']);
-                                    $isDesktop = str_contains($platform, 'windows')
-                                        || str_contains($platform, 'mac')
-                                        || str_contains($platform, 'linux');
-                                @endphp
-
                                 <x-filament::icon
-                                    :icon="$isDesktop ? 'heroicon-o-computer-desktop' : 'heroicon-o-device-phone-mobile'"
+                                    :icon="$sessionIcon"
                                     class="h-8 w-8 text-gray-500 dark:text-gray-400"
                                 />
                             </div>
