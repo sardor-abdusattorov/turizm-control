@@ -59,7 +59,7 @@ class DepartmentSeeder extends Seeder
                     'en' => 'IT Department',
                 ],
                 'sort' => 5,
-                'positions' => ['Разработчик', 'Специалист'],
+                'positions' => ['Менеджер', 'Разработчик', 'Специалист'],
             ],
         ];
 

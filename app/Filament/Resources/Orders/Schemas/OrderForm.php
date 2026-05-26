@@ -34,7 +34,9 @@ class OrderForm
                                 DatePicker::make('deadline_at')
                                     ->label(__('app.label.deadline'))
                                     ->native(false)
-                                    ->displayFormat('d.m.Y'),
+                                    ->displayFormat('d.m.Y')
+                                    ->minDate(now()->startOfDay())
+                                    ->maxDate(now()->endOfYear()),
                             ]),
 
                         TextInput::make('title')
