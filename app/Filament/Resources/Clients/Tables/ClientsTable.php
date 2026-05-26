@@ -20,6 +20,13 @@ class ClientsTable
         return $table
             ->defaultSort('id', 'desc')
             ->columns([
+                TextColumn::make('type')
+                    ->label(__('app.label.client_type'))
+                    ->badge()
+                    ->formatStateUsing(fn (string $state) => Client::getTypes()[$state] ?? $state)
+                    ->color(fn (string $state) => Client::getTypeColors()[$state] ?? 'gray')
+                    ->sortable(),
+
                 TextColumn::make('name')
                     ->label(__('app.label.client_name'))
                     ->searchable()
@@ -57,6 +64,10 @@ class ClientsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('type')
+                    ->label(__('app.label.client_type'))
+                    ->options(Client::getTypes()),
+
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
                     ->options(Client::getStatuses()),

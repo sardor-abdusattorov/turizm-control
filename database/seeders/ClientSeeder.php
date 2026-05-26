@@ -11,6 +11,7 @@ class ClientSeeder extends Seeder
     {
         $clients = [
             [
+                'type' => Client::TYPE_LEGAL,
                 'name' => [
                     'ru' => 'ООО «Олтин Водий»',
                     'uz' => "\"Oltin Vodiy\" MChJ",
@@ -27,6 +28,7 @@ class ClientSeeder extends Seeder
                 'contact_person' => 'Aziz Karimov',
             ],
             [
+                'type' => Client::TYPE_LEGAL,
                 'name' => [
                     'ru' => 'ЧП «Шёлковый путь»',
                     'uz' => "\"Ipak yo'li\" XK",
@@ -43,6 +45,7 @@ class ClientSeeder extends Seeder
                 'contact_person' => 'Bobur Yusupov',
             ],
             [
+                'type' => Client::TYPE_LEGAL,
                 'name' => [
                     'ru' => 'АО «Бухара Тур»',
                     'uz' => "\"Buxoro Tour\" AJ",
@@ -57,6 +60,22 @@ class ClientSeeder extends Seeder
                 'phone' => '+998 65 400-00-03',
                 'email' => 'contact@bukharatour.uz',
                 'contact_person' => 'Sevara Rakhimova',
+            ],
+            [
+                'type' => Client::TYPE_INDIVIDUAL,
+                'name' => [
+                    'ru' => 'Усманов Жасур Алишерович',
+                    'uz' => 'Usmonov Jasur Alisherovich',
+                    'en' => 'Usmanov Jasur Alisherovich',
+                ],
+                'inn' => '30101200012345',
+                'address' => [
+                    'ru' => 'г. Ташкент, мкр. Юнусабад-9, 12-15',
+                    'uz' => "Toshkent sh., Yunusobod-9 mavzesi, 12-15",
+                    'en' => 'Tashkent, Yunusabad-9 district, 12-15',
+                ],
+                'phone' => '+998 90 100-20-30',
+                'email' => 'jasur.u@gmail.com',
             ],
         ];
 

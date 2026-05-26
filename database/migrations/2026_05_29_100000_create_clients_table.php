@@ -10,8 +10,9 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
+            $table->string('type', 20)->default('legal');
             $table->json('name');
-            $table->string('inn', 30)->nullable();
+            $table->string('inn', 30)->nullable()->unique();
             $table->json('address')->nullable();
             $table->string('phone', 50)->nullable();
             $table->string('email')->nullable();
@@ -20,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('status');
-            $table->index('inn');
+            $table->index('type');
         });
     }
 
