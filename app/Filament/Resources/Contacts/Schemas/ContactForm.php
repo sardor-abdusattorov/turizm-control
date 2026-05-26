@@ -51,11 +51,11 @@ class ContactForm
                                     ->unique('contacts', 'inn', ignoreRecord: true)
                                     ->maxLength(30),
 
-                                TextInput::make('inn')
+                                TextInput::make('pinfl')
                                     ->label(__('app.label.pinfl'))
                                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_INDIVIDUAL)
                                     ->required(fn (Get $get) => $get('type') === Contact::TYPE_INDIVIDUAL)
-                                    ->unique('contacts', 'inn', ignoreRecord: true)
+                                    ->unique('contacts', 'pinfl', ignoreRecord: true)
                                     ->maxLength(30),
 
                                 TextInput::make('contact_person')

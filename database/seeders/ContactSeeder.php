@@ -68,7 +68,7 @@ class ContactSeeder extends Seeder
                     'uz' => 'Usmonov Jasur Alisherovich',
                     'en' => 'Usmanov Jasur Alisherovich',
                 ],
-                'inn' => '30101200012345',
+                'pinfl' => '30101200012345',
                 'address' => [
                     'ru' => 'г. Ташкент, мкр. Юнусабад-9, 12-15',
                     'uz' => "Toshkent sh., Yunusobod-9 mavzesi, 12-15",
@@ -80,8 +80,12 @@ class ContactSeeder extends Seeder
         ];
 
         foreach ($clients as $data) {
+            $key = $data['type'] === Contact::TYPE_LEGAL
+                ? ['inn' => $data['inn'] ?? null]
+                : ['pinfl' => $data['pinfl'] ?? null];
+
             Contact::firstOrCreate(
-                ['inn' => $data['inn']],
+                $key,
                 array_merge($data, ['status' => true])
             );
         }

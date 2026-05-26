@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('type', 20)->default('legal');
             $table->json('name');
             $table->string('inn', 30)->nullable()->unique();
+            $table->string('pinfl', 30)->nullable()->unique();
             $table->json('address')->nullable();
             $table->string('phone', 50)->nullable();
             $table->string('email')->nullable();

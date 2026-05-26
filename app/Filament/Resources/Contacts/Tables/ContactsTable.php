@@ -33,9 +33,14 @@ class ContactsTable
                     ->sortable(),
 
                 TextColumn::make('inn')
-                    ->label(__('app.label.inn').' / '.__('app.label.pinfl'))
+                    ->label(__('app.label.inn'))
                     ->searchable()
                     ->toggleable(),
+
+                TextColumn::make('pinfl')
+                    ->label(__('app.label.pinfl'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('contact_person')
                     ->label(__('app.label.contact_person'))

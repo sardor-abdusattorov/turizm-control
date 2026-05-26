@@ -16,6 +16,7 @@ class Contact extends Model
         'type',
         'name',
         'inn',
+        'pinfl',
         'address',
         'phone',
         'email',
