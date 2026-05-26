@@ -3,6 +3,8 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Support\ImageUpload;
+use App\Models\Department;
+use App\Models\Position;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -101,13 +103,13 @@ class ProfileSettings extends Page implements HasForms, HasActions
                             ->schema([
                                 Select::make('department_id')
                                     ->label(__('app.label.department'))
-                                    ->relationship('department', 'name', fn ($query) => $query->where('status', 1))
+                                    ->options(Department::getActive())
                                     ->searchable()
                                     ->preload(),
 
                                 Select::make('position_id')
                                     ->label(__('app.label.position'))
-                                    ->relationship('position', 'name', fn ($query) => $query->where('status', 1))
+                                    ->options(Position::getActive())
                                     ->searchable()
                                     ->preload(),
                             ]),

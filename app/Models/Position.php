@@ -51,4 +51,21 @@ class Position extends Model
     {
         return $query->where('status', self::STATUS_ACTIVE);
     }
+
+    /**
+     * Active positions as id => localized name pairs (for Select::options).
+     *
+     * @return array<int, string>
+     */
+    public static function getActive(): array
+    {
+        return static::query()
+            ->active()
+            ->orderBy('sort')
+            ->get()
+            ->mapWithKeys(fn (self $item) => [
+                $item->id => $item->getTranslation('name', app()->getLocale()),
+            ])
+            ->toArray();
+    }
 }
