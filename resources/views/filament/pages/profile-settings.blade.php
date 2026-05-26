@@ -40,9 +40,9 @@
                         <div class="flex items-center gap-4">
                             <div class="flex-shrink-0">
                                 @if(str_contains(strtolower($session['platform']), 'windows') || str_contains(strtolower($session['platform']), 'mac') || str_contains(strtolower($session['platform']), 'linux'))
-                                    <x-heroicon-o-computer-desktop class="h-8 w-8 text-gray-500 dark:text-gray-400" />
+                                    @svg('heroicon-o-computer-desktop', 'h-8 w-8 text-gray-500 dark:text-gray-400')
                                 @else
-                                    <x-heroicon-o-device-phone-mobile class="h-8 w-8 text-gray-500 dark:text-gray-400" />
+                                    @svg('heroicon-o-device-phone-mobile', 'h-8 w-8 text-gray-500 dark:text-gray-400')
                                 @endif
                             </div>
 
