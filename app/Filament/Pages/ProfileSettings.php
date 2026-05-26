@@ -35,6 +35,7 @@ class ProfileSettings extends Page implements HasForms, HasActions
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserCircle;
     protected string $view = 'filament.pages.profile-settings';
     protected static bool $shouldRegisterNavigation = false;
+    protected static ?string $slug = 'profile';
 
     public ?array $profileData = [];
     public ?array $passwordData = [];
