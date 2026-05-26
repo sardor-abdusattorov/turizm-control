@@ -50,6 +50,21 @@ return [
         'order_type_plural' => 'Order Types',
         'order_file' => 'Order File',
 
+        // Clients
+        'client_single' => 'Client',
+        'client_plural' => 'Clients',
+        'client_name' => 'Client Name',
+        'inn' => 'TIN',
+        'contact_person' => 'Contact Person',
+        'phone' => 'Phone',
+
+        // Contracts
+        'contract_single' => 'Contract',
+        'contract_plural' => 'Contracts',
+        'contract_number' => 'Contract No.',
+        'amount' => 'Amount',
+        'responsible' => 'Responsible',
+
         'department' => 'Department',
         'department_single' => 'Department',
         'department_plural' => 'Departments',
@@ -127,5 +142,14 @@ return [
     'status' => [
         'active' => 'Active',
         'inactive' => 'Inactive',
+    ],
+    'contract' => [
+        'status' => [
+            'draft' => 'Draft',
+            'in_review' => 'In Review',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+            'archived' => 'Archived',
+        ],
     ],
 ];

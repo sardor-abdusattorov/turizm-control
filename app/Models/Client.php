@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Translatable\HasTranslations;
+
+class Client extends Model
+{
+    use HasTranslations;
+
+    public $translatable = ['name', 'address'];
+
+    protected $fillable = [
+        'name',
+        'inn',
+        'address',
+        'phone',
+        'email',
+        'contact_person',
+        'status',
+    ];
+
+    protected $casts = [
+        'status' => 'boolean',
+    ];
+
+    public const STATUS_INACTIVE = 0;
+
+    public const STATUS_ACTIVE = 1;
+
+    public static function getStatuses(): array
+    {
+        return [
+            self::STATUS_ACTIVE => __('app.status.active'),
+            self::STATUS_INACTIVE => __('app.status.inactive'),
+        ];
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', self::STATUS_ACTIVE);
+    }
+
+    /**
+     * Active clients as id => localized name pairs (for Select::options).
+     *
+     * @return array<int, string>
+     */
+    public static function getActive(): array
+    {
+        return static::query()
+            ->active()
+            ->orderBy('id')
+            ->get()
+            ->mapWithKeys(fn (self $item) => [
+                $item->id => $item->getTranslation('name', app()->getLocale()),
+            ])
+            ->toArray();
+    }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class);
+    }
+}
