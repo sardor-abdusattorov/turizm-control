@@ -76,6 +76,7 @@ return [
         // Contract editor
         'contract_editor' => 'Contract Editor',
         'preview' => 'Preview',
+        'approval_signatures' => 'Approval signatures',
 
         // Contract templates
         'contract_template_single' => 'Contract Template',
@@ -172,6 +173,7 @@ return [
         'add_field' => 'Add field',
         'edit_document' => 'Edit document',
         'save' => 'Save',
+        'download_pdf' => 'Download PDF',
     ],
     'message' => [
         'profile_updated' => 'Profile updated successfully',
@@ -220,6 +222,11 @@ return [
             'approved' => 'Approved',
             'rejected' => 'Rejected',
             'skipped' => 'Skipped',
+        ],
+        'signature' => [
+            'pending' => 'Pending',
+            'approved' => 'Approved by',
+            'rejected' => 'Rejected by',
         ],
     ],
     'contact' => [

@@ -2,10 +2,15 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Resources\Contracts\Tables\ContractsTable;
 use App\Models\Contract;
 use App\Models\ContractTemplate;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -16,9 +21,11 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ContractEditor extends Page implements HasForms
+class ContractEditor extends Page implements HasActions, HasForms
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     protected string $view = 'filament.pages.contract-editor';
@@ -78,6 +85,34 @@ class ContractEditor extends Page implements HasForms
     public function getSubheading(): ?string
     {
         return $this->record->getTranslation('title', app()->getLocale());
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('downloadPdf')
+                ->label(__('app.action.download_pdf'))
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('gray')
+                ->modalHeading(__('app.action.download_pdf'))
+                ->modalSubmitActionLabel(__('app.action.download_pdf'))
+                ->schema([
+                    Select::make('locale')
+                        ->label(__('app.label.language'))
+                        ->options([
+                            'ru' => __('app.label.ru'),
+                            'uz' => __('app.label.uz'),
+                            'en' => __('app.label.en'),
+                        ])
+                        ->default($this->previewLocale)
+                        ->required()
+                        ->native(false),
+                ])
+                ->action(fn (array $data): StreamedResponse => ContractsTable::streamContractPdf(
+                    $this->record,
+                    $data['locale'] ?? 'ru'
+                )),
+        ];
     }
 
     public function form(Schema $schema): Schema
@@ -177,7 +212,13 @@ class ContractEditor extends Page implements HasForms
                 .'</p>';
         }
 
-        $values = $this->formData[$this->previewLocale] ?? [];
+        // Merge live form values with the contract's system placeholders
+        // (number, amount, counterparty, dates) so the preview matches
+        // what the PDF will look like.
+        $values = $this->record->renderTemplateValues(
+            $this->previewLocale,
+            $this->formData[$this->previewLocale] ?? []
+        );
 
         return $this->template->render($values, $this->previewLocale);
     }

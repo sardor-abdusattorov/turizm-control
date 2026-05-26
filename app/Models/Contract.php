@@ -226,6 +226,58 @@ class Contract extends Model
     }
 
     /**
+     * Built-in placeholders that consumers (template render, PDF, etc.)
+     * can rely on existing for every contract — number, amount,
+     * counterparty fields, dates. Combined with the user-filled values
+     * stored in contracts.data.
+     *
+     * @return array<string, string>
+     */
+    public function systemPlaceholders(?string $locale = null): array
+    {
+        $locale ??= app()->getLocale();
+
+        return [
+            'contract_number' => (string) $this->number,
+            'amount' => number_format((float) $this->amount, 2, '.', ' '),
+            'currency_code' => (string) ($this->currency?->short_name ?? ''),
+            'currency_name' => (string) ($this->currency?->getTranslation('name', $locale) ?? ''),
+            'contact_name' => (string) ($this->contact?->getTranslation('name', $locale) ?? ''),
+            'contact_inn' => (string) ($this->contact?->inn ?? ''),
+            'contact_pinfl' => (string) ($this->contact?->pinfl ?? ''),
+            'contact_address' => (string) ($this->contact?->getTranslation('address', $locale) ?? ''),
+            'contact_phone' => (string) ($this->contact?->phone ?? ''),
+            'contact_email' => (string) ($this->contact?->email ?? ''),
+            'contact_person' => (string) ($this->contact?->contact_person ?? ''),
+            'deadline' => $this->deadline_at?->format('d.m.Y') ?? '',
+            'signed_at' => $this->signed_at?->format('d.m.Y') ?? '',
+            'created_at' => $this->created_at?->format('d.m.Y') ?? '',
+            'today' => now()->format('d.m.Y'),
+        ];
+    }
+
+    /**
+     * Values that will be substituted into the contract template — both
+     * the auto-populated system placeholders and whatever the manager
+     * has filled into contracts.data for this locale.
+     *
+     * @return array<string, scalar>
+     */
+    public function renderTemplateValues(?string $locale = null, array $overrideUserValues = []): array
+    {
+        $locale ??= app()->getLocale();
+
+        $userValues = ! empty($overrideUserValues)
+            ? $overrideUserValues
+            : ($this->getTranslation('data', $locale) ?: []);
+
+        return array_merge(
+            $this->systemPlaceholders($locale),
+            $userValues,
+        );
+    }
+
+    /**
      * Build the suggested approval chain for a manager: take their
      * defaultRecipients, group by department code, and emit them in the
      * order configured in settings.approval.flow. Used as the default

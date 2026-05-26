@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Contracts\Tables;
 
 use App\Filament\Pages\ContractEditor;
 use App\Models\Contract;
+use App\Models\ContractTemplate;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -11,6 +13,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
@@ -18,6 +21,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ContractsTable
 {
@@ -221,6 +225,27 @@ class ContractsTable
                         ->url(fn (Contract $record) => ContractEditor::getUrl(['record' => $record]))
                         ->visible(fn (Contract $record) => $record->canBeEditedBy()),
 
+                    Action::make('downloadPdf')
+                        ->label(__('app.action.download_pdf'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->modalHeading(__('app.action.download_pdf'))
+                        ->modalSubmitActionLabel(__('app.action.download_pdf'))
+                        ->schema([
+                            Select::make('locale')
+                                ->label(__('app.label.language'))
+                                ->options([
+                                    'ru' => __('app.label.ru'),
+                                    'uz' => __('app.label.uz'),
+                                    'en' => __('app.label.en'),
+                                ])
+                                ->default(app()->getLocale())
+                                ->required()
+                                ->native(false),
+                        ])
+                        ->action(function (array $data, Contract $record): StreamedResponse {
+                            return self::streamContractPdf($record, $data['locale'] ?? 'ru');
+                        }),
+
                     ViewAction::make(),
 
                     EditAction::make()
@@ -238,5 +263,31 @@ class ContractsTable
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function streamContractPdf(Contract $record, string $locale): StreamedResponse
+    {
+        $record->loadMissing(['orderType', 'contact', 'currency', 'approvers.user.department', 'approvers.user.position']);
+
+        $template = ContractTemplate::defaultForOrderType($record->order_type_id);
+
+        $bodyHtml = $template
+            ? $template->render($record->renderTemplateValues($locale), $locale)
+            : '';
+
+        $pdf = Pdf::loadView('pdf.contract', [
+            'contract' => $record,
+            'bodyHtml' => $bodyHtml,
+            'locale' => $locale,
+            'approvers' => $record->approvers,
+        ]);
+
+        $filename = "{$record->number}-{$locale}.pdf";
+
+        return response()->streamDownload(
+            fn () => print($pdf->output()),
+            $filename,
+            ['Content-Type' => 'application/pdf'],
+        );
     }
 }
