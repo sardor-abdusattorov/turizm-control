@@ -79,12 +79,27 @@ class ContractEditor extends Page implements HasActions, HasForms
 
     public function getTitle(): string
     {
+        // Shield's permission discovery instantiates this page without
+        // calling mount(), so $record may not be initialized yet.
+        if (! isset($this->record)) {
+            return __('app.label.contract_editor');
+        }
+
         return __('app.label.contract_editor').': '.$this->record->number;
     }
 
     public function getSubheading(): ?string
     {
+        if (! isset($this->record)) {
+            return null;
+        }
+
         return $this->record->getTranslation('title', app()->getLocale());
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('app.label.contract_editor');
     }
 
     protected function getHeaderActions(): array
