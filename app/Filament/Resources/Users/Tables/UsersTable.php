@@ -8,6 +8,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -21,11 +22,13 @@ class UsersTable
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('profile_image')
-                    ->label(__('app.label.profile_image'))
-                    ->collection('profile_image')
-                    ->circular()
-                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name='.urlencode($record->name).'&color=7F9CF5&background=EBF4FF'),
+                ImageColumn::make('image')
+                    ->label(__('app.label.image'))
+                    ->disk('public')
+                    ->square()
+                    ->imageHeight(75)
+                    ->disk('public')
+                    ->defaultImageUrl(asset('images/no_image.png')),
 
                 TextColumn::make('name')
                     ->label(__('app.label.name'))

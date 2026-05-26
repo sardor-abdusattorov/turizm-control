@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Filament\Support\ImageUpload;
 use App\Models\Department;
 use App\Models\Position;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -33,15 +33,8 @@ class UserForm
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
 
-                        SpatieMediaLibraryFileUpload::make('profile_image')
-                            ->label(__('app.label.profile_image'))
-                            ->collection('profile_image')
-                            ->disk('public')
-                            ->image()
-                            ->disk('public')
-                            ->imageEditor()
-                            ->circleCropper()
-                            ->maxSize(2048),
+                        ImageUpload::make('users')
+                            ->required(),
                     ])
                     ->columns(1),
 
