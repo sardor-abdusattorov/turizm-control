@@ -39,11 +39,17 @@
                     @foreach($this->getSessions() as $session)
                         <div class="flex items-center gap-4">
                             <div class="flex-shrink-0">
-                                @if(str_contains(strtolower($session['platform']), 'windows') || str_contains(strtolower($session['platform']), 'mac') || str_contains(strtolower($session['platform']), 'linux'))
-                                    @svg('heroicon-o-computer-desktop', 'h-8 w-8 text-gray-500 dark:text-gray-400')
-                                @else
-                                    @svg('heroicon-o-device-phone-mobile', 'h-8 w-8 text-gray-500 dark:text-gray-400')
-                                @endif
+                                @php
+                                    $platform = strtolower($session['platform']);
+                                    $isDesktop = str_contains($platform, 'windows')
+                                        || str_contains($platform, 'mac')
+                                        || str_contains($platform, 'linux');
+                                @endphp
+
+                                <x-filament::icon
+                                    :icon="$isDesktop ? 'heroicon-o-computer-desktop' : 'heroicon-o-device-phone-mobile'"
+                                    class="h-8 w-8 text-gray-500 dark:text-gray-400"
+                                />
                             </div>
 
                             <div class="flex-1">
