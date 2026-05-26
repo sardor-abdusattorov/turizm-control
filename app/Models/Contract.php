@@ -168,6 +168,63 @@ class Contract extends Model
         $this->update(['status' => self::STATUS_DRAFT]);
     }
 
+    public function canBeSubmittedBy(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        return $user
+            && $this->status === self::STATUS_DRAFT
+            && ($this->responsible_id === $user->id || $user->hasRole('super_admin'))
+            && $this->hasApprovers();
+    }
+
+    public function canBeApprovedBy(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        return $user
+            && $this->status === self::STATUS_IN_REVIEW
+            && $this->isCurrentApprover($user);
+    }
+
+    public function canBeEditedBy(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->hasRole('super_admin')) {
+            return $this->status !== self::STATUS_ARCHIVED;
+        }
+
+        return $this->responsible_id === $user->id
+            && in_array($this->status, [
+                self::STATUS_DRAFT,
+                self::STATUS_IN_REVIEW,
+                self::STATUS_REJECTED,
+            ], true);
+    }
+
+    public function canBeDeletedBy(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        return $user
+            && $this->status === self::STATUS_DRAFT
+            && ($this->responsible_id === $user->id || $user->hasRole('super_admin'));
+    }
+
+    public function canBeArchivedBy(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        return $user
+            && $this->status !== self::STATUS_ARCHIVED
+            && $user->hasRole('super_admin');
+    }
+
     /**
      * Build the suggested approval chain for a manager: take their
      * defaultRecipients, group by department code, and emit them in the
