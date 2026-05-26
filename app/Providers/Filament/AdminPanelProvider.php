@@ -6,14 +6,13 @@ use App\Filament\Pages\ProfileSettings;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
+use Filament\Actions\Action;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
-use Filament\Navigation\NavigationItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -48,7 +47,7 @@ class AdminPanelProvider extends PanelProvider
 
             ])
             ->userMenuItems([
-                'profile' => MenuItem::make()
+                'profile' => Action::make('profile')
                     ->label(fn () => __('app.label.profile_settings'))
                     ->url(fn (): string => ProfileSettings::getUrl())
                     ->icon('heroicon-o-user-circle'),

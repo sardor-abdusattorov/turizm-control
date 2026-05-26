@@ -3,8 +3,6 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Support\ImageUpload;
-use App\Models\Department;
-use App\Models\Position;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -20,7 +18,6 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -62,6 +59,8 @@ class ProfileSettings extends Page implements HasForms, HasActions
         $this->profileForm->fill([
             'name' => $user->name,
             'email' => $user->email,
+            'image' => $user->image,
+            'telegram_chat_id' => $user->telegram_chat_id,
             'department_id' => $user->department_id,
             'position_id' => $user->position_id,
             'default_recipients' => $user->getDefaultRecipientIds(),
@@ -78,9 +77,8 @@ class ProfileSettings extends Page implements HasForms, HasActions
                     ->description(__('app.label.personal_information_description'))
                     ->aside()
                     ->schema([
-                        ImageUpload::make('profile_image')
-                            ->label(__('app.label.profile_image'))
-                            ->required(),
+                        ImageUpload::make('users')
+                            ->label(__('app.label.profile_image')),
 
                         TextInput::make('name')
                             ->label(__('app.label.name'))
@@ -94,17 +92,22 @@ class ProfileSettings extends Page implements HasForms, HasActions
                             ->unique('users', 'email', ignorable: Auth::user())
                             ->maxLength(255),
 
+                        TextInput::make('telegram_chat_id')
+                            ->label(__('app.label.telegram_chat_id'))
+                            ->helperText(__('app.label.telegram_chat_id_help'))
+                            ->maxLength(255),
+
                         Grid::make(2)
                             ->schema([
                                 Select::make('department_id')
                                     ->label(__('app.label.department'))
-                                    ->options(Department::query()->where('status', 1)->pluck('name', 'id'))
+                                    ->relationship('department', 'name', fn ($query) => $query->where('status', 1))
                                     ->searchable()
                                     ->preload(),
 
                                 Select::make('position_id')
                                     ->label(__('app.label.position'))
-                                    ->options(Position::query()->where('status', 1)->pluck('name', 'id'))
+                                    ->relationship('position', 'name', fn ($query) => $query->where('status', 1))
                                     ->searchable()
                                     ->preload(),
                             ]),
@@ -173,11 +176,12 @@ class ProfileSettings extends Page implements HasForms, HasActions
             $user->update([
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'image' => $data['image'] ?? null,
+                'telegram_chat_id' => $data['telegram_chat_id'] ?? null,
                 'department_id' => $data['department_id'],
                 'position_id' => $data['position_id'],
             ]);
 
-            // Sync default recipients relationship
             $user->defaultRecipients()->sync($data['default_recipients'] ?? []);
 
             Notification::make()

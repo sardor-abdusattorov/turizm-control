@@ -3,8 +3,6 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use App\Filament\Support\ImageUpload;
-use App\Models\Department;
-use App\Models\Position;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -33,8 +31,11 @@ class UserForm
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
 
-                        ImageUpload::make('users')
-                            ->required(),
+                        TextInput::make('telegram_chat_id')
+                            ->label(__('app.label.telegram_chat_id'))
+                            ->maxLength(255),
+
+                        ImageUpload::make('users'),
                     ])
                     ->columns(1),
 
@@ -42,13 +43,13 @@ class UserForm
                     ->schema([
                         Select::make('department_id')
                             ->label(__('app.label.department'))
-                            ->options(Department::pluck('name', 'id'))
+                            ->relationship('department', 'name')
                             ->searchable()
                             ->preload(),
 
                         Select::make('position_id')
                             ->label(__('app.label.position'))
-                            ->options(Position::pluck('name', 'id'))
+                            ->relationship('position', 'name')
                             ->searchable()
                             ->preload(),
 

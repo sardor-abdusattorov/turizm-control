@@ -31,8 +31,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     protected $fillable = [
         'name',
+        'image',
         'email',
         'password',
+        'telegram_chat_id',
         'department_id',
         'position_id',
         'status',
@@ -43,12 +45,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         'remember_token',
     ];
 
-    protected $appends = ['profile_image'];
-
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'ui_settings' => 'array',
         'status' => 'boolean',
     ];
 
@@ -59,7 +58,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->avatar_url ? Storage::url($this->avatar_url) : null;
+        return $this->image ? Storage::url($this->image) : null;
     }
 
     public function department(): BelongsTo

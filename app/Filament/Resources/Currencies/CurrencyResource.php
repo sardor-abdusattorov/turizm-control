@@ -23,7 +23,7 @@ class CurrencyResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('app.label.reference_data');
+        return __('app.label.resources');
     }
 
     public static function getModelLabel(): string
