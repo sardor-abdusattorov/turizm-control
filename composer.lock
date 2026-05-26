@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "377aab8b53a69f7079dbc3704a7877b9",
+    "content-hash": "dbe41aa158759c10f57a168b69a546d0",
     "packages": [
         {
             "name": "abdulmajeed-jamaan/filament-translatable-tabs",
@@ -3572,6 +3572,71 @@
                 }
             ],
             "time": "2026-03-08T20:05:35+00:00"
+        },
+        {
+            "name": "leek/filament-header-filters",
+            "version": "v2.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/leek/filament-header-filters.git",
+                "reference": "97f9cbfa25a530f1da3ed1885afbdcfe2ab2e3ef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/leek/filament-header-filters/zipball/97f9cbfa25a530f1da3ed1885afbdcfe2ab2e3ef",
+                "reference": "97f9cbfa25a530f1da3ed1885afbdcfe2ab2e3ef",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0 || ^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0 || ^10.0 || ^11.0",
+                "pestphp/pest": "^3.0 || ^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0 || ^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Leek\\FilamentHeaderFilters\\FilamentHeaderFiltersServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Leek\\FilamentHeaderFilters\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Jones",
+                    "email": "leeked@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Inline header filter components for Filament tables — attach any BaseFilter to a column header.",
+            "keywords": [
+                "filament",
+                "filamentphp",
+                "filters",
+                "header-filters",
+                "laravel",
+                "leek",
+                "tables"
+            ],
+            "support": {
+                "issues": "https://github.com/leek/filament-header-filters/issues",
+                "source": "https://github.com/leek/filament-header-filters"
+            },
+            "time": "2026-05-04T15:22:14+00:00"
         },
         {
             "name": "livewire/livewire",
