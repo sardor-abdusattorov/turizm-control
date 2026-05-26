@@ -93,6 +93,8 @@ return [
     ],
     'action' => [
         'update' => 'Update',
+        'confirm' => 'Confirm',
+        'cancel' => 'Cancel',
         'logout_other_sessions' => 'Log Out Other Browser Sessions',
     ],
     'message' => [

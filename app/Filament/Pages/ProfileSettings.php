@@ -223,20 +223,32 @@ class ProfileSettings extends Page implements HasForms, HasActions
         return Action::make('logoutOtherSessions')
             ->label(__('app.action.logout_other_sessions'))
             ->color('danger')
+            ->icon('heroicon-o-arrow-right-on-rectangle')
             ->requiresConfirmation()
             ->modalHeading(__('app.action.logout_other_sessions'))
             ->modalDescription(__('app.message.confirm_logout_other_sessions'))
-            ->modalSubmitActionLabel(__('app.action.logout_other_sessions'))
-            ->action(function () {
+            ->modalSubmitActionLabel(__('app.action.confirm'))
+            ->schema([
+                TextInput::make('password')
+                    ->label(__('app.label.password'))
+                    ->password()
+                    ->required()
+                    ->currentPassword()
+                    ->revealable(),
+            ])
+            ->action(function (array $data) {
                 if (config('session.driver') !== 'database') {
                     Notification::make()
                         ->title(__('app.message.session_driver_not_supported'))
                         ->danger()
                         ->send();
+
                     return;
                 }
 
-                DB::table('sessions')
+                Auth::guard('web')->logoutOtherDevices($data['password']);
+
+                DB::table(config('session.table', 'sessions'))
                     ->where('user_id', Auth::id())
                     ->where('id', '!=', Session::getId())
                     ->delete();
@@ -248,22 +260,25 @@ class ProfileSettings extends Page implements HasForms, HasActions
             });
     }
 
+    /**
+     * @return array<int, array{id: string, ip_address: ?string, browser: string, platform: string, is_current_device: bool, last_active: string}>
+     */
     public function getSessions(): array
     {
         if (config('session.driver') !== 'database') {
             return [];
         }
 
-        return DB::table('sessions')
+        return DB::table(config('session.table', 'sessions'))
             ->where('user_id', Auth::id())
             ->orderByDesc('last_activity')
             ->get()
             ->map(function ($session) {
                 $agent = $this->parseUserAgent($session->user_agent);
+
                 return [
                     'id' => $session->id,
                     'ip_address' => $session->ip_address,
-                    'user_agent' => $session->user_agent,
                     'browser' => $agent['browser'],
                     'platform' => $agent['platform'],
                     'is_current_device' => $session->id === Session::getId(),

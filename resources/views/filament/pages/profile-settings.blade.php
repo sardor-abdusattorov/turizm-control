@@ -29,14 +29,16 @@
             {{ __('app.label.browser_sessions_description') }}
         </x-slot>
 
+        @php($sessions = $this->getSessions())
+
         <div class="space-y-4">
             <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ __('app.label.browser_sessions_info') }}
             </p>
 
-            @if(count($this->getSessions()) > 0)
+            @if(count($sessions) > 0)
                 <div class="space-y-4">
-                    @foreach($this->getSessions() as $session)
+                    @foreach($sessions as $session)
                         <div class="flex items-center gap-4">
                             <div class="flex-shrink-0">
                                 @php
@@ -54,26 +56,27 @@
 
                             <div class="flex-1">
                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $session['platform'] }} - {{ $session['browser'] }}
-                                </div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">
-                                    {{ $session['ip_address'] }}
+                                    {{ $session['platform'] }} — {{ $session['browser'] }}
                                     @if($session['is_current_device'])
-                                        <span class="text-success-600 dark:text-success-400 font-semibold">
+                                        <span class="ml-2 text-success-600 dark:text-success-400 font-semibold">
                                             {{ __('app.label.this_device') }}
                                         </span>
-                                    @else
-                                        <span>{{ __('app.label.last_active') }}: {{ $session['last_active'] }}</span>
                                     @endif
+                                </div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ $session['ip_address'] }} ·
+                                    {{ __('app.label.last_active') }}: {{ $session['last_active'] }}
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
 
-                <div class="mt-4 flex justify-end">
-                    {{ $this->logoutOtherSessionsAction }}
-                </div>
+                @if(count($sessions) > 1)
+                    <div class="mt-4 flex justify-end">
+                        {{ $this->logoutOtherSessionsAction }}
+                    </div>
+                @endif
             @else
                 <p class="text-sm text-gray-500 dark:text-gray-400">
                     {{ __('app.label.no_other_sessions') }}
