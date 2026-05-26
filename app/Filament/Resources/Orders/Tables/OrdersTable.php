@@ -3,13 +3,16 @@
 namespace App\Filament\Resources\Orders\Tables;
 
 use App\Models\Order;
+use App\Models\OrderType;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -21,6 +24,7 @@ class OrdersTable
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            ->filtersLayout(FiltersLayout::Hidden)
             ->columns([
                 TextColumn::make('title')
                     ->label(__('app.label.title'))
@@ -31,8 +35,18 @@ class OrdersTable
                 TextColumn::make('orderType.title')
                     ->label(__('app.label.order_type_single'))
                     ->badge()
-                    ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->headerFilter(
+                        SelectFilter::make('order_type_id')
+                            ->options(fn () => OrderType::query()
+                                ->orderBy('sort')
+                                ->get()
+                                ->mapWithKeys(fn (OrderType $t) => [
+                                    $t->id => $t->getTranslation('title', app()->getLocale()),
+                                ])
+                                ->toArray())
+                            ->native(false)
+                    ),
 
                 TextColumn::make('deadline_at')
                     ->label(__('app.label.deadline'))
@@ -42,7 +56,22 @@ class OrdersTable
                         $record?->deadline_at?->isPast() => 'danger',
                         $record?->deadline_at?->diffInDays(now(), false) >= -3 => 'warning',
                         default => null,
-                    }),
+                    })
+                    ->headerFilter(
+                        Filter::make('deadline_at_range')
+                            ->columns(2)
+                            ->schema([
+                                DatePicker::make('from')
+                                    ->placeholder(__('app.label.from'))
+                                    ->native(false),
+                                DatePicker::make('until')
+                                    ->placeholder(__('app.label.until'))
+                                    ->native(false),
+                            ])
+                            ->query(fn (Builder $query, array $data): Builder => $query
+                                ->when($data['from'] ?? null, fn (Builder $q, $v) => $q->whereDate('deadline_at', '>=', $v))
+                                ->when($data['until'] ?? null, fn (Builder $q, $v) => $q->whereDate('deadline_at', '<=', $v)))
+                    ),
 
                 TextColumn::make('creator.name')
                     ->label(__('app.label.created_by'))
@@ -55,28 +84,18 @@ class OrdersTable
                     ->onIcon('heroicon-m-check-circle')
                     ->offIcon('heroicon-m-x-circle')
                     ->onColor('success')
-                    ->offColor('danger'),
+                    ->offColor('danger')
+                    ->headerFilter(
+                        SelectFilter::make('status')
+                            ->options(Order::getStatuses())
+                            ->native(false)
+                    ),
 
                 TextColumn::make('created_at')
                     ->label(__('app.label.created_at'))
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                SelectFilter::make('order_type_id')
-                    ->label(__('app.label.order_type_single'))
-                    ->relationship('orderType', 'title')
-                    ->searchable()
-                    ->preload(),
-
-                SelectFilter::make('status')
-                    ->label(__('app.label.status'))
-                    ->options(Order::getStatuses()),
-
-                Filter::make('overdue')
-                    ->label(__('app.label.overdue'))
-                    ->query(fn (Builder $query) => $query->whereDate('deadline_at', '<', now())),
             ])
             ->recordActions([
                 ViewAction::make(),

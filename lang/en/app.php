@@ -40,6 +40,8 @@ return [
         'created_by' => 'Created by',
         'deadline' => 'Deadline',
         'overdue' => 'Overdue',
+        'from' => 'From',
+        'until' => 'Until',
 
         // Orders
         'order_single' => 'Order',
