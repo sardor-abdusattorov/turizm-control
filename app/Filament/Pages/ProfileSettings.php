@@ -287,8 +287,13 @@ class ProfileSettings extends Page implements HasForms, HasActions
             return [];
         }
 
+        $activityThreshold = now()
+            ->subMinutes((int) config('session.lifetime', 120))
+            ->getTimestamp();
+
         return DB::table(config('session.table', 'sessions'))
             ->where('user_id', Auth::id())
+            ->where('last_activity', '>=', $activityThreshold)
             ->orderByDesc('last_activity')
             ->get()
             ->map(function ($session) {
