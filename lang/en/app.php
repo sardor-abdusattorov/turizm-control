@@ -56,11 +56,8 @@ return [
         'contact_name' => 'Name',
         'contact_type' => 'Type',
         'contact_person' => 'Contact Person',
-        'tax_id' => 'Tax ID',
-        'tax_id_helper' => 'TIN for legal entities, PINFL for individuals',
-        'inn' => 'TIN',
+        'inn' => 'INN',
         'pinfl' => 'PINFL',
-        'full_name' => 'Full Name',
         'phone' => 'Phone',
 
         // Contracts

@@ -45,10 +45,17 @@ class ContactForm
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('inn')
-                                    ->label(__('app.label.tax_id'))
-                                    ->helperText(__('app.label.tax_id_helper'))
+                                    ->label(__('app.label.inn'))
+                                    ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                                     ->required(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
-                                    ->unique(ignoreRecord: true)
+                                    ->unique('contacts', 'inn', ignoreRecord: true)
+                                    ->maxLength(30),
+
+                                TextInput::make('inn')
+                                    ->label(__('app.label.pinfl'))
+                                    ->visible(fn (Get $get) => $get('type') === Contact::TYPE_INDIVIDUAL)
+                                    ->required(fn (Get $get) => $get('type') === Contact::TYPE_INDIVIDUAL)
+                                    ->unique('contacts', 'inn', ignoreRecord: true)
                                     ->maxLength(30),
 
                                 TextInput::make('contact_person')

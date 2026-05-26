@@ -33,7 +33,7 @@ class ContactsTable
                     ->sortable(),
 
                 TextColumn::make('inn')
-                    ->label(__('app.label.tax_id'))
+                    ->label(__('app.label.inn').' / '.__('app.label.pinfl'))
                     ->searchable()
                     ->toggleable(),
 
