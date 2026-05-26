@@ -3,9 +3,12 @@
 namespace App\Filament\Pages;
 
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
+use App\Models\Department;
 use App\Models\Settings as SettingsModel;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -55,7 +58,46 @@ class Settings extends Page implements HasForms
 
     public function mount(): void
     {
-        $this->form->fill($this->getSettingsData());
+        $data = $this->getSettingsData();
+
+        // Repeater expects an array of associative items, while the
+        // setting itself is stored as a flat list of department codes.
+        $flow = $data['approval']['flow'] ?? [];
+        $data['approval']['flow'] = array_map(
+            fn (string $code) => ['code' => $code],
+            is_array($flow) ? array_values($flow) : []
+        );
+
+        $this->form->fill($data);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function getApproverDepartmentOptions(): array
+    {
+        $names = Department::query()
+            ->whereIn('code', Department::APPROVER_CODES)
+            ->get()
+            ->mapWithKeys(fn (Department $d) => [
+                $d->code => $d->getTranslation('name', app()->getLocale()),
+            ])
+            ->toArray();
+
+        $fallbackLabels = [
+            'legal' => __('app.label.department_legal'),
+            'financial' => __('app.label.department_financial'),
+            'accounting' => __('app.label.department_accounting'),
+            'direction' => __('app.label.department_direction'),
+        ];
+
+        $options = [];
+
+        foreach (Department::APPROVER_CODES as $code) {
+            $options[$code] = $names[$code] ?? $fallbackLabels[$code] ?? $code;
+        }
+
+        return $options;
     }
 
     protected function getForms(): array
@@ -131,6 +173,27 @@ class Settings extends Page implements HasForms
                                     ->rows(6)
                                     ->helperText(__('app.helper.metrics_google')),
                             ]),
+
+                        Tabs\Tab::make(__('app.label.tab_approval_flow'))
+                            ->schema([
+                                Repeater::make('approval.flow')
+                                    ->label(__('app.label.approval_flow'))
+                                    ->helperText(__('app.helper.approval_flow'))
+                                    ->reorderableWithDragAndDrop()
+                                    ->reorderable()
+                                    ->addActionLabel(__('app.action.add_department'))
+                                    ->schema([
+                                        Select::make('code')
+                                            ->label(__('app.label.department_single'))
+                                            ->options(fn () => $this->getApproverDepartmentOptions())
+                                            ->required()
+                                            ->native(false),
+                                    ])
+                                    ->itemLabel(
+                                        fn (array $state): ?string => $this->getApproverDepartmentOptions()[$state['code'] ?? ''] ?? null
+                                    )
+                                    ->collapsible(),
+                            ]),
                     ]),
             ])
             ->statePath('data');
@@ -149,7 +212,17 @@ class Settings extends Page implements HasForms
     {
         $data = $this->form->getState();
 
+        // Repeater state is [['code' => 'legal'], ['code' => 'financial']];
+        // collapse it back to a flat list of unique codes for storage.
+        if (isset($data['approval']['flow']) && is_array($data['approval']['flow'])) {
+            $data['approval']['flow'] = array_values(array_unique(array_filter(
+                array_map(fn (array $item) => $item['code'] ?? null, $data['approval']['flow'])
+            )));
+        }
+
         $this->saveSettings($data);
+
+        clear_settings_cache();
 
         Notification::make()
             ->title(__('filament-panels::resources/pages/edit-record.notifications.saved.title'))

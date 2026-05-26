@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
 class Contract extends Model
@@ -109,5 +110,61 @@ class Contract extends Model
     public function responsible(): BelongsTo
     {
         return $this->belongsTo(User::class, 'responsible_id');
+    }
+
+    public function approvers(): HasMany
+    {
+        return $this->hasMany(ContractApprover::class)->orderBy('order');
+    }
+
+    /**
+     * Get the approver row that is currently waiting on a decision
+     * (the first one with status = pending in chain order).
+     */
+    public function currentApprover(): ?ContractApprover
+    {
+        return $this->approvers()
+            ->where('status', ContractApprover::STATUS_PENDING)
+            ->orderBy('order')
+            ->first();
+    }
+
+    public function isCurrentApprover(User $user): bool
+    {
+        $current = $this->currentApprover();
+
+        return $current !== null && $current->user_id === $user->id;
+    }
+
+    public function hasApprovers(): bool
+    {
+        return $this->approvers()->exists();
+    }
+
+    public function allApproved(): bool
+    {
+        return $this->hasApprovers()
+            && $this->approvers()->where('status', '!=', ContractApprover::STATUS_APPROVED)->doesntExist();
+    }
+
+    public function wasRejected(): bool
+    {
+        return $this->approvers()->where('status', ContractApprover::STATUS_REJECTED)->exists();
+    }
+
+    /**
+     * Reset all approver decisions back to pending and revert contract
+     * to draft. Called when a manager edits a contract that was already
+     * sent for review.
+     */
+    public function resetApprovalState(): void
+    {
+        $this->approvers()->update([
+            'status' => ContractApprover::STATUS_PENDING,
+            'comment' => null,
+            'acted_at' => null,
+        ]);
+
+        $this->update(['status' => self::STATUS_DRAFT]);
     }
 }

@@ -109,4 +109,25 @@ class Department extends Model
             ])
             ->toArray();
     }
+
+    /**
+     * Canonical approval flow order: takes the admin-configured order
+     * from settings.approval.flow and falls back to APPROVER_CODES when
+     * none is set or the saved one is empty.
+     *
+     * @return array<int, string>
+     */
+    public static function approvalFlow(): array
+    {
+        $flow = settings('approval.flow');
+
+        if (! is_array($flow) || empty($flow)) {
+            return self::APPROVER_CODES;
+        }
+
+        return array_values(array_intersect(
+            array_filter($flow, 'is_string'),
+            self::APPROVER_CODES
+        ));
+    }
 }

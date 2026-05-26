@@ -30,6 +30,12 @@ return [
         'updated_at' => 'Updated at',
         'tab_seo' => 'SEO',
         'tab_metrics' => 'Metrics',
+        'tab_approval_flow' => 'Approval Flow',
+        'approval_flow' => 'Approval Flow',
+        'department_legal' => 'Legal Department',
+        'department_financial' => 'Financial Department',
+        'department_accounting' => 'Accounting',
+        'department_direction' => 'Direction',
         'seo_title' => 'SEO Title',
         'seo_description' => 'SEO Description',
         'seo_keywords' => 'SEO Keywords',
@@ -127,6 +133,7 @@ return [
         'confirm' => 'Confirm',
         'cancel' => 'Cancel',
         'logout_other_sessions' => 'Log Out Other Browser Sessions',
+        'add_department' => 'Add department',
     ],
     'message' => [
         'profile_updated' => 'Profile updated successfully',
@@ -140,6 +147,7 @@ return [
         'metrics_google' => 'Insert Google Analytics tracking code here',
         'seo_og_image' => 'Recommended size: 1200x630px. PNG or JPEG format.',
         'seo_indexing_enabled' => 'If disabled, meta robots noindex, nofollow will be added',
+        'approval_flow' => 'Order of departments that contracts pass through during approval. Drag rows to reorder.',
     ],
     'status' => [
         'active' => 'Active',
@@ -152,6 +160,14 @@ return [
             'approved' => 'Approved',
             'rejected' => 'Rejected',
             'archived' => 'Archived',
+        ],
+    ],
+    'contract_approver' => [
+        'status' => [
+            'pending' => 'Pending',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+            'skipped' => 'Skipped',
         ],
     ],
     'contact' => [
