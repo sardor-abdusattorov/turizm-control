@@ -3,11 +3,14 @@
 namespace App\Filament\Resources\Clients\Schemas;
 
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
+use App\Models\Client;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class ClientForm
@@ -19,10 +22,20 @@ class ClientForm
             ->components([
                 Section::make(__('app.label.basic_information'))
                     ->schema([
+                        Radio::make('type')
+                            ->label(__('app.label.client_type'))
+                            ->options(Client::getTypes())
+                            ->default(Client::TYPE_LEGAL)
+                            ->required()
+                            ->inline()
+                            ->live(),
+
                         TranslatableTabs::make()
                             ->schema([
                                 TextInput::make('name')
-                                    ->label(__('app.label.client_name'))
+                                    ->label(fn (Get $get) => $get('type') === Client::TYPE_INDIVIDUAL
+                                        ? __('app.label.full_name')
+                                        : __('app.label.client_name'))
                                     ->required()
                                     ->maxLength(255),
 
@@ -34,11 +47,16 @@ class ClientForm
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('inn')
-                                    ->label(__('app.label.inn'))
+                                    ->label(fn (Get $get) => $get('type') === Client::TYPE_INDIVIDUAL
+                                        ? __('app.label.pinfl')
+                                        : __('app.label.inn'))
+                                    ->required(fn (Get $get) => $get('type') === Client::TYPE_LEGAL)
+                                    ->unique(ignoreRecord: true)
                                     ->maxLength(30),
 
                                 TextInput::make('contact_person')
                                     ->label(__('app.label.contact_person'))
+                                    ->visible(fn (Get $get) => $get('type') === Client::TYPE_LEGAL)
                                     ->maxLength(255),
 
                                 TextInput::make('phone')

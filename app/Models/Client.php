@@ -13,6 +13,7 @@ class Client extends Model
     public $translatable = ['name', 'address'];
 
     protected $fillable = [
+        'type',
         'name',
         'inn',
         'address',
@@ -30,11 +31,31 @@ class Client extends Model
 
     public const STATUS_ACTIVE = 1;
 
+    public const TYPE_LEGAL = 'legal';
+
+    public const TYPE_INDIVIDUAL = 'individual';
+
     public static function getStatuses(): array
     {
         return [
             self::STATUS_ACTIVE => __('app.status.active'),
             self::STATUS_INACTIVE => __('app.status.inactive'),
+        ];
+    }
+
+    public static function getTypes(): array
+    {
+        return [
+            self::TYPE_LEGAL => __('app.client.type.legal'),
+            self::TYPE_INDIVIDUAL => __('app.client.type.individual'),
+        ];
+    }
+
+    public static function getTypeColors(): array
+    {
+        return [
+            self::TYPE_LEGAL => 'info',
+            self::TYPE_INDIVIDUAL => 'warning',
         ];
     }
 
