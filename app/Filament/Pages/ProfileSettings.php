@@ -271,6 +271,15 @@ class ProfileSettings extends Page implements HasForms, HasActions
                     ->where('id', '!=', Session::getId())
                     ->delete();
 
+                // logoutOtherDevices() re-hashes the user's password but does NOT
+                // sync the new hash into the current session. AuthenticateSession
+                // middleware would then see a mismatch and kick us out on the next
+                // request, same as the other sessions. Mirror Jetstream and store
+                // the new hash so the current device stays logged in.
+                request()->session()->put([
+                    'password_hash_'.Auth::getDefaultDriver() => Auth::user()->getAuthPassword(),
+                ]);
+
                 Notification::make()
                     ->title(__('app.message.other_sessions_logged_out'))
                     ->success()
