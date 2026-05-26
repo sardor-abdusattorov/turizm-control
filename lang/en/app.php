@@ -36,6 +36,18 @@ return [
         'seo_og_image' => 'OG Image',
         'metrics_yandex' => 'Yandex Metrika',
         'metrics_google' => 'Google Analytics',
+        'documents' => 'Documents',
+        'created_by' => 'Created by',
+        'deadline' => 'Deadline',
+        'overdue' => 'Overdue',
+
+        // Orders
+        'order_single' => 'Order',
+        'order_plural' => 'Orders',
+        'order_type_single' => 'Order Type',
+        'order_type_plural' => 'Order Types',
+        'order_file' => 'Order File',
+
         'department' => 'Department',
         'department_single' => 'Department',
         'department_plural' => 'Departments',
