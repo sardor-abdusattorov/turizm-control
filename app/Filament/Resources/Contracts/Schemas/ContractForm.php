@@ -6,6 +6,7 @@ use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
 use App\Filament\Resources\Contacts\Schemas\ContactForm;
 use App\Models\Contact;
 use App\Models\Contract;
+use App\Models\ContractTemplate;
 use App\Models\Currency;
 use App\Models\OrderType;
 use App\Models\User;
@@ -16,6 +17,9 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\View as SchemaView;
 use Filament\Schemas\Schema;
 
 class ContractForm
@@ -46,7 +50,8 @@ class ContractForm
                         ->options(OrderType::getActive())
                         ->required()
                         ->searchable()
-                        ->preload(),
+                        ->preload()
+                        ->live(),
 
                     Select::make('contact_id')
                         ->label(__('app.label.contact_single'))
@@ -96,7 +101,8 @@ class ContractForm
     }
 
     /**
-     * Approval chain — used only by the create wizard's second step.
+     * Approval chain — used by the wizard's Step 1 (collapsible section)
+     * and anywhere else where the chain needs to be edited inline.
      * Pre-fills with the manager's defaultRecipients ordered by the
      * admin-configured approval flow.
      *
@@ -128,6 +134,109 @@ class ContractForm
                 ->minItems(1)
                 ->default(fn () => Contract::suggestApproverChain())
                 ->collapsible(),
+        ];
+    }
+
+    /**
+     * Step 2 of the create wizard: split-screen contract editor. Left
+     * column has language-tabbed inputs built from the template's
+     * fields schema. Right column has the live preview (reads form
+     * state and renders the template body with placeholders filled).
+     *
+     * Dynamic because it depends on the order_type chosen in Step 1.
+     *
+     * @return array<int, \Filament\Schemas\Components\Component>
+     */
+    public static function editorSchemaFor(?int $orderTypeId): array
+    {
+        if (! $orderTypeId) {
+            return [
+                Section::make()
+                    ->schema([
+                        SchemaView::make('filament.components.contract-editor-empty')
+                            ->viewData(['message' => __('app.message.select_order_type_first')]),
+                    ]),
+            ];
+        }
+
+        $template = ContractTemplate::defaultForOrderType($orderTypeId);
+
+        if (! $template) {
+            return [
+                Section::make()
+                    ->schema([
+                        SchemaView::make('filament.components.contract-editor-empty')
+                            ->viewData(['message' => __('app.message.no_template_for_type')]),
+                    ]),
+            ];
+        }
+
+        $fields = is_array($template->fields) ? $template->fields : [];
+
+        $localeTabs = [];
+
+        foreach (['ru', 'uz', 'en'] as $locale) {
+            $tabFields = [];
+
+            foreach ($fields as $field) {
+                $name = $field['name'] ?? null;
+
+                if (! $name) {
+                    continue;
+                }
+
+                $statePath = "data.{$locale}.{$name}";
+                $label = $field['label'] ?? $name;
+                $type = $field['type'] ?? 'text';
+                $required = (bool) ($field['required'] ?? false);
+
+                $tabFields[] = match ($type) {
+                    'textarea' => Textarea::make($statePath)
+                        ->label($label)
+                        ->rows(3)
+                        ->required($required)
+                        ->live(debounce: 500),
+                    'number' => TextInput::make($statePath)
+                        ->label($label)
+                        ->numeric()
+                        ->required($required)
+                        ->live(debounce: 500),
+                    'date' => DatePicker::make($statePath)
+                        ->label($label)
+                        ->native(false)
+                        ->displayFormat('d.m.Y')
+                        ->required($required)
+                        ->live(),
+                    default => TextInput::make($statePath)
+                        ->label($label)
+                        ->required($required)
+                        ->live(debounce: 500),
+                };
+            }
+
+            if (empty($tabFields)) {
+                $tabFields[] = SchemaView::make('filament.components.contract-editor-empty')
+                    ->viewData(['message' => __('app.message.template_has_no_fields')]);
+            }
+
+            $localeTabs[] = Tab::make(strtoupper($locale))->schema($tabFields);
+        }
+
+        return [
+            Grid::make(['default' => 1, 'lg' => 2])
+                ->schema([
+                    Section::make(__('app.label.contract_data'))
+                        ->columnSpan(1)
+                        ->schema([
+                            Tabs::make()->tabs($localeTabs),
+                        ]),
+
+                    Section::make(__('app.label.preview'))
+                        ->columnSpan(1)
+                        ->schema([
+                            SchemaView::make('filament.components.contract-editor-preview'),
+                        ]),
+                ]),
         ];
     }
 }
