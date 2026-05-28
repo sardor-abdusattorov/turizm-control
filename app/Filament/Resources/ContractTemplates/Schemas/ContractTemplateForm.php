@@ -5,12 +5,13 @@ namespace App\Filament\Resources\ContractTemplates\Schemas;
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
 use App\Models\OrderType;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View as SchemaView;
 use Filament\Schemas\Schema;
 
 class ContractTemplateForm
@@ -96,13 +97,27 @@ class ContractTemplateForm
                 Section::make(__('app.label.contract_template_content'))
                     ->description(__('app.helper.contract_template_content'))
                     ->schema([
+                        SchemaView::make('filament.components.contract-template-placeholders')
+                            ->columnSpanFull(),
+
                         TranslatableTabs::make()
                             ->schema([
-                                Textarea::make('content')
+                                RichEditor::make('content')
                                     ->label(__('app.label.content'))
                                     ->required()
-                                    ->rows(20)
-                                    ->extraInputAttributes(['style' => 'font-family: monospace; font-size: 13px;']),
+                                    ->toolbarButtons([
+                                        ['bold', 'italic', 'underline', 'strike'],
+                                        ['h2', 'h3'],
+                                        ['orderedList', 'bulletList'],
+                                        ['blockquote', 'codeBlock'],
+                                        ['attachFiles', 'link'],
+                                        ['alignStart', 'alignCenter', 'alignEnd', 'alignJustify'],
+                                        ['undo', 'redo'],
+                                    ])
+                                    ->fileAttachmentsDisk('public')
+                                    ->fileAttachmentsDirectory('contract-templates')
+                                    ->fileAttachmentsVisibility('public')
+                                    ->extraAttributes(['style' => 'min-height: 400px;']),
                             ]),
                     ]),
             ]);

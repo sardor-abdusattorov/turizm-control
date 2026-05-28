@@ -125,6 +125,29 @@ class Settings extends Page implements HasForms
             ->components([
                 Tabs::make(__('app.label.settings'))
                     ->schema([
+                        Tabs\Tab::make(__('app.label.tab_organization'))
+                            ->schema([
+                                TranslatableTabs::make('organization_translations')
+                                    ->schema([
+                                        TextInput::make('organization.name')
+                                            ->label(__('app.label.organization_name'))
+                                            ->maxLength(255),
+                                    ]),
+
+                                FileUpload::make('organization.logo_path')
+                                    ->label(__('app.label.organization_logo'))
+                                    ->image()
+                                    ->imageEditor()
+                                    ->directory('organization')
+                                    ->disk('public')
+                                    ->visibility('public')
+                                    ->maxSize(2048)
+                                    ->previewable()
+                                    ->downloadable()
+                                    ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/svg+xml'])
+                                    ->helperText(__('app.helper.organization_logo')),
+                            ]),
+
                         Tabs\Tab::make(__('app.label.tab_seo'))
                             ->schema([
                                 TranslatableTabs::make('seo_translations')

@@ -101,6 +101,60 @@ class ContractForm
     }
 
     /**
+     * Multi-row "items" repeater — for purchase-order style documents
+     * (Заявка на закупку, etc.) where the body is a table of
+     * specifications. Optional: if the template doesn't use the
+     * {{purchase_items}} placeholder the section just stays empty.
+     *
+     * @return array<int, \Filament\Schemas\Components\Component>
+     */
+    public static function itemsSchema(): array
+    {
+        return [
+            Repeater::make('items')
+                ->label(__('app.label.contract_items'))
+                ->addActionLabel(__('app.action.add_item'))
+                ->reorderable()
+                ->reorderableWithDragAndDrop()
+                ->collapsible()
+                ->itemLabel(function (array $state): ?string {
+                    $spec = $state['specification'] ?? null;
+
+                    if (is_array($spec)) {
+                        $spec = $spec[app()->getLocale()]
+                            ?? $spec['ru']
+                            ?? array_values($spec)[0]
+                            ?? null;
+                    }
+
+                    return is_string($spec) && $spec !== '' ? $spec : null;
+                })
+                ->schema([
+                    TranslatableTabs::make()
+                        ->schema([
+                            Textarea::make('specification')
+                                ->label(__('app.label.items_specification'))
+                                ->rows(2)
+                                ->required(),
+                            TextInput::make('counterparty')
+                                ->label(__('app.label.items_counterparty')),
+                        ]),
+
+                    Grid::make(['default' => 1, 'md' => 2])
+                        ->schema([
+                            TextInput::make('amount')
+                                ->label(__('app.label.items_amount'))
+                                ->numeric()
+                                ->default(0),
+                            TextInput::make('agreement_ref')
+                                ->label(__('app.label.items_agreement_ref'))
+                                ->maxLength(255),
+                        ]),
+                ]),
+        ];
+    }
+
+    /**
      * Approval chain — used by the wizard's Step 1 (collapsible section)
      * and anywhere else where the chain needs to be edited inline.
      * Pre-fills with the manager's defaultRecipients ordered by the

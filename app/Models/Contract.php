@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\HtmlString;
 use Spatie\Translatable\HasTranslations;
 
 class Contract extends Model
@@ -115,6 +117,11 @@ class Contract extends Model
     public function approvers(): HasMany
     {
         return $this->hasMany(ContractApprover::class)->orderBy('order');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(ContractItem::class)->orderBy('sort')->orderBy('id');
     }
 
     /**
@@ -228,32 +235,128 @@ class Contract extends Model
     /**
      * Built-in placeholders that consumers (template render, PDF, etc.)
      * can rely on existing for every contract — number, amount,
-     * counterparty fields, dates. Combined with the user-filled values
+     * counterparty fields, dates, plus the HTML "blocks" for logo,
+     * approvers and item table. Combined with the user-filled values
      * stored in contracts.data.
      *
-     * @return array<string, string>
+     * Plain-text values are returned as strings (escaped by render());
+     * HTML blocks (logo, approvers_block, purchase_items) are returned
+     * as HtmlString so render() emits them raw.
+     *
+     * @return array<string, scalar|HtmlString|null>
      */
     public function systemPlaceholders(?string $locale = null): array
     {
         $locale ??= app()->getLocale();
 
+        return array_merge(
+            self::organizationPlaceholders($locale),
+            [
+                'contract_number' => (string) $this->number,
+                'amount' => number_format((float) $this->amount, 2, '.', ' '),
+                'currency_code' => (string) ($this->currency?->short_name ?? ''),
+                'currency_name' => (string) ($this->currency?->getTranslation('name', $locale) ?? ''),
+                'contact_name' => (string) ($this->contact?->getTranslation('name', $locale) ?? ''),
+                'contact_inn' => (string) ($this->contact?->inn ?? ''),
+                'contact_pinfl' => (string) ($this->contact?->pinfl ?? ''),
+                'contact_address' => (string) ($this->contact?->getTranslation('address', $locale) ?? ''),
+                'contact_phone' => (string) ($this->contact?->phone ?? ''),
+                'contact_email' => (string) ($this->contact?->email ?? ''),
+                'contact_person' => (string) ($this->contact?->contact_person ?? ''),
+                'manager_name' => (string) ($this->responsible?->name ?? ''),
+                'manager_position' => (string) ($this->responsible?->department?->getTranslation('name', $locale) ?? ''),
+                'deadline' => $this->deadline_at?->format('d.m.Y') ?? '',
+                'signed_at' => $this->signed_at?->format('d.m.Y') ?? '',
+                'created_at' => $this->created_at?->format('d.m.Y') ?? '',
+                'today' => now()->format('d.m.Y'),
+                'approvers_block' => new HtmlString($this->renderApproversBlock($locale)),
+                'purchase_items' => new HtmlString($this->renderPurchaseItems($locale)),
+            ],
+        );
+    }
+
+    /**
+     * Logo + organization name pulled from the global Settings store.
+     * Same on every contract; extracted into its own method so the
+     * create wizard's preview can reuse it before a Contract row
+     * exists.
+     *
+     * @return array<string, scalar|HtmlString>
+     */
+    public static function organizationPlaceholders(?string $locale = null): array
+    {
+        $locale ??= app()->getLocale();
+
+        $logoPath = settings('organization.logo_path');
+
+        $logoHtml = '';
+
+        if ($logoPath) {
+            $url = str_starts_with($logoPath, 'http')
+                ? $logoPath
+                : Storage::disk('public')->url($logoPath);
+
+            $logoHtml = '<img src="'.e($url).'" alt="logo" style="max-height: 80px;">';
+        }
+
+        // Translatable fields are stored as separate keyed rows
+        // (organization.name.ru, organization.name.uz, ...) by the
+        // Settings save flow, so look up by locale and fall back to
+        // ru → first non-empty.
+        $orgName = settings("organization.name.{$locale}")
+            ?: settings('organization.name.ru')
+            ?: settings('organization.name.uz')
+            ?: settings('organization.name.en')
+            ?: '';
+
         return [
-            'contract_number' => (string) $this->number,
-            'amount' => number_format((float) $this->amount, 2, '.', ' '),
-            'currency_code' => (string) ($this->currency?->short_name ?? ''),
-            'currency_name' => (string) ($this->currency?->getTranslation('name', $locale) ?? ''),
-            'contact_name' => (string) ($this->contact?->getTranslation('name', $locale) ?? ''),
-            'contact_inn' => (string) ($this->contact?->inn ?? ''),
-            'contact_pinfl' => (string) ($this->contact?->pinfl ?? ''),
-            'contact_address' => (string) ($this->contact?->getTranslation('address', $locale) ?? ''),
-            'contact_phone' => (string) ($this->contact?->phone ?? ''),
-            'contact_email' => (string) ($this->contact?->email ?? ''),
-            'contact_person' => (string) ($this->contact?->contact_person ?? ''),
-            'deadline' => $this->deadline_at?->format('d.m.Y') ?? '',
-            'signed_at' => $this->signed_at?->format('d.m.Y') ?? '',
-            'created_at' => $this->created_at?->format('d.m.Y') ?? '',
-            'today' => now()->format('d.m.Y'),
+            'logo' => new HtmlString($logoHtml),
+            'organization_name' => (string) $orgName,
         ];
+    }
+
+    /**
+     * Render the 5-column (or however-many-rows-exist) approvals
+     * table that lives at the bottom of every contract, fed from
+     * the contract_approvers rows. Returns HTML.
+     */
+    public function renderApproversBlock(?string $locale = null): string
+    {
+        $locale ??= app()->getLocale();
+
+        $approvers = $this->approvers()->with('user.department')->get();
+
+        if ($approvers->isEmpty()) {
+            return '';
+        }
+
+        return view('contract.approvers-block', [
+            'approvers' => $approvers,
+            'locale' => $locale,
+            'responsible' => $this->responsible,
+        ])->render();
+    }
+
+    /**
+     * Render the multi-row items table (specification / amount /
+     * counterparty / agreement reference) used by "purchase order"
+     * style contracts. Returns HTML.
+     */
+    public function renderPurchaseItems(?string $locale = null): string
+    {
+        $locale ??= app()->getLocale();
+
+        $items = $this->items;
+
+        if ($items->isEmpty()) {
+            return '';
+        }
+
+        return view('contract.items-table', [
+            'items' => $items,
+            'locale' => $locale,
+            'currencyCode' => $this->currency?->short_name ?? '',
+        ])->render();
     }
 
     /**
