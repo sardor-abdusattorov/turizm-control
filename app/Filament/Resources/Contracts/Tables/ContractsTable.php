@@ -2,20 +2,16 @@
 
 namespace App\Filament\Resources\Contracts\Tables;
 
-use App\Filament\Pages\ContractEditor;
+use App\Filament\Resources\Contracts\Actions\ContractWorkflowActions;
 use App\Models\Contract;
 use App\Models\ContractTemplate;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -118,143 +114,7 @@ class ContractsTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    Action::make('submitForApproval')
-                        ->label(__('app.action.submit_for_approval'))
-                        ->icon('heroicon-o-paper-airplane')
-                        ->color('primary')
-                        ->visible(fn (Contract $record) => $record->canBeSubmittedBy())
-                        ->requiresConfirmation()
-                        ->modalHeading(__('app.action.submit_for_approval'))
-                        ->modalDescription(__('app.message.submit_for_approval_confirm'))
-                        ->action(function (Contract $record) {
-                            $record->update(['status' => Contract::STATUS_IN_REVIEW]);
-
-                            Notification::make()
-                                ->title(__('app.message.contract_submitted'))
-                                ->success()
-                                ->send();
-                        }),
-
-                    Action::make('approve')
-                        ->label(__('app.action.approve'))
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->visible(fn (Contract $record) => $record->canBeApprovedBy())
-                        ->modalHeading(__('app.action.approve'))
-                        ->schema([
-                            Textarea::make('comment')
-                                ->label(__('app.label.comment'))
-                                ->rows(3),
-                        ])
-                        ->action(function (array $data, Contract $record) {
-                            $current = $record->currentApprover();
-                            $current?->markApproved($data['comment'] ?? null);
-
-                            if ($record->allApproved()) {
-                                $record->update([
-                                    'status' => Contract::STATUS_APPROVED,
-                                    'signed_at' => now()->toDateString(),
-                                ]);
-                            }
-
-                            Notification::make()
-                                ->title(__('app.message.contract_approved'))
-                                ->success()
-                                ->send();
-                        }),
-
-                    Action::make('reject')
-                        ->label(__('app.action.reject'))
-                        ->icon('heroicon-o-x-circle')
-                        ->color('danger')
-                        ->visible(fn (Contract $record) => $record->canBeApprovedBy())
-                        ->modalHeading(__('app.action.reject'))
-                        ->schema([
-                            Textarea::make('comment')
-                                ->label(__('app.label.rejection_reason'))
-                                ->required()
-                                ->rows(3),
-                        ])
-                        ->action(function (array $data, Contract $record) {
-                            $current = $record->currentApprover();
-                            $current?->markRejected($data['comment']);
-
-                            $record->update(['status' => Contract::STATUS_REJECTED]);
-
-                            Notification::make()
-                                ->title(__('app.message.contract_rejected'))
-                                ->danger()
-                                ->send();
-                        }),
-
-                    Action::make('returnForRevision')
-                        ->label(__('app.action.return_for_revision'))
-                        ->icon('heroicon-o-arrow-uturn-left')
-                        ->color('warning')
-                        ->visible(fn (Contract $record) => $record->canBeApprovedBy())
-                        ->modalHeading(__('app.action.return_for_revision'))
-                        ->schema([
-                            Textarea::make('comment')
-                                ->label(__('app.label.return_reason'))
-                                ->required()
-                                ->rows(3),
-                        ])
-                        ->action(function (array $data, Contract $record) {
-                            $current = $record->currentApprover();
-                            $current?->update([
-                                'comment' => $data['comment'],
-                                'acted_at' => now(),
-                            ]);
-
-                            $record->update(['status' => Contract::STATUS_DRAFT]);
-
-                            Notification::make()
-                                ->title(__('app.message.contract_returned'))
-                                ->warning()
-                                ->send();
-                        }),
-
-                    Action::make('archive')
-                        ->label(__('app.action.archive'))
-                        ->icon('heroicon-o-archive-box')
-                        ->color('gray')
-                        ->visible(fn (Contract $record) => $record->canBeArchivedBy())
-                        ->requiresConfirmation()
-                        ->action(function (Contract $record) {
-                            $record->update(['status' => Contract::STATUS_ARCHIVED]);
-
-                            Notification::make()
-                                ->title(__('app.message.contract_archived'))
-                                ->success()
-                                ->send();
-                        }),
-
-                    Action::make('editDocument')
-                        ->label(__('app.action.edit_document'))
-                        ->icon('heroicon-o-document-text')
-                        ->url(fn (Contract $record) => ContractEditor::getUrl(['record' => $record]))
-                        ->visible(fn (Contract $record) => $record->canBeEditedBy()),
-
-                    Action::make('downloadPdf')
-                        ->label(__('app.action.download_pdf'))
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->modalHeading(__('app.action.download_pdf'))
-                        ->modalSubmitActionLabel(__('app.action.download_pdf'))
-                        ->schema([
-                            Select::make('locale')
-                                ->label(__('app.label.language'))
-                                ->options([
-                                    'ru' => __('app.label.ru'),
-                                    'uz' => __('app.label.uz'),
-                                    'en' => __('app.label.en'),
-                                ])
-                                ->default(app()->getLocale())
-                                ->required()
-                                ->native(false),
-                        ])
-                        ->action(function (array $data, Contract $record): StreamedResponse {
-                            return self::streamContractPdf($record, $data['locale'] ?? 'ru');
-                        }),
+                    ...ContractWorkflowActions::all(),
 
                     ViewAction::make(),
 

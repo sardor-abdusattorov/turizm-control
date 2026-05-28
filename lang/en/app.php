@@ -190,6 +190,25 @@ return [
         'edit_document' => 'Edit document',
         'save' => 'Save',
         'download_pdf' => 'Download PDF',
+        'open_contract' => 'Open contract',
+    ],
+    'notification' => [
+        'approval_requested' => [
+            'title' => 'Contract is waiting for your approval',
+            'body' => 'Contract :number was submitted for review and you are the current approver.',
+        ],
+        'contract_approved' => [
+            'title' => 'Contract fully approved',
+            'body' => 'Contract :number has passed the entire approval chain.',
+        ],
+        'contract_rejected' => [
+            'title' => 'Contract rejected',
+            'body' => 'Contract :number was rejected — reason: :reason',
+        ],
+        'contract_returned' => [
+            'title' => 'Contract returned for revision',
+            'body' => 'Contract :number was sent back to draft — note: :reason',
+        ],
     ],
     'message' => [
         'profile_updated' => 'Profile updated successfully',
