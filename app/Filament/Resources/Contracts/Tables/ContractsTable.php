@@ -86,6 +86,16 @@ class ContractsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Filter::make('awaiting_my_approval')
+                    ->label(__('app.filter.awaiting_my_approval'))
+                    ->query(fn (Builder $query) => $query->awaitingApprovalBy())
+                    ->toggle(),
+
+                Filter::make('mine')
+                    ->label(__('app.filter.my_contracts'))
+                    ->query(fn (Builder $query) => $query->where('responsible_id', auth()->id()))
+                    ->toggle(),
+
                 SelectFilter::make('order_type_id')
                     ->label(__('app.label.order_type_single'))
                     ->relationship('orderType', 'title')

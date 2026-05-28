@@ -41,9 +41,27 @@ class ContractResource extends Resource
         return 2;
     }
 
+    /**
+     * Show "N contracts waiting on me" as the navigation badge for
+     * approvers; for everyone else show the total contract count.
+     * Hidden when zero.
+     */
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::$model::count();
+        $awaiting = Contract::query()->awaitingApprovalBy()->count();
+
+        if ($awaiting > 0) {
+            return (string) $awaiting;
+        }
+
+        $total = static::$model::count();
+
+        return $total > 0 ? (string) $total : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return Contract::query()->awaitingApprovalBy()->exists() ? 'warning' : null;
     }
 
     protected static ?string $recordTitleAttribute = 'number';

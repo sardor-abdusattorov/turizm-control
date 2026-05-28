@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 use Spatie\Translatable\HasTranslations;
 
 class Contract extends Model
 {
+    use HasFactory;
     use HasTranslations;
 
     public $translatable = ['title', 'description', 'data'];
@@ -377,6 +381,57 @@ class Contract extends Model
         return array_merge(
             $this->systemPlaceholders($locale),
             $userValues,
+        );
+    }
+
+    /**
+     * Contracts that are waiting on this user's decision right now —
+     * status is in_review, the user is on the approver list with a
+     * pending row, and no earlier (lower-order) approver is still
+     * pending. Used by the list page's "Awaiting my approval" filter
+     * and the dashboard widget.
+     */
+    public function scopeAwaitingApprovalBy(Builder $query, ?User $user = null): Builder
+    {
+        $user ??= auth()->user();
+
+        if (! $user) {
+            return $query->whereRaw('0 = 1');
+        }
+
+        return $query
+            ->where('status', self::STATUS_IN_REVIEW)
+            ->whereIn('id', function ($sub) use ($user): void {
+                $sub->select('a1.contract_id')
+                    ->from('contract_approvers as a1')
+                    ->where('a1.user_id', $user->id)
+                    ->where('a1.status', ContractApprover::STATUS_PENDING)
+                    ->whereNotExists(function ($inner): void {
+                        $inner->select(DB::raw(1))
+                            ->from('contract_approvers as a2')
+                            ->whereColumn('a2.contract_id', 'a1.contract_id')
+                            ->where('a2.status', ContractApprover::STATUS_PENDING)
+                            ->whereColumn('a2.order', '<', 'a1.order');
+                    });
+            });
+    }
+
+    /**
+     * Contracts where this user is on the approval chain (any
+     * position, any status) — used by the "Approvals involving me"
+     * filter so reviewers can see the full history they touched.
+     */
+    public function scopeInvolvingApprover(Builder $query, ?User $user = null): Builder
+    {
+        $user ??= auth()->user();
+
+        if (! $user) {
+            return $query->whereRaw('0 = 1');
+        }
+
+        return $query->whereHas(
+            'approvers',
+            fn (Builder $q) => $q->where('user_id', $user->id),
         );
     }
 

@@ -27,6 +27,21 @@ class EditContract extends EditRecord
         ];
     }
 
+    /**
+     * Translatable JSON fields come back from the model as the active
+     * locale only. Re-hydrate all locales so the locale-tabbed editor
+     * shows existing values for RU/UZ/EN, not just the current
+     * session language.
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['data'] = $this->record->getTranslations('data');
+        $data['title'] = $this->record->getTranslations('title');
+        $data['description'] = $this->record->getTranslations('description');
+
+        return $data;
+    }
+
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $this->originalStatus = $this->record->status;

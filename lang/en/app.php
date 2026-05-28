@@ -39,6 +39,9 @@ return [
         'items_amount' => 'Total amount',
         'items_counterparty' => 'Counterparty',
         'items_agreement_ref' => 'Agreement no. / date',
+        'overdue' => 'Overdue',
+        'responsible' => 'Responsible manager',
+        'contract_number' => 'Contract no.',
         'approval_flow' => 'Approval Flow',
         'department_legal' => 'Legal Department',
         'department_financial' => 'Financial Department',
@@ -290,5 +293,15 @@ return [
             'legal' => 'Legal Entity',
             'individual' => 'Individual',
         ],
+    ],
+    'tab' => [
+        'all_contracts' => 'All',
+        'awaiting_me' => 'Awaiting my approval',
+        'my_contracts' => 'My contracts',
+        'involving_me' => 'Approvals involving me',
+    ],
+    'filter' => [
+        'awaiting_my_approval' => 'Awaiting my approval',
+        'my_contracts' => 'My contracts',
     ],
 ];

@@ -24,6 +24,11 @@ use Filament\Schemas\Schema;
 
 class ContractForm
 {
+    /**
+     * Full edit-form composition: basic + items + approvers + document
+     * fields. Used by EditContract (the create wizard pulls the parts
+     * it needs directly via basicSchema / itemsSchema / approversSchema).
+     */
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -31,6 +36,22 @@ class ContractForm
             ->components([
                 Section::make(__('app.label.basic_information'))
                     ->schema(self::basicSchema()),
+
+                Section::make(__('app.label.contract_items'))
+                    ->description(__('app.helper.contract_items'))
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema(self::itemsSchema(relationship: true)),
+
+                Section::make(__('app.label.approval_chain'))
+                    ->description(__('app.helper.approval_chain'))
+                    ->collapsible()
+                    ->schema(self::approversSchema(relationship: true)),
+
+                Section::make(__('app.label.contract_data'))
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema(fn (?Contract $record): array => self::documentFieldsForRecord($record)),
             ]);
     }
 
@@ -106,16 +127,29 @@ class ContractForm
      * specifications. Optional: if the template doesn't use the
      * {{purchase_items}} placeholder the section just stays empty.
      *
+     * When relationship=true the repeater binds to the HasMany so
+     * Filament handles loading existing rows + sync-on-save (used by
+     * EditContract). When false the repeater is plain array state and
+     * the page is responsible for persisting (used by the create
+     * wizard's afterCreate).
+     *
      * @return array<int, \Filament\Schemas\Components\Component>
      */
-    public static function itemsSchema(): array
+    public static function itemsSchema(bool $relationship = false): array
     {
+        $repeater = Repeater::make('items');
+
+        if ($relationship) {
+            $repeater->relationship();
+        }
+
         return [
-            Repeater::make('items')
+            $repeater
                 ->label(__('app.label.contract_items'))
                 ->addActionLabel(__('app.action.add_item'))
                 ->reorderable()
                 ->reorderableWithDragAndDrop()
+                ->orderColumn('sort')
                 ->collapsible()
                 ->itemLabel(function (array $state): ?string {
                     $spec = $state['specification'] ?? null;
@@ -156,16 +190,21 @@ class ContractForm
 
     /**
      * Approval chain — used by the wizard's Step 1 (collapsible section)
-     * and anywhere else where the chain needs to be edited inline.
-     * Pre-fills with the manager's defaultRecipients ordered by the
-     * admin-configured approval flow.
+     * and the edit form. Pre-fills with the manager's defaultRecipients
+     * ordered by the admin-configured approval flow.
      *
      * @return array<int, \Filament\Schemas\Components\Component>
      */
-    public static function approversSchema(): array
+    public static function approversSchema(bool $relationship = false): array
     {
+        $repeater = Repeater::make('approvers');
+
+        if ($relationship) {
+            $repeater->relationship();
+        }
+
         return [
-            Repeater::make('approvers')
+            $repeater
                 ->label(__('app.label.approval_chain'))
                 ->helperText(__('app.helper.approval_chain'))
                 ->schema([
@@ -184,10 +223,82 @@ class ContractForm
                 })
                 ->reorderable()
                 ->reorderableWithDragAndDrop()
+                ->orderColumn('order')
                 ->addActionLabel(__('app.action.add_approver'))
                 ->minItems(1)
-                ->default(fn () => Contract::suggestApproverChain())
+                ->default(fn () => $relationship ? null : Contract::suggestApproverChain())
                 ->collapsible(),
+        ];
+    }
+
+    /**
+     * Document-fields editor for the edit page. Same locale-tabbed
+     * inputs as the wizard's split-editor but without the right-side
+     * preview. Built dynamically from the record's order_type
+     * template; returns an empty array if no template or no fields.
+     *
+     * @return array<int, \Filament\Schemas\Components\Component>
+     */
+    public static function documentFieldsForRecord(?Contract $record): array
+    {
+        if (! $record || ! $record->order_type_id) {
+            return [];
+        }
+
+        $template = ContractTemplate::defaultForOrderType($record->order_type_id);
+
+        if (! $template) {
+            return [];
+        }
+
+        $fields = is_array($template->fields) ? $template->fields : [];
+
+        if (empty($fields)) {
+            return [];
+        }
+
+        $localeTabs = [];
+
+        foreach (['ru', 'uz', 'en'] as $locale) {
+            $tabFields = [];
+
+            foreach ($fields as $field) {
+                $name = $field['name'] ?? null;
+
+                if (! $name) {
+                    continue;
+                }
+
+                $statePath = "data.{$locale}.{$name}";
+                $label = $field['label'] ?? $name;
+                $type = $field['type'] ?? 'text';
+                $required = (bool) ($field['required'] ?? false);
+
+                $tabFields[] = match ($type) {
+                    'textarea' => Textarea::make($statePath)
+                        ->label($label)
+                        ->rows(3)
+                        ->required($required),
+                    'number' => TextInput::make($statePath)
+                        ->label($label)
+                        ->numeric()
+                        ->required($required),
+                    'date' => DatePicker::make($statePath)
+                        ->label($label)
+                        ->native(false)
+                        ->displayFormat('d.m.Y')
+                        ->required($required),
+                    default => TextInput::make($statePath)
+                        ->label($label)
+                        ->required($required),
+                };
+            }
+
+            $localeTabs[] = Tab::make(strtoupper($locale))->schema($tabFields);
+        }
+
+        return [
+            Tabs::make()->tabs($localeTabs),
         ];
     }
 
