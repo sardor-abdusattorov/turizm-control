@@ -11,7 +11,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class ContactPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('view_any_contact');
@@ -66,4 +66,5 @@ class ContactPolicy
     {
         return $authUser->can('reorder_contact');
     }
+
 }

@@ -5,8 +5,8 @@ namespace App\Filament\Resources\Contracts\Pages;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListContracts extends ListRecords
