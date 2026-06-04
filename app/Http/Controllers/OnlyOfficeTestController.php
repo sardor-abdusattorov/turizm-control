@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\OnlyOffice\OnlyOfficeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -20,16 +21,14 @@ class OnlyOfficeTestController extends Controller
         return response()->download(Storage::disk('local')->path(self::PATH), 'test.docx');
     }
 
-    public function callback(Request $request): JsonResponse
+    public function callback(Request $request, OnlyOfficeService $service): JsonResponse
     {
-        Log::info('OnlyOffice callback', $request->all());
-
         $status = (int) $request->input('status', 0);
         $url = $request->input('url');
 
         if (in_array($status, [2, 6], true) && is_string($url)) {
             try {
-                $body = Http::timeout(30)->get($url)->body();
+                $body = Http::timeout(30)->get($service->internalDownloadUrl($url))->body();
                 Storage::disk('local')->put(self::PATH, $body);
                 Log::info('OnlyOffice saved', ['bytes' => strlen($body)]);
             } catch (\Throwable $e) {

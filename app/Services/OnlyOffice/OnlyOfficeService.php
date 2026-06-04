@@ -21,6 +21,15 @@ class OnlyOfficeService
         return $this->trim(config('onlyoffice.public_url')).'/web-apps/apps/api/documents/api.js';
     }
 
+    public function internalDownloadUrl(string $url): string
+    {
+        return str_replace(
+            $this->trim(config('onlyoffice.public_url')),
+            $this->trim(config('onlyoffice.internal_url')),
+            $url,
+        );
+    }
+
     public function configForFile(string $key, string $title, string $documentUrl, string $callbackUrl, bool $edit = true): array
     {
         $config = [
