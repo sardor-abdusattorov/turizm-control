@@ -24,7 +24,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - app
     restart: unless-stopped
@@ -41,6 +42,11 @@ services:
       - "33061:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD:-secret}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
     networks:
       - app
     restart: unless-stopped
@@ -73,10 +79,6 @@ services:
     profiles:
       - tools
 
-  # OnlyOffice Document Server — the in-browser Word/Excel/PPT editor.
-  # First boot takes ~1-2 min while it provisions its internal Postgres
-  # + RabbitMQ; the editor JS lives at /web-apps/apps/api/documents/api.js.
-  # JWT_SECRET here MUST match ONLYOFFICE_JWT_SECRET in the Laravel .env.
   onlyoffice:
     image: onlyoffice/documentserver:8.2
     container_name: turizm-onlyoffice
