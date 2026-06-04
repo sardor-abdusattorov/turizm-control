@@ -13,8 +13,20 @@ cp .env.example .env
 # 2. Поднять контейнеры (первый раз качает образы ~5-10 мин)
 docker compose up -d
 
-# 3. Установить зависимости, БД, ассеты (одной командой)
-bash setup.sh
+# 3. Зависимости
+docker compose exec php composer install
+
+# 4. Ключ приложения
+docker compose exec php php artisan key:generate
+
+# 5. БД + сидеры
+docker compose exec php php artisan migrate --seed
+
+# 6. Симлинк storage
+docker compose exec php php artisan storage:link
+
+# 7. Сборка фронтенда
+docker compose run --rm node sh -c "npm install && npm run build"
 ```
 
 Готово. Открыть **http://localhost:8000/admin**
