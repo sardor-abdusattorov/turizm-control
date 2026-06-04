@@ -3,10 +3,13 @@
         <div id="onlyoffice-editor" style="height: 80vh; width: 100%;"></div>
     </div>
 
-    <script src="{{ $apiScriptUrl }}"></script>
-    <script>
-        window.addEventListener('load', function () {
-            new DocsAPI.DocEditor('onlyoffice-editor', {!! \Illuminate\Support\Js::from($config) !!});
-        });
-    </script>
+    @assets
+        <script src="{{ $apiScriptUrl }}"></script>
+    @endassets
+
+    @script
+        <script>
+            new DocsAPI.DocEditor('onlyoffice-editor', @js($config));
+        </script>
+    @endscript
 </x-filament-panels::page>
