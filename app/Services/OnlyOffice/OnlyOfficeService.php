@@ -21,6 +21,42 @@ class OnlyOfficeService
         return $this->trim(config('onlyoffice.public_url')).'/web-apps/apps/api/documents/api.js';
     }
 
+    public function configForFile(string $key, string $title, string $documentUrl, string $callbackUrl, bool $edit = true): array
+    {
+        $config = [
+            'documentType' => 'word',
+            'type' => 'desktop',
+            'width' => '100%',
+            'height' => '100%',
+            'document' => [
+                'fileType' => 'docx',
+                'key' => $key,
+                'title' => $title,
+                'url' => $documentUrl,
+                'permissions' => [
+                    'edit' => $edit,
+                    'review' => $edit,
+                    'comment' => $edit,
+                    'download' => true,
+                    'print' => true,
+                ],
+            ],
+            'editorConfig' => [
+                'mode' => $edit ? 'edit' : 'view',
+                'lang' => 'ru',
+                'callbackUrl' => $callbackUrl,
+                'customization' => [
+                    'forcesave' => true,
+                    'compactHeader' => false,
+                ],
+            ],
+        ];
+
+        $config['token'] = $this->signer->encode($config);
+
+        return $config;
+    }
+
     public function editorConfig(Contract $contract, User $user): array
     {
         $permissions = $this->resolvePermissions($contract, $user);

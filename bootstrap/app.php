@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->throttleApi()->api(
             prepend: ForceJsonResponseMiddleware::class
         );
+
+        $middleware->validateCsrfTokens(except: [
+            'onlyoffice-test/*',
+            'onlyoffice/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
