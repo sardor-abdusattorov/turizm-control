@@ -60,6 +60,19 @@ services:
       - app
     restart: unless-stopped
 
+  node:
+    image: node:24-alpine
+    container_name: turizm-node
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - vendor:/var/www/vendor
+      - node_modules:/var/www/node_modules
+    networks:
+      - app
+    profiles:
+      - tools
+
   # OnlyOffice Document Server — the in-browser Word/Excel/PPT editor.
   # First boot takes ~1-2 min while it provisions its internal Postgres
   # + RabbitMQ; the editor JS lives at /web-apps/apps/api/documents/api.js.
@@ -89,6 +102,7 @@ networks:
 volumes:
   mysql_data:
   vendor:
+  node_modules:
   onlyoffice_data:
   onlyoffice_log:
   onlyoffice_cache:
