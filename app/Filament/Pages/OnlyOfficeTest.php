@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Services\OnlyOffice\OnlyOfficeService;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class OnlyOfficeTest extends Page
@@ -33,8 +34,13 @@ class OnlyOfficeTest extends Page
 
         $host = rtrim((string) config('onlyoffice.callback_host'), '/');
 
+        $path = Storage::disk('local')->path('onlyoffice-test/test.docx');
+        $key = is_file($path)
+            ? substr(md5(filemtime($path).filesize($path)), 0, 22)
+            : Str::random(22);
+
         $config = $service->configForFile(
-            key: Str::random(20),
+            key: $key,
             title: 'test.docx',
             documentUrl: $host.'/onlyoffice-test/document',
             callbackUrl: $host.'/onlyoffice-test/callback',
