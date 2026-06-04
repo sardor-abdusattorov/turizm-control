@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
 class Contact extends Model
@@ -84,8 +83,4 @@ class Contact extends Model
             ->toArray();
     }
 
-    public function contracts(): HasMany
-    {
-        return $this->hasMany(Contract::class);
-    }
 }

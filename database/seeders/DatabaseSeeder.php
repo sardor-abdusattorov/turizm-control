@@ -16,7 +16,6 @@ class DatabaseSeeder extends Seeder
             ContactSeeder::class,
             UserSeeder::class,
             TestUsersSeeder::class,
-            ContractTemplateSeeder::class,
             OrdersSeeder::class,
         ]);
     }

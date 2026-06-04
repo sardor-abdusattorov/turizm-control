@@ -62,19 +62,6 @@ class OrderTypeSeeder extends Seeder
                 ],
                 'sort' => 4,
             ],
-            [
-                'title' => [
-                    'ru' => 'Заявка на закупку',
-                    'uz' => 'Xarid uchun ariza',
-                    'en' => 'Purchase request',
-                ],
-                'description' => [
-                    'ru' => 'Заявки на государственную закупку товаров и услуг',
-                    'uz' => 'Davlat tomonidan mol va xizmatlar xaridiga arizalar',
-                    'en' => 'Public procurement requests for goods and services',
-                ],
-                'sort' => 5,
-            ],
         ];
 
         foreach ($types as $data) {
