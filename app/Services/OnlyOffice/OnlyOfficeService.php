@@ -45,6 +45,10 @@ class OnlyOfficeService
                 'mode' => $edit ? 'edit' : 'view',
                 'lang' => 'ru',
                 'callbackUrl' => $callbackUrl,
+                'user' => [
+                    'id' => (string) (auth()->id() ?? '0'),
+                    'name' => (string) (auth()->user()?->name ?? 'User'),
+                ],
                 'customization' => [
                     'forcesave' => true,
                     'compactHeader' => false,
