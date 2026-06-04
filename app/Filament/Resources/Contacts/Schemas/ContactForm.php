@@ -44,6 +44,16 @@ class ContactForm
 
                         Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
+                                TextInput::make('legal_form')
+                                    ->label(__('app.label.legal_form'))
+                                    ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
+                                    ->maxLength(50),
+
+                                TextInput::make('oked')
+                                    ->label(__('app.label.oked'))
+                                    ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
+                                    ->maxLength(20),
+
                                 TextInput::make('inn')
                                     ->label(__('app.label.inn'))
                                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
@@ -57,6 +67,11 @@ class ContactForm
                                     ->required(fn (Get $get) => $get('type') === Contact::TYPE_INDIVIDUAL)
                                     ->unique('contacts', 'pinfl', ignoreRecord: true)
                                     ->maxLength(30),
+
+                                TextInput::make('director_name')
+                                    ->label(__('app.label.director_name'))
+                                    ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
+                                    ->maxLength(255),
 
                                 TextInput::make('contact_person')
                                     ->label(__('app.label.contact_person'))
@@ -77,6 +92,26 @@ class ContactForm
                         Toggle::make('status')
                             ->label(__('app.label.status'))
                             ->default(true),
+                    ]),
+
+                Section::make(__('app.label.bank_requisites'))
+                    ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
+                    ->schema([
+                        Grid::make(['default' => 1, 'md' => 2])
+                            ->schema([
+                                TextInput::make('bank_account')
+                                    ->label(__('app.label.bank_account'))
+                                    ->maxLength(50),
+
+                                TextInput::make('mfo')
+                                    ->label(__('app.label.mfo'))
+                                    ->maxLength(20),
+
+                                TextInput::make('bank_name')
+                                    ->label(__('app.label.bank_name'))
+                                    ->columnSpanFull()
+                                    ->maxLength(255),
+                            ]),
                     ]),
             ]);
     }

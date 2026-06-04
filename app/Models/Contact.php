@@ -16,13 +16,19 @@ class Contact extends Model
 
     protected $fillable = [
         'type',
+        'legal_form',
         'name',
         'inn',
         'pinfl',
+        'oked',
         'address',
         'phone',
         'email',
         'contact_person',
+        'director_name',
+        'bank_account',
+        'bank_name',
+        'mfo',
         'status',
     ];
 

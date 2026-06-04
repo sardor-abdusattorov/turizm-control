@@ -76,6 +76,13 @@ return [
         'inn' => 'INN',
         'pinfl' => 'PINFL',
         'phone' => 'Phone',
+        'legal_form' => 'Legal form',
+        'oked' => 'OKED',
+        'director_name' => 'Director (full name)',
+        'bank_requisites' => 'Bank details',
+        'bank_account' => 'Account number',
+        'bank_name' => 'Bank name',
+        'mfo' => 'MFO',
 
         // Contracts
         'contract_single' => 'Contract',

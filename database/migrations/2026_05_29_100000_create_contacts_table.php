@@ -11,13 +11,19 @@ return new class extends Migration
         Schema::create('contacts', function (Blueprint $table) {
             $table->id();
             $table->string('type', 20)->default('legal');
+            $table->string('legal_form', 50)->nullable();
             $table->json('name');
             $table->string('inn', 30)->nullable()->unique();
             $table->string('pinfl', 30)->nullable()->unique();
+            $table->string('oked', 20)->nullable();
             $table->json('address')->nullable();
             $table->string('phone', 50)->nullable();
             $table->string('email')->nullable();
             $table->string('contact_person')->nullable();
+            $table->string('director_name')->nullable();
+            $table->string('bank_account', 50)->nullable();
+            $table->string('bank_name')->nullable();
+            $table->string('mfo', 20)->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
 
