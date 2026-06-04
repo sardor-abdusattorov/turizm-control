@@ -61,6 +61,28 @@ services:
       - app
     restart: unless-stopped
 
+  # OnlyOffice Document Server — the in-browser Word/Excel/PPT editor.
+  # First boot takes ~1-2 min while it provisions its internal Postgres
+  # + RabbitMQ; the editor JS lives at /web-apps/apps/api/documents/api.js.
+  # JWT_SECRET here MUST match ONLYOFFICE_JWT_SECRET in the Laravel .env.
+  onlyoffice:
+    image: onlyoffice/documentserver:8.2
+    container_name: turizm-onlyoffice
+    environment:
+      JWT_ENABLED: "true"
+      JWT_SECRET: ${ONLYOFFICE_JWT_SECRET:-change-this-secret}
+      JWT_HEADER: "Authorization"
+    ports:
+      - "8082:80"
+    volumes:
+      - onlyoffice_data:/var/www/onlyoffice/Data
+      - onlyoffice_log:/var/log/onlyoffice
+      - onlyoffice_cache:/var/lib/onlyoffice
+      - onlyoffice_db:/var/lib/postgresql
+    networks:
+      - app
+    restart: unless-stopped
+
 networks:
   app:
     driver: bridge
@@ -68,3 +90,7 @@ networks:
 volumes:
   mysql_data:
   vendor:
+  onlyoffice_data:
+  onlyoffice_log:
+  onlyoffice_cache:
+  onlyoffice_db:
