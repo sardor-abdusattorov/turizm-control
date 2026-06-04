@@ -102,6 +102,9 @@ return [
         'contract_template_name' => 'Template Name',
         'contract_template_fields' => 'Form Fields',
         'contract_template_content' => 'Template Body',
+        'contract_template_file' => 'Template document',
+        'template_file' => 'Document (.docx)',
+        'available_placeholders' => 'Available placeholders',
         'content' => 'Content',
         'fields' => 'Fields',
         'field_key' => 'Field key',
@@ -237,6 +240,7 @@ return [
         'preview_empty_hint' => 'Fill in the fields on the left — the rendered document will appear here.',
     ],
     'helper' => [
+        'template_file' => 'Upload the contract as a .docx with {{placeholders}} where values should be inserted. Max 10 MB.',
         'metrics_yandex' => 'Insert Yandex Metrica tracking code here',
         'metrics_google' => 'Insert Google Analytics tracking code here',
         'seo_og_image' => 'Recommended size: 1200x630px. PNG or JPEG format.',

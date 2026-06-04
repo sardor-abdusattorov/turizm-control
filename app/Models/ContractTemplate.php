@@ -38,6 +38,14 @@ class ContractTemplate extends Model
         ];
     }
 
+    public static function getStatuses(): array
+    {
+        return [
+            self::STATUS_ACTIVE => __('app.status.active'),
+            self::STATUS_INACTIVE => __('app.status.inactive'),
+        ];
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', self::STATUS_ACTIVE);
