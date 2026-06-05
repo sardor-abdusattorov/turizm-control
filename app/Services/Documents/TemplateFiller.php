@@ -2,11 +2,15 @@
 
 namespace App\Services\Documents;
 
+use DOMDocument;
+use DOMElement;
 use RuntimeException;
 use ZipArchive;
 
 class TemplateFiller
 {
+    private const WORD_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+
     public function fill(string $sourcePath, string $destinationPath, array $values): void
     {
         if (! is_file($sourcePath)) {
@@ -29,14 +33,13 @@ class TemplateFiller
             throw new RuntimeException("Failed to open docx as zip: {$destinationPath}");
         }
 
-        $patterns = [];
-        $count = $zip->numFiles;
+        $entries = [];
 
-        for ($i = 0; $i < $count; $i++) {
-            $patterns[] = $zip->getNameIndex($i);
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $entries[] = $zip->getNameIndex($i);
         }
 
-        foreach ($patterns as $name) {
+        foreach ($entries as $name) {
             if (! $this->shouldProcess($name)) {
                 continue;
             }
@@ -47,11 +50,11 @@ class TemplateFiller
                 continue;
             }
 
-            $replaced = $this->replaceInXml($xml, $values);
+            $newXml = $this->processXml($xml, $values);
 
-            if ($replaced !== $xml) {
+            if ($newXml !== null && $newXml !== $xml) {
                 $zip->deleteName($name);
-                $zip->addFromString($name, $replaced);
+                $zip->addFromString($name, $newXml);
             }
         }
 
@@ -63,26 +66,84 @@ class TemplateFiller
         return (bool) preg_match('#^word/(document|header\d*|footer\d*)\.xml$#', $entry);
     }
 
-    private function replaceInXml(string $xml, array $values): string
+    private function processXml(string $xml, array $values): ?string
     {
-        return (string) preg_replace_callback(
+        $dom = new DOMDocument();
+        $dom->preserveWhiteSpace = true;
+        $dom->formatOutput = false;
+
+        if (! @$dom->loadXML($xml, LIBXML_NONET)) {
+            return null;
+        }
+
+        $paragraphs = [];
+
+        foreach ($dom->getElementsByTagNameNS(self::WORD_NS, 'p') as $paragraph) {
+            $paragraphs[] = $paragraph;
+        }
+
+        $changed = false;
+
+        foreach ($paragraphs as $paragraph) {
+            if ($this->fillParagraph($paragraph, $values)) {
+                $changed = true;
+            }
+        }
+
+        if (! $changed) {
+            return null;
+        }
+
+        return $dom->saveXML();
+    }
+
+    private function fillParagraph(DOMElement $paragraph, array $values): bool
+    {
+        $textNodes = [];
+
+        foreach ($paragraph->getElementsByTagNameNS(self::WORD_NS, 't') as $textNode) {
+            $textNodes[] = $textNode;
+        }
+
+        if (empty($textNodes)) {
+            return false;
+        }
+
+        $full = '';
+
+        foreach ($textNodes as $textNode) {
+            $full .= $textNode->nodeValue;
+        }
+
+        if (! str_contains($full, '{{')) {
+            return false;
+        }
+
+        $replaced = preg_replace_callback(
             '/\{\{\s*([a-z][a-z0-9_.]*)\s*\}\}/i',
             function (array $match) use ($values): string {
                 $key = strtolower($match[1]);
-                $value = $values[$key] ?? null;
 
-                if ($value === null) {
-                    return $match[0];
-                }
-
-                return $this->escapeForXml((string) $value);
+                return array_key_exists($key, $values)
+                    ? (string) $values[$key]
+                    : $match[0];
             },
-            $xml,
+            $full,
         );
-    }
 
-    private function escapeForXml(string $value): string
-    {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_XML1, 'UTF-8');
+        if ($replaced === $full) {
+            return false;
+        }
+
+        $textNodes[0]->nodeValue = $replaced;
+        $textNodes[0]->setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
+
+        $count = count($textNodes);
+
+        for ($i = 1; $i < $count; $i++) {
+            $textNodes[$i]->nodeValue = '';
+        }
+
+        return true;
     }
 }
