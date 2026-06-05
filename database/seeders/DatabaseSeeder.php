@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             ContactSeeder::class,
             UserSeeder::class,
             TestUsersSeeder::class,
+            SettingsSeeder::class,
             OrdersSeeder::class,
         ]);
     }
