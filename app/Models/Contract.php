@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Services\Documents\ContractPlaceholderValues;
+use App\Services\Documents\TemplateFiller;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Contract extends Model
@@ -109,6 +112,43 @@ class Contract extends Model
     public function refreshDocumentKey(): void
     {
         $this->update(['document_key' => static::generateDocumentKey()]);
+    }
+
+    public function documentPath(): string
+    {
+        return "contracts/{$this->id}/draft.docx";
+    }
+
+    public function documentAbsolutePath(): string
+    {
+        return Storage::disk('local')->path($this->documentPath());
+    }
+
+    public function documentExists(): bool
+    {
+        return Storage::disk('local')->exists($this->documentPath());
+    }
+
+    public function buildDocumentFromTemplate(TemplateFiller $filler, ContractPlaceholderValues $values): void
+    {
+        $template = $this->template;
+
+        if (! $template || ! $template->template_file) {
+            return;
+        }
+
+        $templateAbsolute = Storage::disk('local')->path($template->template_file);
+
+        if (! is_file($templateAbsolute)) {
+            return;
+        }
+
+        $filler->fill($templateAbsolute, $this->documentAbsolutePath(), $values->for($this));
+
+        $this->update([
+            'document_file' => $this->documentPath(),
+            'document_key' => static::generateDocumentKey(),
+        ]);
     }
 
     public function template(): BelongsTo
