@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('contract_templates', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('order_type_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
             $table->string('language', 2)->default('ru');
             $table->string('template_file');
@@ -17,6 +18,7 @@ return new class extends Migration
             $table->boolean('status')->default(true);
             $table->timestamps();
 
+            $table->index('order_type_id');
             $table->index('language');
             $table->index('status');
         });

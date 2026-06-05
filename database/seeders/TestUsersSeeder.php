@@ -67,5 +67,30 @@ class TestUsersSeeder extends Seeder
 
             $user->syncRoles([$data['role']]);
         }
+
+        $this->wireDefaultRecipients();
+    }
+
+    protected function wireDefaultRecipients(): void
+    {
+        $legal = User::firstWhere('email', 'legal@test.uz');
+        $financial = User::firstWhere('email', 'financial@test.uz');
+        $accounting = User::firstWhere('email', 'accounting@test.uz');
+        $director = User::firstWhere('email', 'mr.silverwind1998@gmail.com');
+
+        $chainForOwner = collect([$legal, $financial, $accounting])
+            ->filter()
+            ->pluck('id')
+            ->all();
+
+        $chainForManager = collect([$legal, $financial, $accounting, $director])
+            ->filter()
+            ->pluck('id')
+            ->all();
+
+        $director?->defaultRecipients()->sync($chainForOwner);
+
+        $manager = User::firstWhere('email', 'manager@test.uz');
+        $manager?->defaultRecipients()->sync($chainForManager);
     }
 }

@@ -24,6 +24,11 @@ class ContractTemplatesTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('orderType.title')
+                    ->label(__('app.label.order_type_single'))
+                    ->badge()
+                    ->placeholder('—'),
+
                 TextColumn::make('language')
                     ->label(__('app.label.language'))
                     ->badge()

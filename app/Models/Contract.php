@@ -20,6 +20,7 @@ class Contract extends Model
     protected $fillable = [
         'number',
         'contract_template_id',
+        'order_type_id',
         'contact_id',
         'currency_id',
         'responsible_id',
@@ -186,6 +187,11 @@ class Contract extends Model
     public function template(): BelongsTo
     {
         return $this->belongsTo(ContractTemplate::class, 'contract_template_id');
+    }
+
+    public function orderType(): BelongsTo
+    {
+        return $this->belongsTo(OrderType::class);
     }
 
     public function contact(): BelongsTo

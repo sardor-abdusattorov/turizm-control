@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contracts;
 
 use App\Filament\Resources\Contracts\Pages\CreateContract;
 use App\Filament\Resources\Contracts\Pages\EditContract;
+use App\Filament\Resources\Contracts\Pages\EditContractDocument;
 use App\Filament\Resources\Contracts\Pages\ListContracts;
 use App\Filament\Resources\Contracts\RelationManagers\ApproversRelationManager;
 use App\Filament\Resources\Contracts\Schemas\ContractForm;
@@ -71,6 +72,7 @@ class ContractResource extends Resource
             'index' => ListContracts::route('/'),
             'create' => CreateContract::route('/create'),
             'edit' => EditContract::route('/{record}/edit'),
+            'document' => EditContractDocument::route('/{record}/document'),
         ];
     }
 }

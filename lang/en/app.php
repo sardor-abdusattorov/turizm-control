@@ -64,6 +64,7 @@ return [
         'order_single' => 'Order',
         'order_plural' => 'Orders',
         'order_type_single' => 'Order Type',
+        'no_category' => 'No category',
         'order_type_plural' => 'Order Types',
         'order_file' => 'Order File',
 
@@ -248,6 +249,8 @@ return [
     'helper' => [
         'template_file' => 'Upload the contract as a .docx with {{placeholders}} where values should be inserted. Max 10 MB.',
         'contract_template_choice' => 'Pick a template — its language is shown in brackets and sets the contract language.',
+        'contract_order_type' => 'Optional category to group contracts in reports.',
+        'approval_chain_form' => 'Pre-filled from your profile. Drag rows to reorder, add or remove approvers for this contract specifically.',
         'metrics_yandex' => 'Insert Yandex Metrica tracking code here',
         'metrics_google' => 'Insert Google Analytics tracking code here',
         'seo_og_image' => 'Recommended size: 1200x630px. PNG or JPEG format.',

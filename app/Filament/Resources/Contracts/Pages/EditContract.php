@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Contracts\Pages;
 
-use App\Filament\Pages\ContractDocumentEditor;
 use App\Filament\Resources\Contracts\ContractResource;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -19,7 +18,7 @@ class EditContract extends EditRecord
                 ->label(__('app.action.open_editor'))
                 ->icon('heroicon-o-pencil-square')
                 ->color('primary')
-                ->url(fn () => ContractDocumentEditor::getUrl(['record' => $this->record]))
+                ->url(fn () => ContractResource::getUrl('document', ['record' => $this->record]))
                 ->visible(fn () => $this->record?->documentExists()),
 
             DeleteAction::make()

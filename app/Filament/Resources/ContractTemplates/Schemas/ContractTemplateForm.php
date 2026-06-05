@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ContractTemplates\Schemas;
 
 use App\Models\ContractTemplate;
+use App\Models\OrderType;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -28,6 +29,13 @@ class ContractTemplateForm
                                     ->label(__('app.label.contract_template_name'))
                                     ->required()
                                     ->maxLength(255),
+
+                                Select::make('order_type_id')
+                                    ->label(__('app.label.order_type_single'))
+                                    ->options(OrderType::getActive())
+                                    ->searchable()
+                                    ->preload()
+                                    ->placeholder(__('app.label.no_category')),
 
                                 Select::make('language')
                                     ->label(__('app.label.language'))

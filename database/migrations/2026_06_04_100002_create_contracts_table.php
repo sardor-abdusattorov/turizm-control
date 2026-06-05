@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('number', 50)->unique();
             $table->foreignId('contract_template_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('order_type_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('contact_id')->constrained()->restrictOnDelete();
             $table->foreignId('currency_id')->constrained()->restrictOnDelete();
             $table->foreignId('responsible_id')->constrained('users')->cascadeOnDelete();
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('status');
+            $table->index('order_type_id');
         });
     }
 
