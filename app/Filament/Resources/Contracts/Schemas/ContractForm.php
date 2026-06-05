@@ -10,8 +10,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class ContractForm
@@ -31,29 +29,21 @@ class ContractForm
                                     ->maxLength(50)
                                     ->unique('contracts', 'number', ignoreRecord: true),
 
-                                Select::make('language')
-                                    ->label(__('app.label.language'))
-                                    ->options(ContractTemplate::getLanguages())
-                                    ->default('ru')
-                                    ->required()
-                                    ->native(false)
-                                    ->live()
-                                    ->afterStateUpdated(fn (Set $set) => $set('contract_template_id', null)),
-
                                 Select::make('contract_template_id')
                                     ->label(__('app.label.contract_template_single'))
-                                    ->options(function (Get $get): array {
-                                        $language = $get('language') ?: 'ru';
-
-                                        return ContractTemplate::query()
-                                            ->where('language', $language)
+                                    ->options(
+                                        ContractTemplate::query()
                                             ->active()
                                             ->orderBy('sort')
-                                            ->pluck('name', 'id')
-                                            ->toArray();
-                                    })
+                                            ->get()
+                                            ->mapWithKeys(fn (ContractTemplate $t): array => [
+                                                $t->id => $t->name.' ('.strtoupper($t->language).')',
+                                            ])
+                                            ->toArray()
+                                    )
                                     ->required()
                                     ->searchable()
+                                    ->preload()
                                     ->helperText(__('app.helper.contract_template_choice')),
 
                                 Select::make('contact_id')
@@ -64,12 +54,13 @@ class ContractForm
                                     ->preload()
                                     ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema))
                                     ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey()),
-                            ]),
 
-                        TextInput::make('title')
-                            ->label(__('app.label.contract_title'))
-                            ->required()
-                            ->maxLength(255),
+                                TextInput::make('title')
+                                    ->label(__('app.label.contract_title'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
+                            ]),
 
                         Grid::make(['default' => 1, 'md' => 2])
                             ->schema([

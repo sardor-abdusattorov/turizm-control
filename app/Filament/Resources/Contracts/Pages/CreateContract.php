@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Filament\Pages\ContractDocumentEditor;
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Models\ContractTemplate;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
 use Filament\Resources\Pages\CreateRecord;
@@ -16,6 +17,7 @@ class CreateContract extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['responsible_id'] = Auth::id();
+        $data['language'] = ContractTemplate::find($data['contract_template_id'] ?? null)?->language ?? 'ru';
 
         return $data;
     }
