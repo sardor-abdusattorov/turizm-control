@@ -230,6 +230,7 @@ return [
         ],
     ],
     'message' => [
+        'loading_editor' => 'Loading editor…',
         'profile_updated' => 'Profile updated successfully',
         'password_updated' => 'Password updated successfully',
         'confirm_logout_other_sessions' => 'Please enter your password to confirm you would like to log out of your other browser sessions across all of your devices.',
