@@ -141,6 +141,8 @@ return [
         'sort' => 'Sort',
         'position' => 'Position',
         'position_single' => 'Position',
+        'full_name' => 'Full name',
+        'acted_at' => 'Acted at',
         'position_plural' => 'Positions',
         'position_name' => 'Position Name',
         'general_information' => 'General Information',

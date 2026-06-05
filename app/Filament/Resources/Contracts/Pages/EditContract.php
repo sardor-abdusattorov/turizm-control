@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Filament\Pages\ContractDocumentEditor;
 use App\Filament\Resources\Contracts\ContractResource;
-use App\Models\Contract;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;

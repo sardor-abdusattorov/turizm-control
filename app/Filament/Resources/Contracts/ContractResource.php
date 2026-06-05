@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Contracts;
 use App\Filament\Resources\Contracts\Pages\CreateContract;
 use App\Filament\Resources\Contracts\Pages\EditContract;
 use App\Filament\Resources\Contracts\Pages\ListContracts;
+use App\Filament\Resources\Contracts\RelationManagers\ApproversRelationManager;
 use App\Filament\Resources\Contracts\Schemas\ContractForm;
 use App\Filament\Resources\Contracts\Tables\ContractsTable;
 use App\Models\Contract;
@@ -59,7 +60,9 @@ class ContractResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            ApproversRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

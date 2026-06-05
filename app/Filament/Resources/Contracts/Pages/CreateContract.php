@@ -26,6 +26,8 @@ class CreateContract extends CreateRecord
             app(TemplateFiller::class),
             app(ContractPlaceholderValues::class),
         );
+
+        $this->record->buildApproverChain();
     }
 
     protected function getRedirectUrl(): string

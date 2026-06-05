@@ -151,6 +151,42 @@ class Contract extends Model
         ]);
     }
 
+    public function buildApproverChain(): int
+    {
+        $manager = $this->responsible;
+
+        if (! $manager) {
+            return 0;
+        }
+
+        $flow = Department::approvalFlow();
+
+        $recipients = $manager->defaultRecipients()
+            ->where('users.status', User::STATUS_ACTIVE)
+            ->with('department')
+            ->get()
+            ->filter(fn (User $user): bool => $user->department?->isApproverDepartment() ?? false)
+            ->groupBy(fn (User $user): string => (string) $user->department?->code);
+
+        $created = 0;
+        $order = 1;
+
+        foreach ($flow as $code) {
+            foreach ($recipients->get($code, collect()) as $recipient) {
+                ContractApprover::create([
+                    'contract_id' => $this->id,
+                    'user_id' => $recipient->id,
+                    'order' => $order++,
+                    'status' => ContractApprover::STATUS_PENDING,
+                ]);
+
+                $created++;
+            }
+        }
+
+        return $created;
+    }
+
     public function template(): BelongsTo
     {
         return $this->belongsTo(ContractTemplate::class, 'contract_template_id');
