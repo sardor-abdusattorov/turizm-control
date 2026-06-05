@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\ContractTemplates\Schemas;
 
 use App\Models\ContractTemplate;
-use App\Models\OrderType;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -25,12 +24,10 @@ class ContractTemplateForm
                     ->schema([
                         Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
-                                Select::make('order_type_id')
-                                    ->label(__('app.label.order_type_single'))
-                                    ->options(OrderType::getActive())
+                                TextInput::make('name')
+                                    ->label(__('app.label.contract_template_name'))
                                     ->required()
-                                    ->searchable()
-                                    ->preload(),
+                                    ->maxLength(255),
 
                                 Select::make('language')
                                     ->label(__('app.label.language'))
@@ -38,11 +35,6 @@ class ContractTemplateForm
                                     ->default('ru')
                                     ->required()
                                     ->native(false),
-
-                                TextInput::make('name')
-                                    ->label(__('app.label.contract_template_name'))
-                                    ->required()
-                                    ->maxLength(255),
 
                                 TextInput::make('sort')
                                     ->label(__('app.label.sort'))
@@ -77,10 +69,11 @@ class ContractTemplateForm
     protected static function placeholderHint(): string
     {
         $items = [
-            '{{number}}', '{{date.day}}', '{{date.month}}', '{{date.year}}',
-            '{{deadline}}', '{{amount}}', '{{currency}}',
-            '{{contact.name}}', '{{contact.legal_form}}', '{{contact.inn}}',
-            '{{contact.pinfl}}', '{{contact.oked}}', '{{contact.director}}',
+            '{{number}}', '{{title}}',
+            '{{date.day}}', '{{date.month}}', '{{date.year}}', '{{date.full}}',
+            '{{amount}}', '{{currency}}',
+            '{{contact.name}}', '{{contact.legal_form}}', '{{contact.director}}',
+            '{{contact.inn}}', '{{contact.pinfl}}', '{{contact.oked}}',
             '{{contact.address}}', '{{contact.phone}}', '{{contact.email}}',
             '{{contact.bank_account}}', '{{contact.bank_name}}', '{{contact.mfo}}',
         ];

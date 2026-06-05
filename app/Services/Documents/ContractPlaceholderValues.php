@@ -12,7 +12,6 @@ class ContractPlaceholderValues
 
         $contact = $contract->contact;
         $currency = $contract->currency;
-        $deadline = $contract->deadline_at;
         $signed = $contract->signed_at;
         $created = $contract->created_at ?? now();
         $locale = $contract->language ?: 'ru';
@@ -30,11 +29,9 @@ class ContractPlaceholderValues
             'date.month' => $created->format('m'),
             'date.year' => $created->format('Y'),
             'date.full' => $created->format('d.m.Y'),
-            'deadline' => $deadline?->format('d.m.Y') ?? '',
             'signed_at' => $signed?->format('d.m.Y') ?? '',
             'amount' => number_format((float) $contract->amount, 2, '.', ' '),
             'currency' => (string) ($currency?->short_name ?? ''),
-            'signing_place' => (string) ($contract->signing_place ?? ''),
             'contact.name' => (string) $contactName,
             'contact.legal_form' => (string) ($contact?->legal_form ?? ''),
             'contact.inn' => (string) ($contact?->inn ?? ''),

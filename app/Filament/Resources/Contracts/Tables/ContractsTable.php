@@ -32,11 +32,6 @@ class ContractsTable
                     ->wrap()
                     ->limit(50),
 
-                TextColumn::make('orderType.title')
-                    ->label(__('app.label.order_type_single'))
-                    ->badge()
-                    ->toggleable(),
-
                 TextColumn::make('contact.name')
                     ->label(__('app.label.contact_single'))
                     ->searchable()
@@ -54,11 +49,6 @@ class ContractsTable
                     ->color(fn (string $state) => Contract::getStatusColors()[$state] ?? 'gray')
                     ->sortable(),
 
-                TextColumn::make('deadline_at')
-                    ->label(__('app.label.deadline'))
-                    ->date('d.m.Y')
-                    ->sortable(),
-
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))
                     ->toggleable(),
@@ -70,12 +60,6 @@ class ContractsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('order_type_id')
-                    ->label(__('app.label.order_type_single'))
-                    ->relationship('orderType', 'title')
-                    ->searchable()
-                    ->preload(),
-
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
                     ->options(Contract::getStatuses()),

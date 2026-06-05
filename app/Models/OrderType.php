@@ -63,14 +63,4 @@ class OrderType extends Model
     {
         return $this->hasMany(Order::class);
     }
-
-    public function contracts(): HasMany
-    {
-        return $this->hasMany(Contract::class);
-    }
-
-    public function contractTemplates(): HasMany
-    {
-        return $this->hasMany(ContractTemplate::class);
-    }
 }

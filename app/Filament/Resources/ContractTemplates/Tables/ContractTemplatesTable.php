@@ -24,11 +24,6 @@ class ContractTemplatesTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('orderType.title')
-                    ->label(__('app.label.order_type_single'))
-                    ->badge()
-                    ->sortable(),
-
                 TextColumn::make('language')
                     ->label(__('app.label.language'))
                     ->badge()
@@ -53,12 +48,6 @@ class ContractTemplatesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('order_type_id')
-                    ->label(__('app.label.order_type_single'))
-                    ->relationship('orderType', 'title')
-                    ->searchable()
-                    ->preload(),
-
                 SelectFilter::make('language')
                     ->label(__('app.label.language'))
                     ->options(ContractTemplate::getLanguages()),

@@ -12,16 +12,13 @@ return new class extends Migration
             $table->id();
             $table->string('number', 50)->unique();
             $table->foreignId('contract_template_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('order_type_id')->constrained()->restrictOnDelete();
             $table->foreignId('contact_id')->constrained()->restrictOnDelete();
             $table->foreignId('currency_id')->constrained()->restrictOnDelete();
             $table->foreignId('responsible_id')->constrained('users')->cascadeOnDelete();
             $table->string('language', 2)->default('ru');
             $table->string('title');
             $table->decimal('amount', 15, 2)->default(0);
-            $table->string('signing_place')->nullable();
             $table->string('status', 30)->default('draft');
-            $table->date('deadline_at')->nullable();
             $table->date('signed_at')->nullable();
 
             $table->string('document_file')->nullable();
@@ -31,8 +28,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('status');
-            $table->index('deadline_at');
-            $table->index('order_type_id');
         });
     }
 

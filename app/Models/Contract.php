@@ -20,16 +20,13 @@ class Contract extends Model
     protected $fillable = [
         'number',
         'contract_template_id',
-        'order_type_id',
         'contact_id',
         'currency_id',
         'responsible_id',
         'language',
         'title',
         'amount',
-        'signing_place',
         'status',
-        'deadline_at',
         'signed_at',
         'document_file',
         'document_key',
@@ -38,7 +35,6 @@ class Contract extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
-        'deadline_at' => 'date',
         'signed_at' => 'date',
     ];
 
@@ -190,11 +186,6 @@ class Contract extends Model
     public function template(): BelongsTo
     {
         return $this->belongsTo(ContractTemplate::class, 'contract_template_id');
-    }
-
-    public function orderType(): BelongsTo
-    {
-        return $this->belongsTo(OrderType::class);
     }
 
     public function contact(): BelongsTo

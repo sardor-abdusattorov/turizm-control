@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ContractTemplate extends Model
@@ -12,7 +11,6 @@ class ContractTemplate extends Model
     use HasFactory;
 
     protected $fillable = [
-        'order_type_id',
         'name',
         'language',
         'template_file',
@@ -49,22 +47,6 @@ class ContractTemplate extends Model
     public function scopeActive($query)
     {
         return $query->where('status', self::STATUS_ACTIVE);
-    }
-
-    public static function defaultForOrderType(int $orderTypeId, string $language = 'ru'): ?self
-    {
-        return static::query()
-            ->where('order_type_id', $orderTypeId)
-            ->where('language', $language)
-            ->active()
-            ->orderBy('sort')
-            ->orderBy('id')
-            ->first();
-    }
-
-    public function orderType(): BelongsTo
-    {
-        return $this->belongsTo(OrderType::class);
     }
 
     public function contracts(): HasMany
