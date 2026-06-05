@@ -30,6 +30,8 @@ class ContractApprover extends Model
 
     public const STATUS_REJECTED = 'rejected';
 
+    public const STATUS_RETURNED = 'returned';
+
     public const STATUS_SKIPPED = 'skipped';
 
     public static function getStatuses(): array
@@ -38,6 +40,7 @@ class ContractApprover extends Model
             self::STATUS_PENDING => __('app.contract_approver.status.pending'),
             self::STATUS_APPROVED => __('app.contract_approver.status.approved'),
             self::STATUS_REJECTED => __('app.contract_approver.status.rejected'),
+            self::STATUS_RETURNED => __('app.contract_approver.status.returned'),
             self::STATUS_SKIPPED => __('app.contract_approver.status.skipped'),
         ];
     }
@@ -48,6 +51,7 @@ class ContractApprover extends Model
             self::STATUS_PENDING => 'warning',
             self::STATUS_APPROVED => 'success',
             self::STATUS_REJECTED => 'danger',
+            self::STATUS_RETURNED => 'info',
             self::STATUS_SKIPPED => 'gray',
         ];
     }
@@ -75,6 +79,15 @@ class ContractApprover extends Model
     {
         $this->update([
             'status' => self::STATUS_REJECTED,
+            'comment' => $comment,
+            'acted_at' => now(),
+        ]);
+    }
+
+    public function markReturned(?string $comment = null): void
+    {
+        $this->update([
+            'status' => self::STATUS_RETURNED,
             'comment' => $comment,
             'acted_at' => now(),
         ]);

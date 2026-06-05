@@ -238,6 +238,7 @@ return [
         'other_sessions_logged_out' => 'Other browser sessions logged out successfully',
         'submit_for_approval_confirm' => 'The contract will be sent to the configured approval chain and you will not be able to edit it without resetting approvals. Continue?',
         'submitted_for_approval' => 'Contract sent for approval',
+        'action_not_allowed' => 'This action is not allowed for the contract in its current state',
         'contract_submitted' => 'Contract sent for approval',
         'contract_approved' => 'Contract approved',
         'contract_rejected' => 'Contract rejected',
@@ -324,6 +325,7 @@ return [
             'pending' => 'Pending',
             'approved' => 'Approved',
             'rejected' => 'Rejected',
+            'returned' => 'Returned',
             'skipped' => 'Skipped',
         ],
         'signature' => [
