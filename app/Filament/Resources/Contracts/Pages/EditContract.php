@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Models\Contract;
 use App\Services\Contracts\ContractWorkflow;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -17,6 +18,13 @@ class EditContract extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('downloadPdf')
+                ->label(__('app.action.download_pdf'))
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('success')
+                ->url(fn () => route('contracts.pdf.download', ['contract' => $this->record]))
+                ->visible(fn () => $this->record?->status === Contract::STATUS_APPROVED),
+
             Action::make('openEditor')
                 ->label(__('app.action.open_editor'))
                 ->icon('heroicon-o-pencil-square')

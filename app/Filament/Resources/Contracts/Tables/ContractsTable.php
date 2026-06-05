@@ -68,6 +68,13 @@ class ContractsTable
                 ViewAction::make(),
 
                 ActionGroup::make([
+                    Action::make('downloadPdf')
+                        ->label(__('app.action.download_pdf'))
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->color('success')
+                        ->url(fn (Contract $record) => route('contracts.pdf.download', ['contract' => $record]))
+                        ->visible(fn (Contract $record) => $record->status === Contract::STATUS_APPROVED),
+
                     Action::make('openEditor')
                         ->label(__('app.action.open_editor'))
                         ->icon('heroicon-o-pencil-square')

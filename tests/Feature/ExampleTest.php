@@ -1,7 +1,5 @@
 <?php
 
-test('the application returns a successful response', function () {
-    $response = $this->get('/');
-
-    $response->assertStatus(200);
+test('guests are redirected to login from the Filament panel', function () {
+    $this->get('/')->assertRedirect('/login');
 });

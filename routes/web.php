@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ContractEditorController;
+use App\Http\Controllers\ContractPdfController;
 use App\Http\Controllers\OnlyOfficeContractController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,4 +14,10 @@ Route::post('/onlyoffice/{contract}/callback', [OnlyOfficeContractController::cl
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/contracts/{contract}/editor', [ContractEditorController::class, 'show'])
         ->name('contracts.editor');
+
+    Route::get('/contracts/{contract}/pdf', [ContractPdfController::class, 'download'])
+        ->name('contracts.pdf.download');
+
+    Route::get('/contracts/{contract}/pdf/inline', [ContractPdfController::class, 'inline'])
+        ->name('contracts.pdf.inline');
 });

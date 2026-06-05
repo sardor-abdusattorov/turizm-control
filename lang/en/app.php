@@ -209,6 +209,7 @@ return [
         'open_editor' => 'Open editor',
         'save' => 'Save',
         'download_pdf' => 'Download PDF',
+        'preview_pdf' => 'Preview PDF',
         'open_contract' => 'Open contract',
     ],
     'notification' => [

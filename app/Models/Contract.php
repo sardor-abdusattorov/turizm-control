@@ -286,6 +286,25 @@ class Contract extends Model
             && $this->isCurrentApprover($user);
     }
 
+    public function canBeViewedBy(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        if ($this->responsible_id === $user->id) {
+            return true;
+        }
+
+        return $this->approvers()->where('user_id', $user->id)->exists();
+    }
+
     public function canBeEditedBy(?User $user = null): bool
     {
         $user ??= auth()->user();
