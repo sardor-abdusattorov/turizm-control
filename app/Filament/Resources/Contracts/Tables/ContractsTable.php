@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Contracts\Tables;
 
-use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -70,7 +69,7 @@ class ContractsTable
                         ->label(__('app.action.open_editor'))
                         ->icon('heroicon-o-pencil-square')
                         ->color('primary')
-                        ->url(fn (Contract $record) => ContractResource::getUrl('document', ['record' => $record]))
+                        ->url(fn (Contract $record) => route('contracts.editor', ['contract' => $record]))
                         ->visible(fn (Contract $record) => $record->documentExists()),
 
                     EditAction::make(),

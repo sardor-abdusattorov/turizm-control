@@ -54,6 +54,6 @@ class CreateContract extends CreateRecord
 
     protected function getRedirectUrl(): string
     {
-        return ContractResource::getUrl('document', ['record' => $this->record]);
+        return route('contracts.editor', ['contract' => $this->record]);
     }
 }
