@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Services\OnlyOffice\OnlyOfficeService;
 use Illuminate\Contracts\View\View;
@@ -19,7 +20,7 @@ class ContractEditorController extends Controller
             'contract' => $contract,
             'apiScriptUrl' => $service->apiScriptUrl(),
             'config' => $service->editorConfig($contract, auth()->user()),
-            'backUrl' => '/admin/contracts/'.$contract->id.'/edit',
+            'backUrl' => ContractResource::getUrl('edit', ['record' => $contract]),
         ]);
     }
 }
