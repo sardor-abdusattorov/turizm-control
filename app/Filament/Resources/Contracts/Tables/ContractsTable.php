@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contracts\Tables;
 
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
+use App\Services\Contracts\ContractWorkflow;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -11,6 +12,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -73,16 +75,46 @@ class ContractsTable
                     Action::make('downloadPdf')
                         ->label(__('app.action.download_pdf'))
                         ->icon('heroicon-o-document-arrow-down')
-                        ->color('success')
                         ->url(fn (Contract $record) => route('contracts.pdf.download', ['contract' => $record]))
                         ->visible(fn (Contract $record) => $record->status === Contract::STATUS_APPROVED),
+
+                    Action::make('previewPdf')
+                        ->label(__('app.action.preview_pdf'))
+                        ->icon('heroicon-o-eye')
+                        ->url(
+                            fn (Contract $record) => route('contracts.pdf.inline', ['contract' => $record]),
+                            shouldOpenInNewTab: true,
+                        )
+                        ->visible(fn (Contract $record) => $record->documentExists() && in_array($record->status, [
+                            Contract::STATUS_IN_REVIEW,
+                            Contract::STATUS_APPROVED,
+                        ], true)),
 
                     Action::make('openEditor')
                         ->label(__('app.action.open_editor'))
                         ->icon('heroicon-o-pencil-square')
-                        ->color('primary')
                         ->url(fn (Contract $record) => route('contracts.editor', ['contract' => $record]))
                         ->visible(fn (Contract $record) => $record->documentExists() && $record->canBeEditedBy()),
+
+                    Action::make('submitForApproval')
+                        ->label(__('app.action.submit_for_approval'))
+                        ->icon('heroicon-o-paper-airplane')
+                        ->requiresConfirmation()
+                        ->modalHeading(__('app.action.submit_for_approval'))
+                        ->modalDescription(__('app.message.submit_for_approval_confirm'))
+                        ->visible(fn (Contract $record) => $record->canBeSubmittedBy())
+                        ->action(function (Contract $record, ContractWorkflow $workflow): void {
+                            if (! $workflow->submit($record)) {
+                                Notification::make()->title(__('app.message.action_not_allowed'))->danger()->send();
+
+                                return;
+                            }
+
+                            Notification::make()
+                                ->title(__('app.message.submitted_for_approval'))
+                                ->success()
+                                ->send();
+                        }),
 
                     EditAction::make()
                         ->visible(fn (Contract $record) => $record->canBeEditedBy()),
