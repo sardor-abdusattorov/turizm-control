@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Contracts\Tables;
 
+use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -64,10 +65,11 @@ class ContractsTable
                     ->label(__('app.label.status'))
                     ->options(Contract::getStatuses()),
             ])
+            ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))
             ->recordActions([
-                ViewAction::make(),
-
                 ActionGroup::make([
+                    ViewAction::make(),
+
                     Action::make('downloadPdf')
                         ->label(__('app.action.download_pdf'))
                         ->icon('heroicon-o-document-arrow-down')
