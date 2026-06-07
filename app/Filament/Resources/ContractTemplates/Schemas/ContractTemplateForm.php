@@ -22,40 +22,48 @@ class ContractTemplateForm
             ->columns(1)
             ->components([
                 Section::make(__('app.label.basic_information'))
+                    ->collapsible()
                     ->schema([
-                        Grid::make(['default' => 1, 'md' => 2])
+                        Grid::make(['default' => 1, 'md' => 12])
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('app.label.contract_template_name'))
                                     ->required()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->columnSpan(['default' => 12, 'md' => 4]),
 
                                 Select::make('order_type_id')
                                     ->label(__('app.label.order_type_single'))
                                     ->options(OrderType::getActive())
                                     ->searchable()
                                     ->preload()
-                                    ->placeholder(__('app.label.no_category')),
+                                    ->placeholder(__('app.label.no_category'))
+                                    ->columnSpan(['default' => 12, 'md' => 3]),
 
                                 Select::make('language')
                                     ->label(__('app.label.language'))
                                     ->options(ContractTemplate::getLanguages())
                                     ->default('ru')
                                     ->required()
-                                    ->native(false),
+                                    ->native(false)
+                                    ->columnSpan(['default' => 12, 'md' => 2]),
 
                                 TextInput::make('sort')
                                     ->label(__('app.label.sort'))
                                     ->numeric()
-                                    ->default(0),
-                            ]),
+                                    ->default(0)
+                                    ->columnSpan(['default' => 12, 'md' => 1]),
 
-                        Toggle::make('status')
-                            ->label(__('app.label.status'))
-                            ->default(true),
+                                Toggle::make('status')
+                                    ->label(__('app.label.status'))
+                                    ->default(true)
+                                    ->inline(false)
+                                    ->columnSpan(['default' => 12, 'md' => 2]),
+                            ]),
                     ]),
 
                 Section::make(__('app.label.contract_template_file'))
+                    ->collapsible()
                     ->schema([
                         FileUpload::make('template_file')
                             ->label(__('app.label.template_file'))
