@@ -6,14 +6,13 @@ use App\Filament\Support\DocumentUpload;
 use App\Models\ContractTemplate;
 use App\Models\OrderType;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Support\HtmlString;
 
 class ContractTemplateForm
 {
@@ -81,13 +80,14 @@ class ContractTemplateForm
                                 ->visible(fn (?ContractTemplate $record) => $record?->templateExists() ?? false),
                         ])->columnSpanFull(),
 
-                        Placeholder::make('editor_hint')
+                        TextEntry::make('editor_hint')
                             ->hiddenLabel()
-                            ->content(__('app.helper.template_editor_independent')),
+                            ->state(__('app.helper.template_editor_independent')),
 
-                        Placeholder::make('placeholders_hint')
+                        TextEntry::make('placeholders_hint')
                             ->label(__('app.label.available_placeholders'))
-                            ->content(new HtmlString(self::placeholderHint())),
+                            ->state(self::placeholderHint())
+                            ->html(),
                     ]),
             ]);
     }
