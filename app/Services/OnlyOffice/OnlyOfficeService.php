@@ -186,17 +186,16 @@ class OnlyOfficeService
      */
     private function customization(): array
     {
-        return array_filter([
+        return [
             'forcesave' => true,
             'autosave' => true,
             'compactHeader' => false,
-            'uiTheme' => config('onlyoffice.ui_theme'),
             'review' => [
                 'showReviewChanges' => true,
                 'reviewDisplay' => 'markup',
                 'hoverMode' => true,
             ],
-        ], static fn (mixed $value): bool => $value !== null && $value !== '');
+        ];
     }
 
     private function permissionSet(bool $edit, bool $review, bool $comment): array
