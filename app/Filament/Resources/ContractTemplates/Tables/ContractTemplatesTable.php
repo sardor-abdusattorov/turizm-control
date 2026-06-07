@@ -28,6 +28,13 @@ class ContractTemplatesTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('template_file')
+                    ->label(__('app.label.document'))
+                    ->icon('heroicon-o-document-text')
+                    ->iconColor('primary')
+                    ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : '—')
+                    ->limit(35),
+
                 TextColumn::make('orderType.title')
                     ->label(__('app.label.order_type_single'))
                     ->badge()
@@ -65,7 +72,10 @@ class ContractTemplatesTable
                     ->label(__('app.label.status'))
                     ->options(ContractTemplate::getStatuses()),
             ])
-            ->recordUrl(fn (ContractTemplate $record) => ContractTemplateResource::getUrl('view', ['record' => $record]))
+            ->recordUrl(fn (ContractTemplate $record) => $record->templateExists()
+                ? route('contract-templates.editor', ['template' => $record, 'mode' => 'edit'])
+                : ContractTemplateResource::getUrl('view', ['record' => $record])
+            )
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make(),
