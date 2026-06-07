@@ -4,6 +4,7 @@ namespace App\Services\OnlyOffice;
 
 use App\Models\Contract;
 use App\Models\ContractTemplate;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -62,6 +63,23 @@ class OnlyOfficeService
             permissions: $permissions,
             mode: $mode,
             lang: $template->language ?: 'ru',
+            user: $user,
+        );
+    }
+
+    public function orderEditorConfig(Order $order, User $user, ?string $forceMode = null): array
+    {
+        $permissions = $this->permissionSet(edit: true, review: true, comment: true);
+        $mode = $this->resolveMode($forceMode, 'edit', $permissions);
+
+        return $this->buildConfig(
+            key: (string) $order->document_key,
+            title: basename((string) $order->file_path),
+            documentUrl: $this->internalRouteUrl('order', $order->id, 'document', $order->document_key),
+            callbackUrl: $this->internalRouteUrl('order', $order->id, 'callback', $order->document_key),
+            permissions: $permissions,
+            mode: $mode,
+            lang: app()->getLocale() ?: 'ru',
             user: $user,
         );
     }
@@ -220,9 +238,11 @@ class OnlyOfficeService
 
     private function internalRouteUrl(string $subject, int $id, string $action, ?string $sharedKey): string
     {
-        $prefix = $subject === 'template'
-            ? "/onlyoffice/template/{$id}/{$action}"
-            : "/onlyoffice/{$id}/{$action}";
+        $prefix = match ($subject) {
+            'template' => "/onlyoffice/template/{$id}/{$action}",
+            'order' => "/onlyoffice/order/{$id}/{$action}",
+            default => "/onlyoffice/{$id}/{$action}",
+        };
 
         return $this->callbackHost().$prefix.'?shared_key='.$sharedKey;
     }

@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use App\Filament\Resources\Orders\OrderResource;
 use App\Models\Order;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -27,6 +29,18 @@ class OrdersTable
                     ->searchable()
                     ->sortable()
                     ->wrap(),
+
+                TextColumn::make('file_path')
+                    ->label(__('app.label.document'))
+                    ->badge()
+                    ->color('primary')
+                    ->icon('heroicon-o-document-text')
+                    ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : '—')
+                    ->limit(35)
+                    ->url(fn (Order $record) => $record->fileExists() && $record->isDocx()
+                        ? route('orders.editor', ['order' => $record, 'mode' => 'edit'])
+                        : null
+                    ),
 
                 TextColumn::make('orderType.title')
                     ->label(__('app.label.order_type_single'))
@@ -78,10 +92,15 @@ class OrdersTable
                     ->label(__('app.label.overdue'))
                     ->query(fn (Builder $query) => $query->whereDate('deadline_at', '<', now())),
             ])
+            ->recordUrl(fn (Order $record) => OrderResource::getUrl('view', ['record' => $record]))
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->color('gray'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
