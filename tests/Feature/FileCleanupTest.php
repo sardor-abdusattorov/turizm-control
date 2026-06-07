@@ -46,3 +46,20 @@ it('wipes the contract folder on disk when a contract is deleted', function () {
     Storage::disk('local')->assertMissing("contracts/{$contract->id}/draft.docx");
     Storage::disk('local')->assertMissing("contracts/{$contract->id}/contract.pdf");
 });
+
+it('wipes files for every order in a bulk delete', function () {
+    Storage::fake('public');
+
+    $orders = Order::factory()->count(3)->create();
+
+    foreach ($orders as $i => $order) {
+        $order->update(['file_path' => "uploads/files/orders/bulk-{$i}.docx"]);
+        Storage::disk('public')->put($order->file_path, 'fake');
+    }
+
+    Order::query()->whereIn('id', $orders->pluck('id'))->get()->each->delete();
+
+    foreach ($orders as $i => $order) {
+        Storage::disk('public')->assertMissing("uploads/files/orders/bulk-{$i}.docx");
+    }
+});
