@@ -11,7 +11,6 @@ use App\Models\User;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
@@ -24,71 +23,72 @@ class ContractForm
             ->columns(1)
             ->components([
                 Section::make(__('app.label.basic_information'))
+                    ->collapsible()
                     ->schema([
-                        Grid::make(['default' => 1, 'md' => 2])
-                            ->schema([
-                                TextInput::make('number')
-                                    ->label(__('app.label.contract_number'))
-                                    ->required()
-                                    ->maxLength(50)
-                                    ->unique('contracts', 'number', ignoreRecord: true),
+                        TextInput::make('number')
+                            ->label(__('app.label.contract_number'))
+                            ->required()
+                            ->maxLength(50)
+                            ->unique('contracts', 'number', ignoreRecord: true)
+                            ->columnSpanFull(),
 
-                                Select::make('order_type_id')
-                                    ->label(__('app.label.order_type_single'))
-                                    ->options(OrderType::getActive())
-                                    ->searchable()
-                                    ->preload()
-                                    ->placeholder(__('app.label.no_category'))
-                                    ->helperText(__('app.helper.contract_order_type')),
+                        Select::make('order_type_id')
+                            ->label(__('app.label.order_type_single'))
+                            ->options(OrderType::getActive())
+                            ->searchable()
+                            ->preload()
+                            ->placeholder(__('app.label.no_category'))
+                            ->helperText(__('app.helper.contract_order_type'))
+                            ->columnSpanFull(),
 
-                                Select::make('contract_template_id')
-                                    ->label(__('app.label.contract_template_single'))
-                                    ->options(
-                                        ContractTemplate::query()
-                                            ->active()
-                                            ->orderBy('sort')
-                                            ->get()
-                                            ->mapWithKeys(fn (ContractTemplate $t): array => [
-                                                $t->id => $t->name.' ('.strtoupper($t->language).')',
-                                            ])
-                                            ->toArray()
-                                    )
-                                    ->required()
-                                    ->searchable()
-                                    ->preload()
-                                    ->helperText(__('app.helper.contract_template_choice')),
+                        Select::make('contract_template_id')
+                            ->label(__('app.label.contract_template_single'))
+                            ->options(
+                                ContractTemplate::query()
+                                    ->active()
+                                    ->orderBy('sort')
+                                    ->get()
+                                    ->mapWithKeys(fn (ContractTemplate $t): array => [
+                                        $t->id => $t->name.' ('.strtoupper($t->language).')',
+                                    ])
+                                    ->toArray()
+                            )
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->helperText(__('app.helper.contract_template_choice'))
+                            ->columnSpanFull(),
 
-                                Select::make('contact_id')
-                                    ->label(__('app.label.contact_single'))
-                                    ->options(Contact::getActive())
-                                    ->required()
-                                    ->searchable()
-                                    ->preload()
-                                    ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema))
-                                    ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey()),
+                        Select::make('contact_id')
+                            ->label(__('app.label.contact_single'))
+                            ->options(Contact::getActive())
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema))
+                            ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey())
+                            ->columnSpanFull(),
 
-                                TextInput::make('title')
-                                    ->label(__('app.label.contract_title'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->columnSpanFull(),
-                            ]),
+                        TextInput::make('title')
+                            ->label(__('app.label.contract_title'))
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
 
-                        Grid::make(['default' => 1, 'md' => 2])
-                            ->schema([
-                                TextInput::make('amount')
-                                    ->label(__('app.label.amount'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->required(),
+                        TextInput::make('amount')
+                            ->label(__('app.label.amount'))
+                            ->numeric()
+                            ->default(0)
+                            ->required()
+                            ->columnSpanFull(),
 
-                                Select::make('currency_id')
-                                    ->label(__('app.label.currency_single'))
-                                    ->options(Currency::query()->where('status', true)->pluck('short_name', 'id'))
-                                    ->required()
-                                    ->searchable()
-                                    ->preload(),
-                            ]),
+                        Select::make('currency_id')
+                            ->label(__('app.label.currency_single'))
+                            ->options(Currency::query()->where('status', true)->pluck('short_name', 'id'))
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make(__('app.label.approval_chain'))
