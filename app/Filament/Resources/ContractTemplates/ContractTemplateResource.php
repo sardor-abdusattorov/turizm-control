@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ContractTemplates;
 use App\Filament\Resources\ContractTemplates\Pages\CreateContractTemplate;
 use App\Filament\Resources\ContractTemplates\Pages\EditContractTemplate;
 use App\Filament\Resources\ContractTemplates\Pages\ListContractTemplates;
+use App\Filament\Resources\ContractTemplates\Pages\ViewContractTemplate;
 use App\Filament\Resources\ContractTemplates\Schemas\ContractTemplateForm;
 use App\Filament\Resources\ContractTemplates\Tables\ContractTemplatesTable;
 use App\Models\ContractTemplate;
@@ -67,6 +68,7 @@ class ContractTemplateResource extends Resource
         return [
             'index' => ListContractTemplates::route('/'),
             'create' => CreateContractTemplate::route('/create'),
+            'view' => ViewContractTemplate::route('/{record}'),
             'edit' => EditContractTemplate::route('/{record}/edit'),
         ];
     }

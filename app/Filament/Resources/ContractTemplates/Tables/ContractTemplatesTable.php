@@ -10,6 +10,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -64,11 +65,13 @@ class ContractTemplatesTable
                     ->label(__('app.label.status'))
                     ->options(ContractTemplate::getStatuses()),
             ])
-            ->recordUrl(fn (ContractTemplate $record) => ContractTemplateResource::getUrl('edit', ['record' => $record]))
+            ->recordUrl(fn (ContractTemplate $record) => ContractTemplateResource::getUrl('view', ['record' => $record]))
             ->recordActions([
                 ActionGroup::make([
+                    ViewAction::make(),
+
                     Action::make('openEditor')
-                        ->label(__('app.action.open_editor'))
+                        ->label(__('app.action.open_template_in_editor'))
                         ->icon('heroicon-o-pencil-square')
                         ->url(fn (ContractTemplate $record) => route('contract-templates.editor', ['template' => $record]))
                         ->visible(fn (ContractTemplate $record) => $record->templateExists()),
