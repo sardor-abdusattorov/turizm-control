@@ -109,6 +109,29 @@ it('persists the edited template back to storage on OnlyOffice callback', functi
         ->and($template->fresh()->document_key)->not->toBe($originalKey);
 });
 
+it('keeps the document_key intact on forcesave callbacks during editing', function () {
+    Http::fake([
+        '*/edited-template.docx' => Http::response('%mid-edit-binary'),
+    ]);
+
+    $template = makeTemplateWithFile();
+    $originalKey = $template->document_key;
+
+    post(
+        route('onlyoffice.template.callback', [
+            'template' => $template,
+            'shared_key' => $template->document_key,
+        ]),
+        [
+            'status' => 6,
+            'url' => 'http://onlyoffice/cache/files/edited-template.docx',
+        ],
+    )->assertOk()->assertExactJson(['error' => 0]);
+
+    expect(Storage::disk('local')->get($template->template_file))->toBe('%mid-edit-binary')
+        ->and($template->fresh()->document_key)->toBe($originalKey);
+});
+
 it('rejects OnlyOffice callbacks without a matching shared_key', function () {
     $template = makeTemplateWithFile();
 

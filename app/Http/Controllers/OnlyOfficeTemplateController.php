@@ -39,10 +39,14 @@ class OnlyOfficeTemplateController extends Controller
                     ->body();
 
                 Storage::disk('local')->put($template->template_file, $body);
-                $template->refreshDocumentKey();
+
+                if ($status === 2) {
+                    $template->refreshDocumentKey();
+                }
 
                 Log::info('Contract template saved', [
                     'template_id' => $template->id,
+                    'status' => $status,
                     'bytes' => strlen($body),
                 ]);
             } catch (\Throwable $e) {

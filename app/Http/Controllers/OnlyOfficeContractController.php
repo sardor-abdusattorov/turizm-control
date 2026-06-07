@@ -39,10 +39,14 @@ class OnlyOfficeContractController extends Controller
                     ->body();
 
                 Storage::disk('local')->put($contract->documentPath(), $body);
-                $contract->refreshDocumentKey();
+
+                if ($status === 2) {
+                    $contract->refreshDocumentKey();
+                }
 
                 Log::info('Contract document saved', [
                     'contract_id' => $contract->id,
+                    'status' => $status,
                     'bytes' => strlen($body),
                 ]);
             } catch (\Throwable $e) {
