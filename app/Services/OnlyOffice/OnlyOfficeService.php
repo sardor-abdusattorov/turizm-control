@@ -35,116 +35,35 @@ class OnlyOfficeService
     {
         $permissions = $this->resolvePermissions($contract, $user);
         $defaultMode = ($permissions['edit'] || $permissions['review']) ? 'edit' : 'view';
-        $mode = $this->normaliseMode($forceMode) ?? $defaultMode;
+        $mode = $this->resolveMode($forceMode, $defaultMode, $permissions);
 
-        if ($mode === 'edit' && ! $permissions['edit']) {
-            $mode = $permissions['review'] ? 'review' : 'view';
-        }
-
-        $config = [
-            'documentType' => 'word',
-            'type' => 'desktop',
-            'width' => '100%',
-            'height' => '100%',
-            'document' => [
-                'fileType' => 'docx',
-                'key' => (string) $contract->document_key,
-                'title' => $contract->number.'.docx',
-                'url' => $this->documentUrl($contract),
-                'permissions' => $permissions,
-            ],
-            'editorConfig' => [
-                'mode' => $mode,
-                'lang' => $contract->language ?: 'ru',
-                'callbackUrl' => $this->callbackUrl($contract),
-                'user' => [
-                    'id' => (string) $user->id,
-                    'name' => $user->name,
-                ],
-                'customization' => $this->reviewCustomization(),
-            ],
-        ];
-
-        $config['token'] = $this->signer->encode($config);
-
-        return $config;
+        return $this->buildConfig(
+            key: (string) $contract->document_key,
+            title: $contract->number.'.docx',
+            documentUrl: $this->internalRouteUrl('contract', $contract->id, 'document', $contract->document_key),
+            callbackUrl: $this->internalRouteUrl('contract', $contract->id, 'callback', $contract->document_key),
+            permissions: $permissions,
+            mode: $mode,
+            lang: $contract->language ?: 'ru',
+            user: $user,
+        );
     }
 
     public function templateEditorConfig(ContractTemplate $template, User $user, ?string $forceMode = null): array
     {
-        $mode = $this->normaliseMode($forceMode) ?? 'edit';
+        $permissions = $this->permissionSet(edit: true, review: true, comment: true);
+        $mode = $this->resolveMode($forceMode, 'edit', $permissions);
 
-        $config = [
-            'documentType' => 'word',
-            'type' => 'desktop',
-            'width' => '100%',
-            'height' => '100%',
-            'document' => [
-                'fileType' => 'docx',
-                'key' => (string) $template->document_key,
-                'title' => $template->name.'.docx',
-                'url' => $this->templateDocumentUrl($template),
-                'permissions' => $this->permissionSet(edit: true, review: true, comment: true),
-            ],
-            'editorConfig' => [
-                'mode' => $mode,
-                'lang' => $template->language ?: 'ru',
-                'callbackUrl' => $this->templateCallbackUrl($template),
-                'user' => [
-                    'id' => (string) $user->id,
-                    'name' => $user->name,
-                ],
-                'customization' => $this->reviewCustomization(),
-            ],
-        ];
-
-        $config['token'] = $this->signer->encode($config);
-
-        return $config;
-    }
-
-    private function normaliseMode(?string $mode): ?string
-    {
-        if ($mode === null) {
-            return null;
-        }
-
-        return in_array($mode, ['edit', 'view', 'review'], true) ? $mode : null;
-    }
-
-    /**
-     * Default customization — keep the editor in Editing mode unless the
-     * acting user explicitly chose Reviewing in the toolbar. We still
-     * keep showReviewChanges on so any existing revisions are visible in
-     * the sidebar right away.
-     *
-     * @return array<string, mixed>
-     */
-    private function reviewCustomization(): array
-    {
-        return [
-            'forcesave' => true,
-            'autosave' => true,
-            'compactHeader' => false,
-            'review' => [
-                'showReviewChanges' => true,
-                'reviewDisplay' => 'markup',
-                'hoverMode' => true,
-            ],
-        ];
-    }
-
-    public function resolvePermissions(Contract $contract, User $user): array
-    {
-        if ($contract->status === Contract::STATUS_DRAFT && $contract->canBeEditedBy($user)) {
-            return $this->permissionSet(edit: true, review: true, comment: true);
-        }
-
-        if ($contract->status === Contract::STATUS_IN_REVIEW && $contract->isCurrentApprover($user)) {
-            return $this->permissionSet(edit: false, review: true, comment: true);
-        }
-
-        return $this->permissionSet(edit: false, review: false, comment: false);
+        return $this->buildConfig(
+            key: (string) $template->document_key,
+            title: $template->name.'.docx',
+            documentUrl: $this->internalRouteUrl('template', $template->id, 'document', $template->document_key),
+            callbackUrl: $this->internalRouteUrl('template', $template->id, 'callback', $template->document_key),
+            permissions: $permissions,
+            mode: $mode,
+            lang: $template->language ?: 'ru',
+            user: $user,
+        );
     }
 
     public function convertToPdf(Contract $contract): ?string
@@ -155,7 +74,7 @@ class OnlyOfficeService
             'outputtype' => 'pdf',
             'key' => Str::random(20),
             'title' => $contract->number.'.docx',
-            'url' => $this->documentUrl($contract),
+            'url' => $this->internalRouteUrl('contract', $contract->id, 'document', $contract->document_key),
         ];
 
         $payload['token'] = $this->signer->encode($payload);
@@ -191,6 +110,95 @@ class OnlyOfficeService
         return $decoded['payload'] ?? $decoded;
     }
 
+    public function resolvePermissions(Contract $contract, User $user): array
+    {
+        if ($contract->status === Contract::STATUS_DRAFT && $contract->canBeEditedBy($user)) {
+            return $this->permissionSet(edit: true, review: true, comment: true);
+        }
+
+        if ($contract->status === Contract::STATUS_IN_REVIEW && $contract->isCurrentApprover($user)) {
+            return $this->permissionSet(edit: false, review: true, comment: true);
+        }
+
+        return $this->permissionSet(edit: false, review: false, comment: false);
+    }
+
+    /**
+     * @param  array<string, mixed>  $permissions
+     */
+    private function buildConfig(
+        string $key,
+        string $title,
+        string $documentUrl,
+        string $callbackUrl,
+        array $permissions,
+        string $mode,
+        string $lang,
+        User $user,
+    ): array {
+        $config = [
+            'documentType' => 'word',
+            'type' => 'desktop',
+            'width' => '100%',
+            'height' => '100%',
+            'document' => [
+                'fileType' => 'docx',
+                'key' => $key,
+                'title' => $title,
+                'url' => $documentUrl,
+                'permissions' => $permissions,
+            ],
+            'editorConfig' => [
+                'mode' => $mode,
+                'lang' => $lang,
+                'callbackUrl' => $callbackUrl,
+                'user' => [
+                    'id' => (string) $user->id,
+                    'name' => $user->name,
+                ],
+                'customization' => $this->customization(),
+            ],
+        ];
+
+        $config['token'] = $this->signer->encode($config);
+
+        return $config;
+    }
+
+    /**
+     * @param  array<string, mixed>  $permissions
+     */
+    private function resolveMode(?string $forceMode, string $default, array $permissions): string
+    {
+        $mode = in_array($forceMode, ['edit', 'view', 'review'], true)
+            ? $forceMode
+            : $default;
+
+        if ($mode === 'edit' && ! ($permissions['edit'] ?? false)) {
+            return ($permissions['review'] ?? false) ? 'review' : 'view';
+        }
+
+        return $mode;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function customization(): array
+    {
+        return array_filter([
+            'forcesave' => true,
+            'autosave' => true,
+            'compactHeader' => false,
+            'uiTheme' => config('onlyoffice.ui_theme'),
+            'review' => [
+                'showReviewChanges' => true,
+                'reviewDisplay' => 'markup',
+                'hoverMode' => true,
+            ],
+        ], static fn (mixed $value): bool => $value !== null && $value !== '');
+    }
+
     private function permissionSet(bool $edit, bool $review, bool $comment): array
     {
         return [
@@ -203,24 +211,13 @@ class OnlyOfficeService
         ];
     }
 
-    private function documentUrl(Contract $contract): string
+    private function internalRouteUrl(string $subject, int $id, string $action, ?string $sharedKey): string
     {
-        return $this->callbackHost()."/onlyoffice/{$contract->id}/document?shared_key={$contract->document_key}";
-    }
+        $prefix = $subject === 'template'
+            ? "/onlyoffice/template/{$id}/{$action}"
+            : "/onlyoffice/{$id}/{$action}";
 
-    private function callbackUrl(Contract $contract): string
-    {
-        return $this->callbackHost()."/onlyoffice/{$contract->id}/callback?shared_key={$contract->document_key}";
-    }
-
-    private function templateDocumentUrl(ContractTemplate $template): string
-    {
-        return $this->callbackHost()."/onlyoffice/template/{$template->id}/document?shared_key={$template->document_key}";
-    }
-
-    private function templateCallbackUrl(ContractTemplate $template): string
-    {
-        return $this->callbackHost()."/onlyoffice/template/{$template->id}/callback?shared_key={$template->document_key}";
+        return $this->callbackHost().$prefix.'?shared_key='.$sharedKey;
     }
 
     private function callbackHost(): string

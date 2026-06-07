@@ -3,21 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContractTemplate;
-use App\Models\User;
-use App\Services\OnlyOffice\OnlyOfficeService;
+use App\Services\OnlyOffice\OnlyOfficeCallbackHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use MrAdder\FilamentLogger\Facades\FilamentLogger;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class OnlyOfficeTemplateController extends Controller
 {
+    public function __construct(public OnlyOfficeCallbackHandler $callback) {}
+
     public function document(Request $request, ContractTemplate $template): BinaryFileResponse
     {
-        $this->ensureSharedKey($request, $template);
+        $this->callback->ensureSharedKey($request, $template->document_key);
 
         abort_unless($template->templateExists(), 404);
 
@@ -27,67 +24,21 @@ class OnlyOfficeTemplateController extends Controller
         );
     }
 
-    public function callback(Request $request, ContractTemplate $template, OnlyOfficeService $service): JsonResponse
+    public function callback(Request $request, ContractTemplate $template): JsonResponse
     {
-        $this->ensureSharedKey($request, $template);
+        $this->callback->ensureSharedKey($request, $template->document_key);
 
-        $status = (int) $request->input('status', 0);
-        $url = $request->input('url');
-
-        if (in_array($status, [2, 6], true) && is_string($url)) {
-            try {
-                $body = Http::timeout(60)
-                    ->get($service->internalDownloadUrl($url))
-                    ->body();
-
-                Storage::disk('public')->put($template->template_file, $body);
-
-                if ($status === 2) {
-                    $template->refreshDocumentKey();
-                }
-
-                Log::info('Contract template saved', [
-                    'template_id' => $template->id,
-                    'status' => $status,
-                    'bytes' => strlen($body),
-                ]);
-
-                $userIds = $request->input('users', []);
-
-                FilamentLogger::log(
-                    event: $status === 2 ? 'Template Saved' : 'Template Forcesave',
-                    description: 'Template "'.$template->name.'" saved via OnlyOffice',
-                    options: [
-                        'logName' => 'Document',
-                        'subject' => $template,
-                        'causer' => is_array($userIds) ? User::find($userIds[0] ?? null) : null,
-                        'properties' => [
-                            'status' => $status,
-                            'bytes' => strlen($body),
-                            'template_name' => $template->name,
-                        ],
-                    ],
-                );
-            } catch (\Throwable $e) {
-                Log::error('Contract template save failed', [
-                    'template_id' => $template->id,
-                    'error' => $e->getMessage(),
-                ]);
-
-                return response()->json(['error' => 1]);
-            }
-        }
-
-        return response()->json(['error' => 0]);
-    }
-
-    private function ensureSharedKey(Request $request, ContractTemplate $template): void
-    {
-        $provided = (string) $request->query('shared_key', '');
-
-        abort_unless(
-            $provided !== '' && hash_equals((string) $template->document_key, $provided),
-            403,
+        $result = $this->callback->handle(
+            request: $request,
+            subject: $template,
+            savedEvent: 'Template Saved',
+            forcesaveEvent: 'Template Forcesave',
+            logDescription: 'Template "'.$template->name.'" saved via OnlyOffice',
+            persist: $this->callback->persistToDisk('public', $template->template_file),
+            onFinalSave: fn () => $template->refreshDocumentKey(),
+            logProperties: ['template_name' => $template->name],
         );
+
+        return response()->json($result);
     }
 }
