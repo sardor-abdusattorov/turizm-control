@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\ContractTemplates\Schemas;
 
+use App\Filament\Support\DocumentUpload;
 use App\Models\ContractTemplate;
 use App\Models\OrderType;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -63,14 +63,10 @@ class ContractTemplateForm
                 Section::make(__('app.label.contract_template_file'))
                     ->collapsible()
                     ->schema([
-                        FileUpload::make('template_file')
+                        DocumentUpload::make('contract-templates', 'template_file')
                             ->label(__('app.label.template_file'))
-                            ->disk('public')
-                            ->visibility('public')
-                            ->directory('contract-templates')
                             ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                             ->required()
-                            ->downloadable()
                             ->maxSize(10240)
                             ->helperText(__('app.helper.template_file')),
 
