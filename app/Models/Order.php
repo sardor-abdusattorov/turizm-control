@@ -74,8 +74,26 @@ class Order extends Model
 
     public function isDocx(): bool
     {
-        return $this->file_path
-            && str_ends_with(strtolower($this->file_path), '.docx');
+        return $this->extension() === 'docx';
+    }
+
+    public function isOpenableInOnlyOffice(): bool
+    {
+        return in_array($this->extension(), ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'], true);
+    }
+
+    public function extension(): ?string
+    {
+        if (! $this->file_path) {
+            return null;
+        }
+
+        return strtolower(pathinfo($this->file_path, PATHINFO_EXTENSION));
+    }
+
+    public function publicUrl(): ?string
+    {
+        return $this->file_path ? asset('storage/'.$this->file_path) : null;
     }
 
     public static function getStatuses(): array

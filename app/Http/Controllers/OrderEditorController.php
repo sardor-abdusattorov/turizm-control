@@ -13,8 +13,8 @@ class OrderEditorController extends Controller
 {
     public function show(Request $request, Order $order, OnlyOfficeService $service): Response
     {
-        if (! $order->fileExists() || ! $order->isDocx()) {
-            throw new NotFoundHttpException('Order file is missing or not a .docx.');
+        if (! $order->fileExists() || ! $order->isOpenableInOnlyOffice()) {
+            throw new NotFoundHttpException('Order file is missing or unsupported by OnlyOffice.');
         }
 
         return response()

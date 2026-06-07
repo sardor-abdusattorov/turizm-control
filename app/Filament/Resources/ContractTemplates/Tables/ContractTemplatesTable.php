@@ -35,8 +35,9 @@ class ContractTemplatesTable
                     ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : '—')
                     ->limit(35)
                     ->url(fn (ContractTemplate $record) => $record->templateExists()
-                        ? route('contract-templates.editor', ['template' => $record, 'mode' => 'edit'])
-                        : null
+                        ? route('contract-templates.editor', ['template' => $record, 'mode' => 'view'])
+                        : null,
+                        shouldOpenInNewTab: true,
                     ),
 
                 TextColumn::make('orderType.title')

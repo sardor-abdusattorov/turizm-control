@@ -19,14 +19,14 @@ class ViewOrder extends ViewRecord
                 ->icon('heroicon-o-pencil-square')
                 ->color('primary')
                 ->url(fn () => route('orders.editor', ['order' => $this->record, 'mode' => 'edit']))
-                ->visible(fn () => $this->record?->fileExists() && $this->record?->isDocx()),
+                ->visible(fn () => $this->record?->fileExists() && $this->record?->isOpenableInOnlyOffice()),
 
             Action::make('viewFile')
                 ->label(__('app.action.open_file'))
                 ->icon('heroicon-o-eye')
                 ->color('gray')
-                ->url(fn () => asset('storage/'.$this->record->file_path), shouldOpenInNewTab: true)
-                ->visible(fn () => $this->record?->fileExists() && ! $this->record?->isDocx()),
+                ->url(fn () => $this->record->publicUrl(), shouldOpenInNewTab: true)
+                ->visible(fn () => $this->record?->fileExists() && ! $this->record?->isOpenableInOnlyOffice()),
 
             EditAction::make(),
         ];

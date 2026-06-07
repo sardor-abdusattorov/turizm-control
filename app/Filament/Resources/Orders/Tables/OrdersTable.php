@@ -37,10 +37,11 @@ class OrdersTable
                     ->icon('heroicon-o-document-text')
                     ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : '—')
                     ->limit(35)
-                    ->url(fn (Order $record) => $record->fileExists() && $record->isDocx()
-                        ? route('orders.editor', ['order' => $record, 'mode' => 'edit'])
-                        : null
-                    ),
+                    ->url(fn (Order $record): ?string => match (true) {
+                        ! $record->fileExists() => null,
+                        $record->isOpenableInOnlyOffice() => route('orders.editor', ['order' => $record, 'mode' => 'view']),
+                        default => $record->publicUrl(),
+                    }, shouldOpenInNewTab: true),
 
                 TextColumn::make('orderType.title')
                     ->label(__('app.label.order_type_single'))

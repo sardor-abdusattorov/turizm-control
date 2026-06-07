@@ -71,6 +71,7 @@ class OnlyOfficeService
     {
         $permissions = $this->permissionSet(edit: true, review: true, comment: true);
         $mode = $this->resolveMode($forceMode, 'edit', $permissions);
+        $extension = $order->extension() ?: 'docx';
 
         return $this->buildConfig(
             key: (string) $order->document_key,
@@ -81,6 +82,8 @@ class OnlyOfficeService
             mode: $mode,
             lang: app()->getLocale() ?: 'ru',
             user: $user,
+            fileType: $extension,
+            documentType: $this->documentTypeForExtension($extension),
         );
     }
 
@@ -153,14 +156,16 @@ class OnlyOfficeService
         string $mode,
         string $lang,
         User $user,
+        string $fileType = 'docx',
+        string $documentType = 'word',
     ): array {
         $config = [
-            'documentType' => 'word',
+            'documentType' => $documentType,
             'type' => 'desktop',
             'width' => '100%',
             'height' => '100%',
             'document' => [
-                'fileType' => 'docx',
+                'fileType' => $fileType,
                 'key' => $key,
                 'title' => $title,
                 'url' => $documentUrl,
@@ -181,6 +186,16 @@ class OnlyOfficeService
         $config['token'] = $this->signer->encode($config);
 
         return $config;
+    }
+
+    private function documentTypeForExtension(string $extension): string
+    {
+        return match (strtolower($extension)) {
+            'xls', 'xlsx', 'csv' => 'cell',
+            'ppt', 'pptx' => 'slide',
+            'pdf' => 'pdf',
+            default => 'word',
+        };
     }
 
     /**
