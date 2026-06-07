@@ -56,11 +56,7 @@ class OnlyOfficeService
                     'id' => (string) $user->id,
                     'name' => $user->name,
                 ],
-                'customization' => [
-                    'forcesave' => true,
-                    'autosave' => true,
-                    'compactHeader' => false,
-                ],
+                'customization' => $this->reviewCustomization(),
             ],
         ];
 
@@ -91,17 +87,35 @@ class OnlyOfficeService
                     'id' => (string) $user->id,
                     'name' => $user->name,
                 ],
-                'customization' => [
-                    'forcesave' => true,
-                    'autosave' => true,
-                    'compactHeader' => false,
-                ],
+                'customization' => $this->reviewCustomization(),
             ],
         ];
 
         $config['token'] = $this->signer->encode($config);
 
         return $config;
+    }
+
+    /**
+     * Default customization block — track-changes ON for everyone, with the
+     * review pane open so editors see who changed what without flipping
+     * any switches first.
+     *
+     * @return array<string, mixed>
+     */
+    private function reviewCustomization(): array
+    {
+        return [
+            'forcesave' => true,
+            'autosave' => true,
+            'compactHeader' => false,
+            'review' => [
+                'trackChanges' => true,
+                'showReviewChanges' => true,
+                'reviewDisplay' => 'markup',
+                'hoverMode' => true,
+            ],
+        ];
     }
 
     public function resolvePermissions(Contract $contract, User $user): array
