@@ -91,6 +91,27 @@ class Order extends Model
         return strtolower(pathinfo($this->file_path, PATHINFO_EXTENSION));
     }
 
+    public function documentColor(): string
+    {
+        return match ($this->extension()) {
+            'doc', 'docx' => 'info',
+            'xls', 'xlsx', 'csv' => 'success',
+            'ppt', 'pptx' => 'warning',
+            'pdf' => 'danger',
+            default => 'gray',
+        };
+    }
+
+    public function documentIcon(): string
+    {
+        return match ($this->extension()) {
+            'xls', 'xlsx', 'csv' => 'heroicon-o-table-cells',
+            'ppt', 'pptx' => 'heroicon-o-presentation-chart-bar',
+            'pdf' => 'heroicon-o-document',
+            default => 'heroicon-o-document-text',
+        };
+    }
+
     public function publicUrl(): ?string
     {
         return $this->file_path ? asset('storage/'.$this->file_path) : null;

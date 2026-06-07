@@ -33,8 +33,8 @@ class OrdersTable
                 TextColumn::make('file_path')
                     ->label(__('app.label.document'))
                     ->badge()
-                    ->color('primary')
-                    ->icon('heroicon-o-document-text')
+                    ->color(fn (Order $record): string => $record->documentColor())
+                    ->icon(fn (Order $record): string => $record->documentIcon())
                     ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : '—')
                     ->limit(35)
                     ->url(fn (Order $record): ?string => match (true) {
