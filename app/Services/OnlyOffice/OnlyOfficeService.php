@@ -156,7 +156,7 @@ class OnlyOfficeService
                     'id' => (string) $user->id,
                     'name' => $user->name,
                 ],
-                'customization' => $this->customization(),
+                'customization' => $this->customization($mode),
             ],
         ];
 
@@ -182,16 +182,24 @@ class OnlyOfficeService
     }
 
     /**
+     * Customization block. trackChanges is set explicitly per mode so
+     * OnlyOffice doesn't fall back to the user's saved preference (which
+     * stuck ON from earlier sessions and forced the editor into the
+     * Reviewing badge even when we opened in mode=edit).
+     *
      * @return array<string, mixed>
      */
-    private function customization(): array
+    private function customization(string $mode): array
     {
+        $isReview = $mode === 'review';
+
         return [
             'forcesave' => true,
             'autosave' => true,
             'compactHeader' => false,
             'review' => [
-                'showReviewChanges' => true,
+                'trackChanges' => $isReview,
+                'showReviewChanges' => $isReview,
                 'reviewDisplay' => 'markup',
                 'hoverMode' => true,
             ],
