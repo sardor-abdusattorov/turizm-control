@@ -40,7 +40,7 @@ class OrdersTable
                     ->url(fn (Order $record): ?string => match (true) {
                         ! $record->fileExists() => null,
                         $record->isOpenableInOnlyOffice() => route('orders.editor', ['order' => $record, 'mode' => 'view']),
-                        default => $record->publicUrl(),
+                        default => route('orders.file.inline', ['order' => $record]),
                     }, shouldOpenInNewTab: true),
 
                 TextColumn::make('orderType.title')

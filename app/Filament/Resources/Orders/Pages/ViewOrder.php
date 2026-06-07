@@ -25,7 +25,7 @@ class ViewOrder extends ViewRecord
                 ->label(__('app.action.open_file'))
                 ->icon('heroicon-o-eye')
                 ->color('gray')
-                ->url(fn () => $this->record->publicUrl(), shouldOpenInNewTab: true)
+                ->url(fn () => route('orders.file.inline', ['order' => $this->record]), shouldOpenInNewTab: true)
                 ->visible(fn () => $this->record?->fileExists() && ! $this->record?->isOpenableInOnlyOffice()),
 
             EditAction::make(),

@@ -7,6 +7,7 @@ use App\Http\Controllers\OnlyOfficeContractController;
 use App\Http\Controllers\OnlyOfficeOrderController;
 use App\Http\Controllers\OnlyOfficeTemplateController;
 use App\Http\Controllers\OrderEditorController;
+use App\Http\Controllers\OrderFileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/onlyoffice/{contract}/document', [OnlyOfficeContractController::class, 'document'])
@@ -42,4 +43,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     Route::get('/orders/{order}/editor', [OrderEditorController::class, 'show'])
         ->name('orders.editor');
+
+    Route::get('/orders/{order}/file', [OrderFileController::class, 'inline'])
+        ->name('orders.file.inline');
 });
