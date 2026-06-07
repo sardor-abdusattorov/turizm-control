@@ -34,6 +34,7 @@ class ContractForm
                             ->hiddenLabel()
                             ->icon('heroicon-o-document-text')
                             ->iconColor('primary')
+                            ->weight('bold')
                             ->state(fn (Contract $record): string => $record->number.'.docx')
                             ->columnSpanFull(),
 
@@ -133,7 +134,7 @@ class ContractForm
                 Section::make(__('app.label.approval_chain'))
                     ->description(__('app.helper.approval_chain_form'))
                     ->collapsible()
-                    ->visible(fn (?Contract $record): bool => $record === null)
+                    ->hiddenOn('edit')
                     ->schema([
                         Repeater::make('approver_chain')
                             ->hiddenLabel()
