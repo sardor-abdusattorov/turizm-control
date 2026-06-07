@@ -148,7 +148,7 @@ class Contract extends Model
             return;
         }
 
-        $templateAbsolute = Storage::disk('local')->path($template->template_file);
+        $templateAbsolute = Storage::disk('public')->path($template->template_file);
 
         if (! is_file($templateAbsolute)) {
             return;
