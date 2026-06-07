@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contract;
+use App\Models\User;
 use App\Services\OnlyOffice\OnlyOfficeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use MrAdder\FilamentLogger\Facades\FilamentLogger;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class OnlyOfficeContractController extends Controller
@@ -49,6 +51,23 @@ class OnlyOfficeContractController extends Controller
                     'status' => $status,
                     'bytes' => strlen($body),
                 ]);
+
+                $userIds = $request->input('users', []);
+
+                FilamentLogger::log(
+                    event: $status === 2 ? 'Contract Document Saved' : 'Contract Document Forcesave',
+                    description: 'Contract '.$contract->number.' saved via OnlyOffice',
+                    options: [
+                        'logName' => 'Document',
+                        'subject' => $contract,
+                        'causer' => is_array($userIds) ? User::find($userIds[0] ?? null) : null,
+                        'properties' => [
+                            'status' => $status,
+                            'bytes' => strlen($body),
+                            'contract_number' => $contract->number,
+                        ],
+                    ],
+                );
             } catch (\Throwable $e) {
                 Log::error('Contract document save failed', [
                     'contract_id' => $contract->id,

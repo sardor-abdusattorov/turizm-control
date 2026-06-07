@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContractTemplate;
+use App\Models\User;
 use App\Services\OnlyOffice\OnlyOfficeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use MrAdder\FilamentLogger\Facades\FilamentLogger;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class OnlyOfficeTemplateController extends Controller
@@ -49,6 +51,23 @@ class OnlyOfficeTemplateController extends Controller
                     'status' => $status,
                     'bytes' => strlen($body),
                 ]);
+
+                $userIds = $request->input('users', []);
+
+                FilamentLogger::log(
+                    event: $status === 2 ? 'Template Saved' : 'Template Forcesave',
+                    description: 'Template "'.$template->name.'" saved via OnlyOffice',
+                    options: [
+                        'logName' => 'Document',
+                        'subject' => $template,
+                        'causer' => is_array($userIds) ? User::find($userIds[0] ?? null) : null,
+                        'properties' => [
+                            'status' => $status,
+                            'bytes' => strlen($body),
+                            'template_name' => $template->name,
+                        ],
+                    ],
+                );
             } catch (\Throwable $e) {
                 Log::error('Contract template save failed', [
                     'template_id' => $template->id,

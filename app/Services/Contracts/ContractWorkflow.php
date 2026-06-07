@@ -6,6 +6,7 @@ use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use MrAdder\FilamentLogger\Facades\FilamentLogger;
 
 class ContractWorkflow
 {
@@ -19,7 +20,7 @@ class ContractWorkflow
             return false;
         }
 
-        DB::transaction(function () use ($contract): void {
+        DB::transaction(function () use ($contract, $user): void {
             $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
 
             $current = $contract->currentApprover();
@@ -27,6 +28,13 @@ class ContractWorkflow
             if ($current) {
                 $this->notifier->notifyApprovalRequested($current);
             }
+
+            $this->logWorkflowEvent(
+                event: 'Contract Submitted',
+                contract: $contract,
+                user: $user,
+                properties: ['next_approver_id' => $current?->user_id],
+            );
         });
 
         return true;
@@ -44,7 +52,7 @@ class ContractWorkflow
             return false;
         }
 
-        DB::transaction(function () use ($contract, $current, $comment): void {
+        DB::transaction(function () use ($contract, $current, $comment, $user): void {
             $current->markApproved($comment);
 
             if ($contract->fresh()->allApproved()) {
@@ -54,6 +62,13 @@ class ContractWorkflow
                 ]);
                 $this->notifier->notifyApproved($contract);
 
+                $this->logWorkflowEvent(
+                    event: 'Contract Approved',
+                    contract: $contract,
+                    user: $user,
+                    properties: ['comment' => $comment, 'final' => true],
+                );
+
                 return;
             }
 
@@ -62,6 +77,16 @@ class ContractWorkflow
             if ($next) {
                 $this->notifier->notifyApprovalRequested($next);
             }
+
+            $this->logWorkflowEvent(
+                event: 'Contract Step Approved',
+                contract: $contract,
+                user: $user,
+                properties: [
+                    'comment' => $comment,
+                    'next_approver_id' => $next?->user_id,
+                ],
+            );
         });
 
         return true;
@@ -79,10 +104,17 @@ class ContractWorkflow
             return false;
         }
 
-        DB::transaction(function () use ($contract, $current, $comment): void {
+        DB::transaction(function () use ($contract, $current, $comment, $user): void {
             $current->markRejected($comment);
             $contract->update(['status' => Contract::STATUS_REJECTED]);
             $this->notifier->notifyRejected($contract, $comment);
+
+            $this->logWorkflowEvent(
+                event: 'Contract Rejected',
+                contract: $contract,
+                user: $user,
+                properties: ['comment' => $comment],
+            );
         });
 
         return true;
@@ -100,7 +132,7 @@ class ContractWorkflow
             return false;
         }
 
-        DB::transaction(function () use ($contract, $current, $comment): void {
+        DB::transaction(function () use ($contract, $current, $comment, $user): void {
             $current->markReturned($comment);
 
             $contract->approvers()
@@ -113,8 +145,35 @@ class ContractWorkflow
 
             $contract->update(['status' => Contract::STATUS_DRAFT]);
             $this->notifier->notifyReturned($contract, $comment);
+
+            $this->logWorkflowEvent(
+                event: 'Contract Returned',
+                contract: $contract,
+                user: $user,
+                properties: ['comment' => $comment],
+            );
         });
 
         return true;
+    }
+
+    /**
+     * @param  array<string, mixed>  $properties
+     */
+    private function logWorkflowEvent(string $event, Contract $contract, ?User $user, array $properties = []): void
+    {
+        FilamentLogger::log(
+            event: $event,
+            description: $event.' — '.$contract->number,
+            options: [
+                'logName' => 'Workflow',
+                'subject' => $contract,
+                'causer' => $user,
+                'properties' => array_filter(
+                    array_merge(['contract_number' => $contract->number], $properties),
+                    static fn (mixed $value): bool => $value !== null,
+                ),
+            ],
+        );
     }
 }
