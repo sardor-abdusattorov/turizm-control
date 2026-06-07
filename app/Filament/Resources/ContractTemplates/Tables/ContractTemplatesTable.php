@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources\ContractTemplates\Tables;
 
+use App\Filament\Resources\ContractTemplates\ContractTemplateResource;
 use App\Models\ContractTemplate;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -61,9 +64,20 @@ class ContractTemplatesTable
                     ->label(__('app.label.status'))
                     ->options(ContractTemplate::getStatuses()),
             ])
+            ->recordUrl(fn (ContractTemplate $record) => ContractTemplateResource::getUrl('edit', ['record' => $record]))
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    Action::make('openEditor')
+                        ->label(__('app.action.open_editor'))
+                        ->icon('heroicon-o-pencil-square')
+                        ->url(fn (ContractTemplate $record) => route('contract-templates.editor', ['template' => $record]))
+                        ->visible(fn (ContractTemplate $record) => $record->templateExists()),
+
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->color('gray'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

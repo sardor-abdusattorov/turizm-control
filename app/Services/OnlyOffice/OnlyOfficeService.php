@@ -3,6 +3,7 @@
 namespace App\Services\OnlyOffice;
 
 use App\Models\Contract;
+use App\Models\ContractTemplate;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -51,6 +52,41 @@ class OnlyOfficeService
                 'mode' => $mode,
                 'lang' => $contract->language ?: 'ru',
                 'callbackUrl' => $this->callbackUrl($contract),
+                'user' => [
+                    'id' => (string) $user->id,
+                    'name' => $user->name,
+                ],
+                'customization' => [
+                    'forcesave' => true,
+                    'autosave' => true,
+                    'compactHeader' => false,
+                ],
+            ],
+        ];
+
+        $config['token'] = $this->signer->encode($config);
+
+        return $config;
+    }
+
+    public function templateEditorConfig(ContractTemplate $template, User $user): array
+    {
+        $config = [
+            'documentType' => 'word',
+            'type' => 'desktop',
+            'width' => '100%',
+            'height' => '100%',
+            'document' => [
+                'fileType' => 'docx',
+                'key' => (string) $template->document_key,
+                'title' => $template->name.'.docx',
+                'url' => $this->templateDocumentUrl($template),
+                'permissions' => $this->permissionSet(edit: true, review: true, comment: true),
+            ],
+            'editorConfig' => [
+                'mode' => 'edit',
+                'lang' => $template->language ?: 'ru',
+                'callbackUrl' => $this->templateCallbackUrl($template),
                 'user' => [
                     'id' => (string) $user->id,
                     'name' => $user->name,
@@ -145,6 +181,16 @@ class OnlyOfficeService
     private function callbackUrl(Contract $contract): string
     {
         return $this->callbackHost()."/onlyoffice/{$contract->id}/callback?shared_key={$contract->document_key}";
+    }
+
+    private function templateDocumentUrl(ContractTemplate $template): string
+    {
+        return $this->callbackHost()."/onlyoffice/template/{$template->id}/document?shared_key={$template->document_key}";
+    }
+
+    private function templateCallbackUrl(ContractTemplate $template): string
+    {
+        return $this->callbackHost()."/onlyoffice/template/{$template->id}/callback?shared_key={$template->document_key}";
     }
 
     private function callbackHost(): string

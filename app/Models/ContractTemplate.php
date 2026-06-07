@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ContractTemplate extends Model
 {
@@ -16,6 +18,7 @@ class ContractTemplate extends Model
         'name',
         'language',
         'template_file',
+        'document_key',
         'sort',
         'status',
     ];
@@ -28,6 +31,46 @@ class ContractTemplate extends Model
     public const STATUS_INACTIVE = 0;
 
     public const STATUS_ACTIVE = 1;
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $template): void {
+            if (! $template->document_key) {
+                $template->document_key = static::generateDocumentKey();
+            }
+        });
+
+        static::updating(function (self $template): void {
+            if ($template->isDirty('template_file')) {
+                $template->document_key = static::generateDocumentKey();
+            }
+        });
+    }
+
+    public static function generateDocumentKey(): string
+    {
+        return Str::random(20);
+    }
+
+    public function refreshDocumentKey(): void
+    {
+        $this->update(['document_key' => static::generateDocumentKey()]);
+    }
+
+    public function templateAbsolutePath(): ?string
+    {
+        if (! $this->template_file) {
+            return null;
+        }
+
+        return Storage::disk('local')->path($this->template_file);
+    }
+
+    public function templateExists(): bool
+    {
+        return $this->template_file
+            && Storage::disk('local')->exists($this->template_file);
+    }
 
     public static function getLanguages(): array
     {
