@@ -38,6 +38,11 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('3rem')
+            ->brandName(fn (): string => rescue(
+                fn () => settings('organization.name'),
+                config('app.name'),
+                report: false,
+            ) ?: config('app.name'))
             ->login()
             ->defaultThemeMode(ThemeMode::Light)
             ->colors([
@@ -114,6 +119,6 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-        ->viteTheme('resources/css/filament/admin/theme.css');
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }
