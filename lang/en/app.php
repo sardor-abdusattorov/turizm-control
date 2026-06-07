@@ -207,6 +207,7 @@ return [
         'add_item' => 'Add item',
         'edit_document' => 'Edit document',
         'open_editor' => 'Open editor',
+        'open_template_in_editor' => 'Open template in editor',
         'save' => 'Save',
         'download_pdf' => 'Download PDF',
         'preview_pdf' => 'Preview PDF',
@@ -254,6 +255,7 @@ return [
     ],
     'helper' => [
         'template_file' => 'Upload the contract as a .docx with {{placeholders}} where values should be inserted. Max 10 MB.',
+        'template_editor_independent' => 'Document content is edited in OnlyOffice — changes save automatically there. The "Save changes" button below only stores the metadata above (name, order type, sort, status).',
         'contract_template_choice' => 'Pick a template — its language is shown in brackets and sets the contract language.',
         'contract_order_type' => 'Optional category to group contracts in reports.',
         'approval_chain_form' => 'Pre-filled from your profile. Drag rows to reorder, add or remove approvers for this contract specifically.',

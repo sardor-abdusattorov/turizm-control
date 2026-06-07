@@ -9,6 +9,8 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Actions\Action;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
@@ -71,6 +73,21 @@ class ContractTemplateForm
                             ->downloadable()
                             ->maxSize(10240)
                             ->helperText(__('app.helper.template_file')),
+
+                        Actions::make([
+                            Action::make('openTemplateInEditor')
+                                ->label(__('app.action.open_template_in_editor'))
+                                ->icon('heroicon-o-pencil-square')
+                                ->color('primary')
+                                ->url(fn (?ContractTemplate $record) => $record
+                                    ? route('contract-templates.editor', ['template' => $record])
+                                    : null)
+                                ->visible(fn (?ContractTemplate $record) => $record?->templateExists() ?? false),
+                        ])->columnSpanFull(),
+
+                        Placeholder::make('editor_hint')
+                            ->hiddenLabel()
+                            ->content(__('app.helper.template_editor_independent')),
 
                         Placeholder::make('placeholders_hint')
                             ->label(__('app.label.available_placeholders'))

@@ -39,13 +39,13 @@ it('issues a fresh document_key when the template is created', function () {
         ->and(strlen($template->document_key))->toBe(20);
 });
 
-it('rotates the document_key when template_file is replaced', function () {
+it('keeps the document_key when template_file is mass-updated, leaving rotation to the OnlyOffice callback', function () {
     $template = ContractTemplate::factory()->create();
     $originalKey = $template->document_key;
 
     $template->update(['template_file' => 'contract-templates/replaced.docx']);
 
-    expect($template->fresh()->document_key)->not->toBe($originalKey);
+    expect($template->fresh()->document_key)->toBe($originalKey);
 });
 
 it('renders the OnlyOffice editor view for an existing template', function () {

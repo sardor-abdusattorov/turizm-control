@@ -15,7 +15,7 @@ class EditContractTemplate extends EditRecord
     {
         return [
             Action::make('openEditor')
-                ->label(__('app.action.open_editor'))
+                ->label(__('app.action.open_template_in_editor'))
                 ->icon('heroicon-o-pencil-square')
                 ->color('primary')
                 ->url(fn () => route('contract-templates.editor', ['template' => $this->record]))

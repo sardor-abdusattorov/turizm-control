@@ -39,12 +39,6 @@ class ContractTemplate extends Model
                 $template->document_key = static::generateDocumentKey();
             }
         });
-
-        static::updating(function (self $template): void {
-            if ($template->isDirty('template_file')) {
-                $template->document_key = static::generateDocumentKey();
-            }
-        });
     }
 
     public static function generateDocumentKey(): string
