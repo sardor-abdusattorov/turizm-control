@@ -4,7 +4,6 @@ namespace App\Filament\Resources\ContractTemplates\Tables;
 
 use App\Filament\Resources\ContractTemplates\ContractTemplateResource;
 use App\Models\ContractTemplate;
-use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -30,10 +29,15 @@ class ContractTemplatesTable
 
                 TextColumn::make('template_file')
                     ->label(__('app.label.document'))
+                    ->badge()
+                    ->color('primary')
                     ->icon('heroicon-o-document-text')
-                    ->iconColor('primary')
                     ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : '—')
-                    ->limit(35),
+                    ->limit(35)
+                    ->url(fn (ContractTemplate $record) => $record->templateExists()
+                        ? route('contract-templates.editor', ['template' => $record, 'mode' => 'edit'])
+                        : null
+                    ),
 
                 TextColumn::make('orderType.title')
                     ->label(__('app.label.order_type_single'))
@@ -72,23 +76,10 @@ class ContractTemplatesTable
                     ->label(__('app.label.status'))
                     ->options(ContractTemplate::getStatuses()),
             ])
-            ->recordUrl(fn (ContractTemplate $record) => $record->templateExists()
-                ? route('contract-templates.editor', ['template' => $record, 'mode' => 'edit'])
-                : ContractTemplateResource::getUrl('view', ['record' => $record])
-            )
+            ->recordUrl(fn (ContractTemplate $record) => ContractTemplateResource::getUrl('view', ['record' => $record]))
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make(),
-
-                    Action::make('openEditor')
-                        ->label(__('app.action.open_template_in_editor'))
-                        ->icon('heroicon-o-pencil-square')
-                        ->url(fn (ContractTemplate $record) => route('contract-templates.editor', [
-                            'template' => $record,
-                            'mode' => 'edit',
-                        ]))
-                        ->visible(fn (ContractTemplate $record) => $record->templateExists()),
-
                     EditAction::make(),
                     DeleteAction::make(),
                 ])
