@@ -16,9 +16,12 @@ class ViewContractTemplate extends ViewRecord
         return [
             Action::make('openEditor')
                 ->label(__('app.action.open_template_in_editor'))
-                ->icon('heroicon-o-pencil-square')
-                ->color('primary')
-                ->url(fn () => route('contract-templates.editor', ['template' => $this->record]))
+                ->icon('heroicon-o-eye')
+                ->color('gray')
+                ->url(fn () => route('contract-templates.editor', [
+                    'template' => $this->record,
+                    'mode' => 'view',
+                ]))
                 ->visible(fn () => $this->record?->templateExists()),
 
             EditAction::make(),

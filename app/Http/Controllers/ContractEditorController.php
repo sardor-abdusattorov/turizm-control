@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Services\OnlyOffice\OnlyOfficeService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ContractEditorController extends Controller
 {
-    public function show(Contract $contract, OnlyOfficeService $service): Response
+    public function show(Request $request, Contract $contract, OnlyOfficeService $service): Response
     {
         if (! $contract->documentExists()) {
             throw new NotFoundHttpException('Contract document not built yet.');
@@ -20,7 +21,7 @@ class ContractEditorController extends Controller
             ->view('contracts.editor', [
                 'contract' => $contract,
                 'apiScriptUrl' => $service->apiScriptUrl(),
-                'config' => $service->editorConfig($contract, auth()->user()),
+                'config' => $service->editorConfig($contract, auth()->user(), $request->query('mode')),
                 'backUrl' => ContractResource::getUrl('view', ['record' => $contract]),
             ])
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')

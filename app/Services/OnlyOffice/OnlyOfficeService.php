@@ -31,10 +31,15 @@ class OnlyOfficeService
         );
     }
 
-    public function editorConfig(Contract $contract, User $user): array
+    public function editorConfig(Contract $contract, User $user, ?string $forceMode = null): array
     {
         $permissions = $this->resolvePermissions($contract, $user);
-        $mode = ($permissions['edit'] || $permissions['review']) ? 'edit' : 'view';
+        $defaultMode = ($permissions['edit'] || $permissions['review']) ? 'edit' : 'view';
+        $mode = $this->normaliseMode($forceMode) ?? $defaultMode;
+
+        if ($mode === 'edit' && ! $permissions['edit']) {
+            $mode = $permissions['review'] ? 'review' : 'view';
+        }
 
         $config = [
             'documentType' => 'word',
@@ -65,8 +70,10 @@ class OnlyOfficeService
         return $config;
     }
 
-    public function templateEditorConfig(ContractTemplate $template, User $user): array
+    public function templateEditorConfig(ContractTemplate $template, User $user, ?string $forceMode = null): array
     {
+        $mode = $this->normaliseMode($forceMode) ?? 'edit';
+
         $config = [
             'documentType' => 'word',
             'type' => 'desktop',
@@ -80,7 +87,7 @@ class OnlyOfficeService
                 'permissions' => $this->permissionSet(edit: true, review: true, comment: true),
             ],
             'editorConfig' => [
-                'mode' => 'edit',
+                'mode' => $mode,
                 'lang' => $template->language ?: 'ru',
                 'callbackUrl' => $this->templateCallbackUrl($template),
                 'user' => [
@@ -94,6 +101,15 @@ class OnlyOfficeService
         $config['token'] = $this->signer->encode($config);
 
         return $config;
+    }
+
+    private function normaliseMode(?string $mode): ?string
+    {
+        if ($mode === null) {
+            return null;
+        }
+
+        return in_array($mode, ['edit', 'view', 'review'], true) ? $mode : null;
     }
 
     /**

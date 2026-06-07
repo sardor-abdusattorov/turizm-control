@@ -32,10 +32,13 @@ class ViewContract extends ViewRecord
 
             Action::make('openEditor')
                 ->label(__('app.action.open_editor'))
-                ->icon('heroicon-o-pencil-square')
-                ->color('primary')
-                ->url(fn () => route('contracts.editor', ['contract' => $this->record]))
-                ->visible(fn () => $this->record?->documentExists() && $this->record?->canBeEditedBy()),
+                ->icon('heroicon-o-eye')
+                ->color('gray')
+                ->url(fn () => route('contracts.editor', [
+                    'contract' => $this->record,
+                    'mode' => 'view',
+                ]))
+                ->visible(fn () => $this->record?->documentExists()),
 
             EditAction::make()
                 ->visible(fn () => $this->record?->canBeEditedBy()),
