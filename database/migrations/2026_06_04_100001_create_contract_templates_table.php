@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('language', 2)->default('ru');
             $table->string('template_file');
+            $table->string('document_key')->nullable();
             $table->unsignedInteger('sort')->default(0);
             $table->boolean('status')->default(true);
             $table->timestamps();
