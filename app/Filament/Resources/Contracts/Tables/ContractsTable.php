@@ -93,7 +93,10 @@ class ContractsTable
                     Action::make('openEditor')
                         ->label(__('app.action.open_editor'))
                         ->icon('heroicon-o-pencil-square')
-                        ->url(fn (Contract $record) => route('contracts.editor', ['contract' => $record]))
+                        ->url(fn (Contract $record) => route('contracts.editor', [
+                            'contract' => $record,
+                            'mode' => 'edit',
+                        ]))
                         ->visible(fn (Contract $record) => $record->documentExists() && $record->canBeEditedBy()),
 
                     Action::make('submitForApproval')

@@ -113,9 +113,10 @@ class OnlyOfficeService
     }
 
     /**
-     * Default customization block — track-changes ON for everyone, with the
-     * review pane open so editors see who changed what without flipping
-     * any switches first.
+     * Default customization — keep the editor in Editing mode unless the
+     * acting user explicitly chose Reviewing in the toolbar. We still
+     * keep showReviewChanges on so any existing revisions are visible in
+     * the sidebar right away.
      *
      * @return array<string, mixed>
      */
@@ -126,7 +127,6 @@ class OnlyOfficeService
             'autosave' => true,
             'compactHeader' => false,
             'review' => [
-                'trackChanges' => true,
                 'showReviewChanges' => true,
                 'reviewDisplay' => 'markup',
                 'hoverMode' => true,

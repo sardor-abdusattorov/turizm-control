@@ -18,7 +18,10 @@ class EditContractTemplate extends EditRecord
                 ->label(__('app.action.open_template_in_editor'))
                 ->icon('heroicon-o-pencil-square')
                 ->color('primary')
-                ->url(fn () => route('contract-templates.editor', ['template' => $this->record]))
+                ->url(fn () => route('contract-templates.editor', [
+                    'template' => $this->record,
+                    'mode' => 'edit',
+                ]))
                 ->visible(fn () => $this->record?->templateExists()),
 
             DeleteAction::make(),

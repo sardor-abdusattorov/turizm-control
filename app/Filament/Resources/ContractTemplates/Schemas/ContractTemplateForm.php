@@ -75,7 +75,10 @@ class ContractTemplateForm
                                 ->icon('heroicon-o-pencil-square')
                                 ->color('primary')
                                 ->url(fn (?ContractTemplate $record) => $record
-                                    ? route('contract-templates.editor', ['template' => $record])
+                                    ? route('contract-templates.editor', [
+                                        'template' => $record,
+                                        'mode' => 'edit',
+                                    ])
                                     : null)
                                 ->visible(fn (?ContractTemplate $record) => $record?->templateExists() ?? false),
                         ])->columnSpanFull(),

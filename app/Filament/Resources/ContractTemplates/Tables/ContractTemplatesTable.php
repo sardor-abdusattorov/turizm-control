@@ -73,7 +73,10 @@ class ContractTemplatesTable
                     Action::make('openEditor')
                         ->label(__('app.action.open_template_in_editor'))
                         ->icon('heroicon-o-pencil-square')
-                        ->url(fn (ContractTemplate $record) => route('contract-templates.editor', ['template' => $record]))
+                        ->url(fn (ContractTemplate $record) => route('contract-templates.editor', [
+                            'template' => $record,
+                            'mode' => 'edit',
+                        ]))
                         ->visible(fn (ContractTemplate $record) => $record->templateExists()),
 
                     EditAction::make(),

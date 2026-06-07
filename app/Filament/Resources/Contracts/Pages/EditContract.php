@@ -29,7 +29,10 @@ class EditContract extends EditRecord
                 ->label(__('app.action.open_editor'))
                 ->icon('heroicon-o-pencil-square')
                 ->color('primary')
-                ->url(fn () => route('contracts.editor', ['contract' => $this->record]))
+                ->url(fn () => route('contracts.editor', [
+                    'contract' => $this->record,
+                    'mode' => 'edit',
+                ]))
                 ->visible(fn () => $this->record?->documentExists()),
 
             Action::make('submitForApproval')
