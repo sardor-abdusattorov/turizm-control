@@ -254,6 +254,11 @@ return [
         'preview_empty_hint' => 'Fill in the fields on the left — the rendered document will appear here.',
     ],
     'helper' => [
+        'inn' => '9 digits for legal entities',
+        'pinfl' => '14 digits',
+        'oked' => '5 digits',
+        'mfo' => '5-digit bank code',
+        'bank_account' => '20 digits',
         'template_file' => 'Upload the contract as a .docx with {{placeholders}} where values should be inserted. Max 10 MB.',
         'template_editor_independent' => 'Document content is edited in OnlyOffice — changes save automatically there. The "Save changes" button below only stores the metadata above (name, order type, sort, status).',
         'contract_template_choice' => 'Pick a template — its language is shown in brackets and sets the contract language.',

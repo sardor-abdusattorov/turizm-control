@@ -21,6 +21,7 @@ class ContactForm
             ->columns(1)
             ->components([
                 Section::make(__('app.label.basic_information'))
+                    ->collapsible()
                     ->schema([
                         Radio::make('type')
                             ->label(__('app.label.contact_type'))
@@ -52,21 +53,30 @@ class ContactForm
                                 TextInput::make('oked')
                                     ->label(__('app.label.oked'))
                                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
-                                    ->maxLength(20),
+                                    ->helperText(__('app.helper.oked'))
+                                    ->numeric()
+                                    ->minLength(5)
+                                    ->maxLength(5),
 
                                 TextInput::make('inn')
                                     ->label(__('app.label.inn'))
                                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                                     ->required(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
-                                    ->unique('contacts', 'inn', ignoreRecord: true)
-                                    ->maxLength(30),
+                                    ->helperText(__('app.helper.inn'))
+                                    ->numeric()
+                                    ->minLength(9)
+                                    ->maxLength(9)
+                                    ->unique('contacts', 'inn', ignoreRecord: true),
 
                                 TextInput::make('pinfl')
                                     ->label(__('app.label.pinfl'))
                                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_INDIVIDUAL)
                                     ->required(fn (Get $get) => $get('type') === Contact::TYPE_INDIVIDUAL)
-                                    ->unique('contacts', 'pinfl', ignoreRecord: true)
-                                    ->maxLength(30),
+                                    ->helperText(__('app.helper.pinfl'))
+                                    ->numeric()
+                                    ->minLength(14)
+                                    ->maxLength(14)
+                                    ->unique('contacts', 'pinfl', ignoreRecord: true),
 
                                 TextInput::make('director_name')
                                     ->label(__('app.label.director_name'))
@@ -81,6 +91,8 @@ class ContactForm
                                 TextInput::make('phone')
                                     ->label(__('app.label.phone'))
                                     ->tel()
+                                    ->mask('+999 99 999 99 99')
+                                    ->placeholder('+998 90 123 45 67')
                                     ->maxLength(50),
 
                                 TextInput::make('email')
@@ -95,17 +107,24 @@ class ContactForm
                     ]),
 
                 Section::make(__('app.label.bank_requisites'))
+                    ->collapsible()
                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                     ->schema([
                         Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
                                 TextInput::make('bank_account')
                                     ->label(__('app.label.bank_account'))
-                                    ->maxLength(50),
+                                    ->helperText(__('app.helper.bank_account'))
+                                    ->numeric()
+                                    ->minLength(20)
+                                    ->maxLength(20),
 
                                 TextInput::make('mfo')
                                     ->label(__('app.label.mfo'))
-                                    ->maxLength(20),
+                                    ->helperText(__('app.helper.mfo'))
+                                    ->numeric()
+                                    ->minLength(5)
+                                    ->maxLength(5),
 
                                 TextInput::make('bank_name')
                                     ->label(__('app.label.bank_name'))
