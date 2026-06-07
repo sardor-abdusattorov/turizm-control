@@ -34,7 +34,7 @@ class Department extends Model
      *
      * @var array<int, string>
      */
-    public const APPROVER_CODES = ['legal', 'financial', 'accounting', 'direction'];
+    public const APPROVER_CODES = ['legal', 'accounting', 'direction'];
 
     /**
      * Get available statuses

@@ -52,19 +52,11 @@ class PositionSeeder extends Seeder
             ],
             [
                 'name' => [
-                    'ru' => 'Финансовый менеджер',
-                    'uz' => 'Moliya menejeri',
-                    'en' => 'Financial Manager',
-                ],
-                'sort' => 6,
-            ],
-            [
-                'name' => [
                     'ru' => 'Менеджер',
                     'uz' => 'Menejer',
                     'en' => 'Manager',
                 ],
-                'sort' => 7,
+                'sort' => 6,
             ],
             [
                 'name' => [
@@ -72,15 +64,7 @@ class PositionSeeder extends Seeder
                     'uz' => 'Mutaxassis',
                     'en' => 'Specialist',
                 ],
-                'sort' => 8,
-            ],
-            [
-                'name' => [
-                    'ru' => 'Разработчик',
-                    'uz' => 'Dasturchi',
-                    'en' => 'Developer',
-                ],
-                'sort' => 9,
+                'sort' => 7,
             ],
         ];
 

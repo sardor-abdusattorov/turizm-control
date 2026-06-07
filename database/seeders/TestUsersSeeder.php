@@ -12,7 +12,7 @@ class TestUsersSeeder extends Seeder
 {
     public function run(): void
     {
-        $roles = ['manager', 'legal_officer', 'financial_officer', 'accountant', 'director'];
+        $roles = ['manager', 'legal_officer', 'accountant', 'director'];
 
         foreach ($roles as $roleName) {
             Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
@@ -27,13 +27,6 @@ class TestUsersSeeder extends Seeder
                 'role' => 'legal_officer',
             ],
             [
-                'name' => 'Dilshod Karimov',
-                'email' => 'financial@test.uz',
-                'department_code' => 'financial',
-                'position_ru' => 'Финансовый менеджер',
-                'role' => 'financial_officer',
-            ],
-            [
                 'name' => 'Madina Saidova',
                 'email' => 'accounting@test.uz',
                 'department_code' => 'accounting',
@@ -43,14 +36,16 @@ class TestUsersSeeder extends Seeder
             [
                 'name' => 'Rustam Nazarov',
                 'email' => 'manager@test.uz',
-                'department_code' => 'it',
+                'department_code' => null,
                 'position_ru' => 'Менеджер',
                 'role' => 'manager',
             ],
         ];
 
         foreach ($users as $data) {
-            $department = Department::firstWhere('code', $data['department_code']);
+            $department = $data['department_code']
+                ? Department::firstWhere('code', $data['department_code'])
+                : null;
             $position = Position::firstWhere('name->ru', $data['position_ru']);
 
             $user = User::firstOrCreate(
@@ -74,23 +69,19 @@ class TestUsersSeeder extends Seeder
     protected function wireDefaultRecipients(): void
     {
         $legal = User::firstWhere('email', 'legal@test.uz');
-        $financial = User::firstWhere('email', 'financial@test.uz');
         $accounting = User::firstWhere('email', 'accounting@test.uz');
         $director = User::firstWhere('email', 'mr.silverwind1998@gmail.com');
 
-        $chainForOwner = collect([$legal, $financial, $accounting])
+        $chain = collect([$legal, $accounting, $director])
             ->filter()
             ->pluck('id')
             ->all();
 
-        $chainForManager = collect([$legal, $financial, $accounting, $director])
-            ->filter()
-            ->pluck('id')
-            ->all();
-
-        $director?->defaultRecipients()->sync($chainForOwner);
+        $director?->defaultRecipients()->sync(
+            collect([$legal, $accounting])->filter()->pluck('id')->all()
+        );
 
         $manager = User::firstWhere('email', 'manager@test.uz');
-        $manager?->defaultRecipients()->sync($chainForManager);
+        $manager?->defaultRecipients()->sync($chain);
     }
 }

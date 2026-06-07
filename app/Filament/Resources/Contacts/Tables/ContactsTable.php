@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Contacts\Tables;
 
+use App\Filament\Resources\Contacts\ContactResource;
 use App\Models\Contact;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -77,10 +79,15 @@ class ContactsTable
                     ->label(__('app.label.status'))
                     ->options(Contact::getStatuses()),
             ])
+            ->recordUrl(fn (Contact $record) => ContactResource::getUrl('view', ['record' => $record]))
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->color('gray'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

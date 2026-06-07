@@ -31,7 +31,7 @@ class SettingsSeeder extends Seeder
             'metrics.yandex' => '',
             'metrics.google' => '',
 
-            'approval.flow' => ['legal', 'financial', 'accounting', 'direction'],
+            'approval.flow' => ['legal', 'accounting', 'direction'],
         ];
 
         foreach ($values as $key => $value) {

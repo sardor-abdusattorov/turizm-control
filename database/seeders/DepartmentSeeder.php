@@ -32,34 +32,14 @@ class DepartmentSeeder extends Seeder
                 'positions' => ['Юрист', 'Специалист'],
             ],
             [
-                'code' => 'financial',
-                'name' => [
-                    'ru' => 'Финансовый отдел',
-                    'uz' => "Moliya bo'limi",
-                    'en' => 'Financial Department',
-                ],
-                'sort' => 3,
-                'positions' => ['Финансовый менеджер', 'Специалист'],
-            ],
-            [
                 'code' => 'accounting',
                 'name' => [
                     'ru' => 'Бухгалтерия',
                     'uz' => 'Buxgalteriya',
                     'en' => 'Accounting',
                 ],
-                'sort' => 4,
+                'sort' => 3,
                 'positions' => ['Главный бухгалтер', 'Бухгалтер'],
-            ],
-            [
-                'code' => 'it',
-                'name' => [
-                    'ru' => 'IT отдел',
-                    'uz' => "IT bo'lim",
-                    'en' => 'IT Department',
-                ],
-                'sort' => 5,
-                'positions' => ['Менеджер', 'Разработчик', 'Специалист'],
             ],
         ];
 
