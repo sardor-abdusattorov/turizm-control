@@ -63,7 +63,8 @@ class ContractTemplateForm
                     ->schema([
                         FileUpload::make('template_file')
                             ->label(__('app.label.template_file'))
-                            ->disk('local')
+                            ->disk('public')
+                            ->visibility('public')
                             ->directory('contract-templates')
                             ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                             ->required()

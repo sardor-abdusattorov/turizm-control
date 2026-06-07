@@ -45,7 +45,11 @@
 <body>
     <div class="editor-shell">
         <div class="editor-topbar">
-            <a href="{{ $backUrl }}" class="close-btn" title="{{ __('app.action.close') }}">
+            <a href="{{ $backUrl }}"
+               class="close-btn"
+               title="{{ __('app.action.close') }}"
+               data-back-url="{{ $backUrl }}"
+               onclick="closeEditor(event)">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
@@ -69,6 +73,18 @@
 
     <script src="{{ $apiScriptUrl }}"></script>
     <script>
+        function closeEditor(event) {
+            event.preventDefault();
+            var backUrl = event.currentTarget.getAttribute('data-back-url');
+
+            if (document.referrer && window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+
+            window.location.href = backUrl;
+        }
+
         (function () {
             var config = @json($config);
             var attempts = 0;

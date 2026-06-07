@@ -38,7 +38,7 @@ class OnlyOfficeTemplateController extends Controller
                     ->get($service->internalDownloadUrl($url))
                     ->body();
 
-                Storage::disk('local')->put($template->template_file, $body);
+                Storage::disk('public')->put($template->template_file, $body);
 
                 if ($status === 2) {
                     $template->refreshDocumentKey();
