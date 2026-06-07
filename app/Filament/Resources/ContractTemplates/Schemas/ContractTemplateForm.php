@@ -9,7 +9,6 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
@@ -30,32 +29,33 @@ class ContractTemplateForm
                             ->maxLength(255)
                             ->columnSpanFull(),
 
-                        Grid::make(['default' => 1, 'md' => 4])
-                            ->schema([
-                                Select::make('order_type_id')
-                                    ->label(__('app.label.order_type_single'))
-                                    ->options(OrderType::getActive())
-                                    ->searchable()
-                                    ->preload()
-                                    ->placeholder(__('app.label.no_category')),
+                        Select::make('order_type_id')
+                            ->label(__('app.label.order_type_single'))
+                            ->options(OrderType::getActive())
+                            ->searchable()
+                            ->preload()
+                            ->placeholder(__('app.label.no_category'))
+                            ->columnSpanFull(),
 
-                                Select::make('language')
-                                    ->label(__('app.label.language'))
-                                    ->options(ContractTemplate::getLanguages())
-                                    ->default('ru')
-                                    ->required()
-                                    ->native(false),
+                        Select::make('language')
+                            ->label(__('app.label.language'))
+                            ->options(ContractTemplate::getLanguages())
+                            ->default('ru')
+                            ->required()
+                            ->native(false)
+                            ->columnSpanFull(),
 
-                                TextInput::make('sort')
-                                    ->label(__('app.label.sort'))
-                                    ->numeric()
-                                    ->default(0),
+                        TextInput::make('sort')
+                            ->label(__('app.label.sort'))
+                            ->numeric()
+                            ->default(0)
+                            ->columnSpanFull(),
 
-                                Toggle::make('status')
-                                    ->label(__('app.label.status'))
-                                    ->default(true)
-                                    ->inline(false),
-                            ]),
+                        Toggle::make('status')
+                            ->label(__('app.label.status'))
+                            ->default(true)
+                            ->inline(false)
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make(__('app.label.contract_template_file'))
