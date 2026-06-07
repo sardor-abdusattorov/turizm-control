@@ -24,41 +24,37 @@ class ContractTemplateForm
                 Section::make(__('app.label.basic_information'))
                     ->collapsible()
                     ->schema([
-                        Grid::make(['default' => 1, 'md' => 12])
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label(__('app.label.contract_template_name'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->columnSpan(['default' => 12, 'md' => 4]),
+                        TextInput::make('name')
+                            ->label(__('app.label.contract_template_name'))
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
 
+                        Grid::make(['default' => 1, 'md' => 4])
+                            ->schema([
                                 Select::make('order_type_id')
                                     ->label(__('app.label.order_type_single'))
                                     ->options(OrderType::getActive())
                                     ->searchable()
                                     ->preload()
-                                    ->placeholder(__('app.label.no_category'))
-                                    ->columnSpan(['default' => 12, 'md' => 3]),
+                                    ->placeholder(__('app.label.no_category')),
 
                                 Select::make('language')
                                     ->label(__('app.label.language'))
                                     ->options(ContractTemplate::getLanguages())
                                     ->default('ru')
                                     ->required()
-                                    ->native(false)
-                                    ->columnSpan(['default' => 12, 'md' => 2]),
+                                    ->native(false),
 
                                 TextInput::make('sort')
                                     ->label(__('app.label.sort'))
                                     ->numeric()
-                                    ->default(0)
-                                    ->columnSpan(['default' => 12, 'md' => 1]),
+                                    ->default(0),
 
                                 Toggle::make('status')
                                     ->label(__('app.label.status'))
                                     ->default(true)
-                                    ->inline(false)
-                                    ->columnSpan(['default' => 12, 'md' => 2]),
+                                    ->inline(false),
                             ]),
                     ]),
 
