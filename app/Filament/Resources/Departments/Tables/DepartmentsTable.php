@@ -33,6 +33,7 @@ class DepartmentsTable
                 TextColumn::make('positions.name')
                     ->label(__('app.label.position_plural'))
                     ->badge()
+                    ->wrap()
                     ->searchable(),
 
                 TextColumn::make('sort')
