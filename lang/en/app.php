@@ -208,6 +208,7 @@ return [
         'edit_document' => 'Edit document',
         'open_editor' => 'Open editor',
         'open_template_in_editor' => 'Open template in editor',
+        'open_file' => 'Open file',
         'save' => 'Save',
         'download_pdf' => 'Download PDF',
         'preview_pdf' => 'Preview PDF',

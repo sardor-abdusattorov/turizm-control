@@ -82,6 +82,20 @@ class Contract extends Model
                 $contract->document_key = static::generateDocumentKey();
             }
         });
+
+        static::deleting(function (self $contract): void {
+            foreach ([$contract->document_file, $contract->pdf_file] as $path) {
+                if ($path && Storage::disk('local')->exists($path)) {
+                    Storage::disk('local')->delete($path);
+                }
+            }
+
+            $folder = "contracts/{$contract->id}";
+
+            if (Storage::disk('local')->exists($folder)) {
+                Storage::disk('local')->deleteDirectory($folder);
+            }
+        });
     }
 
     public static function generateNumber(): string

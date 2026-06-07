@@ -39,6 +39,12 @@ class Order extends Model
                 $order->document_key = static::generateDocumentKey();
             }
         });
+
+        static::deleting(function (self $order): void {
+            if ($order->file_path && Storage::disk('public')->exists($order->file_path)) {
+                Storage::disk('public')->delete($order->file_path);
+            }
+        });
     }
 
     public static function generateDocumentKey(): string

@@ -14,7 +14,6 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('file_path');
-            $table->string('document_key')->nullable();
             $table->date('deadline_at')->nullable();
             $table->boolean('status')->default(true);
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
