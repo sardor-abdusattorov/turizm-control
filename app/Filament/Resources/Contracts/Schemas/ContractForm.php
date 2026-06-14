@@ -28,6 +28,18 @@ class ContractForm
         return $schema
             ->columns(1)
             ->components([
+                Section::make()
+                    ->hiddenLabel()
+                    ->visible(fn (?Contract $record): bool => $record !== null
+                        && in_array($record->status, [Contract::STATUS_IN_REVIEW, Contract::STATUS_APPROVED, Contract::STATUS_REJECTED], true))
+                    ->schema([
+                        TextEntry::make('edit_warning')
+                            ->hiddenLabel()
+                            ->state(fn (): string => '⚠️ '.__('app.message.edit_invalidates_approvals'))
+                            ->color('warning')
+                            ->columnSpanFull(),
+                    ]),
+
                 Section::make(__('app.label.attached_document'))
                     ->visible(fn (?Contract $record): bool => $record !== null && $record->documentExists())
                     ->schema([

@@ -6,8 +6,10 @@
     $statusLabel = Contract::getStatuses()[$record->status] ?? $record->status;
     $current = $record->currentApprover();
 
-    $approvedCount = $record->approvers->where('status', ContractApprover::STATUS_APPROVED)->count();
-    $totalCount = $record->approvers->count();
+    $active = $record->activeApprovers;
+    $historical = $record->approvers->whereIn('status', [ContractApprover::STATUS_INVALIDATED, ContractApprover::STATUS_SKIPPED]);
+    $approvedCount = $active->where('status', ContractApprover::STATUS_APPROVED)->count();
+    $totalCount = $active->count();
     $progress = $totalCount ? round($approvedCount / $totalCount * 100) : 0;
 
     $pillFor = fn (string $status): string => [
@@ -172,10 +174,10 @@
                 @if ($totalCount > 0)<span class="cv-count">{{ $approvedCount }} / {{ $totalCount }}</span>@endif
             </div>
 
-            @if ($record->approvers->isEmpty())
+            @if ($active->isEmpty() && $historical->isEmpty())
                 <div class="cv-card__body"><p style="font-size:.85rem;color:var(--cv-muted)">{{ __('app.label.no_approvers') }}</p></div>
             @else
-                @foreach ($record->approvers as $approver)
+                @foreach ($active as $approver)
                     @php $isCurrent = $this->isCurrentApprover($approver); @endphp
                     <div class="cv-appr {{ $isCurrent ? 'cv-appr--current' : '' }}">
                         <div class="cv-ava-wrap">
@@ -199,6 +201,35 @@
                         </div>
                     </div>
                 @endforeach
+
+                @if ($historical->isNotEmpty())
+                    <details style="border-top:1px solid var(--cv-divider); background:var(--cv-soft);">
+                        <summary style="padding:.75rem 1.25rem; cursor:pointer; font-size:.8rem; color:var(--cv-muted); user-select:none;">
+                            {{ __('app.label.previous_attempts') }} ({{ $historical->count() }})
+                        </summary>
+                        @foreach ($historical as $approver)
+                            <div class="cv-appr" style="opacity:.7;">
+                                <div class="cv-ava-wrap">
+                                    <img class="cv-ava" src="{{ $this->approverAvatar($approver) }}" alt="">
+                                    <span class="cv-ord">{{ $approver->order }}</span>
+                                </div>
+                                <div class="cv-appr__id">
+                                    <div class="cv-appr__name">{{ $approver->user?->name }}</div>
+                                    <div class="cv-appr__dept">{{ $approver->user?->department?->name }}</div>
+                                    @if ($approver->comment)
+                                        <div class="cv-cmt">{{ $approver->comment }}</div>
+                                    @endif
+                                </div>
+                                <div class="cv-appr__right">
+                                    <span class="cv-pill cv-pill--gray">{{ ContractApprover::getStatuses()[$approver->status] ?? $approver->status }}</span>
+                                    @if ($approver->acted_at)
+                                        <span class="cv-when">{{ $approver->acted_at->format('d.m.Y H:i') }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </details>
+                @endif
             @endif
         </section>
 

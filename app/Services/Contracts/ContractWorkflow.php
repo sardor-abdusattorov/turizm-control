@@ -21,6 +21,13 @@ class ContractWorkflow
         }
 
         DB::transaction(function () use ($contract, $user): void {
+            // If there are no active approvers (every row is INVALIDATED
+            // because the contract was edited mid-flow), rebuild the
+            // queue from the global settings flow before sending.
+            if (! $contract->activeApprovers()->exists()) {
+                $contract->buildApprovalChainFromFlow();
+            }
+
             $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
 
             $current = $this->advanceToActiveApprover($contract);

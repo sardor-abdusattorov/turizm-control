@@ -83,6 +83,10 @@ class Contract extends Model
             }
         });
 
+        static::updating(function (self $contract): void {
+            $contract->maybeInvalidateOnEdit();
+        });
+
         static::deleting(function (self $contract): void {
             foreach ([$contract->document_file, $contract->pdf_file] as $path) {
                 if ($path && Storage::disk('local')->exists($path)) {
@@ -96,6 +100,81 @@ class Contract extends Model
                 Storage::disk('local')->deleteDirectory($folder);
             }
         });
+    }
+
+    /**
+     * Business fields whose change mid-flow must invalidate prior approvals.
+     * Bookkeeping columns (status, document_key, pdf_file, signed_at, …) are
+     * intentionally NOT in this list — they change as part of the workflow
+     * itself and must never trigger a cancel-on-edit cascade.
+     *
+     * @var array<int, string>
+     */
+    public const REAPPROVAL_TRIGGER_FIELDS = [
+        'number',
+        'title',
+        'amount',
+        'currency_id',
+        'contact_id',
+        'order_type_id',
+        'contract_template_id',
+        'document_file',
+        'language',
+    ];
+
+    private bool $preserveApprovedStatus = false;
+
+    /**
+     * Allow the next save to keep the APPROVED status and skip
+     * invalidation. Used by the "edit approved contract" path —
+     * caller must enforce the permission upstream.
+     */
+    public function preserveApprovedOnNextSave(): self
+    {
+        $this->preserveApprovedStatus = true;
+
+        return $this;
+    }
+
+    /**
+     * Run from the `updating` hook. When meaningful fields change on a
+     * contract that's already past the draft stage, cancel every
+     * existing approver row and drop the contract back to DRAFT so the
+     * manager re-submits the queue (which rebuilds fresh pending rows
+     * via ContractObserver / afterSave).
+     */
+    private function maybeInvalidateOnEdit(): void
+    {
+        if ($this->preserveApprovedStatus) {
+            return;
+        }
+
+        // Mid-flow only — drafts and already-cancelled rejected ones don't
+        // have anything to invalidate yet, archived is read-only.
+        if (! in_array($this->getOriginal('status'), [
+            self::STATUS_IN_REVIEW,
+            self::STATUS_APPROVED,
+            self::STATUS_REJECTED,
+        ], true)) {
+            return;
+        }
+
+        $touched = array_keys($this->getDirty());
+        $businessTouched = array_intersect($touched, self::REAPPROVAL_TRIGGER_FIELDS);
+
+        if (empty($businessTouched)) {
+            return;
+        }
+
+        // The hook fires *before* the update is persisted, so we modify
+        // the in-flight attributes directly — status falls back to draft.
+        $this->status = self::STATUS_DRAFT;
+        $this->signed_at = null;
+
+        // Invalidate prior approvers — keeps the audit trail, frees the
+        // queue. Fresh rows are NOT rebuilt here: the manager re-submits,
+        // and at submit time the queue is read from settings as usual.
+        $this->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
     }
 
     public static function generateNumber(): string
@@ -285,17 +364,40 @@ class Contract extends Model
         return $this->belongsTo(User::class, 'responsible_id');
     }
 
+    /** Every row ever attached, oldest first — for history modal. */
     public function approvers(): HasMany
     {
         return $this->hasMany(ContractApprover::class)->orderBy('order');
     }
 
+    /** Only the rows that count toward the current workflow. */
+    public function activeApprovers(): HasMany
+    {
+        return $this->hasMany(ContractApprover::class)
+            ->whereNotIn('status', [ContractApprover::STATUS_INVALIDATED, ContractApprover::STATUS_SKIPPED])
+            ->orderBy('order');
+    }
+
     public function currentApprover(): ?ContractApprover
     {
-        return $this->approvers()
+        return $this->activeApprovers()
             ->where('status', ContractApprover::STATUS_PENDING)
             ->orderBy('order')
             ->first();
+    }
+
+    /**
+     * Mark every approver row attached to the contract as INVALIDATED.
+     * Used when the contract is edited mid-flow — old rows stay for the
+     * audit history, fresh pending rows are built next.
+     */
+    public function invalidateAllApprovers(?string $note = null): int
+    {
+        return $this->approvers()->update([
+            'status' => ContractApprover::STATUS_INVALIDATED,
+            'comment' => $note,
+            'acted_at' => now(),
+        ]);
     }
 
     public function isCurrentApprover(User $user): bool
@@ -310,15 +412,22 @@ class Contract extends Model
         return $this->approvers()->exists();
     }
 
+    /** Submit needs either an active queue OR the global settings flow to fall back on. */
+    public function canRebuildChainOnSubmit(): bool
+    {
+        return $this->activeApprovers()->doesntExist()
+            && ! empty(self::approvalChainPreview());
+    }
+
     public function allApproved(): bool
     {
-        return $this->hasApprovers()
-            && $this->approvers()->where('status', '!=', ContractApprover::STATUS_APPROVED)->doesntExist();
+        return $this->activeApprovers()->exists()
+            && $this->activeApprovers()->where('status', '!=', ContractApprover::STATUS_APPROVED)->doesntExist();
     }
 
     public function wasRejected(): bool
     {
-        return $this->approvers()->where('status', ContractApprover::STATUS_REJECTED)->exists();
+        return $this->activeApprovers()->where('status', ContractApprover::STATUS_REJECTED)->exists();
     }
 
     public function resetApprovalState(): void
@@ -350,7 +459,7 @@ class Contract extends Model
         return $user
             && $this->status === self::STATUS_DRAFT
             && ($this->responsible_id === $user->id || $user->hasRole('super_admin'))
-            && $this->hasApprovers();
+            && ($this->activeApprovers()->exists() || $this->canRebuildChainOnSubmit());
     }
 
     public function canBeApprovedBy(?User $user = null): bool

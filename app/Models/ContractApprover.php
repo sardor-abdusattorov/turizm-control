@@ -38,6 +38,17 @@ class ContractApprover extends Model
 
     public const STATUS_SKIPPED = 'skipped';
 
+    public const STATUS_INVALIDATED = 'invalidated';
+
+    /** Statuses that no longer participate in the active queue. */
+    public const HISTORICAL_STATUSES = [
+        self::STATUS_APPROVED,
+        self::STATUS_REJECTED,
+        self::STATUS_RETURNED,
+        self::STATUS_SKIPPED,
+        self::STATUS_INVALIDATED,
+    ];
+
     public static function getStatuses(): array
     {
         return [
@@ -46,6 +57,7 @@ class ContractApprover extends Model
             self::STATUS_REJECTED => __('app.contract_approver.status.rejected'),
             self::STATUS_RETURNED => __('app.contract_approver.status.returned'),
             self::STATUS_SKIPPED => __('app.contract_approver.status.skipped'),
+            self::STATUS_INVALIDATED => __('app.contract_approver.status.invalidated'),
         ];
     }
 
@@ -57,7 +69,14 @@ class ContractApprover extends Model
             self::STATUS_REJECTED => 'danger',
             self::STATUS_RETURNED => 'info',
             self::STATUS_SKIPPED => 'gray',
+            self::STATUS_INVALIDATED => 'gray',
         ];
+    }
+
+    /** Scope: rows that count toward the active workflow (excludes invalidated/skipped). */
+    public function scopeActive($query)
+    {
+        return $query->whereNotIn('status', [self::STATUS_INVALIDATED, self::STATUS_SKIPPED]);
     }
 
     public function contract(): BelongsTo
