@@ -150,6 +150,8 @@ return [
         'description' => 'Description',
         'image' => 'Image',
         'user' => 'User',
+        'attached_document' => 'Attached document',
+        'size' => 'Size',
         'document' => 'Document',
 
         // Currencies

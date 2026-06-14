@@ -4,16 +4,21 @@ namespace App\Filament\Resources\Contracts\Schemas;
 
 use App\Filament\Resources\Contacts\Schemas\ContactForm;
 use App\Models\Contact;
+use App\Models\Contract;
 use App\Models\ContractTemplate;
 use App\Models\Currency;
 use App\Models\OrderType;
 use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ContractForm
 {
@@ -22,6 +27,41 @@ class ContractForm
         return $schema
             ->columns(1)
             ->components([
+                Section::make(__('app.label.attached_document'))
+                    ->visible(fn (?Contract $record): bool => $record !== null && $record->documentExists())
+                    ->schema([
+                        TextEntry::make('document_file')
+                            ->hiddenLabel()
+                            ->icon('heroicon-o-document-text')
+                            ->iconColor('primary')
+                            ->weight('bold')
+                            ->state(fn (Contract $record): string => $record->number.'.docx')
+                            ->columnSpanFull(),
+
+                        TextEntry::make('document_size')
+                            ->label(__('app.label.size'))
+                            ->state(function (Contract $record): string {
+                                $bytes = Storage::disk('local')->size($record->documentPath());
+
+                                return number_format($bytes / 1024, 1).' KB';
+                            }),
+
+                        TextEntry::make('created_at')
+                            ->label(__('app.label.created_at'))
+                            ->dateTime('d.m.Y H:i'),
+
+                        Actions::make([
+                            Action::make('openInEditor')
+                                ->label(__('app.action.open_editor'))
+                                ->icon('heroicon-o-pencil-square')
+                                ->color('primary')
+                                ->url(fn (Contract $record) => route('contracts.editor', [
+                                    'contract' => $record,
+                                    'mode' => 'edit',
+                                ])),
+                        ])->columnSpanFull(),
+                    ]),
+
                 Section::make(__('app.label.basic_information'))
                     ->collapsible()
                     ->schema([
@@ -94,6 +134,7 @@ class ContractForm
                 Section::make(__('app.label.approval_chain'))
                     ->description(__('app.helper.approval_chain_form'))
                     ->collapsible()
+                    ->hiddenOn('edit')
                     ->schema([
                         Repeater::make('approver_chain')
                             ->hiddenLabel()

@@ -4,6 +4,9 @@ namespace App\Filament\Resources\Contracts\RelationManagers;
 
 use App\Models\ContractApprover;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -24,38 +27,55 @@ class ApproversRelationManager extends RelationManager
             ->recordTitleAttribute('id')
             ->defaultSort('order')
             ->columns([
-                TextColumn::make('order')
-                    ->label('№')
-                    ->sortable(),
+                Split::make([
+                    TextColumn::make('order')
+                        ->label('#')
+                        ->size(TextColumn\TextColumnSize::Large)
+                        ->weight('bold')
+                        ->color('gray')
+                        ->grow(false),
 
-                TextColumn::make('user.name')
-                    ->label(__('app.label.full_name'))
-                    ->searchable(),
+                    ImageColumn::make('user.avatar_url')
+                        ->label('')
+                        ->circular()
+                        ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name='
+                            .urlencode($record->user?->name ?? '?')
+                            .'&background=E0E7FF&color=4338CA&size=64')
+                        ->grow(false),
 
-                TextColumn::make('user.department.name')
-                    ->label(__('app.label.department_single'))
-                    ->badge(),
+                    Stack::make([
+                        TextColumn::make('user.name')
+                            ->label(__('app.label.full_name'))
+                            ->weight('bold')
+                            ->searchable(),
 
-                TextColumn::make('user.position.name')
-                    ->label(__('app.label.position_single'))
-                    ->toggleable(),
+                        TextColumn::make('user.department.name')
+                            ->label(__('app.label.department_single'))
+                            ->size(TextColumn\TextColumnSize::Small)
+                            ->color('gray'),
+                    ]),
 
-                TextColumn::make('status')
-                    ->label(__('app.label.status'))
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => ContractApprover::getStatuses()[$state] ?? $state)
-                    ->color(fn (string $state): string => ContractApprover::getStatusColors()[$state] ?? 'gray'),
+                    TextColumn::make('comment')
+                        ->label(__('app.label.comment'))
+                        ->wrap()
+                        ->limit(60)
+                        ->placeholder('—'),
 
-                TextColumn::make('acted_at')
-                    ->label(__('app.label.acted_at'))
-                    ->dateTime('d.m.Y H:i')
-                    ->placeholder('—'),
+                    Stack::make([
+                        TextColumn::make('status')
+                            ->label(__('app.label.status'))
+                            ->badge()
+                            ->formatStateUsing(fn (string $state): string => ContractApprover::getStatuses()[$state] ?? $state)
+                            ->color(fn (string $state): string => ContractApprover::getStatusColors()[$state] ?? 'gray'),
 
-                TextColumn::make('comment')
-                    ->label(__('app.label.comment'))
-                    ->wrap()
-                    ->limit(60)
-                    ->placeholder('—'),
+                        TextColumn::make('acted_at')
+                            ->label(__('app.label.acted_at'))
+                            ->dateTime('d.m.Y H:i')
+                            ->size(TextColumn\TextColumnSize::Small)
+                            ->color('gray')
+                            ->placeholder('—'),
+                    ])->alignment('end'),
+                ]),
             ])
             ->headerActions([])
             ->recordActions([])
