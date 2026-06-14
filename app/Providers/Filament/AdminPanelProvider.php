@@ -41,7 +41,8 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->defaultThemeMode(ThemeMode::Light)
             ->colors([
-                'primary' => Color::Blue,
+                'primary' => \Openplain\FilamentShadcnTheme\Color::Default,
+
             ])
             ->spa()
             ->font('Inter')
