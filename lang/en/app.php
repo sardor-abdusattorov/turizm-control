@@ -375,6 +375,13 @@ return [
         'my_contracts' => 'My contracts',
         'involving_me' => 'Approvals involving me',
     ],
+    'stats' => [
+        'overdue_count' => ':count overdue',
+        'on_track' => 'On track',
+        'my_in_review' => 'My contracts in review',
+        'my_approved' => 'My approved contracts',
+        'my_drafts' => 'My drafts',
+    ],
     'filter' => [
         'awaiting_my_approval' => 'Awaiting my approval',
         'my_contracts' => 'My contracts',

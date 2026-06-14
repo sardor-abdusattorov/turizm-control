@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\ProfileSettings;
+use App\Filament\Widgets\ContractStatsWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
@@ -16,7 +17,6 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -24,6 +24,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Openplain\FilamentShadcnTheme\Color;
 use Spatie\Permission\Models\Role;
 
 class AdminPanelProvider extends PanelProvider
@@ -41,7 +42,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->defaultThemeMode(ThemeMode::Light)
             ->colors([
-                'primary' => \Openplain\FilamentShadcnTheme\Color::Default,
+                'primary' => Color::Default,
 
             ])
             ->spa()
@@ -77,7 +78,7 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
-
+                ContractStatsWidget::class,
             ])
             ->resources([
 
