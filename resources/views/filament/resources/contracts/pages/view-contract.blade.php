@@ -8,207 +8,241 @@
 
     $approvedCount = $record->approvers->where('status', ContractApprover::STATUS_APPROVED)->count();
     $totalCount = $record->approvers->count();
-    $pendingCount = $record->approvers->where('status', ContractApprover::STATUS_PENDING)->count();
+    $progress = $totalCount ? round($approvedCount / $totalCount * 100) : 0;
 
-    $tone = [
-        'success' => 'text-success-600 dark:text-success-400',
-        'danger' => 'text-danger-600 dark:text-danger-400',
-        'warning' => 'text-warning-600 dark:text-warning-400',
-        'info' => 'text-info-600 dark:text-info-400',
-        'gray' => 'text-gray-400',
-    ];
+    $pillFor = fn (string $status): string => [
+        ContractApprover::STATUS_APPROVED => 'success',
+        ContractApprover::STATUS_REJECTED => 'danger',
+        ContractApprover::STATUS_RETURNED => 'info',
+        ContractApprover::STATUS_PENDING => 'warning',
+        ContractApprover::STATUS_SKIPPED => 'gray',
+    ][$status] ?? 'gray';
 
-    $meta = [
-        ['icon' => 'heroicon-o-building-office-2', 'label' => __('app.label.contact_single'), 'value' => $record->contact?->name],
-        ['icon' => 'heroicon-o-document-duplicate', 'label' => __('app.label.contract_template_single'), 'value' => $record->template?->name],
-        ['icon' => 'heroicon-o-tag', 'label' => __('app.label.order_type_single'), 'value' => $record->orderType?->title ?: '—'],
-        ['icon' => 'heroicon-o-user', 'label' => __('app.label.responsible'), 'value' => $record->responsible?->name],
-        ['icon' => 'heroicon-o-banknotes', 'label' => __('app.label.amount'), 'value' => number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? '')],
-        ['icon' => 'heroicon-o-calendar-days', 'label' => __('app.label.signing_date'), 'value' => $record->signed_at?->format('d.m.Y') ?: '—'],
+    $details = [
+        [__('app.label.contract_number'), $record->number],
+        [__('app.label.contact_single'), $record->contact?->name],
+        [__('app.label.contract_template_single'), $record->template?->name],
+        [__('app.label.order_type_single'), $record->orderType?->title ?: '—'],
+        [__('app.label.responsible'), $record->responsible?->name],
+        [__('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? '')],
+        [__('app.label.signing_date'), $record->signed_at?->format('d.m.Y') ?: '—'],
+        [__('app.label.created_at'), $record->created_at?->format('d.m.Y H:i')],
     ];
 @endphp
 
 <x-filament-panels::page>
-    {{-- Hero --}}
-    <section @class([
-        'relative overflow-hidden rounded-2xl p-6 ring-1',
-        'bg-success-50/60 ring-success-200 dark:bg-success-500/5 dark:ring-success-500/20' => $statusColor === 'success',
-        'bg-warning-50/60 ring-warning-200 dark:bg-warning-500/5 dark:ring-warning-500/20' => $statusColor === 'warning',
-        'bg-danger-50/60 ring-danger-200 dark:bg-danger-500/5 dark:ring-danger-500/20' => $statusColor === 'danger',
-        'bg-gray-50 ring-gray-200 dark:bg-white/5 dark:ring-white/10' => in_array($statusColor, ['gray', 'info']),
-    ])>
-        <div class="flex flex-wrap items-start justify-between gap-4">
-            <div class="min-w-0">
-                <h1 class="text-2xl font-bold tracking-tight text-gray-950 dark:text-white">{{ $record->number }}</h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ $record->title }}</p>
-            </div>
-            <x-filament::badge :color="$statusColor" size="lg">{{ $statusLabel }}</x-filament::badge>
+    <style>
+        .cv { display: flex; flex-direction: column; gap: 1.25rem;
+            --cv-surface:#fff; --cv-ring:rgba(17,24,39,.08); --cv-text:#111827; --cv-muted:#6b7280;
+            --cv-track:#e5e7eb; --cv-divider:rgba(17,24,39,.06); --cv-soft:#f9fafb; }
+        .dark .cv { --cv-surface:#18181b; --cv-ring:rgba(255,255,255,.08); --cv-text:#f4f4f5; --cv-muted:#9ca3af;
+            --cv-track:rgba(255,255,255,.1); --cv-divider:rgba(255,255,255,.07); --cv-soft:rgba(255,255,255,.04); }
+
+        .cv-card { background:var(--cv-surface); border-radius:1rem; box-shadow:0 0 0 1px var(--cv-ring), 0 1px 2px rgba(0,0,0,.04); overflow:hidden; }
+        .cv-card__head { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:1rem 1.25rem; border-bottom:1px solid var(--cv-divider); }
+        .cv-card__body { padding:1.25rem; }
+        .cv-h2 { font-size:.95rem; font-weight:600; color:var(--cv-text); margin:0; display:flex; align-items:center; gap:.5rem; }
+        .cv-h2 svg { width:1.1rem; height:1.1rem; color:var(--cv-muted); }
+        .cv-count { font-size:.75rem; color:var(--cv-muted); }
+
+        /* status strip */
+        .cv-strip { display:flex; flex-wrap:wrap; align-items:center; gap:1.25rem; background:var(--cv-surface);
+            border-radius:1rem; padding:.85rem 1.25rem; box-shadow:0 0 0 1px var(--cv-ring); }
+        .cv-strip__cur { display:flex; align-items:center; gap:.5rem; font-size:.85rem; color:var(--cv-muted); }
+        .cv-strip__cur b { color:var(--cv-text); font-weight:600; }
+        .cv-strip__cur svg { width:1.1rem; height:1.1rem; color:#f59e0b; }
+        .cv-prog { display:flex; align-items:center; gap:.6rem; margin-left:auto; }
+        .cv-prog__num { font-size:.8rem; color:var(--cv-muted); }
+        .cv-prog__track { width:9rem; height:.5rem; border-radius:999px; background:var(--cv-track); overflow:hidden; }
+        .cv-prog__bar { height:100%; border-radius:999px; background:#3b82f6; transition:width .3s; }
+
+        /* pills */
+        .cv-pill { display:inline-flex; align-items:center; padding:.2rem .65rem; border-radius:999px; font-size:.75rem; font-weight:600; white-space:nowrap; }
+        .cv-pill--success{ background:#dcfce7; color:#166534; } .dark .cv-pill--success{ background:rgba(34,197,94,.16); color:#86efac; }
+        .cv-pill--warning{ background:#fef9c3; color:#854d0e; } .dark .cv-pill--warning{ background:rgba(234,179,8,.16); color:#fde047; }
+        .cv-pill--danger { background:#fee2e2; color:#991b1b; } .dark .cv-pill--danger { background:rgba(239,68,68,.16); color:#fca5a5; }
+        .cv-pill--info   { background:#dbeafe; color:#1e40af; } .dark .cv-pill--info   { background:rgba(59,130,246,.16); color:#93c5fd; }
+        .cv-pill--gray   { background:#f3f4f6; color:#374151; } .dark .cv-pill--gray   { background:rgba(255,255,255,.08); color:#d1d5db; }
+
+        /* approver cards */
+        .cv-appr { display:flex; align-items:center; gap:1rem; padding:1rem 1.25rem; border-bottom:1px solid var(--cv-divider); }
+        .cv-appr:last-child { border-bottom:0; }
+        .cv-appr--current { background:linear-gradient(90deg, rgba(245,158,11,.07), transparent); box-shadow:inset 3px 0 0 #f59e0b; }
+        .cv-ava-wrap { position:relative; flex-shrink:0; }
+        .cv-ava { width:3rem; height:3rem; border-radius:999px; object-fit:cover; box-shadow:0 0 0 2px var(--cv-ring); display:block; }
+        .cv-ord { position:absolute; bottom:-.25rem; right:-.25rem; width:1.3rem; height:1.3rem; border-radius:999px;
+            background:#3b82f6; color:#fff; font-size:.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px var(--cv-surface); }
+        .cv-appr__id { min-width:0; flex:1; }
+        .cv-appr__name { font-size:.95rem; font-weight:600; color:var(--cv-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .cv-appr__dept { font-size:.8rem; color:var(--cv-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .cv-appr__right { display:flex; flex-direction:column; align-items:flex-end; gap:.3rem; text-align:right; }
+        .cv-when { font-size:.72rem; color:var(--cv-muted); }
+        .cv-when--over { color:#dc2626; font-weight:600; }
+        .cv-cmt { margin-top:.5rem; padding:.4rem .7rem; border-radius:.5rem; background:var(--cv-soft); font-size:.78rem; color:var(--cv-muted); }
+
+        /* document */
+        .cv-doc { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+        .cv-doc__ic { width:3.25rem; height:3.25rem; border-radius:.75rem; background:rgba(59,130,246,.1); color:#2563eb; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .cv-doc__ic svg { width:1.7rem; height:1.7rem; }
+        .cv-doc__name { font-weight:600; color:var(--cv-text); font-size:.95rem; }
+        .cv-doc__meta { font-size:.8rem; color:var(--cv-muted); margin-top:.15rem; }
+        .cv-doc__act { margin-left:auto; display:flex; gap:.5rem; }
+        .cv-pdf { margin-top:1rem; border:1px solid var(--cv-divider); border-radius:.75rem; overflow:hidden; }
+        .cv-pdf iframe { width:100%; height:70vh; background:#fff; display:block; border:0; }
+        .cv-empty { display:flex; flex-direction:column; align-items:center; gap:.5rem; padding:2.5rem 0; color:var(--cv-muted); }
+        .cv-empty svg { width:2.25rem; height:2.25rem; opacity:.4; }
+
+        /* details table */
+        .cv-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+        .cv-table tr:nth-child(odd) td { background:var(--cv-soft); }
+        .cv-table td { padding:.7rem 1rem; border-bottom:1px solid var(--cv-divider); color:var(--cv-text); }
+        .cv-table td:first-child { width:38%; color:var(--cv-muted); font-weight:500; }
+        .cv-table tr:last-child td { border-bottom:0; }
+
+        /* history */
+        .cv-hist { display:flex; flex-direction:column; gap:1.1rem; }
+        .cv-hi { display:flex; gap:.75rem; }
+        .cv-hi__ic { width:2rem; height:2rem; border-radius:999px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .cv-hi__ic svg { width:1rem; height:1rem; }
+        .cv-hi__ic--success{ background:#dcfce7; color:#16a34a;} .dark .cv-hi__ic--success{ background:rgba(34,197,94,.16);}
+        .cv-hi__ic--danger { background:#fee2e2; color:#dc2626;} .dark .cv-hi__ic--danger { background:rgba(239,68,68,.16);}
+        .cv-hi__ic--warning{ background:#fef9c3; color:#ca8a04;} .dark .cv-hi__ic--warning{ background:rgba(234,179,8,.16);}
+        .cv-hi__ic--info   { background:#dbeafe; color:#2563eb;} .dark .cv-hi__ic--info   { background:rgba(59,130,246,.16);}
+        .cv-hi__ic--gray   { background:#f3f4f6; color:#6b7280;} .dark .cv-hi__ic--gray   { background:rgba(255,255,255,.08);}
+        .cv-hi__desc { font-size:.85rem; font-weight:500; color:var(--cv-text); }
+        .cv-hi__meta { font-size:.75rem; color:var(--cv-muted); margin-top:.1rem; }
+    </style>
+
+    <div class="cv">
+        {{-- Status strip --}}
+        <div class="cv-strip">
+            <span class="cv-pill cv-pill--{{ $statusColor }}">{{ $statusLabel }}</span>
+
+            @if ($current && $record->status === Contract::STATUS_IN_REVIEW)
+                <span class="cv-strip__cur">
+                    @svg('heroicon-o-clock')
+                    {{ __('app.label.current_step') }}: <b>{{ $current->user?->name }}</b>
+                </span>
+            @endif
+
+            @if ($totalCount > 0)
+                <div class="cv-prog">
+                    <span class="cv-prog__num">{{ $approvedCount }} / {{ $totalCount }}</span>
+                    <span class="cv-prog__track"><span class="cv-prog__bar" style="width: {{ $progress }}%"></span></span>
+                </div>
+            @endif
         </div>
 
-        @if ($totalCount > 0)
-            <div class="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-gray-200/70 pt-4 dark:border-white/10">
-                @if ($current && $record->status === Contract::STATUS_IN_REVIEW)
-                    <div class="flex items-center gap-2 text-sm">
-                        @svg('heroicon-o-clock', 'h-5 w-5 text-warning-500')
-                        <span class="text-gray-500 dark:text-gray-400">{{ __('app.label.current_step') }}:</span>
-                        <span class="font-semibold text-gray-900 dark:text-white">{{ $current->user?->name }}</span>
-                    </div>
-                @endif
-                <div class="flex items-center gap-3">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ $approvedCount }} / {{ $totalCount }}</span>
-                    <div class="h-2 w-32 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
-                        <div class="h-full rounded-full bg-primary-500 transition-all" style="width: {{ $totalCount ? round($approvedCount / $totalCount * 100) : 0 }}%"></div>
-                    </div>
-                </div>
+        {{-- Document --}}
+        <section class="cv-card">
+            <div class="cv-card__head">
+                <h2 class="cv-h2">@svg('heroicon-o-document-text') {{ __('app.label.attached_document') }}</h2>
             </div>
-        @endif
-    </section>
-
-    {{-- Tabbed body --}}
-    <div x-data="{ tab: 'document' }" class="mt-2">
-        <x-filament::tabs>
-            <x-filament::tabs.item alpine-active="tab === 'document'" x-on:click="tab = 'document'" icon="heroicon-o-document-text">
-                {{ __('app.label.document') }}
-            </x-filament::tabs.item>
-            <x-filament::tabs.item alpine-active="tab === 'approval'" x-on:click="tab = 'approval'" icon="heroicon-o-users" :badge="$pendingCount ?: null">
-                {{ __('app.label.approval_chain') }}
-            </x-filament::tabs.item>
-            <x-filament::tabs.item alpine-active="tab === 'history'" x-on:click="tab = 'history'" icon="heroicon-o-clock">
-                {{ __('app.label.execution_history') }}
-            </x-filament::tabs.item>
-        </x-filament::tabs>
-
-        {{-- DOCUMENT --}}
-        <div x-show="tab === 'document'" class="mt-6 space-y-6">
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                @foreach ($meta as $item)
-                    <div class="rounded-xl bg-white p-4 ring-1 ring-gray-200 dark:bg-white/5 dark:ring-white/10">
-                        <div class="flex items-center gap-2 text-gray-400">
-                            @svg($item['icon'], 'h-4 w-4')
-                            <span class="text-xs font-medium uppercase tracking-wide">{{ $item['label'] }}</span>
-                        </div>
-                        <div class="mt-1.5 truncate text-sm font-semibold text-gray-900 dark:text-white">{{ $item['value'] ?: '—' }}</div>
-                    </div>
-                @endforeach
-            </div>
-
-            <x-filament::section>
-                <x-slot name="heading">{{ __('app.label.attached_document') }}</x-slot>
-
+            <div class="cv-card__body">
                 @if ($record->documentExists())
-                    <div class="flex flex-wrap items-center gap-4">
-                        <div class="flex size-14 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-600 dark:bg-primary-500/10">
-                            @svg('heroicon-o-document-text', 'h-8 w-8')
+                    <div class="cv-doc">
+                        <div class="cv-doc__ic">@svg('heroicon-o-document-text')</div>
+                        <div>
+                            <div class="cv-doc__name">{{ $record->number }}.docx</div>
+                            <div class="cv-doc__meta">{{ $this->documentSizeLabel() }} · {{ $record->created_at->format('d.m.Y H:i') }}</div>
                         </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="truncate font-semibold text-gray-900 dark:text-white">{{ $record->number }}.docx</div>
-                            <div class="mt-0.5 text-sm text-gray-500">{{ $this->documentSizeLabel() }} · {{ $record->created_at->format('d.m.Y H:i') }}</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <x-filament::button tag="a" :href="$this->editorUrl($record->canBeEditedBy() ? 'edit' : 'view')" icon="heroicon-o-pencil-square" color="primary">
+                        <div class="cv-doc__act">
+                            <x-filament::button tag="a" :href="$this->editorUrl($record->canBeEditedBy() ? 'edit' : 'view')" icon="heroicon-o-pencil-square" color="primary" size="sm">
                                 {{ __('app.action.open_editor') }}
                             </x-filament::button>
                             @if ($record->status === Contract::STATUS_APPROVED)
-                                <x-filament::button tag="a" :href="route('contracts.pdf.download', ['contract' => $record])" icon="heroicon-o-document-arrow-down" color="gray">PDF</x-filament::button>
+                                <x-filament::button tag="a" :href="route('contracts.pdf.download', ['contract' => $record])" icon="heroicon-o-document-arrow-down" color="gray" size="sm">PDF</x-filament::button>
                             @endif
                         </div>
                     </div>
 
                     @if ($url = $this->pdfPreviewUrl())
-                        <div class="mt-4 overflow-hidden rounded-xl border border-gray-200 dark:border-white/10">
-                            <iframe src="{{ $url }}" class="w-full bg-white" style="height: 72vh;" loading="lazy"></iframe>
-                        </div>
+                        <div class="cv-pdf"><iframe src="{{ $url }}" loading="lazy"></iframe></div>
                     @endif
                 @else
-                    <div class="flex flex-col items-center justify-center gap-2 py-10 text-center">
-                        @svg('heroicon-o-document', 'h-10 w-10 text-gray-300')
-                        <p class="text-sm text-gray-500">{{ __('app.label.document_not_ready') }}</p>
+                    <div class="cv-empty">@svg('heroicon-o-document') <span>{{ __('app.label.document_not_ready') }}</span></div>
+                @endif
+            </div>
+        </section>
+
+        {{-- Approval chain --}}
+        <section class="cv-card">
+            <div class="cv-card__head">
+                <h2 class="cv-h2">@svg('heroicon-o-users') {{ __('app.label.approval_chain') }}</h2>
+                @if ($totalCount > 0)<span class="cv-count">{{ $approvedCount }} / {{ $totalCount }}</span>@endif
+            </div>
+
+            @if ($record->approvers->isEmpty())
+                <div class="cv-card__body"><p style="font-size:.85rem;color:var(--cv-muted)">{{ __('app.label.no_approvers') }}</p></div>
+            @else
+                @foreach ($record->approvers as $approver)
+                    @php $isCurrent = $this->isCurrentApprover($approver); @endphp
+                    <div class="cv-appr {{ $isCurrent ? 'cv-appr--current' : '' }}">
+                        <div class="cv-ava-wrap">
+                            <img class="cv-ava" src="{{ $this->approverAvatar($approver) }}" alt="">
+                            <span class="cv-ord">{{ $approver->order }}</span>
+                        </div>
+                        <div class="cv-appr__id">
+                            <div class="cv-appr__name">{{ $approver->user?->name }}</div>
+                            <div class="cv-appr__dept">{{ $approver->user?->department?->name }}</div>
+                            @if ($approver->comment)
+                                <div class="cv-cmt">{{ $approver->comment }}</div>
+                            @endif
+                        </div>
+                        <div class="cv-appr__right">
+                            <span class="cv-pill cv-pill--{{ $pillFor($approver->status) }}">{{ ContractApprover::getStatuses()[$approver->status] ?? $approver->status }}</span>
+                            @if ($approver->acted_at)
+                                <span class="cv-when">{{ $approver->acted_at->format('d.m.Y H:i') }}</span>
+                            @elseif ($approver->isPending() && $approver->due_at)
+                                <span class="cv-when {{ $approver->isOverdue() ? 'cv-when--over' : '' }}">⏳ {{ $approver->due_at->format('d.m.Y H:i') }}</span>
+                            @endif
+                        </div>
                     </div>
-                @endif
-            </x-filament::section>
-        </div>
+                @endforeach
+            @endif
+        </section>
 
-        {{-- APPROVAL --}}
-        <div x-show="tab === 'approval'" x-cloak class="mt-6">
-            <x-filament::section>
-                <x-slot name="heading">{{ __('app.label.approval_chain') }}</x-slot>
+        {{-- Details --}}
+        <section class="cv-card">
+            <div class="cv-card__head">
+                <h2 class="cv-h2">@svg('heroicon-o-clipboard-document-list') {{ __('app.label.basic_information') }}</h2>
+            </div>
+            <table class="cv-table">
+                @foreach ($details as [$label, $value])
+                    <tr><td>{{ $label }}</td><td>{{ $value ?: '—' }}</td></tr>
+                @endforeach
+            </table>
+        </section>
 
-                @if ($record->approvers->isEmpty())
-                    <p class="text-sm text-gray-500">{{ __('app.label.no_approvers') }}</p>
-                @else
-                    <ol class="space-y-0">
-                        @foreach ($record->approvers as $approver)
-                            @php $visual = $this->approverVisual($approver); $isCurrent = $this->isCurrentApprover($approver); @endphp
-                            <li class="flex gap-4">
-                                <div class="flex flex-col items-center">
-                                    <span @class(['flex size-10 items-center justify-center rounded-full ring-4 ring-white dark:ring-gray-900', 'bg-success-100 dark:bg-success-500/20' => $visual['color'] === 'success', 'bg-danger-100 dark:bg-danger-500/20' => $visual['color'] === 'danger', 'bg-warning-100 dark:bg-warning-500/20' => $visual['color'] === 'warning', 'bg-info-100 dark:bg-info-500/20' => $visual['color'] === 'info', 'bg-gray-100 dark:bg-white/10' => $visual['color'] === 'gray'])>
-                                        <span class="{{ $tone[$visual['color']] ?? 'text-gray-400' }}">@svg($visual['icon'], 'h-5 w-5')</span>
-                                    </span>
-                                    @unless ($loop->last)
-                                        <span class="my-1 w-0.5 flex-1 bg-gray-200 dark:bg-white/10"></span>
-                                    @endunless
-                                </div>
-
-                                <div @class(['mb-4 flex-1 rounded-xl p-3 ring-1', 'bg-warning-50 ring-warning-200 dark:bg-warning-500/5 dark:ring-warning-500/20' => $isCurrent, 'bg-transparent ring-transparent' => ! $isCurrent])>
-                                    <div class="flex items-center gap-3">
-                                        <img src="{{ $this->approverAvatar($approver) }}" alt="" class="size-9 shrink-0 rounded-full object-cover">
-                                        <div class="min-w-0 flex-1">
-                                            <div class="truncate text-sm font-semibold text-gray-900 dark:text-white">{{ $approver->user?->name }}</div>
-                                            <div class="truncate text-xs text-gray-500">{{ $approver->user?->department?->name }}</div>
-                                        </div>
-                                        <x-filament::badge :color="$visual['color']">{{ ContractApprover::getStatuses()[$approver->status] ?? $approver->status }}</x-filament::badge>
-                                    </div>
-
-                                    @if ($approver->acted_at)
-                                        <div class="mt-2 pl-12 text-xs text-gray-500">{{ $approver->acted_at->format('d.m.Y H:i') }}</div>
-                                    @elseif ($approver->isPending() && $approver->due_at)
-                                        <div class="mt-2 flex items-center gap-1.5 pl-12 text-xs {{ $approver->isOverdue() ? 'font-medium text-danger-600' : 'text-gray-500' }}">
-                                            @svg('heroicon-m-clock', 'h-4 w-4')
-                                            {{ __('app.label.due_at') }} {{ $approver->due_at->format('d.m.Y H:i') }}
-                                        </div>
-                                    @endif
-
-                                    @if ($approver->comment)
-                                        <div class="mt-2 ml-12 rounded-lg bg-gray-100 px-3 py-2 text-xs text-gray-600 dark:bg-white/5 dark:text-gray-300">{{ $approver->comment }}</div>
-                                    @endif
-                                </div>
-                            </li>
-                        @endforeach
-                    </ol>
-                @endif
-            </x-filament::section>
-        </div>
-
-        {{-- HISTORY --}}
-        <div x-show="tab === 'history'" x-cloak class="mt-6">
-            <x-filament::section>
-                <x-slot name="heading">{{ __('app.label.execution_history') }}</x-slot>
-
+        {{-- Execution history --}}
+        <section class="cv-card">
+            <div class="cv-card__head">
+                <h2 class="cv-h2">@svg('heroicon-o-clock') {{ __('app.label.execution_history') }}</h2>
+            </div>
+            <div class="cv-card__body">
                 @php $activities = $this->getActivities(); $prevKey = null; @endphp
                 @if ($activities->isEmpty())
-                    <p class="text-sm text-gray-500">{{ __('app.label.no_history') }}</p>
+                    <p style="font-size:.85rem;color:var(--cv-muted)">{{ __('app.label.no_history') }}</p>
                 @else
-                    <ol class="space-y-5">
+                    <div class="cv-hist">
                         @foreach ($activities as $activity)
                             @php $key = ($activity->description ?? '').'|'.$activity->created_at?->format('YmdHi'); @endphp
                             @continue($key === $prevKey)
                             @php $prevKey = $key; $av = $this->activityVisual($activity->event ?? ''); @endphp
-                            <li class="flex gap-3">
-                                <span @class(['mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full', 'bg-success-100 dark:bg-success-500/20' => $av['color'] === 'success', 'bg-danger-100 dark:bg-danger-500/20' => $av['color'] === 'danger', 'bg-warning-100 dark:bg-warning-500/20' => $av['color'] === 'warning', 'bg-info-100 dark:bg-info-500/20' => $av['color'] === 'info', 'bg-gray-100 dark:bg-white/10' => $av['color'] === 'gray'])>
-                                    <span class="{{ $tone[$av['color']] ?? 'text-gray-400' }}">@svg($av['icon'], 'h-4 w-4')</span>
-                                </span>
-                                <div class="min-w-0 flex-1">
-                                    <div class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ $activity->description ?: $activity->event }}</div>
-                                    <div class="mt-0.5 text-xs text-gray-500">{{ $activity->causer?->name ?? __('app.label.system') }} · {{ $activity->created_at?->format('d.m.Y H:i') }}</div>
+                            <div class="cv-hi">
+                                <span class="cv-hi__ic cv-hi__ic--{{ $av['color'] }}">@svg($av['icon'])</span>
+                                <div>
+                                    <div class="cv-hi__desc">{{ $activity->description ?: $activity->event }}</div>
+                                    <div class="cv-hi__meta">{{ $activity->causer?->name ?? __('app.label.system') }} · {{ $activity->created_at?->format('d.m.Y H:i') }}</div>
                                     @if ($comment = data_get($activity->properties, 'comment'))
-                                        <div class="mt-1.5 rounded-lg bg-gray-100 px-3 py-2 text-xs text-gray-600 dark:bg-white/5 dark:text-gray-300">{{ $comment }}</div>
+                                        <div class="cv-cmt" style="margin-top:.4rem">{{ $comment }}</div>
                                     @endif
                                 </div>
-                            </li>
+                            </div>
                         @endforeach
-                    </ol>
+                    </div>
                 @endif
-            </x-filament::section>
-        </div>
+            </div>
+        </section>
     </div>
 </x-filament-panels::page>

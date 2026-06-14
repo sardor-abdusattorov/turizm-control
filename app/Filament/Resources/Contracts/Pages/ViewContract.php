@@ -20,6 +20,16 @@ class ViewContract extends ViewRecord
 
     protected string $view = 'filament.resources.contracts.pages.view-contract';
 
+    public function getHeading(): string
+    {
+        return $this->record->number;
+    }
+
+    public function getSubheading(): ?string
+    {
+        return $this->record->title;
+    }
+
     protected function getHeaderActions(): array
     {
         return [
