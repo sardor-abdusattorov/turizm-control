@@ -30,7 +30,7 @@ class ApproversRelationManager extends RelationManager
                 Split::make([
                     TextColumn::make('order')
                         ->label('#')
-                        ->size(TextColumn\TextColumnSize::Large)
+                        ->size('lg')
                         ->weight('bold')
                         ->color('gray')
                         ->grow(false),
@@ -51,7 +51,7 @@ class ApproversRelationManager extends RelationManager
 
                         TextColumn::make('user.department.name')
                             ->label(__('app.label.department_single'))
-                            ->size(TextColumn\TextColumnSize::Small)
+                            ->size('sm')
                             ->color('gray'),
                     ]),
 
@@ -71,7 +71,7 @@ class ApproversRelationManager extends RelationManager
                         TextColumn::make('acted_at')
                             ->label(__('app.label.acted_at'))
                             ->dateTime('d.m.Y H:i')
-                            ->size(TextColumn\TextColumnSize::Small)
+                            ->size('sm')
                             ->color('gray')
                             ->placeholder('—'),
                     ])->alignment('end'),
