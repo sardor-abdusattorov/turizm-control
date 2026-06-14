@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\ContractStatsWidget;
+use App\Services\Telegram\TelegramService;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
@@ -55,6 +56,13 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn () => __('app.label.profile_settings'))
                     ->url(fn (): string => ProfileSettings::getUrl())
                     ->icon('heroicon-o-user-circle'),
+
+                'telegram' => Action::make('telegram')
+                    ->label(fn () => __('app.label.connect_telegram'))
+                    ->url(fn (): string => route('telegram.connect'))
+                    ->openUrlInNewTab()
+                    ->icon('heroicon-o-paper-airplane')
+                    ->visible(fn (): bool => app(TelegramService::class)->isConfigured()),
             ])
             ->navigationGroups([
 

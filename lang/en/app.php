@@ -171,6 +171,7 @@ return [
 
         // Profile
         'profile_settings' => 'Profile Settings',
+        'connect_telegram' => 'Connect Telegram',
         'my_profile' => 'My Profile',
         'manage_profile' => 'Manage your profile information, security and active sessions',
         'personal_info' => 'Personal Information',
@@ -349,6 +350,14 @@ return [
             'rejected' => 'Rejected',
             'archived' => 'Archived',
         ],
+    ],
+    'telegram' => [
+        'link_missing_token' => 'Open the “Connect Telegram” link from the app to link your account.',
+        'link_expired' => 'This link has expired. Generate a new one from the app.',
+        'link_success' => 'Connected, :name. You will receive contract notifications here.',
+        'approved' => 'Contract :number approved.',
+        'not_allowed' => 'You cannot approve this contract right now.',
+        'action_failed' => 'Could not process the action.',
     ],
     'contract_approver' => [
         'status' => [

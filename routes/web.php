@@ -8,6 +8,8 @@ use App\Http\Controllers\OnlyOfficeOrderController;
 use App\Http\Controllers\OnlyOfficeTemplateController;
 use App\Http\Controllers\OrderEditorController;
 use App\Http\Controllers\OrderFileController;
+use App\Http\Controllers\TelegramConnectController;
+use App\Http\Controllers\TelegramWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/onlyoffice/{contract}/document', [OnlyOfficeContractController::class, 'document'])
@@ -28,7 +30,13 @@ Route::get('/onlyoffice/order/{order}/document', [OnlyOfficeOrderController::cla
 Route::post('/onlyoffice/order/{order}/callback', [OnlyOfficeOrderController::class, 'callback'])
     ->name('onlyoffice.order.callback');
 
+Route::post('/telegram/webhook/{secret}', [TelegramWebhookController::class, 'handle'])
+    ->name('telegram.webhook');
+
 Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/telegram/connect', [TelegramConnectController::class, 'connect'])
+        ->name('telegram.connect');
+
     Route::get('/contracts/{contract}/editor', [ContractEditorController::class, 'show'])
         ->name('contracts.editor');
 

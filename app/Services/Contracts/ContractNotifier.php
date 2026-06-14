@@ -36,6 +36,7 @@ class ContractNotifier
         $this->sendTelegram($recipient, $contract,
             '📨 '.__('app.notification.approval_requested.title'),
             __('app.notification.approval_requested.body', ['number' => $contract->number]),
+            withApprove: true,
         );
     }
 
@@ -153,13 +154,28 @@ class ContractNotifier
             ->markAsRead();
     }
 
-    protected function sendTelegram(User $recipient, Contract $contract, string $title, string $body): void
+    protected function sendTelegram(User $recipient, Contract $contract, string $title, string $body, bool $withApprove = false): void
     {
         $url = ContractResource::getUrl('view', ['record' => $contract->id]);
 
+        $keyboard = [];
+
+        if ($withApprove) {
+            $keyboard[] = [[
+                'text' => '✅ '.__('app.action.approve'),
+                'callback_data' => "approve:{$contract->id}",
+            ]];
+        }
+
+        $keyboard[] = [[
+            'text' => __('app.action.open_contract'),
+            'url' => $url,
+        ]];
+
         $this->telegram->send(
             $recipient->telegram_chat_id,
-            "<b>{$title}</b>\n{$body}\n\n<a href=\"{$url}\">".__('app.action.open_contract').'</a>',
+            "<b>{$title}</b>\n{$body}",
+            $keyboard,
         );
     }
 }
