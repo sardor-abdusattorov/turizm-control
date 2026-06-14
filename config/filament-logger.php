@@ -1,6 +1,9 @@
 <?php
 
 use App\Filament\Resources\ActivityResource;
+use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Resources\ContractTemplates\ContractTemplateResource;
+use App\Filament\Resources\Orders\OrderResource;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
@@ -210,7 +213,13 @@ return [
         'color' => 'success',
 
         'exclude' => [
-            // App\Filament\Resources\UserResource::class,
+            // Contracts, Templates and Orders are already tracked by the
+            // ModelLogger via Eloquent events; logging the Filament UI
+            // actions on top of that produced duplicate Created / Updated
+            // entries in the Execution history.
+            ContractResource::class,
+            ContractTemplateResource::class,
+            OrderResource::class,
         ],
         'ignore' => [
             'updated_at',

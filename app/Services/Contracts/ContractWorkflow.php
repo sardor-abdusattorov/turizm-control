@@ -23,7 +23,7 @@ class ContractWorkflow
         DB::transaction(function () use ($contract, $user): void {
             $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
 
-            $current = $contract->currentApprover();
+            $current = $this->advanceToActiveApprover($contract);
 
             if ($current) {
                 $current->startReview($this->slaDays());
@@ -39,6 +39,28 @@ class ContractWorkflow
         });
 
         return true;
+    }
+
+    /**
+     * Skip pending approvers whose user is no longer active and return
+     * the first one that can actually act. The skipped rows are marked
+     * STATUS_SKIPPED so the chain still reads cleanly.
+     */
+    private function advanceToActiveApprover(Contract $contract): ?ContractApprover
+    {
+        while ($pending = $contract->fresh()->currentApprover()) {
+            if ($pending->user && (bool) $pending->user->status) {
+                return $pending;
+            }
+
+            $pending->update([
+                'status' => ContractApprover::STATUS_SKIPPED,
+                'comment' => __('app.message.approver_inactive'),
+                'acted_at' => now(),
+            ]);
+        }
+
+        return null;
     }
 
     public function approve(Contract $contract, User $user, ?string $comment = null): bool
@@ -73,9 +95,19 @@ class ContractWorkflow
                 return;
             }
 
-            $next = $contract->fresh()->currentApprover();
+            $next = $this->advanceToActiveApprover($contract);
 
-            if ($next) {
+            if (! $next) {
+                // Skipping all remaining inactive approvers cleared the
+                // queue — treat the contract as fully approved.
+                if ($contract->fresh()->allApproved()) {
+                    $contract->update([
+                        'status' => Contract::STATUS_APPROVED,
+                        'signed_at' => now()->toDateString(),
+                    ]);
+                    $this->notifier->notifyApproved($contract);
+                }
+            } else {
                 $next->startReview($this->slaDays());
                 $this->notifier->notifyApprovalRequested($next);
             }

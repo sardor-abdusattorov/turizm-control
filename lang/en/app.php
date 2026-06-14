@@ -262,6 +262,7 @@ return [
         'submit_for_approval_confirm' => 'The contract will be sent to the configured approval chain and you will not be able to edit it without resetting approvals. Continue?',
         'submitted_for_approval' => 'Contract sent for approval',
         'action_not_allowed' => 'This action is not allowed for the contract in its current state',
+        'approver_inactive' => 'Skipped — approver account is inactive.',
         'contract_submitted' => 'Contract sent for approval',
         'contract_approved' => 'Contract approved',
         'contract_rejected' => 'Contract rejected',

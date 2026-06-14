@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Filament\Resources\Contracts\ContractResource;
-use App\Models\Contract;
 use App\Services\Contracts\ContractWorkflow;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -15,15 +14,19 @@ class EditContract extends EditRecord
 {
     protected static string $resource = ContractResource::class;
 
+    protected function getRedirectUrl(): string
+    {
+        return ContractResource::getUrl('view', ['record' => $this->record]);
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('downloadPdf')
-                ->label(__('app.action.download_pdf'))
-                ->icon('heroicon-o-document-arrow-down')
-                ->color('success')
-                ->url(fn () => route('contracts.pdf.download', ['contract' => $this->record]))
-                ->visible(fn () => $this->record?->status === Contract::STATUS_APPROVED),
+            Action::make('backToView')
+                ->label(__('app.action.back_to_contract'))
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(fn () => ContractResource::getUrl('view', ['record' => $this->record])),
 
             Action::make('openEditor')
                 ->label(__('app.action.open_editor'))
@@ -34,31 +37,6 @@ class EditContract extends EditRecord
                     'mode' => 'edit',
                 ]))
                 ->visible(fn () => $this->record?->documentExists()),
-
-            Action::make('submitForApproval')
-                ->label(__('app.action.submit_for_approval'))
-                ->icon('heroicon-o-paper-airplane')
-                ->color('success')
-                ->requiresConfirmation()
-                ->modalHeading(__('app.action.submit_for_approval'))
-                ->modalDescription(__('app.message.submit_for_approval_confirm'))
-                ->visible(fn () => $this->record?->canBeSubmittedBy())
-                ->action(function (ContractWorkflow $workflow): void {
-                    if (! $workflow->submit($this->record)) {
-                        Notification::make()->title(__('app.message.action_not_allowed'))->danger()->send();
-
-                        return;
-                    }
-
-                    Notification::make()
-                        ->title(__('app.message.submitted_for_approval'))
-                        ->success()
-                        ->send();
-
-                    $this->redirect(ContractResource::getUrl('view', ['record' => $this->record]));
-                }),
-
-            ...self::approvalActions($this->record),
 
             DeleteAction::make()
                 ->visible(fn () => $this->record?->canBeDeletedBy()),
