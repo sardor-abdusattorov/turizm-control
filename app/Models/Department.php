@@ -56,6 +56,31 @@ class Department extends Model
     }
 
     /**
+     * Members of this department.
+     */
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    /**
+     * The user who approves on behalf of this department in the global
+     * flow — the department head when active, otherwise the first active
+     * member. Returns null when the department has no usable approver.
+     */
+    public function approverUser(): ?User
+    {
+        if ($this->head && (bool) $this->head->status) {
+            return $this->head;
+        }
+
+        return $this->users()
+            ->where('status', User::STATUS_ACTIVE)
+            ->orderBy('id')
+            ->first();
+    }
+
+    /**
      * Scope for active departments
      */
     public function scopeActive($query)

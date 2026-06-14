@@ -162,6 +162,68 @@ class Contract extends Model
         ]);
     }
 
+    /**
+     * Build the approval chain from the global settings queue: for each
+     * department in the configured approval flow, add its approver user
+     * (head, or first active member) in order. Skips departments without
+     * a usable approver and never adds the same user twice.
+     */
+    public function buildApprovalChainFromFlow(): int
+    {
+        $order = 1;
+        $created = 0;
+        $seen = [];
+
+        foreach (Department::approvalFlow() as $code) {
+            $user = Department::findByCode($code)?->approverUser();
+
+            if (! $user || in_array($user->id, $seen, true)) {
+                continue;
+            }
+
+            ContractApprover::create([
+                'contract_id' => $this->id,
+                'user_id' => $user->id,
+                'order' => $order++,
+                'status' => ContractApprover::STATUS_PENDING,
+            ]);
+
+            $seen[] = $user->id;
+            $created++;
+        }
+
+        return $created;
+    }
+
+    /**
+     * Preview of the approval chain the global flow would produce, as
+     * "Department — User" lines, for display on the create form.
+     *
+     * @return array<int, string>
+     */
+    public static function approvalChainPreview(): array
+    {
+        $rows = [];
+        $position = 1;
+        $seen = [];
+
+        foreach (Department::approvalFlow() as $code) {
+            $department = Department::findByCode($code);
+            $user = $department?->approverUser();
+
+            if (! $user || in_array($user->id, $seen, true)) {
+                continue;
+            }
+
+            $deptName = $department->getTranslation('name', app()->getLocale());
+            $rows[] = "{$position}. {$deptName} — {$user->name}";
+            $seen[] = $user->id;
+            $position++;
+        }
+
+        return $rows;
+    }
+
     public function buildApproverChain(): int
     {
         $manager = $this->responsible;

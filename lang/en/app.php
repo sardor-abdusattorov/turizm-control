@@ -284,6 +284,7 @@ return [
         'contract_template_choice' => 'Pick a template — its language is shown in brackets and sets the contract language.',
         'contract_order_type' => 'Optional category to group contracts in reports.',
         'approval_chain_form' => 'Pre-filled from your profile. Drag rows to reorder, add or remove approvers for this contract specifically.',
+        'approval_chain_global' => 'Contracts follow the approval queue configured in Settings → Approval Flow. These approvers will be assigned automatically.',
         'metrics_yandex' => 'Insert Yandex Metrica tracking code here',
         'metrics_google' => 'Insert Google Analytics tracking code here',
         'seo_og_image' => 'Recommended size: 1200x630px. PNG or JPEG format.',
