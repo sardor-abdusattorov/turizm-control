@@ -43,6 +43,8 @@ return [
         'responsible' => 'Responsible manager',
         'contract_number' => 'Contract no.',
         'approval_flow' => 'Approval Flow',
+        'approval_sla_days' => 'Review deadline (days)',
+        'due_at' => 'Due',
         'department_legal' => 'Legal Department',
         'department_financial' => 'Financial Department',
         'department_accounting' => 'Accounting',
@@ -233,6 +235,14 @@ return [
             'title' => 'Contract returned for revision',
             'body' => 'Contract :number was sent back to draft — note: :reason',
         ],
+        'approval_due_soon' => [
+            'title' => 'Approval deadline approaching',
+            'body' => 'Contract :number is waiting for your approval and the deadline is near.',
+        ],
+        'approval_overdue' => [
+            'title' => 'Approval overdue',
+            'body' => 'Contract :number is past its approval deadline and still waiting for you.',
+        ],
     ],
     'message' => [
         'loading_editor' => 'Loading editor…',
@@ -272,6 +282,7 @@ return [
         'seo_og_image' => 'Recommended size: 1200x630px. PNG or JPEG format.',
         'seo_indexing_enabled' => 'If disabled, meta robots noindex, nofollow will be added',
         'approval_flow' => 'Order of departments that contracts pass through during approval. Drag rows to reorder.',
+        'approval_sla_days' => 'How many days each approver has to review before the step is overdue and a reminder is sent.',
         'approval_chain' => 'Pre-filled from your default approvers ordered by the system approval flow. You can add, remove, or reorder them per contract.',
         'contract_step_approvers' => 'Pick the people who will approve this contract, in order.',
         'contract_template_fields' => 'Define the form fields the manager will fill in. The field key is the placeholder name used inside the template body (e.g. lessee_name will be substituted for {{lessee_name}}).',

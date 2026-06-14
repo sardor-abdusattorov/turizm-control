@@ -73,7 +73,17 @@ class ApproversRelationManager extends RelationManager
                             ->dateTime('d.m.Y H:i')
                             ->size('sm')
                             ->color('gray')
-                            ->placeholder('—'),
+                            ->placeholder('—')
+                            ->visible(fn (ContractApprover $record): bool => $record->acted_at !== null),
+
+                        TextColumn::make('due_at')
+                            ->label(__('app.label.due_at'))
+                            ->state(fn (ContractApprover $record): ?string => $record->isPending() && $record->due_at
+                                ? '⏳ '.$record->due_at->format('d.m.Y H:i')
+                                : null)
+                            ->color(fn (ContractApprover $record): string => $record->isOverdue() ? 'danger' : 'gray')
+                            ->size('sm')
+                            ->placeholder(''),
                     ])->alignment('end'),
                 ]),
             ])

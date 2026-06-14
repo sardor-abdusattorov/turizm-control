@@ -216,6 +216,14 @@ class Settings extends Page implements HasForms
                                         fn (array $state): ?string => $this->getApproverDepartmentOptions()[$state['code'] ?? ''] ?? null
                                     )
                                     ->collapsible(),
+
+                                TextInput::make('approval.sla_days')
+                                    ->label(__('app.label.approval_sla_days'))
+                                    ->helperText(__('app.helper.approval_sla_days'))
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->maxValue(60)
+                                    ->default(2),
                             ]),
                     ]),
             ])

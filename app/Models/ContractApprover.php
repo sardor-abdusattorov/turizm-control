@@ -17,11 +17,15 @@ class ContractApprover extends Model
         'status',
         'comment',
         'acted_at',
+        'due_at',
+        'reminder_sent_at',
     ];
 
     protected $casts = [
         'order' => 'integer',
         'acted_at' => 'datetime',
+        'due_at' => 'datetime',
+        'reminder_sent_at' => 'datetime',
     ];
 
     public const STATUS_PENDING = 'pending';
@@ -96,5 +100,63 @@ class ContractApprover extends Model
     public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;
+    }
+
+    /**
+     * Start the review clock for this step — called when the approver
+     * becomes the current one in the chain. Sets the SLA deadline and
+     * clears any prior reminder flag.
+     */
+    public function startReview(int $slaDays): void
+    {
+        $this->update([
+            'due_at' => now()->addDays($slaDays),
+            'reminder_sent_at' => null,
+        ]);
+    }
+
+    public function isOverdue(): bool
+    {
+        return $this->status === self::STATUS_PENDING
+            && $this->due_at !== null
+            && now()->greaterThan($this->due_at);
+    }
+
+    public function hoursUntilDue(): ?int
+    {
+        if ($this->due_at === null) {
+            return null;
+        }
+
+        return (int) round(now()->diffInHours($this->due_at, false));
+    }
+
+    /**
+     * Whether a reminder should be sent now: once when the deadline is
+     * within 12 hours, then again at most daily once overdue.
+     */
+    public function needsReminder(): bool
+    {
+        if ($this->status !== self::STATUS_PENDING || $this->due_at === null) {
+            return false;
+        }
+
+        $now = now();
+
+        if ($now->greaterThanOrEqualTo($this->due_at)) {
+            return $this->reminder_sent_at === null
+                || $this->reminder_sent_at->lessThan($now->copy()->subDay());
+        }
+
+        if ($now->greaterThanOrEqualTo($this->due_at->copy()->subHours(12))) {
+            return $this->reminder_sent_at === null;
+        }
+
+        return false;
+    }
+
+    public function markReminded(): void
+    {
+        $this->update(['reminder_sent_at' => now()]);
     }
 }

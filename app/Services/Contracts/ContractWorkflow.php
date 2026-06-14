@@ -26,6 +26,7 @@ class ContractWorkflow
             $current = $contract->currentApprover();
 
             if ($current) {
+                $current->startReview($this->slaDays());
                 $this->notifier->notifyApprovalRequested($current);
             }
 
@@ -75,6 +76,7 @@ class ContractWorkflow
             $next = $contract->fresh()->currentApprover();
 
             if ($next) {
+                $next->startReview($this->slaDays());
                 $this->notifier->notifyApprovalRequested($next);
             }
 
@@ -155,6 +157,13 @@ class ContractWorkflow
         });
 
         return true;
+    }
+
+    private function slaDays(): int
+    {
+        $days = (int) settings('approval.sla_days', 2);
+
+        return $days > 0 ? $days : 2;
     }
 
     /**

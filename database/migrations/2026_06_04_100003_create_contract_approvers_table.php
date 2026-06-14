@@ -16,11 +16,14 @@ return new class extends Migration
             $table->string('status', 20)->default('pending');
             $table->text('comment')->nullable();
             $table->timestamp('acted_at')->nullable();
+            $table->timestamp('due_at')->nullable();
+            $table->timestamp('reminder_sent_at')->nullable();
             $table->timestamps();
 
             $table->index(['contract_id', 'order']);
             $table->index('status');
             $table->index('user_id');
+            $table->index('due_at');
         });
     }
 

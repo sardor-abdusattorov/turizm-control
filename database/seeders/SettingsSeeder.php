@@ -32,6 +32,7 @@ class SettingsSeeder extends Seeder
             'metrics.google' => '',
 
             'approval.flow' => ['legal', 'accounting', 'direction'],
+            'approval.sla_days' => 2,
         ];
 
         foreach ($values as $key => $value) {
