@@ -173,7 +173,7 @@ class OnlyOfficeService
             ],
             'editorConfig' => [
                 'mode' => $mode,
-                'lang' => $lang,
+                'lang' => $this->normaliseLang($lang),
                 'callbackUrl' => $callbackUrl,
                 'user' => [
                     'id' => (string) $user->id,
@@ -195,6 +195,32 @@ class OnlyOfficeService
             'ppt', 'pptx' => 'slide',
             'pdf' => 'pdf',
             default => 'word',
+        };
+    }
+
+    /**
+     * Map our internal language code to one OnlyOffice ships a locale
+     * JSON for. Uzbek (uz) isn't bundled with Document Server (CE or
+     * Enterprise), so requesting it triggers a /locale/uz.json 404 and
+     * the editor falls back silently. Send 'ru' for uz (most managers
+     * in UZ are bilingual), and 'en' for anything else we don't know.
+     */
+    private function normaliseLang(string $lang): string
+    {
+        $supported = [
+            'af', 'ar', 'az', 'bg', 'ca', 'cs', 'da', 'de', 'el', 'en',
+            'es', 'eu', 'fi', 'fr', 'gl', 'hu', 'hy', 'id', 'it', 'ja',
+            'ka', 'kk', 'ko', 'lo', 'lv', 'ms', 'nb', 'nl', 'pl', 'pt',
+            'ro', 'ru', 'sk', 'sl', 'sr', 'sv', 'tr', 'uk', 'vi', 'zh',
+        ];
+
+        if (in_array($lang, $supported, true)) {
+            return $lang;
+        }
+
+        return match ($lang) {
+            'uz' => 'ru',
+            default => 'en',
         };
     }
 
