@@ -155,6 +155,13 @@ return [
         'attached_document' => 'Attached document',
         'size' => 'Size',
         'document' => 'Document',
+        'current_step' => 'Current step',
+        'signing_date' => 'Signing date',
+        'document_not_ready' => 'The document has not been generated yet.',
+        'no_approvers' => 'No approvers in the chain.',
+        'execution_history' => 'Execution history',
+        'no_history' => 'No activity yet.',
+        'system' => 'System',
 
         // Currencies
         'currency_single' => 'Currency',
