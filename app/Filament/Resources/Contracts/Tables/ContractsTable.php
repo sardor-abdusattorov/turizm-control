@@ -46,7 +46,8 @@ class ContractsTable
 
                 TextColumn::make('amount')
                     ->label(__('app.label.amount'))
-                    ->money(fn (Contract $record) => $record->currency?->short_name ?? 'UZS', divideBy: 1)
+                    ->formatStateUsing(fn (?string $state, Contract $record): string => number_format((float) $state, 2, ',', ' ').' '.($record->currency?->short_name ?? ''))
+                    ->alignEnd()
                     ->sortable(),
 
                 TextColumn::make('status')
@@ -59,8 +60,8 @@ class ContractsTable
                 ViewColumn::make('approvers_chain')
                     ->label(__('app.label.approvers'))
                     ->view('filament.resources.contracts.tables.approvers-column')
-                    ->extraHeaderAttributes(['style' => 'min-width:12rem;'])
-                    ->extraAttributes(['style' => 'min-width:12rem;']),
+                    ->extraHeaderAttributes(['style' => 'min-width:17rem;'])
+                    ->extraAttributes(['style' => 'min-width:17rem;']),
 
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))
@@ -115,17 +116,13 @@ class ContractsTable
                     ->extraAttributes(['style' => 'display:none;']),
 
                 ActionGroup::make([
-                    ViewAction::make(),
-
-                    Action::make('downloadPdf')
-                        ->label(__('app.action.download_pdf'))
-                        ->icon('heroicon-o-document-arrow-down')
-                        ->url(fn (Contract $record) => route('contracts.pdf.download', ['contract' => $record]))
-                        ->visible(fn (Contract $record) => $record->status === Contract::STATUS_APPROVED),
+                    ViewAction::make()
+                        ->color('gray'),
 
                     Action::make('previewPdf')
                         ->label(__('app.action.preview_pdf'))
                         ->icon('heroicon-o-eye')
+                        ->color('gray')
                         ->url(
                             fn (Contract $record) => route('contracts.pdf.inline', ['contract' => $record]),
                             shouldOpenInNewTab: true,
@@ -135,18 +132,31 @@ class ContractsTable
                             Contract::STATUS_APPROVED,
                         ], true)),
 
+                    Action::make('downloadPdf')
+                        ->label(__('app.action.download_pdf'))
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->color('gray')
+                        ->url(fn (Contract $record) => route('contracts.pdf.download', ['contract' => $record]))
+                        ->visible(fn (Contract $record) => $record->status === Contract::STATUS_APPROVED),
+
                     Action::make('openEditor')
                         ->label(__('app.action.open_editor'))
                         ->icon('heroicon-o-pencil-square')
+                        ->color('gray')
                         ->url(fn (Contract $record) => route('contracts.editor', [
                             'contract' => $record,
                             'mode' => 'edit',
                         ]))
                         ->visible(fn (Contract $record) => $record->documentExists() && $record->canBeEditedBy()),
 
+                    EditAction::make()
+                        ->color('gray')
+                        ->visible(fn (Contract $record) => $record->canBeEditedBy()),
+
                     Action::make('submitForApproval')
                         ->label(__('app.action.submit_for_approval'))
                         ->icon('heroicon-o-arrow-up-tray')
+                        ->color('gray')
                         ->requiresConfirmation()
                         ->modalHeading(__('app.action.submit_for_approval'))
                         ->modalDescription(__('app.message.submit_for_approval_confirm'))
@@ -163,9 +173,6 @@ class ContractsTable
                                 ->success()
                                 ->send();
                         }),
-
-                    EditAction::make()
-                        ->visible(fn (Contract $record) => $record->canBeEditedBy()),
 
                     DeleteAction::make()
                         ->visible(fn (Contract $record) => $record->canBeDeletedBy()),
