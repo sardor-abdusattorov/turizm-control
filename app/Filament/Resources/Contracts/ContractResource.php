@@ -6,7 +6,6 @@ use App\Filament\Resources\Contracts\Pages\CreateContract;
 use App\Filament\Resources\Contracts\Pages\EditContract;
 use App\Filament\Resources\Contracts\Pages\ListContracts;
 use App\Filament\Resources\Contracts\Pages\ViewContract;
-use App\Filament\Resources\Contracts\RelationManagers\ApproversRelationManager;
 use App\Filament\Resources\Contracts\Schemas\ContractForm;
 use App\Filament\Resources\Contracts\Tables\ContractsTable;
 use App\Models\Contract;
@@ -62,9 +61,9 @@ class ContractResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            ApproversRelationManager::class,
-        ];
+        // The approval chain is managed by the in-form picker (draft) and shown
+        // as a timeline on the view page, so no relation-manager table is needed.
+        return [];
     }
 
     /**
