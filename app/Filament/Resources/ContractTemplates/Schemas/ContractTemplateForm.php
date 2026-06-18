@@ -115,10 +115,19 @@ class ContractTemplateForm
         ];
 
         $tags = array_map(
-            fn (string $item): string => '<code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:12px;">'.e($item).'</code>',
+            fn (string $item): string => '<code class="ct-ph">'.e($item).'</code>',
             $items,
         );
 
-        return '<div style="display:flex;flex-wrap:wrap;gap:6px;">'.implode(' ', $tags).'</div>';
+        $style = <<<'CSS'
+<style>
+    .ct-ph-list{ display:flex; flex-wrap:wrap; gap:.4rem; }
+    .ct-ph{ font-size:.825rem; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; padding:.18rem .5rem; border-radius:.35rem;
+        background:#f3f4f6; color:#374151; }
+    .dark .ct-ph{ background:rgba(255,255,255,.08); color:#e5e7eb; }
+</style>
+CSS;
+
+        return $style.'<div class="ct-ph-list">'.implode('', $tags).'</div>';
     }
 }
