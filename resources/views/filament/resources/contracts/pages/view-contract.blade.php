@@ -12,143 +12,148 @@
     $totalCount = $active->count();
     $progress = $totalCount ? round($approvedCount / $totalCount * 100) : 0;
 
-    $pillFor = fn (string $status): string => [
-        ContractApprover::STATUS_APPROVED => 'success',
-        ContractApprover::STATUS_REJECTED => 'danger',
-        ContractApprover::STATUS_RETURNED => 'info',
-        ContractApprover::STATUS_PENDING => 'warning',
-        ContractApprover::STATUS_SKIPPED => 'gray',
-    ][$status] ?? 'gray';
+    $pillFor = fn (string $status): string => ContractApprover::getStatusColors()[$status] ?? 'gray';
+
+    $ic = fn (string $name, int $size = 18) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
     $details = [
-        [__('app.label.contract_number'), $record->number],
-        [__('app.label.contact_single'), $record->contact?->name],
-        [__('app.label.contract_template_single'), $record->template?->name],
-        [__('app.label.order_type_single'), $record->orderType?->title ?: '—'],
-        [__('app.label.responsible'), $record->responsible?->name],
-        [__('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? '')],
-        [__('app.label.signing_date'), $record->signed_at?->format('d.m.Y') ?: '—'],
-        [__('app.label.created_at'), $record->created_at?->format('d.m.Y H:i')],
+        ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number],
+        ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name],
+        ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name],
+        ['heroicon-o-tag', __('app.label.order_type_single'), $record->orderType?->title ?: '—'],
+        ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name],
+        ['heroicon-o-banknotes', __('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? '')],
+        ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y') ?: '—'],
+        ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i')],
     ];
 @endphp
 
 <x-filament-panels::page>
     <style>
-        .cv { display: flex; flex-direction: column; gap: 1.25rem;
-            --cv-surface:#fff; --cv-ring:rgba(17,24,39,.08); --cv-text:#111827; --cv-muted:#6b7280;
-            --cv-track:#e5e7eb; --cv-divider:rgba(17,24,39,.06); --cv-soft:#f9fafb; }
-        .dark .cv { --cv-surface:#18181b; --cv-ring:rgba(255,255,255,.08); --cv-text:#f4f4f5; --cv-muted:#9ca3af;
-            --cv-track:rgba(255,255,255,.1); --cv-divider:rgba(255,255,255,.07); --cv-soft:rgba(255,255,255,.04); }
+        .cw{ display:flex; flex-direction:column; gap:1.25rem;
+            --s:#fff; --r:rgba(17,24,39,.07); --t:#0f172a; --m:#64748b; --m2:#94a3b8; --d:rgba(17,24,39,.06);
+            --soft:#f8fafc; --track:#eef2f6; --accent:#3b82f6; }
+        .dark .cw{ --s:#18181b; --r:rgba(255,255,255,.08); --t:#f4f4f5; --m:#a1a1aa; --m2:#71717a; --d:rgba(255,255,255,.07);
+            --soft:rgba(255,255,255,.03); --track:rgba(255,255,255,.09); --accent:#60a5fa; }
 
-        .cv-card { background:var(--cv-surface); border-radius:1rem; box-shadow:0 0 0 1px var(--cv-ring), 0 1px 2px rgba(0,0,0,.04); overflow:hidden; }
-        .cv-card__head { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:1rem 1.25rem; border-bottom:1px solid var(--cv-divider); }
-        .cv-card__body { padding:1.25rem; }
-        .cv-h2 { font-size:.95rem; font-weight:600; color:var(--cv-text); margin:0; display:flex; align-items:center; gap:.5rem; }
-        .cv-h2 svg { width:1.1rem; height:1.1rem; color:var(--cv-muted); }
-        .cv-count { font-size:.75rem; color:var(--cv-muted); }
+        .cw-card{ background:var(--s); border-radius:1rem; box-shadow:0 0 0 1px var(--r), 0 1px 2px rgba(0,0,0,.04), 0 4px 12px -8px rgba(0,0,0,.12); overflow:hidden; }
+        .cw-hd{ display:flex; align-items:center; gap:.6rem; padding:.95rem 1.25rem; border-bottom:1px solid var(--d); }
+        .cw-hd__ic{ color:var(--m); display:inline-flex; }
+        .cw-hd__t{ font-size:.9rem; font-weight:600; color:var(--t); margin:0; flex:1; }
+        .cw-hd__c{ font-size:.72rem; font-weight:600; color:var(--m); background:var(--soft); padding:.15rem .55rem; border-radius:999px; }
+        .cw-bd{ padding:1.25rem; }
 
-        /* status strip */
-        .cv-strip { display:flex; flex-wrap:wrap; align-items:center; gap:1.25rem; background:var(--cv-surface);
-            border-radius:1rem; padding:.85rem 1.25rem; box-shadow:0 0 0 1px var(--cv-ring); }
-        .cv-strip__cur { display:flex; align-items:center; gap:.5rem; font-size:.85rem; color:var(--cv-muted); }
-        .cv-strip__cur b { color:var(--cv-text); font-weight:600; }
-        .cv-strip__cur svg { width:1.1rem; height:1.1rem; color:#f59e0b; }
-        .cv-prog { display:flex; align-items:center; gap:.6rem; margin-left:auto; }
-        .cv-prog__num { font-size:.8rem; color:var(--cv-muted); }
-        .cv-prog__track { width:9rem; height:.5rem; border-radius:999px; background:var(--cv-track); overflow:hidden; }
-        .cv-prog__bar { height:100%; border-radius:999px; background:#3b82f6; transition:width .3s; }
+        /* hero strip */
+        .cw-hero{ display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; background:var(--s);
+            border-radius:1rem; padding:1rem 1.25rem; box-shadow:0 0 0 1px var(--r), 0 1px 2px rgba(0,0,0,.04); }
+        .cw-hero__cur{ display:flex; align-items:center; gap:.6rem; }
+        .cw-hero__cur img{ width:2rem; height:2rem; border-radius:999px; object-fit:cover; box-shadow:0 0 0 2px var(--r); }
+        .cw-hero__lbl{ font-size:.72rem; color:var(--m2); text-transform:uppercase; letter-spacing:.03em; }
+        .cw-hero__nm{ font-size:.85rem; font-weight:600; color:var(--t); }
+        .cw-hero__prog{ display:flex; align-items:center; gap:.7rem; margin-left:auto; }
+        .cw-hero__num{ font-size:.8rem; font-weight:600; color:var(--m); white-space:nowrap; }
+        .cw-bar{ width:8.5rem; height:.45rem; border-radius:999px; background:var(--track); overflow:hidden; }
+        .cw-bar>span{ display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#3b82f6,#2563eb); transition:width .4s ease; }
 
         /* pills */
-        .cv-pill { display:inline-flex; align-items:center; padding:.2rem .65rem; border-radius:999px; font-size:.75rem; font-weight:600; white-space:nowrap; }
-        .cv-pill--success{ background:#dcfce7; color:#166534; } .dark .cv-pill--success{ background:rgba(34,197,94,.16); color:#86efac; }
-        .cv-pill--warning{ background:#fef9c3; color:#854d0e; } .dark .cv-pill--warning{ background:rgba(234,179,8,.16); color:#fde047; }
-        .cv-pill--danger { background:#fee2e2; color:#991b1b; } .dark .cv-pill--danger { background:rgba(239,68,68,.16); color:#fca5a5; }
-        .cv-pill--info   { background:#dbeafe; color:#1e40af; } .dark .cv-pill--info   { background:rgba(59,130,246,.16); color:#93c5fd; }
-        .cv-pill--gray   { background:#f3f4f6; color:#374151; } .dark .cv-pill--gray   { background:rgba(255,255,255,.08); color:#d1d5db; }
+        .cw-pill{ display:inline-flex; align-items:center; gap:.3rem; padding:.22rem .6rem; border-radius:999px; font-size:.72rem; font-weight:600; line-height:1; white-space:nowrap; }
+        .cw-pill--lg{ padding:.32rem .8rem; font-size:.78rem; }
+        .cw-pill--success{ background:#dcfce7; color:#15803d;} .dark .cw-pill--success{ background:rgba(34,197,94,.16); color:#86efac;}
+        .cw-pill--warning{ background:#fef3c7; color:#b45309;} .dark .cw-pill--warning{ background:rgba(245,158,11,.16); color:#fcd34d;}
+        .cw-pill--danger { background:#fee2e2; color:#b91c1c;} .dark .cw-pill--danger { background:rgba(239,68,68,.16); color:#fca5a5;}
+        .cw-pill--info   { background:#dbeafe; color:#1d4ed8;} .dark .cw-pill--info   { background:rgba(59,130,246,.16); color:#93c5fd;}
+        .cw-pill--gray   { background:#f1f5f9; color:#475569;} .dark .cw-pill--gray   { background:rgba(255,255,255,.07); color:#cbd5e1;}
 
-        /* approver cards */
-        .cv-appr { display:flex; align-items:center; gap:1rem; padding:1rem 1.25rem; border-bottom:1px solid var(--cv-divider); }
-        .cv-appr:last-child { border-bottom:0; }
-        .cv-appr--current { background:linear-gradient(90deg, rgba(245,158,11,.07), transparent); box-shadow:inset 3px 0 0 #f59e0b; }
-        .cv-ava-wrap { position:relative; flex-shrink:0; }
-        .cv-ava { width:3rem; height:3rem; border-radius:999px; object-fit:cover; box-shadow:0 0 0 2px var(--cv-ring); display:block; }
-        .cv-ord { position:absolute; bottom:-.25rem; right:-.25rem; width:1.3rem; height:1.3rem; border-radius:999px;
-            background:#3b82f6; color:#fff; font-size:.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px var(--cv-surface); }
-        .cv-appr__id { min-width:0; flex:1; }
-        .cv-appr__name { font-size:.95rem; font-weight:600; color:var(--cv-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .cv-appr__dept { font-size:.8rem; color:var(--cv-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .cv-appr__right { display:flex; flex-direction:column; align-items:flex-end; gap:.3rem; text-align:right; }
-        .cv-when { font-size:.72rem; color:var(--cv-muted); }
-        .cv-when--over { color:#dc2626; font-weight:600; }
-        .cv-cmt { margin-top:.5rem; padding:.4rem .7rem; border-radius:.5rem; background:var(--cv-soft); font-size:.78rem; color:var(--cv-muted); }
+        /* approver rows */
+        .cw-ap{ display:flex; align-items:center; gap:1rem; padding:1rem 1.25rem; border-bottom:1px solid var(--d); transition:background .15s; }
+        .cw-ap:last-child{ border-bottom:0; }
+        .cw-ap--cur{ background:linear-gradient(90deg, rgba(245,158,11,.06), transparent 60%); box-shadow:inset 3px 0 0 #f59e0b; }
+        .cw-ava{ position:relative; flex-shrink:0; }
+        .cw-ava img{ width:3rem; height:3rem; border-radius:999px; object-fit:cover; box-shadow:0 0 0 2px var(--r); display:block; }
+        .cw-ord{ position:absolute; bottom:-.2rem; right:-.2rem; min-width:1.25rem; height:1.25rem; padding:0 .25rem; border-radius:999px;
+            background:var(--accent); color:#fff; font-size:.68rem; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px var(--s); }
+        .cw-ap__id{ min-width:0; flex:1; }
+        .cw-ap__nm{ font-size:.92rem; font-weight:600; color:var(--t); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .cw-ap__dp{ font-size:.78rem; color:var(--m); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:.05rem; }
+        .cw-ap__rt{ display:flex; flex-direction:column; align-items:flex-end; gap:.35rem; text-align:right; flex-shrink:0; }
+        .cw-when{ font-size:.72rem; color:var(--m2); display:inline-flex; align-items:center; gap:.25rem; }
+        .cw-when--over{ color:#dc2626; font-weight:600; }
+        .cw-cmt{ margin-top:.45rem; padding:.4rem .65rem; border-radius:.5rem; background:var(--soft); font-size:.78rem; color:var(--m); }
+
+        .cw-more{ border-top:1px solid var(--d); }
+        .cw-more>summary{ list-style:none; padding:.7rem 1.25rem; cursor:pointer; font-size:.78rem; color:var(--m); display:flex; align-items:center; gap:.4rem; user-select:none; }
+        .cw-more>summary::-webkit-details-marker{ display:none; }
+        .cw-more[open]>summary{ color:var(--t); }
+        .cw-more .cw-ap{ opacity:.65; }
 
         /* document */
-        .cv-doc { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
-        .cv-doc__ic { width:3.25rem; height:3.25rem; border-radius:.75rem; background:rgba(59,130,246,.1); color:#2563eb; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-        .cv-doc__ic svg { width:1.7rem; height:1.7rem; }
-        .cv-doc__name { font-weight:600; color:var(--cv-text); font-size:.95rem; }
-        .cv-doc__meta { font-size:.8rem; color:var(--cv-muted); margin-top:.15rem; }
-        .cv-doc__act { margin-left:auto; display:flex; gap:.5rem; }
-        .cv-pdf { margin-top:1rem; border:1px solid var(--cv-divider); border-radius:.75rem; overflow:hidden; }
-        .cv-pdf iframe { width:100%; height:70vh; background:#fff; display:block; border:0; }
-        .cv-empty { display:flex; flex-direction:column; align-items:center; gap:.5rem; padding:2.5rem 0; color:var(--cv-muted); }
-        .cv-empty svg { width:2.25rem; height:2.25rem; opacity:.4; }
+        .cw-doc{ display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+        .cw-doc__ic{ width:3.25rem; height:3.25rem; border-radius:.85rem; background:linear-gradient(135deg, rgba(59,130,246,.14), rgba(37,99,235,.08)); color:#2563eb; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .dark .cw-doc__ic{ color:#60a5fa; }
+        .cw-doc__nm{ font-weight:600; color:var(--t); font-size:.92rem; }
+        .cw-doc__mt{ font-size:.78rem; color:var(--m); margin-top:.15rem; }
+        .cw-doc__act{ margin-left:auto; display:flex; gap:.5rem; }
+        .cw-pdf{ margin-top:1.1rem; border:1px solid var(--d); border-radius:.85rem; overflow:hidden; }
+        .cw-pdf iframe{ width:100%; height:70vh; background:#fff; display:block; border:0; }
+        .cw-empty{ display:flex; flex-direction:column; align-items:center; gap:.6rem; padding:2.75rem 0; color:var(--m2); }
+        .cw-empty span{ font-size:.82rem; }
 
-        /* details table */
-        .cv-table { width:100%; border-collapse:collapse; font-size:.85rem; }
-        .cv-table tr:nth-child(odd) td { background:var(--cv-soft); }
-        .cv-table td { padding:.7rem 1rem; border-bottom:1px solid var(--cv-divider); color:var(--cv-text); }
-        .cv-table td:first-child { width:38%; color:var(--cv-muted); font-weight:500; }
-        .cv-table tr:last-child td { border-bottom:0; }
+        /* details grid */
+        .cw-grid{ display:grid; grid-template-columns:1fr; }
+        @media(min-width:640px){ .cw-grid{ grid-template-columns:1fr 1fr; } }
+        .cw-row{ display:flex; align-items:center; gap:.7rem; padding:.85rem 1.25rem; border-bottom:1px solid var(--d); }
+        .cw-row__ic{ color:var(--m2); display:inline-flex; flex-shrink:0; }
+        .cw-row__lb{ font-size:.78rem; color:var(--m); width:42%; flex-shrink:0; }
+        .cw-row__vl{ font-size:.85rem; font-weight:500; color:var(--t); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
         /* history */
-        .cv-hist { display:flex; flex-direction:column; gap:1.1rem; }
-        .cv-hi { display:flex; gap:.75rem; }
-        .cv-hi__ic { width:2rem; height:2rem; border-radius:999px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-        .cv-hi__ic svg { width:1rem; height:1rem; }
-        .cv-hi__ic--success{ background:#dcfce7; color:#16a34a;} .dark .cv-hi__ic--success{ background:rgba(34,197,94,.16);}
-        .cv-hi__ic--danger { background:#fee2e2; color:#dc2626;} .dark .cv-hi__ic--danger { background:rgba(239,68,68,.16);}
-        .cv-hi__ic--warning{ background:#fef9c3; color:#ca8a04;} .dark .cv-hi__ic--warning{ background:rgba(234,179,8,.16);}
-        .cv-hi__ic--info   { background:#dbeafe; color:#2563eb;} .dark .cv-hi__ic--info   { background:rgba(59,130,246,.16);}
-        .cv-hi__ic--gray   { background:#f3f4f6; color:#6b7280;} .dark .cv-hi__ic--gray   { background:rgba(255,255,255,.08);}
-        .cv-hi__desc { font-size:.85rem; font-weight:500; color:var(--cv-text); }
-        .cv-hi__meta { font-size:.75rem; color:var(--cv-muted); margin-top:.1rem; }
+        .cw-hist{ display:flex; flex-direction:column; gap:1.1rem; }
+        .cw-hi{ display:flex; gap:.8rem; }
+        .cw-hi__ic{ width:2.1rem; height:2.1rem; border-radius:999px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .cw-hi__ic--success{ background:#dcfce7; color:#16a34a;} .dark .cw-hi__ic--success{ background:rgba(34,197,94,.16);}
+        .cw-hi__ic--danger { background:#fee2e2; color:#dc2626;} .dark .cw-hi__ic--danger { background:rgba(239,68,68,.16);}
+        .cw-hi__ic--warning{ background:#fef3c7; color:#d97706;} .dark .cw-hi__ic--warning{ background:rgba(245,158,11,.16);}
+        .cw-hi__ic--info   { background:#dbeafe; color:#2563eb;} .dark .cw-hi__ic--info   { background:rgba(59,130,246,.16);}
+        .cw-hi__ic--gray   { background:#f1f5f9; color:#64748b;} .dark .cw-hi__ic--gray   { background:rgba(255,255,255,.07);}
+        .cw-hi__ds{ font-size:.85rem; font-weight:500; color:var(--t); }
+        .cw-hi__mt{ font-size:.74rem; color:var(--m2); margin-top:.12rem; }
     </style>
 
-    <div class="cv">
-        {{-- Status strip --}}
-        <div class="cv-strip">
-            <span class="cv-pill cv-pill--{{ $statusColor }}">{{ $statusLabel }}</span>
+    <div class="cw">
+        {{-- Hero --}}
+        <div class="cw-hero">
+            <span class="cw-pill cw-pill--lg cw-pill--{{ $statusColor }}">{{ $statusLabel }}</span>
 
             @if ($current && $record->status === Contract::STATUS_IN_REVIEW)
-                <span class="cv-strip__cur">
-                    @svg('heroicon-o-clock')
-                    {{ __('app.label.current_step') }}: <b>{{ $current->user?->name }}</b>
-                </span>
+                <div class="cw-hero__cur">
+                    <img src="{{ $this->approverAvatar($current) }}" alt="">
+                    <div>
+                        <div class="cw-hero__lbl">{{ __('app.label.current_step') }}</div>
+                        <div class="cw-hero__nm">{{ $current->user?->name }}</div>
+                    </div>
+                </div>
             @endif
 
             @if ($totalCount > 0)
-                <div class="cv-prog">
-                    <span class="cv-prog__num">{{ $approvedCount }} / {{ $totalCount }}</span>
-                    <span class="cv-prog__track"><span class="cv-prog__bar" style="width: {{ $progress }}%"></span></span>
+                <div class="cw-hero__prog">
+                    <span class="cw-hero__num">{{ $approvedCount }} / {{ $totalCount }}</span>
+                    <span class="cw-bar"><span style="width: {{ $progress }}%"></span></span>
                 </div>
             @endif
         </div>
 
         {{-- Document --}}
-        <section class="cv-card">
-            <div class="cv-card__head">
-                <h2 class="cv-h2">@svg('heroicon-o-document-text') {{ __('app.label.attached_document') }}</h2>
-            </div>
-            <div class="cv-card__body">
+        <section class="cw-card">
+            <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-document-text') !!}</span><h2 class="cw-hd__t">{{ __('app.label.attached_document') }}</h2></div>
+            <div class="cw-bd">
                 @if ($record->documentExists())
-                    <div class="cv-doc">
-                        <div class="cv-doc__ic">@svg('heroicon-o-document-text')</div>
+                    <div class="cw-doc">
+                        <div class="cw-doc__ic">{!! $ic('heroicon-o-document-text', 28) !!}</div>
                         <div>
-                            <div class="cv-doc__name">{{ $record->number }}.docx</div>
-                            <div class="cv-doc__meta">{{ $this->documentSizeLabel() }} · {{ $record->created_at->format('d.m.Y H:i') }}</div>
+                            <div class="cw-doc__nm">{{ $record->number }}.docx</div>
+                            <div class="cw-doc__mt">{{ $this->documentSizeLabel() }} · {{ $record->created_at->format('d.m.Y H:i') }}</div>
                         </div>
-                        <div class="cv-doc__act">
+                        <div class="cw-doc__act">
                             <x-filament::button tag="a" :href="$this->editorUrl($record->canBeEditedBy() ? 'edit' : 'view')" icon="heroicon-o-pencil-square" color="primary" size="sm">
                                 {{ __('app.action.open_editor') }}
                             </x-filament::button>
@@ -157,74 +162,64 @@
                             @endif
                         </div>
                     </div>
-
                     @if ($url = $this->pdfPreviewUrl())
-                        <div class="cv-pdf"><iframe src="{{ $url }}" loading="lazy"></iframe></div>
+                        <div class="cw-pdf"><iframe src="{{ $url }}" loading="lazy"></iframe></div>
                     @endif
                 @else
-                    <div class="cv-empty">@svg('heroicon-o-document') <span>{{ __('app.label.document_not_ready') }}</span></div>
+                    <div class="cw-empty">{!! $ic('heroicon-o-document', 36) !!}<span>{{ __('app.label.document_not_ready') }}</span></div>
                 @endif
             </div>
         </section>
 
         {{-- Approval chain --}}
-        <section class="cv-card">
-            <div class="cv-card__head">
-                <h2 class="cv-h2">@svg('heroicon-o-users') {{ __('app.label.approval_chain') }}</h2>
-                @if ($totalCount > 0)<span class="cv-count">{{ $approvedCount }} / {{ $totalCount }}</span>@endif
+        <section class="cw-card">
+            <div class="cw-hd">
+                <span class="cw-hd__ic">{!! $ic('heroicon-o-users') !!}</span>
+                <h2 class="cw-hd__t">{{ __('app.label.approval_chain') }}</h2>
+                @if ($totalCount > 0)<span class="cw-hd__c">{{ $approvedCount }}/{{ $totalCount }}</span>@endif
             </div>
 
             @if ($active->isEmpty() && $historical->isEmpty())
-                <div class="cv-card__body"><p style="font-size:.85rem;color:var(--cv-muted)">{{ __('app.label.no_approvers') }}</p></div>
+                <div class="cw-bd"><p style="font-size:.85rem;color:var(--m)">{{ __('app.label.no_approvers') }}</p></div>
             @else
-                @foreach ($active as $approver)
-                    @php $isCurrent = $this->isCurrentApprover($approver); @endphp
-                    <div class="cv-appr {{ $isCurrent ? 'cv-appr--current' : '' }}">
-                        <div class="cv-ava-wrap">
-                            <img class="cv-ava" src="{{ $this->approverAvatar($approver) }}" alt="">
-                            <span class="cv-ord">{{ $approver->order }}</span>
+                @foreach ($active as $ap)
+                    <div class="cw-ap {{ $this->isCurrentApprover($ap) ? 'cw-ap--cur' : '' }}">
+                        <div class="cw-ava">
+                            <img src="{{ $this->approverAvatar($ap) }}" alt="">
+                            <span class="cw-ord">{{ $ap->order }}</span>
                         </div>
-                        <div class="cv-appr__id">
-                            <div class="cv-appr__name">{{ $approver->user?->name }}</div>
-                            <div class="cv-appr__dept">{{ $approver->user?->department?->name }}</div>
-                            @if ($approver->comment)
-                                <div class="cv-cmt">{{ $approver->comment }}</div>
-                            @endif
+                        <div class="cw-ap__id">
+                            <div class="cw-ap__nm">{{ $ap->user?->name }}</div>
+                            <div class="cw-ap__dp">{{ $ap->user?->department?->name }}</div>
+                            @if ($ap->comment)<div class="cw-cmt">{{ $ap->comment }}</div>@endif
                         </div>
-                        <div class="cv-appr__right">
-                            <span class="cv-pill cv-pill--{{ $pillFor($approver->status) }}">{{ ContractApprover::getStatuses()[$approver->status] ?? $approver->status }}</span>
-                            @if ($approver->acted_at)
-                                <span class="cv-when">{{ $approver->acted_at->format('d.m.Y H:i') }}</span>
-                            @elseif ($approver->isPending() && $approver->due_at)
-                                <span class="cv-when {{ $approver->isOverdue() ? 'cv-when--over' : '' }}">⏳ {{ $approver->due_at->format('d.m.Y H:i') }}</span>
+                        <div class="cw-ap__rt">
+                            <span class="cw-pill cw-pill--{{ $pillFor($ap->status) }}">{{ ContractApprover::getStatuses()[$ap->status] ?? $ap->status }}</span>
+                            @if ($ap->acted_at)
+                                <span class="cw-when">{{ $ap->acted_at->format('d.m.Y H:i') }}</span>
+                            @elseif ($ap->isPending() && $ap->due_at)
+                                <span class="cw-when {{ $ap->isOverdue() ? 'cw-when--over' : '' }}">{!! $ic('heroicon-m-clock', 13) !!} {{ $ap->due_at->format('d.m.Y H:i') }}</span>
                             @endif
                         </div>
                     </div>
                 @endforeach
 
                 @if ($historical->isNotEmpty())
-                    <details style="border-top:1px solid var(--cv-divider); background:var(--cv-soft);">
-                        <summary style="padding:.75rem 1.25rem; cursor:pointer; font-size:.8rem; color:var(--cv-muted); user-select:none;">
-                            {{ __('app.label.previous_attempts') }} ({{ $historical->count() }})
-                        </summary>
-                        @foreach ($historical as $approver)
-                            <div class="cv-appr" style="opacity:.7;">
-                                <div class="cv-ava-wrap">
-                                    <img class="cv-ava" src="{{ $this->approverAvatar($approver) }}" alt="">
-                                    <span class="cv-ord">{{ $approver->order }}</span>
+                    <details class="cw-more">
+                        <summary>{!! $ic('heroicon-m-chevron-down', 14) !!} {{ __('app.label.previous_attempts') }} ({{ $historical->count() }})</summary>
+                        @foreach ($historical as $ap)
+                            <div class="cw-ap">
+                                <div class="cw-ava">
+                                    <img src="{{ $this->approverAvatar($ap) }}" alt="">
+                                    <span class="cw-ord">{{ $ap->order }}</span>
                                 </div>
-                                <div class="cv-appr__id">
-                                    <div class="cv-appr__name">{{ $approver->user?->name }}</div>
-                                    <div class="cv-appr__dept">{{ $approver->user?->department?->name }}</div>
-                                    @if ($approver->comment)
-                                        <div class="cv-cmt">{{ $approver->comment }}</div>
-                                    @endif
+                                <div class="cw-ap__id">
+                                    <div class="cw-ap__nm">{{ $ap->user?->name }}</div>
+                                    <div class="cw-ap__dp">{{ $ap->user?->department?->name }}</div>
                                 </div>
-                                <div class="cv-appr__right">
-                                    <span class="cv-pill cv-pill--gray">{{ ContractApprover::getStatuses()[$approver->status] ?? $approver->status }}</span>
-                                    @if ($approver->acted_at)
-                                        <span class="cv-when">{{ $approver->acted_at->format('d.m.Y H:i') }}</span>
-                                    @endif
+                                <div class="cw-ap__rt">
+                                    <span class="cw-pill cw-pill--gray">{{ ContractApprover::getStatuses()[$ap->status] ?? $ap->status }}</span>
+                                    @if ($ap->acted_at)<span class="cw-when">{{ $ap->acted_at->format('d.m.Y H:i') }}</span>@endif
                                 </div>
                             </div>
                         @endforeach
@@ -234,40 +229,38 @@
         </section>
 
         {{-- Details --}}
-        <section class="cv-card">
-            <div class="cv-card__head">
-                <h2 class="cv-h2">@svg('heroicon-o-clipboard-document-list') {{ __('app.label.basic_information') }}</h2>
-            </div>
-            <table class="cv-table">
-                @foreach ($details as [$label, $value])
-                    <tr><td>{{ $label }}</td><td>{{ $value ?: '—' }}</td></tr>
+        <section class="cw-card">
+            <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><h2 class="cw-hd__t">{{ __('app.label.basic_information') }}</h2></div>
+            <div class="cw-grid">
+                @foreach ($details as [$icon, $label, $value])
+                    <div class="cw-row">
+                        <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
+                        <span class="cw-row__lb">{{ $label }}</span>
+                        <span class="cw-row__vl">{{ $value ?: '—' }}</span>
+                    </div>
                 @endforeach
-            </table>
+            </div>
         </section>
 
-        {{-- Execution history --}}
-        <section class="cv-card">
-            <div class="cv-card__head">
-                <h2 class="cv-h2">@svg('heroicon-o-clock') {{ __('app.label.execution_history') }}</h2>
-            </div>
-            <div class="cv-card__body">
-                @php $activities = $this->getActivities(); $prevKey = null; @endphp
+        {{-- History --}}
+        <section class="cw-card">
+            <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-clock') !!}</span><h2 class="cw-hd__t">{{ __('app.label.execution_history') }}</h2></div>
+            <div class="cw-bd">
+                @php $activities = $this->getActivities(); $prev = null; @endphp
                 @if ($activities->isEmpty())
-                    <p style="font-size:.85rem;color:var(--cv-muted)">{{ __('app.label.no_history') }}</p>
+                    <p style="font-size:.85rem;color:var(--m)">{{ __('app.label.no_history') }}</p>
                 @else
-                    <div class="cv-hist">
-                        @foreach ($activities as $activity)
-                            @php $key = ($activity->description ?? '').'|'.$activity->created_at?->format('YmdHi'); @endphp
-                            @continue($key === $prevKey)
-                            @php $prevKey = $key; $av = $this->activityVisual($activity->event ?? ''); @endphp
-                            <div class="cv-hi">
-                                <span class="cv-hi__ic cv-hi__ic--{{ $av['color'] }}">@svg($av['icon'])</span>
+                    <div class="cw-hist">
+                        @foreach ($activities as $a)
+                            @php $k = ($a->description ?? '').'|'.$a->created_at?->format('YmdHi'); @endphp
+                            @continue($k === $prev)
+                            @php $prev = $k; $v = $this->activityVisual($a->event ?? ''); @endphp
+                            <div class="cw-hi">
+                                <span class="cw-hi__ic cw-hi__ic--{{ $v['color'] }}">{!! $ic($v['icon'], 16) !!}</span>
                                 <div>
-                                    <div class="cv-hi__desc">{{ $activity->description ?: $activity->event }}</div>
-                                    <div class="cv-hi__meta">{{ $activity->causer?->name ?? __('app.label.system') }} · {{ $activity->created_at?->format('d.m.Y H:i') }}</div>
-                                    @if ($comment = data_get($activity->properties, 'comment'))
-                                        <div class="cv-cmt" style="margin-top:.4rem">{{ $comment }}</div>
-                                    @endif
+                                    <div class="cw-hi__ds">{{ $a->description ?: $a->event }}</div>
+                                    <div class="cw-hi__mt">{{ $a->causer?->name ?? __('app.label.system') }} · {{ $a->created_at?->format('d.m.Y H:i') }}</div>
+                                    @if ($cmt = data_get($a->properties, 'comment'))<div class="cw-cmt" style="margin-top:.4rem">{{ $cmt }}</div>@endif
                                 </div>
                             </div>
                         @endforeach
