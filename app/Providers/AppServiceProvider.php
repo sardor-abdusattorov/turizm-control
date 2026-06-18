@@ -41,12 +41,22 @@ class AppServiceProvider extends ServiceProvider
         FilamentView::registerRenderHook(
             'panels::head.end',
             fn (): string => '
-                <link rel="apple-touch-icon" sizes="180x180" href="' . asset('/images/favicon/apple-touch-icon.png') . '">
-                <link rel="icon" type="image/png" sizes="32x32" href="' . asset('/images/favicon/favicon-32x32.png') . '">
-                <link rel="icon" type="image/png" sizes="16x16" href="' . asset('/images/favicon/favicon-16x16.png') . '">
-                <link rel="manifest" href="' . asset('/images/favicon/site.webmanifest') . '">
-                <link rel="mask-icon" href="' . asset('/images/favicon/safari-pinned-tab.svg') . '" color="#5bbad5">
+                <link rel="apple-touch-icon" sizes="180x180" href="'.asset('/images/favicon/apple-touch-icon.png').'">
+                <link rel="icon" type="image/png" sizes="32x32" href="'.asset('/images/favicon/favicon-32x32.png').'">
+                <link rel="icon" type="image/png" sizes="16x16" href="'.asset('/images/favicon/favicon-16x16.png').'">
+                <link rel="manifest" href="'.asset('/images/favicon/site.webmanifest').'">
+                <link rel="mask-icon" href="'.asset('/images/favicon/safari-pinned-tab.svg').'" color="#5bbad5">
             '
+        );
+
+        // When the SPA panel page is restored from the browser back/forward
+        // cache (e.g. after returning from the full-page OnlyOffice editor),
+        // Alpine/Livewire come back frozen and the sidebar breaks. Force a
+        // clean reload only on bfcache restore — normal SPA navigation is
+        // untouched.
+        FilamentView::registerRenderHook(
+            'panels::body.end',
+            fn (): string => '<script>window.addEventListener("pageshow",function(e){if(e.persisted){window.location.reload();}});</script>'
         );
     }
 
