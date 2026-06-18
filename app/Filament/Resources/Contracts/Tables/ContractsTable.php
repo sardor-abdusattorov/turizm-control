@@ -58,7 +58,9 @@ class ContractsTable
 
                 ViewColumn::make('approvers_chain')
                     ->label(__('app.label.approvers'))
-                    ->view('filament.resources.contracts.tables.approvers-column'),
+                    ->view('filament.resources.contracts.tables.approvers-column')
+                    ->extraHeaderAttributes(['style' => 'min-width:12rem;'])
+                    ->extraAttributes(['style' => 'min-width:12rem;']),
 
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))
