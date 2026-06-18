@@ -22,7 +22,7 @@ class ContractTemplateEditorController extends Controller
                 'template' => $template,
                 'apiScriptUrl' => $service->apiScriptUrl(),
                 'config' => $service->templateEditorConfig($template, auth()->user(), $request->query('mode')),
-                'backUrl' => ContractTemplateResource::getUrl('view', ['record' => $template]),
+                'backUrl' => ContractTemplateResource::getUrl('index'),
             ])
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache')

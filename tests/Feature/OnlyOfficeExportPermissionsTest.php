@@ -3,6 +3,7 @@
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\ContractTemplate;
+use App\Models\Order;
 use App\Models\User;
 use App\Services\OnlyOffice\OnlyOfficeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -66,19 +67,16 @@ it('locks export while the contract is in review for the current approver', func
         ->and($permissions['print'])->toBeFalse();
 });
 
-it('keeps approved contracts read-only inside OnlyOffice (export goes through the PDF button)', function () {
+it('unlocks download and print once the contract is approved', function () {
     $responsible = User::factory()->create();
     $contract = Contract::factory()->approved()->create([
         'responsible_id' => $responsible->id,
     ]);
 
-    // An approved contract opens in view mode, so the in-editor export
-    // controls are hidden — the dedicated "Download PDF" action is the
-    // proper channel for the finished document.
     $permissions = editorPermissions($contract, $responsible);
 
-    expect($permissions['download'])->toBeFalse()
-        ->and($permissions['print'])->toBeFalse();
+    expect($permissions['download'])->toBeTrue()
+        ->and($permissions['print'])->toBeTrue();
 });
 
 it('always lets a super admin export, even on a draft', function () {
@@ -123,24 +121,29 @@ it('trims the editor chrome down to the document', function () {
         ->and($customization['help'])->toBeFalse();
 });
 
-it('allows export when a template is opened in edit mode', function () {
+it('never offers download or print for contract templates, in any mode', function () {
     $template = ContractTemplate::factory()->create();
     Storage::disk('public')->put($template->template_file, 'fake-docx');
 
-    $permissions = app(OnlyOfficeService::class)
-        ->templateEditorConfig($template->fresh(), User::factory()->create(), 'edit')['document']['permissions'];
+    foreach (['view', 'edit'] as $mode) {
+        $permissions = app(OnlyOfficeService::class)
+            ->templateEditorConfig($template->fresh(), User::factory()->create(), $mode)['document']['permissions'];
 
-    expect($permissions['download'])->toBeTrue()
-        ->and($permissions['print'])->toBeTrue();
+        expect($permissions['download'])->toBeFalse()
+            ->and($permissions['print'])->toBeFalse();
+    }
 });
 
-it('hides export when a template is opened in view mode', function () {
-    $template = ContractTemplate::factory()->create();
-    Storage::disk('public')->put($template->template_file, 'fake-docx');
+it('always offers download and print for orders, in any mode', function () {
+    $order = Order::factory()->create([
+        'file_path' => 'uploads/files/orders/2026/06/order.docx',
+    ]);
 
-    $permissions = app(OnlyOfficeService::class)
-        ->templateEditorConfig($template->fresh(), User::factory()->create(), 'view')['document']['permissions'];
+    foreach (['view', 'edit'] as $mode) {
+        $permissions = app(OnlyOfficeService::class)
+            ->orderEditorConfig($order, User::factory()->create(), $mode)['document']['permissions'];
 
-    expect($permissions['download'])->toBeFalse()
-        ->and($permissions['print'])->toBeFalse();
+        expect($permissions['download'])->toBeTrue()
+            ->and($permissions['print'])->toBeTrue();
+    }
 });

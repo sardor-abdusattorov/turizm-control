@@ -52,7 +52,9 @@ class OnlyOfficeService
 
     public function templateEditorConfig(ContractTemplate $template, User $user, ?string $forceMode = null): array
     {
-        $permissions = $this->permissionSet(edit: true, review: true, comment: true);
+        // Templates are internal blanks with placeholders — there's nothing to
+        // export, so download and print stay off in every mode.
+        $permissions = $this->permissionSet(edit: true, review: true, comment: true, download: false, print: false);
         $mode = $this->resolveMode($forceMode, 'edit', $permissions);
 
         return $this->buildConfig(
@@ -69,7 +71,9 @@ class OnlyOfficeService
 
     public function orderEditorConfig(Order $order, User $user, ?string $forceMode = null): array
     {
-        $permissions = $this->permissionSet(edit: true, review: true, comment: true);
+        // Orders are reference documents people legitimately need to grab, so
+        // download and print stay available in both view and edit modes.
+        $permissions = $this->permissionSet(edit: true, review: true, comment: true, download: true, print: true);
         $mode = $this->resolveMode($forceMode, 'edit', $permissions);
         $extension = $order->extension() ?: 'docx';
 
@@ -179,14 +183,6 @@ class OnlyOfficeService
         string $fileType = 'docx',
         string $documentType = 'word',
     ): array {
-        // Read-only view mode never needs export affordances, so strip the
-        // download, print and save-as-PDF controls. A viewer just reads the
-        // document; only an editor (edit/review) keeps those buttons.
-        if ($mode === 'view') {
-            $permissions['download'] = false;
-            $permissions['print'] = false;
-        }
-
         $config = [
             'documentType' => $documentType,
             'type' => 'desktop',

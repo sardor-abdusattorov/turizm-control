@@ -78,14 +78,15 @@
     <script>
         function closeEditor(event) {
             event.preventDefault();
-            var backUrl = event.currentTarget.getAttribute('data-back-url');
+            var fallback = event.currentTarget.getAttribute('data-back-url');
+            var ref = document.referrer;
+            var sameOrigin = ref && ref.indexOf(window.location.origin + '/') === 0;
+            var notSelf = ref && ref.split('#')[0] !== window.location.href.split('#')[0];
 
-            if (document.referrer && window.history.length > 1) {
-                window.history.back();
-                return;
-            }
-
-            window.location.href = backUrl;
+            // Return to the exact page we were opened from (the index list or
+            // the record view), even in a fresh tab where history is empty.
+            // Fall back to the record view when there's no usable referrer.
+            window.location.href = (sameOrigin && notSelf) ? ref : fallback;
         }
 
         (function () {

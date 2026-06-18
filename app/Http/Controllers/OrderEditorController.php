@@ -22,7 +22,7 @@ class OrderEditorController extends Controller
                 'order' => $order,
                 'apiScriptUrl' => $service->apiScriptUrl(),
                 'config' => $service->orderEditorConfig($order, auth()->user(), $request->query('mode')),
-                'backUrl' => OrderResource::getUrl('view', ['record' => $order]),
+                'backUrl' => OrderResource::getUrl('index'),
             ])
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache')
