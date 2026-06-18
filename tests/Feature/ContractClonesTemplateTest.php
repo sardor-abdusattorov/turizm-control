@@ -36,13 +36,12 @@ function docxBody(string $absolutePath): string
 }
 
 it('clones and fills the template into a separate contract file, leaving the template untouched', function () {
-    Storage::fake('public');
     Storage::fake('local');
 
-    // A template with a placeholder, stored on the public disk.
+    // A template with a placeholder, stored on the private (local) disk.
     $templatePath = 'contract-templates/main.docx';
-    Storage::disk('public')->put($templatePath, file_get_contents(makeMinimalDocx('Contract {{number}}')));
-    $templateHashBefore = md5(Storage::disk('public')->get($templatePath));
+    Storage::disk('local')->put($templatePath, file_get_contents(makeMinimalDocx('Contract {{number}}')));
+    $templateHashBefore = md5(Storage::disk('local')->get($templatePath));
 
     $template = ContractTemplate::factory()->create(['template_file' => $templatePath]);
     $contract = Contract::factory()->create([
@@ -53,7 +52,7 @@ it('clones and fills the template into a separate contract file, leaving the tem
     $contract->buildDocumentFromTemplate(app(TemplateFiller::class), app(ContractPlaceholderValues::class));
 
     // 1) The template file is byte-for-byte unchanged.
-    expect(md5(Storage::disk('public')->get($templatePath)))->toBe($templateHashBefore);
+    expect(md5(Storage::disk('local')->get($templatePath)))->toBe($templateHashBefore);
 
     // 2) The contract gets its OWN document on the private (local) disk.
     $contract->refresh();
@@ -64,16 +63,15 @@ it('clones and fills the template into a separate contract file, leaving the tem
     $cloneBody = docxBody(Storage::disk('local')->path($contract->document_file));
     expect($cloneBody)->toContain('C-777')->not->toContain('{{number}}');
 
-    $templateBody = docxBody(Storage::disk('public')->path($templatePath));
+    $templateBody = docxBody(Storage::disk('local')->path($templatePath));
     expect($templateBody)->toContain('{{number}}');
 });
 
 it('gives the contract a different document_key than the template', function () {
-    Storage::fake('public');
     Storage::fake('local');
 
     $templatePath = 'contract-templates/main.docx';
-    Storage::disk('public')->put($templatePath, file_get_contents(makeMinimalDocx('Contract {{number}}')));
+    Storage::disk('local')->put($templatePath, file_get_contents(makeMinimalDocx('Contract {{number}}')));
 
     $template = ContractTemplate::factory()->create(['template_file' => $templatePath]);
     $contract = Contract::factory()->create([

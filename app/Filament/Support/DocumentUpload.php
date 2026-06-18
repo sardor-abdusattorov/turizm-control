@@ -10,9 +10,12 @@ class DocumentUpload
     {
         return FileUpload::make($field)
             ->label(__('app.label.document'))
-            ->disk('public')
+            // Private disk: documents are sensitive and must not be reachable by
+            // a bare /storage URL. The local disk serves them only through
+            // signed, expiring URLs (and our authenticated controllers).
+            ->disk('local')
             ->directory(fn () => "uploads/files/{$folder}/".now()->format('Y/m'))
-            ->visibility('public')
+            ->visibility('private')
             ->acceptedFileTypes([
                 'application/pdf',
                 'application/msword',

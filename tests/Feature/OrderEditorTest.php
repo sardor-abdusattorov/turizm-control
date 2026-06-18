@@ -13,7 +13,7 @@ use function Pest\Laravel\post;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    Storage::fake('public');
+    Storage::fake('local');
 
     config([
         'onlyoffice.public_url' => 'http://onlyoffice',
@@ -26,7 +26,7 @@ beforeEach(function () {
 function makeOrderWithDocx(): Order
 {
     $order = Order::factory()->create();
-    Storage::disk('public')->put($order->file_path, 'fake-docx');
+    Storage::disk('local')->put($order->file_path, 'fake-docx');
 
     return $order->fresh();
 }
@@ -58,7 +58,7 @@ it('returns 404 when the order file is not a docx', function () {
     $order = Order::factory()->create([
         'file_path' => 'uploads/files/orders/2026/06/report.pdf',
     ]);
-    Storage::disk('public')->put($order->file_path, '%PDF-fake');
+    Storage::disk('local')->put($order->file_path, '%PDF-fake');
 
     actingAs(User::factory()->create());
 
@@ -99,7 +99,7 @@ it('persists the edited order docx on OnlyOffice callback', function () {
         'url' => 'http://onlyoffice/cache/files/order-edited.docx',
     ])->assertOk()->assertExactJson(['error' => 0]);
 
-    expect(Storage::disk('public')->get($order->file_path))->toBe('%edited')
+    expect(Storage::disk('local')->get($order->file_path))->toBe('%edited')
         ->and($order->fresh()->document_key)->not->toBe($originalKey);
 });
 

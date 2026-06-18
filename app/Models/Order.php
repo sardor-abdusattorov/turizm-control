@@ -41,8 +41,8 @@ class Order extends Model
         });
 
         static::deleting(function (self $order): void {
-            if ($order->file_path && Storage::disk('public')->exists($order->file_path)) {
-                Storage::disk('public')->delete($order->file_path);
+            if ($order->file_path && Storage::disk('local')->exists($order->file_path)) {
+                Storage::disk('local')->delete($order->file_path);
             }
         });
     }
@@ -63,13 +63,13 @@ class Order extends Model
             return null;
         }
 
-        return Storage::disk('public')->path($this->file_path);
+        return Storage::disk('local')->path($this->file_path);
     }
 
     public function fileExists(): bool
     {
         return $this->file_path
-            && Storage::disk('public')->exists($this->file_path);
+            && Storage::disk('local')->exists($this->file_path);
     }
 
     public function isDocx(): bool
@@ -110,11 +110,6 @@ class Order extends Model
             'pdf' => 'heroicon-o-document',
             default => 'heroicon-o-document-text',
         };
-    }
-
-    public function publicUrl(): ?string
-    {
-        return $this->file_path ? asset('storage/'.$this->file_path) : null;
     }
 
     public static function getStatuses(): array

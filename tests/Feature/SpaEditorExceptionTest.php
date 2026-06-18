@@ -13,7 +13,7 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class);
 
 it('renders the editor link without wire:navigate so it leaves the SPA cleanly', function () {
-    Storage::fake('public');
+    Storage::fake('local');
 
     $user = User::factory()->create();
     foreach (['view_any_contract_template', 'view_contract_template', 'update_contract_template'] as $ability) {
@@ -22,7 +22,7 @@ it('renders the editor link without wire:navigate so it leaves the SPA cleanly',
     }
 
     $template = ContractTemplate::factory()->create();
-    Storage::disk('public')->put($template->template_file, 'fake-docx');
+    Storage::disk('local')->put($template->template_file, 'fake-docx');
 
     actingAs($user->fresh());
 

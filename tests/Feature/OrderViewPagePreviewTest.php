@@ -27,12 +27,12 @@ function actAsOrderViewer(): User
 
 it('embeds an inline PDF iframe on the order view page when the file is a PDF', function () {
     actAsOrderViewer();
-    Storage::fake('public');
+    Storage::fake('local');
 
     $order = Order::factory()->create([
         'file_path' => 'uploads/files/orders/2026/06/sample.pdf',
     ]);
-    Storage::disk('public')->put($order->file_path, '%PDF-fake');
+    Storage::disk('local')->put($order->file_path, '%PDF-fake');
 
     $html = Livewire::test(ViewOrder::class, ['record' => $order->id])->html();
 
@@ -42,12 +42,12 @@ it('embeds an inline PDF iframe on the order view page when the file is a PDF', 
 
 it('embeds an OnlyOffice viewer iframe on the order view page when the file is a docx', function () {
     actAsOrderViewer();
-    Storage::fake('public');
+    Storage::fake('local');
 
     $order = Order::factory()->create([
         'file_path' => 'uploads/files/orders/2026/06/sample.docx',
     ]);
-    Storage::disk('public')->put($order->file_path, 'fake-docx');
+    Storage::disk('local')->put($order->file_path, 'fake-docx');
 
     $html = Livewire::test(ViewOrder::class, ['record' => $order->id])->html();
 
@@ -57,7 +57,7 @@ it('embeds an OnlyOffice viewer iframe on the order view page when the file is a
 
 it('hides the preview when the order has no file on disk', function () {
     actAsOrderViewer();
-    Storage::fake('public');
+    Storage::fake('local');
 
     $order = Order::factory()->create([
         'file_path' => 'uploads/files/orders/2026/06/missing.pdf',

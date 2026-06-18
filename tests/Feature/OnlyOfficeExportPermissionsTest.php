@@ -14,7 +14,7 @@ use Spatie\Permission\Models\Role;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    Storage::fake('public');
+    Storage::fake('local');
     Cache::flush();
 
     config([
@@ -123,7 +123,7 @@ it('trims the editor chrome down to the document', function () {
 
 it('never offers download or print for contract templates, in any mode', function () {
     $template = ContractTemplate::factory()->create();
-    Storage::disk('public')->put($template->template_file, 'fake-docx');
+    Storage::disk('local')->put($template->template_file, 'fake-docx');
 
     foreach (['view', 'edit'] as $mode) {
         $permissions = app(OnlyOfficeService::class)

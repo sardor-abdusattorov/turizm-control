@@ -34,7 +34,7 @@ class OnlyOfficeOrderController extends Controller
             savedEvent: 'Order Document Saved',
             forcesaveEvent: 'Order Document Forcesave',
             logDescription: 'Order "'.$order->title.'" saved via OnlyOffice',
-            persist: $this->callback->persistToDisk('public', $order->file_path),
+            persist: $this->callback->persistToDisk('local', $order->file_path),
             onFinalSave: fn () => $order->refreshDocumentKey(),
             logProperties: ['order_title' => $order->title],
         );

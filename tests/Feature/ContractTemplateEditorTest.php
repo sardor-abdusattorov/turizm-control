@@ -13,7 +13,7 @@ use function Pest\Laravel\post;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    Storage::fake('public');
+    Storage::fake('local');
 
     config([
         'onlyoffice.public_url' => 'http://onlyoffice',
@@ -27,7 +27,7 @@ function makeTemplateWithFile(): ContractTemplate
 {
     $template = ContractTemplate::factory()->create();
 
-    Storage::disk('public')->put($template->template_file, 'fake-docx');
+    Storage::disk('local')->put($template->template_file, 'fake-docx');
 
     return $template->fresh();
 }
@@ -105,7 +105,7 @@ it('persists the edited template back to storage on OnlyOffice callback', functi
         ],
     )->assertOk()->assertExactJson(['error' => 0]);
 
-    expect(Storage::disk('public')->get($template->template_file))->toBe('%edited-binary')
+    expect(Storage::disk('local')->get($template->template_file))->toBe('%edited-binary')
         ->and($template->fresh()->document_key)->not->toBe($originalKey);
 });
 
@@ -128,7 +128,7 @@ it('keeps the document_key intact on forcesave callbacks during editing', functi
         ],
     )->assertOk()->assertExactJson(['error' => 0]);
 
-    expect(Storage::disk('public')->get($template->template_file))->toBe('%mid-edit-binary')
+    expect(Storage::disk('local')->get($template->template_file))->toBe('%mid-edit-binary')
         ->and($template->fresh()->document_key)->toBe($originalKey);
 });
 

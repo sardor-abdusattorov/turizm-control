@@ -34,7 +34,7 @@ class OnlyOfficeTemplateController extends Controller
             savedEvent: 'Template Saved',
             forcesaveEvent: 'Template Forcesave',
             logDescription: 'Template "'.$template->name.'" saved via OnlyOffice',
-            persist: $this->callback->persistToDisk('public', $template->template_file),
+            persist: $this->callback->persistToDisk('local', $template->template_file),
             onFinalSave: fn () => $template->refreshDocumentKey(),
             logProperties: ['template_name' => $template->name],
         );

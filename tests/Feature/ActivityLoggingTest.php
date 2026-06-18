@@ -17,7 +17,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('local');
-    Storage::fake('public');
+    Storage::fake('local');
 
     config([
         'onlyoffice.public_url' => 'http://onlyoffice',
@@ -128,7 +128,7 @@ it('writes a Document activity log entry on OnlyOffice template save', function 
     Http::fake(['*/saved-template.docx' => Http::response('%binary')]);
 
     $template = ContractTemplate::factory()->create();
-    Storage::disk('public')->put($template->template_file, 'fake');
+    Storage::disk('local')->put($template->template_file, 'fake');
 
     post(
         route('onlyoffice.template.callback', [
@@ -154,7 +154,7 @@ it('uses Template Forcesave event for status 6 callbacks', function () {
     Http::fake(['*/saved-template.docx' => Http::response('%binary')]);
 
     $template = ContractTemplate::factory()->create();
-    Storage::disk('public')->put($template->template_file, 'fake');
+    Storage::disk('local')->put($template->template_file, 'fake');
 
     post(
         route('onlyoffice.template.callback', [

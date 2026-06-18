@@ -11,14 +11,14 @@ use function Pest\Laravel\get;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    Storage::fake('public');
+    Storage::fake('local');
 });
 
 it('serves an order PDF inline so the browser renders it instead of downloading', function () {
     $order = Order::factory()->create([
         'file_path' => 'uploads/files/orders/test.pdf',
     ]);
-    Storage::disk('public')->put($order->file_path, '%PDF-fake');
+    Storage::disk('local')->put($order->file_path, '%PDF-fake');
 
     actingAs(User::factory()->create());
 
@@ -34,7 +34,7 @@ it('serves an order xlsx inline', function () {
     $order = Order::factory()->create([
         'file_path' => 'uploads/files/orders/test.xlsx',
     ]);
-    Storage::disk('public')->put($order->file_path, 'fake-xlsx');
+    Storage::disk('local')->put($order->file_path, 'fake-xlsx');
 
     actingAs(User::factory()->create());
 

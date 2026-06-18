@@ -41,8 +41,8 @@ class ContractTemplate extends Model
         });
 
         static::deleting(function (self $template): void {
-            if ($template->template_file && Storage::disk('public')->exists($template->template_file)) {
-                Storage::disk('public')->delete($template->template_file);
+            if ($template->template_file && Storage::disk('local')->exists($template->template_file)) {
+                Storage::disk('local')->delete($template->template_file);
             }
         });
     }
@@ -63,13 +63,13 @@ class ContractTemplate extends Model
             return null;
         }
 
-        return Storage::disk('public')->path($this->template_file);
+        return Storage::disk('local')->path($this->template_file);
     }
 
     public function templateExists(): bool
     {
         return $this->template_file
-            && Storage::disk('public')->exists($this->template_file);
+            && Storage::disk('local')->exists($this->template_file);
     }
 
     public static function getLanguages(): array
