@@ -100,6 +100,7 @@ return [
         // Contract editor
         'contract_editor' => 'Contract Editor',
         'preview' => 'Preview',
+        'preview_not_available' => 'Preview is not available for this file type.',
         'approval_signatures' => 'Approval signatures',
 
         // Contract templates
@@ -222,6 +223,7 @@ return [
         'open_editor' => 'Open editor',
         'open_template_in_editor' => 'Open template in editor',
         'open_file' => 'Open file',
+        'open_in_new_tab' => 'Open in new tab',
         'save' => 'Save',
         'download_pdf' => 'Download PDF',
         'preview_pdf' => 'Preview PDF',
