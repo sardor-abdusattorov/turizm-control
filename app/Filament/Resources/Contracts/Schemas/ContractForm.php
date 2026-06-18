@@ -17,6 +17,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -93,93 +95,100 @@ class ContractForm
                         ])->columnSpanFull(),
                     ]),
 
-                Section::make(__('app.label.basic_information'))
-                    ->collapsible()
-                    ->columns(2)
-                    ->schema([
-                        TextInput::make('number')
-                            ->label(__('app.label.contract_number'))
-                            ->required()
-                            ->maxLength(50)
-                            ->unique('contracts', 'number', ignoreRecord: true),
+                Tabs::make('contract_tabs')
+                    ->columnSpanFull()
+                    ->tabs([
+                        Tab::make(__('app.label.basic_information'))
+                            ->icon('heroicon-o-clipboard-document-list')
+                            ->schema([
+                                TextInput::make('number')
+                                    ->label(__('app.label.contract_number'))
+                                    ->required()
+                                    ->maxLength(50)
+                                    ->unique('contracts', 'number', ignoreRecord: true)
+                                    ->columnSpanFull(),
 
-                        Select::make('order_type_id')
-                            ->label(__('app.label.order_type_single'))
-                            ->options(OrderType::getActive())
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->live()
-                            ->afterStateUpdated(fn (Set $set) => $set('contract_template_id', null)),
+                                Select::make('order_type_id')
+                                    ->label(__('app.label.order_type_single'))
+                                    ->options(OrderType::getActive())
+                                    ->required()
+                                    ->searchable()
+                                    ->preload()
+                                    ->live()
+                                    ->afterStateUpdated(fn (Set $set) => $set('contract_template_id', null))
+                                    ->columnSpanFull(),
 
-                        Select::make('contract_template_id')
-                            ->label(__('app.label.contract_template_single'))
-                            ->options(fn (Get $get): array => self::templateOptions($get('order_type_id')))
-                            ->disabled(fn (Get $get): bool => blank($get('order_type_id')))
-                            ->placeholder(fn (Get $get): string => blank($get('order_type_id'))
-                                ? __('app.label.select_order_type_first')
-                                : __('app.label.select_option'))
-                            ->required()
-                            ->searchable(),
+                                Select::make('contract_template_id')
+                                    ->label(__('app.label.contract_template_single'))
+                                    ->options(fn (Get $get): array => self::templateOptions($get('order_type_id')))
+                                    ->disabled(fn (Get $get): bool => blank($get('order_type_id')))
+                                    ->placeholder(fn (Get $get): string => blank($get('order_type_id'))
+                                        ? __('app.label.select_order_type_first')
+                                        : __('app.label.select_option'))
+                                    ->required()
+                                    ->searchable()
+                                    ->columnSpanFull(),
 
-                        Select::make('contact_id')
-                            ->label(__('app.label.contact_single'))
-                            ->options(Contact::getActive())
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema))
-                            ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey()),
+                                Select::make('contact_id')
+                                    ->label(__('app.label.contact_single'))
+                                    ->options(Contact::getActive())
+                                    ->required()
+                                    ->searchable()
+                                    ->preload()
+                                    ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema))
+                                    ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey())
+                                    ->columnSpanFull(),
 
-                        TextInput::make('title')
-                            ->label(__('app.label.contract_title'))
-                            ->required()
-                            ->maxLength(255)
-                            ->columnSpanFull(),
+                                TextInput::make('title')
+                                    ->label(__('app.label.contract_title'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
 
-                        NumberInput::make('amount')
-                            ->label(__('app.label.amount'))
-                            ->prefix(fn (Get $get): ?string => Currency::find($get('currency_id'))?->short_name)
-                            ->thousandsSeparator(' ')
-                            ->decimalSeparator('.')
-                            ->decimalPlaces(2)
-                            ->default(0)
-                            ->required(),
+                                NumberInput::make('amount')
+                                    ->label(__('app.label.amount'))
+                                    ->prefix(fn (Get $get): ?string => Currency::find($get('currency_id'))?->short_name)
+                                    ->thousandsSeparator(' ')
+                                    ->decimalSeparator('.')
+                                    ->decimalPlaces(2)
+                                    ->default(0)
+                                    ->required()
+                                    ->columnSpanFull(),
 
-                        Select::make('currency_id')
-                            ->label(__('app.label.currency_single'))
-                            ->options(Currency::query()->where('status', true)->pluck('short_name', 'id'))
-                            ->required()
-                            ->live()
-                            ->searchable()
-                            ->preload(),
-                    ]),
+                                Select::make('currency_id')
+                                    ->label(__('app.label.currency_single'))
+                                    ->options(Currency::query()->where('status', true)->pluck('short_name', 'id'))
+                                    ->required()
+                                    ->live()
+                                    ->searchable()
+                                    ->preload()
+                                    ->columnSpanFull(),
+                            ]),
 
-                Section::make(__('app.label.approval_chain'))
-                    ->collapsible()
-                    // On create the section is collapsed by default — the picker
-                    // is pre-filled from profile defaults and most managers don't
-                    // need to touch it. Stays open on edit so the current chain
-                    // is visible at a glance.
-                    ->collapsed(fn (?Contract $record): bool => $record === null)
-                    // Editable on create, and on edit only while the contract is
-                    // still a draft — once submitted the chain is locked.
-                    ->visible(fn (?Contract $record): bool => $record === null || $record->status === Contract::STATUS_DRAFT)
-                    ->schema([
-                        Select::make('approver_chain')
-                            ->hiddenLabel()
-                            ->multiple()
-                            ->options(fn (): array => User::approverOptionsGroupedByDepartment(Auth::id()))
-                            ->default(fn (): array => self::defaultApproverIds())
-                            ->allowHtml()
-                            ->searchable()
-                            ->preload()
-                            ->live(),
+                        Tab::make(__('app.label.approval_chain'))
+                            ->icon('heroicon-o-users')
+                            // Editable on create, and on edit only while the contract
+                            // is still a draft — once submitted the chain is locked.
+                            ->visible(fn (?Contract $record): bool => $record === null || $record->status === Contract::STATUS_DRAFT)
+                            ->badge(fn (Get $get): ?int => ($n = count(array_filter((array) $get('approver_chain')))) ? $n : null)
+                            ->schema([
+                                Select::make('approver_chain')
+                                    ->hiddenLabel()
+                                    ->multiple()
+                                    ->options(fn (): array => User::approverOptionsGroupedByDepartment(Auth::id()))
+                                    ->default(fn (): array => self::defaultApproverIds())
+                                    ->allowHtml()
+                                    ->searchable()
+                                    ->preload()
+                                    ->live()
+                                    ->columnSpanFull(),
 
-                        TextEntry::make('approver_chain_preview')
-                            ->hiddenLabel()
-                            ->state(fn (Get $get): string => self::approvalChainPreview($get('approver_chain')))
-                            ->html(),
+                                TextEntry::make('approver_chain_preview')
+                                    ->hiddenLabel()
+                                    ->state(fn (Get $get): string => self::approvalChainPreview($get('approver_chain')))
+                                    ->html()
+                                    ->columnSpanFull(),
+                            ]),
                     ]),
             ]);
     }

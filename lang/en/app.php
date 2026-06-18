@@ -157,6 +157,7 @@ return [
         'user' => 'User',
         'attached_document' => 'Attached document',
         'size' => 'Size',
+        'file_name' => 'File name',
         'document' => 'Document',
         'current_step' => 'Current step',
         'signing_date' => 'Signing date',

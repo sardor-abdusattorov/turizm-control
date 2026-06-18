@@ -25,7 +25,7 @@ function actAsOrderViewer(): User
     return $user;
 }
 
-it('embeds an inline PDF iframe on the order view page when the file is a PDF', function () {
+it('renders the file card with a PDF-open link for PDF orders', function () {
     actAsOrderViewer();
     Storage::fake('local');
 
@@ -36,11 +36,13 @@ it('embeds an inline PDF iframe on the order view page when the file is a PDF', 
 
     $html = Livewire::test(ViewOrder::class, ['record' => $order->id])->html();
 
-    expect($html)->toContain(route('orders.file.inline', ['order' => $order]))
-        ->and($html)->toContain('<iframe');
+    expect($html)->toContain('sample.pdf')
+        ->toContain('PDF')
+        ->toContain(route('orders.file.inline', ['order' => $order]))
+        ->not->toContain('<iframe');
 });
 
-it('embeds an OnlyOffice viewer iframe on the order view page when the file is a docx', function () {
+it('renders the file card with an OnlyOffice viewer link for docx orders', function () {
     actAsOrderViewer();
     Storage::fake('local');
 
@@ -51,11 +53,13 @@ it('embeds an OnlyOffice viewer iframe on the order view page when the file is a
 
     $html = Livewire::test(ViewOrder::class, ['record' => $order->id])->html();
 
-    expect($html)->toContain(route('orders.editor', ['order' => $order, 'mode' => 'view']))
-        ->and($html)->toContain('<iframe');
+    expect($html)->toContain('sample.docx')
+        ->toContain('DOCX')
+        ->toContain(route('orders.editor', ['order' => $order, 'mode' => 'view']))
+        ->not->toContain('<iframe');
 });
 
-it('hides the preview when the order has no file on disk', function () {
+it('hides the preview card when the order has no file on disk', function () {
     actAsOrderViewer();
     Storage::fake('local');
 
@@ -65,5 +69,8 @@ it('hides the preview when the order has no file on disk', function () {
 
     $html = Livewire::test(ViewOrder::class, ['record' => $order->id])->html();
 
-    expect($html)->not->toContain('<iframe');
+    // No file -> the file-preview component is gated behind fileExists()
+    // on the infolist, so the OnlyOffice viewer URL never appears.
+    expect($html)->not->toContain('<iframe')
+        ->not->toContain(route('orders.editor', ['order' => $order, 'mode' => 'view']));
 });
