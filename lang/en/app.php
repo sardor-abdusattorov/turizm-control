@@ -176,6 +176,8 @@ return [
         'today' => 'Today',
         'yesterday' => 'Yesterday',
         'overdue' => 'Overdue',
+        'overview' => 'Overview',
+        'history' => 'History',
 
         // Currencies
         'currency_single' => 'Currency',

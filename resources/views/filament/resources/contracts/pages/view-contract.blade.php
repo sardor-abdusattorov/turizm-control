@@ -72,6 +72,13 @@
         .cw-cols{ display:grid; grid-template-columns:1fr; gap:1.1rem; align-items:start; }
         @media(min-width:1024px){ .cw-cols{ grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); } }
         .cw-main,.cw-side{ display:flex; flex-direction:column; gap:1.1rem; min-width:0; }
+        .cw-panel{ display:flex; flex-direction:column; gap:1.1rem; }
+        .cw-tabs{ display:flex; gap:.15rem; }
+        .cw-tab{ display:flex; align-items:center; gap:.4rem; padding:.6rem .95rem; font-size:.85rem; font-weight:600; color:var(--m); background:transparent; border:0; border-radius:.7rem; cursor:pointer; transition:all .15s; }
+        .cw-tab:hover{ color:var(--t); background:var(--soft); }
+        .cw-tab--active{ color:var(--accent); background:var(--s); box-shadow:0 0 0 1px var(--r), 0 1px 2px rgba(0,0,0,.05); }
+        .cw-tab__c{ font-size:.68rem; font-weight:700; color:var(--m); background:var(--soft); border-radius:999px; padding:.05rem .4rem; }
+        .cw-tab--active .cw-tab__c{ background:rgba(59,130,246,.12); color:var(--accent); }
 
         /* hero */
         .cw-hero{ position:relative; display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; border-radius:1.1rem; padding:1.35rem 1.5rem 1.35rem 1.65rem; overflow:hidden; box-shadow:0 0 0 1px var(--r), 0 1px 2px rgba(0,0,0,.04); }
@@ -199,7 +206,7 @@
         .cw-modal__empty{ font-size:.82rem; color:var(--m2); padding:.4rem 0; }
     </style>
 
-    <div class="cw" x-data="{ approver: null }" @keydown.escape.window="approver = null">
+    <div class="cw" x-data="{ approver: null, tab: 'overview' }" @keydown.escape.window="approver = null">
         {{-- Hero --}}
         <div class="cw-hero cw-hero--{{ $statusColor }}">
             <div class="cw-hero__l">
@@ -228,11 +235,16 @@
             </div>
         </div>
 
-        <div class="cw-cols">
-            {{-- MAIN: document + approval chain --}}
-            <div class="cw-main">
-                <section class="cw-card">
-                    <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-document-text') !!}</span><h2 class="cw-hd__t">{{ __('app.label.attached_document') }}</h2></div>
+        {{-- Tabs --}}
+        <div class="cw-tabs">
+            <button type="button" class="cw-tab" :class="tab === 'overview' ? 'cw-tab--active' : ''" @click="tab = 'overview'">{!! $ic('heroicon-o-rectangle-group', 16) !!} {{ __('app.label.overview') }}</button>
+            <button type="button" class="cw-tab" :class="tab === 'history' ? 'cw-tab--active' : ''" @click="tab = 'history'">{!! $ic('heroicon-o-clock', 16) !!} {{ __('app.label.history') }}@if ($activities->isNotEmpty())<span class="cw-tab__c">{{ $activities->count() }}</span>@endif</button>
+        </div>
+
+        {{-- Overview --}}
+        <div x-show="tab === 'overview'" class="cw-panel">
+            <section class="cw-card">
+                <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-document-text') !!}</span><h2 class="cw-hd__t">{{ __('app.label.attached_document') }}</h2></div>
                     <div class="cw-bd">
                         @if ($record->documentExists())
                             <div class="cw-doc">
@@ -261,6 +273,8 @@
                     </div>
                 </section>
 
+            <div class="cw-cols">
+                <div class="cw-main">
                 <section class="cw-card">
                     <div class="cw-hd">
                         <span class="cw-hd__ic">{!! $ic('heroicon-o-users') !!}</span>
@@ -337,7 +351,12 @@
                         @endforeach
                     </div>
                 </section>
+                </div>
+            </div>
+        </div>
 
+        {{-- History --}}
+        <div x-show="tab === 'history'" x-cloak class="cw-panel">
                 <section class="cw-card">
                     <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-clock') !!}</span><h2 class="cw-hd__t">{{ __('app.label.execution_history') }}</h2></div>
                     <div class="cw-bd">
@@ -367,7 +386,6 @@
                         @endif
                     </div>
                 </section>
-            </div>
         </div>
 
         {{-- Per-approver detail modals --}}
