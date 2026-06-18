@@ -15,11 +15,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
@@ -86,23 +84,18 @@ class ProfileSettings extends Page implements HasActions, HasForms
             ->components([
                 Grid::make(['default' => 1, 'md' => 3])
                     ->schema([
-                        // Left rail: section heading, description, then the avatar.
-                        Group::make([
-                            TextEntry::make('personal_information_heading')
-                                ->hiddenLabel()
-                                ->state(
-                                    '<div style="font-weight:600;font-size:1rem;color:#111827;">'.e(__('app.label.personal_information')).'</div>'
-                                    .'<div style="margin-top:.25rem;font-size:.875rem;color:#6b7280;line-height:1.4;">'.e(__('app.label.personal_information_description')).'</div>'
-                                )
-                                ->html(),
-
-                            ImageUpload::make('users', 'avatar_url')
-                                ->hiddenLabel()
-                                ->avatar()
-                                ->imageEditorAspectRatios(['1:1'])
-                                ->placeholder(__('app.label.upload_photo'))
-                                ->extraAttributes(['style' => 'max-width:9rem;margin-top:1rem;']),
-                        ])->columnSpan(['md' => 1]),
+                        // Left card: section heading, description, then the avatar.
+                        Section::make(__('app.label.personal_information'))
+                            ->description(__('app.label.personal_information_description'))
+                            ->columnSpan(['md' => 1])
+                            ->schema([
+                                ImageUpload::make('users', 'avatar_url')
+                                    ->hiddenLabel()
+                                    ->avatar()
+                                    ->imageEditorAspectRatios(['1:1'])
+                                    ->placeholder(__('app.label.upload_photo'))
+                                    ->extraAttributes(['style' => 'max-width:9rem;']),
+                            ]),
 
                         // Right card: the editable fields.
                         Section::make()
