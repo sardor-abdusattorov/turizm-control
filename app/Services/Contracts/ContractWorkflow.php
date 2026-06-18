@@ -49,18 +49,20 @@ class ContractWorkflow
     }
 
     /**
-     * Skip pending approvers whose user is no longer active and return
-     * the first one that can actually act. The skipped rows are marked
-     * STATUS_SKIPPED so the chain still reads cleanly.
+     * Walk the chain and return the next approver that can actually act —
+     * the first row that is QUEUED (not yet started) or PENDING (already
+     * reviewing). Skips rows whose user is no longer active, marking them
+     * SKIPPED so the chain still reads cleanly. Caller promotes a QUEUED
+     * row by invoking startReview() on the returned approver.
      */
     private function advanceToActiveApprover(Contract $contract): ?ContractApprover
     {
-        while ($pending = $contract->fresh()->currentApprover()) {
-            if ($pending->user && (bool) $pending->user->status) {
-                return $pending;
+        while ($next = $contract->fresh()->nextInLineApprover()) {
+            if ($next->user && (bool) $next->user->status) {
+                return $next;
             }
 
-            $pending->update([
+            $next->update([
                 'status' => ContractApprover::STATUS_SKIPPED,
                 'comment' => __('app.message.approver_inactive'),
                 'acted_at' => now(),
@@ -179,7 +181,7 @@ class ContractWorkflow
             $contract->approvers()
                 ->where('id', '!=', $current->id)
                 ->update([
-                    'status' => ContractApprover::STATUS_PENDING,
+                    'status' => ContractApprover::STATUS_QUEUED,
                     'comment' => null,
                     'acted_at' => null,
                 ]);

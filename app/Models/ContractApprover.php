@@ -28,6 +28,8 @@ class ContractApprover extends Model
         'reminder_sent_at' => 'datetime',
     ];
 
+    public const STATUS_QUEUED = 'queued';
+
     public const STATUS_PENDING = 'pending';
 
     public const STATUS_APPROVED = 'approved';
@@ -52,6 +54,7 @@ class ContractApprover extends Model
     public static function getStatuses(): array
     {
         return [
+            self::STATUS_QUEUED => __('app.contract_approver.status.queued'),
             self::STATUS_PENDING => __('app.contract_approver.status.pending'),
             self::STATUS_APPROVED => __('app.contract_approver.status.approved'),
             self::STATUS_REJECTED => __('app.contract_approver.status.rejected'),
@@ -64,6 +67,7 @@ class ContractApprover extends Model
     public static function getStatusColors(): array
     {
         return [
+            self::STATUS_QUEUED => 'gray',
             self::STATUS_PENDING => 'warning',
             self::STATUS_APPROVED => 'success',
             self::STATUS_REJECTED => 'danger',
@@ -123,12 +127,14 @@ class ContractApprover extends Model
 
     /**
      * Start the review clock for this step — called when the approver
-     * becomes the current one in the chain. Sets the SLA deadline and
-     * clears any prior reminder flag.
+     * becomes the current one in the chain. Promotes the row from
+     * QUEUED to PENDING (the canonical promotion point), sets the SLA
+     * deadline, and clears any prior reminder flag.
      */
     public function startReview(int $slaDays): void
     {
         $this->update([
+            'status' => self::STATUS_PENDING,
             'due_at' => now()->addDays($slaDays),
             'reminder_sent_at' => null,
         ]);

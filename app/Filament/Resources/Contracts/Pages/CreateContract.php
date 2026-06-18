@@ -42,7 +42,7 @@ class CreateContract extends CreateRecord
                 'contract_id' => $this->record->id,
                 'user_id' => $userId,
                 'order' => $order++,
-                'status' => ContractApprover::STATUS_PENDING,
+                'status' => ContractApprover::STATUS_QUEUED,
             ]);
         }
 

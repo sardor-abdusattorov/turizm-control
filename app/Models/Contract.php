@@ -264,7 +264,7 @@ class Contract extends Model
                 'contract_id' => $this->id,
                 'user_id' => $user->id,
                 'order' => $order++,
-                'status' => ContractApprover::STATUS_PENDING,
+                'status' => ContractApprover::STATUS_QUEUED,
             ]);
 
             $seen[] = $user->id;
@@ -329,7 +329,7 @@ class Contract extends Model
                     'contract_id' => $this->id,
                     'user_id' => $recipient->id,
                     'order' => $order++,
-                    'status' => ContractApprover::STATUS_PENDING,
+                    'status' => ContractApprover::STATUS_QUEUED,
                 ]);
 
                 $created++;
@@ -387,6 +387,19 @@ class Contract extends Model
     }
 
     /**
+     * The next approver who will (or already does) act — first row that is
+     * either actively pending or still queued in the chain. Used by the
+     * workflow to advance the queue and promote the next QUEUED row.
+     */
+    public function nextInLineApprover(): ?ContractApprover
+    {
+        return $this->activeApprovers()
+            ->whereIn('status', [ContractApprover::STATUS_PENDING, ContractApprover::STATUS_QUEUED])
+            ->orderBy('order')
+            ->first();
+    }
+
+    /**
      * Mark every approver row attached to the contract as INVALIDATED.
      * Used when the contract is edited mid-flow — old rows stay for the
      * audit history, fresh pending rows are built next.
@@ -433,7 +446,7 @@ class Contract extends Model
     public function resetApprovalState(): void
     {
         $this->approvers()->update([
-            'status' => ContractApprover::STATUS_PENDING,
+            'status' => ContractApprover::STATUS_QUEUED,
             'comment' => null,
             'acted_at' => null,
         ]);
@@ -446,7 +459,7 @@ class Contract extends Model
         $this->approvers()
             ->where('order', '>', $order)
             ->update([
-                'status' => ContractApprover::STATUS_PENDING,
+                'status' => ContractApprover::STATUS_QUEUED,
                 'comment' => null,
                 'acted_at' => null,
             ]);

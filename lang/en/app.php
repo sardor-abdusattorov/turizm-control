@@ -372,7 +372,8 @@ return [
     ],
     'contract_approver' => [
         'status' => [
-            'pending' => 'Pending',
+            'queued' => 'In queue',
+            'pending' => 'Reviewing',
             'approved' => 'Approved',
             'rejected' => 'Rejected',
             'returned' => 'Returned',

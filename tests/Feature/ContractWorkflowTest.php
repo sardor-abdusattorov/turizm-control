@@ -127,8 +127,8 @@ it('returns a contract for revision, resets other approvers and notifies the res
 
     expect($approvers->firstWhere('order', 2)->status)->toBe(ContractApprover::STATUS_RETURNED)
         ->and($approvers->firstWhere('order', 2)->comment)->toBe('add appendix')
-        ->and($approvers->firstWhere('order', 1)->status)->toBe(ContractApprover::STATUS_PENDING)
-        ->and($approvers->firstWhere('order', 3)->status)->toBe(ContractApprover::STATUS_PENDING);
+        ->and($approvers->firstWhere('order', 1)->status)->toBe(ContractApprover::STATUS_QUEUED)
+        ->and($approvers->firstWhere('order', 3)->status)->toBe(ContractApprover::STATUS_QUEUED);
 
     $this->assertDatabaseHas('notifications', [
         'notifiable_id' => $responsible->id,
