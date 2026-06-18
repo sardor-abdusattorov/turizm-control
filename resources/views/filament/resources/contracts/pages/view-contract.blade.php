@@ -210,12 +210,23 @@
         .cw-kv{ display:flex; align-items:center; gap:.6rem; padding:.5rem 0; }
         .cw-kv__lb{ font-size:0.784rem; color:var(--m); width:35%; flex-shrink:0; }
         .cw-kv__vl{ font-size:0.854rem; font-weight:600; color:var(--t); }
-        .cw-sub{ font-size:0.724rem; font-weight:650; color:var(--m2); text-transform:uppercase; letter-spacing:.04em; margin:1rem 0 .6rem; }
-        .cw-mini{ display:flex; gap:.65rem; padding-bottom:.85rem; position:relative; }
-        .cw-mini:not(:last-child)::before{ content:''; position:absolute; left:.85rem; top:1.9rem; bottom:-.1rem; width:2px; background:var(--track); }
-        .cw-mini__ic{ width:1.75rem; height:1.75rem; border-radius:999px; flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 3px var(--s); }
-        .cw-mini__ds{ font-size:0.825rem; font-weight:600; color:var(--t); }
-        .cw-mini__mt{ font-size:0.724rem; color:var(--m2); margin-top:.1rem; }
+        .cw-sub{ display:flex; align-items:center; justify-content:space-between; font-size:0.724rem; font-weight:650; color:var(--m2); text-transform:uppercase; letter-spacing:.04em; margin:1.1rem 0 .5rem; }
+        .cw-sub__c{ font-size:0.684rem; font-weight:700; padding:.05rem .4rem; border-radius:999px; background:var(--soft); color:var(--m); text-transform:none; letter-spacing:0; }
+        .cw-act{ border:1px solid var(--d); border-radius:.7rem; overflow:hidden; }
+        .cw-act__row{ display:grid; grid-template-columns:2.4rem 1.75rem 1fr auto; align-items:center; gap:.65rem; padding:.55rem .75rem; }
+        .cw-act__row + .cw-act__row{ border-top:1px solid var(--d); }
+        .cw-act__row:nth-child(odd){ background:var(--soft); }
+        .cw-act__time{ font-size:0.7rem; color:var(--m2); font-variant-numeric:tabular-nums; }
+        .cw-act__ic{ width:1.7rem; height:1.7rem; border-radius:999px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .cw-act__ic--success{ background:#dcfce7; color:#16a34a;} .dark .cw-act__ic--success{ background:rgba(34,197,94,.18);}
+        .cw-act__ic--danger { background:#fee2e2; color:#dc2626;} .dark .cw-act__ic--danger { background:rgba(239,68,68,.18);}
+        .cw-act__ic--warning{ background:#ffedd5; color:#c2410c;} .dark .cw-act__ic--warning{ background:rgba(251,146,60,.18);}
+        .cw-act__ic--info   { background:#dbeafe; color:#2563eb;} .dark .cw-act__ic--info   { background:rgba(59,130,246,.18);}
+        .cw-act__ic--gray   { background:#f1f5f9; color:#64748b;} .dark .cw-act__ic--gray   { background:rgba(255,255,255,.07);}
+        .cw-act__ds{ font-size:0.805rem; font-weight:600; color:var(--t); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .cw-act__rel{ font-size:0.7rem; color:var(--m2); white-space:nowrap; }
+        .cw-act__toggle{ width:100%; padding:.55rem; font-size:0.74rem; font-weight:600; color:var(--accent); background:var(--soft); border:0; border-top:1px solid var(--d); cursor:pointer; transition:background .15s; }
+        .cw-act__toggle:hover{ background:rgba(99,102,241,.06); }
         .cw-modal__empty{ font-size:0.825rem; color:var(--m2); padding:.4rem 0; }
     </style>
 
@@ -449,8 +460,12 @@
         @foreach ($allApprovers as $ap)
             @php $apActs = $activities->where('causer_id', $ap->user_id)->values(); @endphp
             <div class="cw-modal" x-show="approver === {{ $ap->id }}" x-cloak style="display:none;">
-                <div class="cw-modal__bg" @click="approver = null"></div>
-                <div class="cw-modal__card" @click.stop>
+                <div class="cw-modal__bg" @click="approver = null"
+                     x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-120" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+                <div class="cw-modal__card" @click.stop
+                     x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95 translate-y-2" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-120" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
                     <div class="cw-modal__hd">
                         <img src="{{ $this->approverAvatar($ap) }}" alt="">
                         <div>
@@ -487,20 +502,30 @@
                             </div>
                         @endif
 
-                        <div class="cw-sub">{{ __('app.label.approver_activity') }}</div>
+                        <div class="cw-sub">
+                            <span>{{ __('app.label.approver_activity') }}</span>
+                            @if ($apActs->isNotEmpty())<span class="cw-sub__c">{{ $apActs->count() }}</span>@endif
+                        </div>
                         @if ($apActs->isEmpty())
                             <div class="cw-modal__empty">{{ __('app.label.no_actions_yet') }}</div>
                         @else
-                            @foreach ($apActs as $a)
-                                @php $v = $this->activityVisual($a->event ?? ''); @endphp
-                                <div class="cw-mini">
-                                    <span class="cw-mini__ic cw-tl__ic--{{ $v['color'] }}">{!! $ic($v['icon'], 13) !!}</span>
-                                    <div>
-                                        <div class="cw-mini__ds">{{ $a->description ?: $a->event }}</div>
-                                        <div class="cw-mini__mt">{{ $a->created_at?->format('d.m.Y H:i') }} · {{ $a->created_at?->diffForHumans() }}</div>
+                            <div class="cw-act" x-data="{ all: false }">
+                                @foreach ($apActs as $a)
+                                    @php $v = $this->activityVisual($a->event ?? ''); @endphp
+                                    <div class="cw-act__row" @if ($loop->index >= 4) x-show="all" x-cloak @endif>
+                                        <span class="cw-act__time">{{ $a->created_at?->format('H:i') }}</span>
+                                        <span class="cw-act__ic cw-act__ic--{{ $v['color'] }}">{!! $ic($v['icon'], 13) !!}</span>
+                                        <span class="cw-act__ds" title="{{ $a->description ?: $a->event }}">{{ $a->description ?: $a->event }}</span>
+                                        <span class="cw-act__rel" title="{{ $a->created_at?->format('d.m.Y H:i') }}">{{ $a->created_at?->diffForHumans() }}</span>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                                @if ($apActs->count() > 4)
+                                    <button type="button" class="cw-act__toggle" @click="all = !all">
+                                        <span x-show="!all">{{ __('app.label.show_all') }} ({{ $apActs->count() - 4 }})</span>
+                                        <span x-show="all" x-cloak>{{ __('app.label.collapse') }}</span>
+                                    </button>
+                                @endif
+                            </div>
                         @endif
                     </div>
                 </div>

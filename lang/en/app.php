@@ -178,6 +178,8 @@ return [
         'overdue' => 'Overdue',
         'overview' => 'Overview',
         'history' => 'History',
+        'show_all' => 'Show all',
+        'collapse' => 'Collapse',
         'workflow_events' => 'Workflow',
         'edit_events' => 'Edits',
         'load_more' => 'Show more',
