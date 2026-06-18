@@ -295,6 +295,7 @@ return [
         'approver_inactive' => 'Skipped — approver account is inactive.',
         'invalidated_on_edit' => 'Cancelled — contract was edited.',
         'edit_invalidates_approvals' => 'Saving changes will cancel all current approvals. The contract will return to Draft and you will need to send it for approval again.',
+        'approvals_cancelled_after_edit' => 'Previous approvals were cancelled because the contract was edited. The chain below was pre-filled from your profile defaults — adjust if needed and send for approval again.',
         'contract_submitted' => 'Contract sent for approval',
         'contract_approved' => 'Contract approved',
         'contract_rejected' => 'Contract rejected',

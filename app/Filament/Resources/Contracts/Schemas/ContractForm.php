@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Contracts\Schemas;
 use App\Filament\Resources\Contacts\Schemas\ContactForm;
 use App\Models\Contact;
 use App\Models\Contract;
+use App\Models\ContractApprover;
 use App\Models\ContractTemplate;
 use App\Models\Currency;
 use App\Models\Department;
@@ -38,6 +39,21 @@ class ContractForm
                         TextEntry::make('edit_warning')
                             ->hiddenLabel()
                             ->state(fn (): string => '⚠️ '.__('app.message.edit_invalidates_approvals'))
+                            ->color('warning')
+                            ->columnSpanFull(),
+                    ]),
+
+                // Post-invalidation notice — shown right after the edit hook
+                // demoted the contract back to DRAFT and cancelled the prior chain.
+                Section::make()
+                    ->hiddenLabel()
+                    ->visible(fn (?Contract $record): bool => $record !== null
+                        && $record->status === Contract::STATUS_DRAFT
+                        && $record->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->exists())
+                    ->schema([
+                        TextEntry::make('invalidated_notice')
+                            ->hiddenLabel()
+                            ->state(fn (): string => '↩️ '.__('app.message.approvals_cancelled_after_edit'))
                             ->color('warning')
                             ->columnSpanFull(),
                     ]),
@@ -204,7 +220,7 @@ class ContractForm
      *
      * @return array<int, int>
      */
-    protected static function defaultApproverIds(): array
+    public static function defaultApproverIds(): array
     {
         $user = Auth::user();
 
