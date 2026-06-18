@@ -24,29 +24,29 @@ class ListContracts extends ListRecords
     {
         $awaitingCount = Contract::query()->awaitingApprovalBy()->count();
 
-        $tabs = [
-            'my_contracts' => Tab::make(__('app.tab.my_contracts'))
-                ->icon('heroicon-o-user')
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('responsible_id', auth()->id())),
+        $tabs = [];
 
-            'awaiting_me' => Tab::make(__('app.tab.awaiting_me'))
-                ->icon('heroicon-o-inbox-arrow-down')
-                ->modifyQueryUsing(fn (Builder $query) => $query->awaitingApprovalBy())
-                ->badge($awaitingCount > 0 ? $awaitingCount : null)
-                ->badgeColor('warning'),
-
-            'involving_me' => Tab::make(__('app.tab.involving_me'))
-                ->icon('heroicon-o-users')
-                ->modifyQueryUsing(fn (Builder $query) => $query->involvingApprover()),
-        ];
-
-        // "All" only makes sense for oversight roles; everyone else is already
-        // limited to their own contracts by the resource query, so the tab
-        // would just duplicate "My contracts".
+        // "All" only makes sense for oversight roles (everyone else is already
+        // limited to their own contracts by the resource query). When present
+        // it leads — it's their primary, broadest view and where they land.
         if (auth()->user()?->hasAnyRole(Contract::OVERSIGHT_ROLES)) {
             $tabs['all'] = Tab::make(__('app.tab.all_contracts'))
                 ->icon('heroicon-o-rectangle-stack');
         }
+
+        $tabs['my_contracts'] = Tab::make(__('app.tab.my_contracts'))
+            ->icon('heroicon-o-user')
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('responsible_id', auth()->id()));
+
+        $tabs['awaiting_me'] = Tab::make(__('app.tab.awaiting_me'))
+            ->icon('heroicon-o-inbox-arrow-down')
+            ->modifyQueryUsing(fn (Builder $query) => $query->awaitingApprovalBy())
+            ->badge($awaitingCount > 0 ? $awaitingCount : null)
+            ->badgeColor('warning');
+
+        $tabs['involving_me'] = Tab::make(__('app.tab.involving_me'))
+            ->icon('heroicon-o-users')
+            ->modifyQueryUsing(fn (Builder $query) => $query->involvingApprover());
 
         return $tabs;
     }

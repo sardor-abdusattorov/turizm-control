@@ -63,8 +63,9 @@ it('hides the All tab from a manager but shows it to oversight roles', function 
         ->not->toHaveKey('all');
 
     actingAs(contractUser('director'));
-    expect(Livewire::test(ListContracts::class)->instance()->getTabs())
-        ->toHaveKey('all');
+    $tabs = Livewire::test(ListContracts::class)->instance()->getTabs();
+    expect($tabs)->toHaveKey('all')
+        ->and(array_key_first($tabs))->toBe('all'); // All leads for oversight
 });
 
 it('defaults an oversight user with no pending approvals to the All tab', function () {
