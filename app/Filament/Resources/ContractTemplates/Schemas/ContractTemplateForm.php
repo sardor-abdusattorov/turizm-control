@@ -114,20 +114,17 @@ class ContractTemplateForm
             '{{contact.bank_account}}', '{{contact.bank_name}}', '{{contact.mfo}}',
         ];
 
+        // Inline styles only — Filament strips <style> from TextEntry HTML state.
+        // Use a semi-transparent neutral that reads on both light and dark themes.
+        $chipStyle = 'font-size:.82rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;'
+            .'padding:.18rem .5rem;border-radius:.35rem;'
+            .'background:rgba(127,127,127,.14);color:currentColor;';
+
         $tags = array_map(
-            fn (string $item): string => '<code class="ct-ph">'.e($item).'</code>',
+            fn (string $item): string => '<code style="'.$chipStyle.'">'.e($item).'</code>',
             $items,
         );
 
-        $style = <<<'CSS'
-<style>
-    .ct-ph-list{ display:flex; flex-wrap:wrap; gap:.4rem; }
-    .ct-ph{ font-size:.825rem; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; padding:.18rem .5rem; border-radius:.35rem;
-        background:#f3f4f6; color:#374151; }
-    .dark .ct-ph{ background:rgba(255,255,255,.08); color:#e5e7eb; }
-</style>
-CSS;
-
-        return $style.'<div class="ct-ph-list">'.implode('', $tags).'</div>';
+        return '<div style="display:flex;flex-wrap:wrap;gap:.4rem;">'.implode('', $tags).'</div>';
     }
 }

@@ -259,26 +259,25 @@ class ContractForm
     {
         $ids = array_values(array_filter(array_map('intval', (array) $ids)));
 
-        $style = <<<'CSS'
-<style>
-    .cf-chain{ display:flex; flex-direction:column; gap:.4rem; margin-top:.25rem;
-        --s:#fff; --d:#e5e7eb; --t:#111827; --m:#6b7280; --num-bg:#eef2ff; --num-fg:#4338ca; }
-    .dark .cf-chain{ --s:rgba(255,255,255,.04); --d:rgba(255,255,255,.08); --t:#f4f4f5; --m:#a1a1aa; --num-bg:rgba(99,102,241,.18); --num-fg:#a5b4fc; }
-    .cf-chain__empty{ margin:0; font-size:.875rem; color:var(--m); }
-    .cf-chain__step{ display:flex; align-items:center; gap:.65rem; padding:.6rem .8rem; border:1px solid var(--d); border-radius:.65rem; background:var(--s); }
-    .cf-chain__n{ flex-shrink:0; width:1.55rem; height:1.55rem; display:flex; align-items:center; justify-content:center; border-radius:50%; background:var(--num-bg); color:var(--num-fg); font-size:.75rem; font-weight:700; }
-    .cf-chain__av{ width:2rem; height:2rem; border-radius:50%; object-fit:cover; flex-shrink:0; }
-    .cf-chain__id{ min-width:0; }
-    .cf-chain__nm{ display:block; font-size:.92rem; font-weight:600; color:var(--t); }
-    .cf-chain__mt{ display:block; font-size:.82rem; color:var(--m); margin-top:.1rem; }
-</style>
-CSS;
-
         if ($ids === []) {
-            return $style.'<p class="cf-chain__empty">'.e(__('app.helper.approval_chain_empty')).'</p>';
+            return '<p style="margin:0;color:#9ca3af;font-size:.875rem;">'.e(__('app.helper.approval_chain_empty')).'</p>';
         }
 
         $users = User::with(['department', 'position'])->whereIn('id', $ids)->get()->keyBy('id');
+
+        // Inline styles only — Filament strips <style> from TextEntry HTML state,
+        // so a <style> block won't apply here. Use semi-transparent neutrals that
+        // read against both light and dark surfaces.
+        $rowStyle = 'display:flex;align-items:center;gap:.7rem;padding:.6rem .8rem;'
+            .'border:1px solid rgba(127,127,127,.22);border-radius:.65rem;'
+            .'background:rgba(127,127,127,.05);';
+        $numStyle = 'flex-shrink:0;width:1.55rem;height:1.55rem;display:flex;align-items:center;'
+            .'justify-content:center;border-radius:50%;background:rgba(99,102,241,.18);'
+            .'color:#6366f1;font-size:.78rem;font-weight:700;';
+        $avStyle = 'width:2rem;height:2rem;border-radius:50%;object-fit:cover;flex-shrink:0;';
+        $idStyle = 'min-width:0;display:flex;flex-direction:column;gap:.12rem;';
+        $nmStyle = 'font-size:.92rem;font-weight:600;color:currentColor;';
+        $mtStyle = 'font-size:.82rem;color:currentColor;opacity:.65;';
 
         $rows = '';
         $step = 1;
@@ -295,18 +294,18 @@ CSS;
 
             $meta = trim(($user->department?->name ?? '').($user->position?->name ? ' · '.$user->position->name : ''), ' ·');
 
-            $rows .= '<div class="cf-chain__step">'
-                .'<span class="cf-chain__n">'.$step.'</span>'
-                .'<img class="cf-chain__av" src="'.e($avatar).'" alt="">'
-                .'<span class="cf-chain__id">'
-                .'<span class="cf-chain__nm">'.e($user->name).'</span>'
-                .'<span class="cf-chain__mt">'.e($meta).'</span>'
+            $rows .= '<div style="'.$rowStyle.'">'
+                .'<span style="'.$numStyle.'">'.$step.'</span>'
+                .'<img src="'.e($avatar).'" alt="" style="'.$avStyle.'">'
+                .'<span style="'.$idStyle.'">'
+                .'<span style="'.$nmStyle.'">'.e($user->name).'</span>'
+                .'<span style="'.$mtStyle.'">'.e($meta).'</span>'
                 .'</span>'
                 .'</div>';
 
             $step++;
         }
 
-        return $style.'<div class="cf-chain">'.$rows.'</div>';
+        return '<div style="display:flex;flex-direction:column;gap:.45rem;margin-top:.25rem;">'.$rows.'</div>';
     }
 }
