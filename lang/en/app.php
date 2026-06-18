@@ -175,6 +175,7 @@ return [
         'no_actions_yet' => 'No actions recorded yet.',
         'today' => 'Today',
         'yesterday' => 'Yesterday',
+        'overdue' => 'Overdue',
 
         // Currencies
         'currency_single' => 'Currency',
@@ -269,6 +270,12 @@ return [
     ],
     'message' => [
         'loading_editor' => 'Loading editor…',
+        'hero_draft' => 'Draft — not submitted for approval yet.',
+        'hero_in_review' => 'Awaiting approval from :name.',
+        'hero_in_review_generic' => 'Moving through the approval chain.',
+        'hero_approved' => 'Fully approved on :date.',
+        'hero_approved_generic' => 'Fully approved.',
+        'hero_rejected' => 'Rejected during review.',
         'profile_updated' => 'Profile updated successfully',
         'password_updated' => 'Password updated successfully',
         'confirm_logout_other_sessions' => 'Please enter your password to confirm you would like to log out of your other browser sessions across all of your devices.',

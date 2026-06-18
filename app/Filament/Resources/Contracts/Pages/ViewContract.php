@@ -10,6 +10,7 @@ use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
@@ -143,6 +144,46 @@ class ViewContract extends ViewRecord
     public function isCurrentApprover(ContractApprover $approver): bool
     {
         return $this->record->currentApprover()?->id === $approver->id;
+    }
+
+    /**
+     * Headline context for the hero: a status-aware one-liner plus the SLA
+     * state of the step currently in review.
+     *
+     * @return array{message: string, overdue: bool, due: ?Carbon}
+     */
+    public function heroContext(): array
+    {
+        $contract = $this->record;
+        $current = $contract->currentApprover();
+
+        return match ($contract->status) {
+            Contract::STATUS_DRAFT => [
+                'message' => __('app.message.hero_draft'),
+                'overdue' => false,
+                'due' => null,
+            ],
+            Contract::STATUS_IN_REVIEW => [
+                'message' => $current?->user
+                    ? __('app.message.hero_in_review', ['name' => $current->user->name])
+                    : __('app.message.hero_in_review_generic'),
+                'overdue' => (bool) $current?->isOverdue(),
+                'due' => $current?->due_at,
+            ],
+            Contract::STATUS_APPROVED => [
+                'message' => $contract->signed_at
+                    ? __('app.message.hero_approved', ['date' => $contract->signed_at->format('d.m.Y')])
+                    : __('app.message.hero_approved_generic'),
+                'overdue' => false,
+                'due' => null,
+            ],
+            Contract::STATUS_REJECTED => [
+                'message' => __('app.message.hero_rejected'),
+                'overdue' => false,
+                'due' => null,
+            ],
+            default => ['message' => '', 'overdue' => false, 'due' => null],
+        };
     }
 
     /**
