@@ -7,7 +7,6 @@ use App\Models\ContractTemplate;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class OnlyOfficeService
@@ -300,51 +299,12 @@ class OnlyOfficeService
             ],
         ];
 
-        if ($logo = $this->editorLogo()) {
-            $customization['logo'] = $logo;
-        }
-
+        // NB: we deliberately do NOT set `customization.logo` here. Community
+        // Edition ignores it for rendering but still blanks the header logo
+        // element via JS on init, which wiped the logo we mount over the
+        // editor's own asset file (see docker-compose `header-logo*.svg`).
+        // Branding is handled entirely by that on-disk file override.
         return $customization;
-    }
-
-    /**
-     * Brand the editor header with the organization logo from Settings, or
-     * fall back to the application's own brand logo (the same one the panel
-     * uses). The URL is browser-reachable so it loads inside the editor frame.
-     *
-     * Note: full white-label (replacing the "about" logo) needs an OnlyOffice
-     * commercial license; the header logo swap below works on Community too.
-     *
-     * @return array{image: string, imageDark: string, url: string}|null
-     */
-    private function editorLogo(): ?array
-    {
-        $url = $this->logoUrl();
-
-        if ($url === null) {
-            return null;
-        }
-
-        return [
-            'image' => $url,
-            'imageDark' => $url,
-            'url' => $this->trim(config('app.url')),
-        ];
-    }
-
-    private function logoUrl(): ?string
-    {
-        $path = settings('organization.logo_path');
-
-        if (is_string($path) && $path !== '') {
-            return Storage::disk('public')->url($path);
-        }
-
-        if (file_exists(public_path('images/logo.png'))) {
-            return asset('images/logo.png');
-        }
-
-        return null;
     }
 
     private function permissionSet(

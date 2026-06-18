@@ -3,7 +3,6 @@
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\ContractTemplate;
-use App\Models\Settings;
 use App\Models\User;
 use App\Services\OnlyOffice\OnlyOfficeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -97,33 +96,18 @@ it('always lets a super admin export, even on a draft', function () {
         ->and($permissions['print'])->toBeTrue();
 });
 
-it('brands the editor with the organization logo when one is configured', function () {
-    Settings::create(['key' => 'organization.logo_path', 'value' => 'organization/logo.png']);
-    Cache::flush();
-
+it('does not send a JWT logo so it cannot blank the mounted editor branding', function () {
     $responsible = User::factory()->create();
     $contract = Contract::factory()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);
 
+    // Branding is applied by overriding the editor's own logo asset on disk
+    // (docker-compose), not via customization.logo — which CE blanks on init.
     $customization = app(OnlyOfficeService::class)->editorConfig($contract, $responsible)['editorConfig']['customization'];
 
-    expect($customization)->toHaveKey('logo')
-        ->and($customization['logo']['image'])->toContain('organization/logo.png');
-});
-
-it('falls back to the application brand logo when no organization logo is set', function () {
-    $responsible = User::factory()->create();
-    $contract = Contract::factory()->create([
-        'responsible_id' => $responsible->id,
-        'status' => Contract::STATUS_DRAFT,
-    ]);
-
-    $customization = app(OnlyOfficeService::class)->editorConfig($contract, $responsible)['editorConfig']['customization'];
-
-    expect($customization)->toHaveKey('logo')
-        ->and($customization['logo']['image'])->toContain('images/logo.png');
+    expect($customization)->not->toHaveKey('logo');
 });
 
 it('trims the editor chrome down to the document', function () {
