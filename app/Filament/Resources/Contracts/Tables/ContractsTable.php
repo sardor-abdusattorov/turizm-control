@@ -61,8 +61,8 @@ class ContractsTable
                     ->label(__('app.label.approvers'))
                     ->view('filament.resources.contracts.tables.approvers-column')
                     ->disableClick()
-                    ->extraHeaderAttributes(['style' => 'min-width:17rem;'])
-                    ->extraAttributes(['style' => 'min-width:17rem;']),
+                    ->extraHeaderAttributes(['style' => 'min-width:11rem;'])
+                    ->extraAttributes(['style' => 'min-width:11rem;']),
 
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))
@@ -95,30 +95,16 @@ class ContractsTable
             ])
             ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))
             ->recordActions([
-                Action::make('approverTimeline')
+                Action::make('contractFlow')
                     ->hiddenLabel()
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('app.action.close'))
                     ->modalWidth('lg')
-                    ->modalHeading(function (Contract $record, Action $action): string {
-                        $approverId = $action->getArguments()['approver'] ?? null;
-                        $approver = $approverId ? $record->approvers()->find($approverId) : null;
-
-                        return $approver?->user?->name ?? __('app.label.approver_details');
-                    })
-                    ->modalContent(function (Contract $record, Action $action) {
-                        $approverId = $action->getArguments()['approver'] ?? null;
-                        $approver = $approverId ? $record->approvers()->find($approverId) : null;
-
-                        if (! $approver) {
-                            return null;
-                        }
-
-                        return view('filament.resources.contracts.tables.approver-timeline-modal', [
-                            'contract' => $record,
-                            'approver' => $approver,
-                        ]);
-                    })
+                    ->modalHeading(fn (Contract $record): string => trim(($record->number ? $record->number.' · ' : '').($record->title ?? '')) ?: __('app.label.approval_chain'))
+                    ->modalContent(fn (Contract $record) => view(
+                        'filament.resources.contracts.tables.approval-flow-modal',
+                        ['contract' => $record],
+                    ))
                     ->extraAttributes(['style' => 'display:none;']),
 
                 ActionGroup::make([

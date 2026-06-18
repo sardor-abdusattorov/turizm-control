@@ -24,13 +24,13 @@ function listOversight(): User
     return $user;
 }
 
-it('renders an Approvers column with a button per approver that mounts the timeline action', function () {
+it('renders the Approvers column with avatars that mount the contract flow action', function () {
     listOversight();
 
     $approver = User::factory()->create(['name' => 'Alisher Lawyer', 'status' => User::STATUS_ACTIVE]);
 
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
-    $row = ContractApprover::factory()->create([
+    ContractApprover::factory()->create([
         'contract_id' => $contract->id,
         'user_id' => $approver->id,
         'order' => 1,
@@ -40,44 +40,51 @@ it('renders an Approvers column with a button per approver that mounts the timel
     $html = Livewire::test(ListContracts::class)->html();
 
     expect($html)
-        ->toContain('Alisher Lawyer')
-        ->toContain("mountTableAction('approverTimeline'")
-        ->toContain("approver: {$row->id}");
+        ->toContain('Alisher Lawyer')                       // name in avatar title/alt
+        ->toContain("mountTableAction('contractFlow'");     // whole cell opens the flow
 });
 
-it('renders the approver timeline modal blade with the approver, status and activity', function () {
+it('renders the approval flow modal as a stepper of the active chain', function () {
     listOversight();
 
-    $approver = User::factory()->create(['name' => 'Madina Accountant']);
+    $first = User::factory()->create(['name' => 'Madina Accountant']);
+    $second = User::factory()->create(['name' => 'Olim Reviewer']);
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
-    $row = ContractApprover::factory()->create([
+
+    ContractApprover::factory()->create([
         'contract_id' => $contract->id,
-        'user_id' => $approver->id,
+        'user_id' => $first->id,
         'order' => 1,
         'status' => ContractApprover::STATUS_APPROVED,
         'acted_at' => now(),
         'comment' => 'Looks fine to me',
     ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $second->id,
+        'order' => 2,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
 
-    $html = view('filament.resources.contracts.tables.approver-timeline-modal', [
+    $html = view('filament.resources.contracts.tables.approval-flow-modal', [
         'contract' => $contract->fresh(),
-        'approver' => $row->fresh(),
     ])->render();
 
     expect($html)
         ->toContain('Madina Accountant')
+        ->toContain('Olim Reviewer')
         ->toContain('Looks fine to me')
         ->toContain('Approved')
-        ->toContain('#1');
+        ->toContain('Reviewing');
 });
 
-it('shows every approval record a person holds across attempts in the modal', function () {
+it('lists invalidated attempts under previous attempts with comments preserved', function () {
     listOversight();
 
     $approver = User::factory()->create(['name' => 'Olim Repeated']);
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
 
-    // First attempt: approved, then invalidated by an edit (comment preserved).
+    // First attempt: approved then invalidated by an edit (comment preserved).
     ContractApprover::factory()->create([
         'contract_id' => $contract->id,
         'user_id' => $approver->id,
@@ -89,21 +96,20 @@ it('shows every approval record a person holds across attempts in the modal', fu
     ]);
 
     // Second attempt: currently reviewing again.
-    $current = ContractApprover::factory()->create([
+    ContractApprover::factory()->create([
         'contract_id' => $contract->id,
         'user_id' => $approver->id,
         'order' => 1,
         'status' => ContractApprover::STATUS_PENDING,
     ]);
 
-    $html = view('filament.resources.contracts.tables.approver-timeline-modal', [
+    $html = view('filament.resources.contracts.tables.approval-flow-modal', [
         'contract' => $contract->fresh(),
-        'approver' => $current->fresh(),
     ])->render();
 
     expect($html)
         ->toContain('Olim Repeated')
-        ->toContain('Approved on first pass')          // original comment kept
-        ->toContain('Cancelled — contract was edited.') // system note kept separately
-        ->toContain('2 attempts');                      // both records listed
+        ->toContain('Approved on first pass')            // historical comment kept
+        ->toContain('Cancelled — contract was edited.')  // system note kept
+        ->toContain(__('app.label.previous_attempts').' (1)'); // collapsible history
 });
