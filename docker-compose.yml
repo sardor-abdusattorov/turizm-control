@@ -93,6 +93,11 @@ services:
       - onlyoffice_log:/var/log/onlyoffice
       - onlyoffice_cache:/var/lib/onlyoffice
       - onlyoffice_db:/var/lib/postgresql
+      # Brand the editor header with our logo. Community Edition silently
+      # ignores the JWT `customization.logo`, so we override the shared logo
+      # asset on disk instead (common/ is used by every editor).
+      - ./docker/onlyoffice/header-logo.svg:/var/www/onlyoffice/documentserver/web-apps/common/main/resources/img/header/header-logo_s.svg:ro
+      - ./docker/onlyoffice/header-logo.svg:/var/www/onlyoffice/documentserver/web-apps/common/main/resources/img/header/header-logo.svg:ro
     networks:
       - app
     restart: unless-stopped
