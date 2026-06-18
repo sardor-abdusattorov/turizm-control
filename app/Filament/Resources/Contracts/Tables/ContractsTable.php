@@ -99,7 +99,12 @@ class ContractsTable
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('app.action.close'))
                     ->modalWidth('lg')
-                    ->modalHeading(__('app.label.approver_details'))
+                    ->modalHeading(function (Contract $record, Action $action): string {
+                        $approverId = $action->getArguments()['approver'] ?? null;
+                        $approver = $approverId ? $record->approvers()->find($approverId) : null;
+
+                        return $approver?->user?->name ?? __('app.label.approver_details');
+                    })
                     ->modalContent(function (Contract $record, Action $action) {
                         $approverId = $action->getArguments()['approver'] ?? null;
                         $approver = $approverId ? $record->approvers()->find($approverId) : null;

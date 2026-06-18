@@ -70,3 +70,40 @@ it('renders the approver timeline modal blade with the approver, status and acti
         ->toContain('Approved')
         ->toContain('#1');
 });
+
+it('shows every approval record a person holds across attempts in the modal', function () {
+    listOversight();
+
+    $approver = User::factory()->create(['name' => 'Olim Repeated']);
+    $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
+
+    // First attempt: approved, then invalidated by an edit (comment preserved).
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $approver->id,
+        'order' => 1,
+        'status' => ContractApprover::STATUS_INVALIDATED,
+        'comment' => 'Approved on first pass',
+        'system_comment' => 'Cancelled — contract was edited.',
+        'acted_at' => now()->subDays(2),
+    ]);
+
+    // Second attempt: currently reviewing again.
+    $current = ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $approver->id,
+        'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+
+    $html = view('filament.resources.contracts.tables.approver-timeline-modal', [
+        'contract' => $contract->fresh(),
+        'approver' => $current->fresh(),
+    ])->render();
+
+    expect($html)
+        ->toContain('Olim Repeated')
+        ->toContain('Approved on first pass')          // original comment kept
+        ->toContain('Cancelled — contract was edited.') // system note kept separately
+        ->toContain('2 attempts');                      // both records listed
+});

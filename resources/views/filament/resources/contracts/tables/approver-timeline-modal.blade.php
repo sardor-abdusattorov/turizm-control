@@ -4,18 +4,30 @@
 
     /** @var \App\Models\Contract $contract */
     /** @var \App\Models\ContractApprover $approver */
-    $statusName = ContractApprover::getStatuses()[$approver->status] ?? $approver->status;
+    $user = $approver->user;
+
+    // Every approval record this person holds on this contract — across all
+    // submit/edit cycles (invalidated attempts included), newest first.
+    $records = $contract->approvers()
+        ->where('user_id', $approver->user_id)
+        ->reorder('id', 'desc')
+        ->get();
 
     $colorFor = function (string $status): array {
         return match ($status) {
-            ContractApprover::STATUS_APPROVED => ['bg' => 'rgba(34,197,94,.12)', 'fg' => '#16a34a', 'ring' => '#22c55e'],
-            ContractApprover::STATUS_REJECTED => ['bg' => 'rgba(239,68,68,.12)', 'fg' => '#dc2626', 'ring' => '#ef4444'],
-            ContractApprover::STATUS_RETURNED => ['bg' => 'rgba(59,130,246,.12)', 'fg' => '#2563eb', 'ring' => '#3b82f6'],
-            ContractApprover::STATUS_PENDING => ['bg' => 'rgba(251,146,60,.14)', 'fg' => '#c2410c', 'ring' => '#fb923c'],
-            default => ['bg' => 'rgba(127,127,127,.10)', 'fg' => 'currentColor', 'ring' => '#94a3b8'],
+            ContractApprover::STATUS_APPROVED => ['bg' => 'rgba(34,197,94,.12)', 'fg' => '#15803d', 'dot' => '#22c55e'],
+            ContractApprover::STATUS_REJECTED => ['bg' => 'rgba(239,68,68,.12)', 'fg' => '#b91c1c', 'dot' => '#ef4444'],
+            ContractApprover::STATUS_RETURNED => ['bg' => 'rgba(59,130,246,.12)', 'fg' => '#1d4ed8', 'dot' => '#3b82f6'],
+            ContractApprover::STATUS_PENDING => ['bg' => 'rgba(251,146,60,.14)', 'fg' => '#c2410c', 'dot' => '#fb923c'],
+            ContractApprover::STATUS_QUEUED => ['bg' => 'rgba(99,102,241,.10)', 'fg' => '#4f46e5', 'dot' => '#818cf8'],
+            default => ['bg' => 'rgba(127,127,127,.10)', 'fg' => 'currentColor', 'dot' => '#94a3b8'],
         };
     };
-    $c = $colorFor($approver->status);
+
+    $hc = $colorFor($approver->status);
+
+    $avatar = $user?->getFilamentAvatarUrl()
+        ?? 'https://ui-avatars.com/api/?name='.urlencode($user?->name ?? '?').'&color=7F9CF5&background=EBF4FF';
 
     $activities = Activity::query()
         ->where('subject_type', $contract->getMorphClass())
@@ -24,9 +36,6 @@
         ->latest()
         ->limit(20)
         ->get();
-
-    $avatar = $approver->user?->getFilamentAvatarUrl()
-        ?? 'https://ui-avatars.com/api/?name='.urlencode($approver->user?->name ?? '?').'&color=7F9CF5&background=EBF4FF';
 
     $iconFor = fn (string $event) => match ($event) {
         'Contract Submitted' => 'heroicon-o-arrow-up-tray',
@@ -38,74 +47,80 @@
     };
 @endphp
 
-<div style="display:flex;flex-direction:column;gap:1rem;">
-    {{-- Header --}}
+<div style="display:flex;flex-direction:column;gap:1.1rem;">
+    {{-- Header: the person --}}
     <div style="display:flex;align-items:center;gap:.85rem;padding-bottom:1rem;border-bottom:1px solid rgba(127,127,127,.18);">
-        <img src="{{ $avatar }}" alt="" style="width:2.6rem;height:2.6rem;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px {{ $c['ring'] }};">
+        <img src="{{ $avatar }}" alt="" style="width:2.7rem;height:2.7rem;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px {{ $hc['dot'] }};">
         <div style="min-width:0;flex:1;">
-            <div style="font-size:1rem;font-weight:700;color:currentColor;">{{ $approver->user?->name ?? '—' }}</div>
-            <div style="font-size:.8rem;color:currentColor;opacity:.65;">
-                {{ $approver->user?->department?->name }}{{ $approver->user?->position?->name ? ' · '.$approver->user->position->name : '' }}
+            <div style="font-size:1.02rem;font-weight:700;color:currentColor;line-height:1.25;">{{ $user?->name ?? '—' }}</div>
+            <div style="font-size:.82rem;color:currentColor;opacity:.65;">
+                {{ $user?->department?->name }}{{ $user?->position?->name ? ' · '.$user->position->name : '' }}
             </div>
         </div>
-        <span style="display:inline-flex;align-items:center;gap:.35rem;padding:.22rem .6rem;border-radius:999px;background:{{ $c['bg'] }};color:{{ $c['fg'] }};border:1px solid {{ $c['ring'] }};font-size:.74rem;font-weight:650;">
-            <span style="width:.45rem;height:.45rem;border-radius:50%;background:{{ $c['ring'] }};"></span>
-            {{ $statusName }}
-        </span>
-    </div>
-
-    {{-- Key facts --}}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem 1.25rem;font-size:.85rem;">
-        <div style="display:flex;justify-content:space-between;gap:.85rem;">
-            <span style="color:currentColor;opacity:.65;">{{ __('app.label.order_position') }}</span>
-            <span style="font-weight:600;">#{{ $approver->order }}</span>
-        </div>
-        @if ($approver->due_at)
-            <div style="display:flex;justify-content:space-between;gap:.85rem;">
-                <span style="color:currentColor;opacity:.65;">{{ __('app.label.deadline') }}</span>
-                <span style="font-weight:600;{{ $approver->isOverdue() ? 'color:#dc2626;' : '' }}">{{ $approver->due_at->format('d.m.Y H:i') }}</span>
-            </div>
-        @endif
-        @if ($approver->acted_at)
-            <div style="display:flex;justify-content:space-between;gap:.85rem;">
-                <span style="color:currentColor;opacity:.65;">{{ __('app.label.acted_at') }}</span>
-                <span style="font-weight:600;">{{ $approver->acted_at->format('d.m.Y H:i') }}</span>
-            </div>
+        @if ($records->count() > 1)
+            <span style="font-size:.74rem;font-weight:600;color:currentColor;opacity:.55;padding:.2rem .5rem;border-radius:.4rem;background:rgba(127,127,127,.1);white-space:nowrap;">
+                {{ trans_choice('app.label.attempts_count', $records->count(), ['count' => $records->count()]) }}
+            </span>
         @endif
     </div>
 
-    {{-- Approver's own comment --}}
-    @if ($approver->comment)
-        <div style="padding:.7rem .9rem;border-radius:.6rem;background:rgba(127,127,127,.08);border:1px solid rgba(127,127,127,.18);font-size:.85rem;">
-            <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:currentColor;opacity:.55;margin-bottom:.3rem;">{{ __('app.label.comment') }}</div>
-            <div>{{ $approver->comment }}</div>
-        </div>
-    @endif
-
-    {{-- System note (e.g. "Cancelled — contract was edited") --}}
-    @if ($approver->system_comment)
-        <div style="padding:.7rem .9rem;border-radius:.6rem;background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.25);font-size:.85rem;">
-            <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:#c2410c;margin-bottom:.3rem;font-weight:650;">{{ __('app.label.system_note') }}</div>
-            <div>{{ $approver->system_comment }}</div>
-        </div>
-    @endif
-
-    {{-- Activity timeline --}}
+    {{-- All approval records for this person --}}
     <div>
-        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:currentColor;opacity:.55;margin-bottom:.6rem;">
-            {{ __('app.label.approver_activity') }}
-            @if ($activities->isNotEmpty())
-                <span style="font-weight:700;color:currentColor;opacity:.75;">· {{ $activities->count() }}</span>
-            @endif
+        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:currentColor;opacity:.55;margin-bottom:.65rem;">
+            {{ __('app.label.approval_records') }}
         </div>
 
-        @if ($activities->isEmpty())
-            <div style="font-size:.82rem;color:currentColor;opacity:.55;padding:.5rem 0;">{{ __('app.label.no_actions_yet') }}</div>
-        @else
+        <div style="display:flex;flex-direction:column;gap:.55rem;">
+            @foreach ($records as $rec)
+                @php $c = $colorFor($rec->status); @endphp
+                <div style="border:1px solid rgba(127,127,127,.18);border-radius:.7rem;padding:.7rem .85rem;{{ $rec->is($approver) ? 'box-shadow:0 0 0 1.5px '.$c['dot'].' inset;' : '' }}">
+                    {{-- Top row: status + dates --}}
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;">
+                        <span style="display:inline-flex;align-items:center;gap:.4rem;padding:.22rem .6rem;border-radius:999px;background:{{ $c['bg'] }};color:{{ $c['fg'] }};font-size:.78rem;font-weight:650;white-space:nowrap;">
+                            <span style="width:.45rem;height:.45rem;border-radius:50%;background:{{ $c['dot'] }};"></span>
+                            {{ ContractApprover::getStatuses()[$rec->status] ?? $rec->status }}
+                        </span>
+                        <span style="font-size:.74rem;color:currentColor;opacity:.6;white-space:nowrap;">
+                            #{{ $rec->order }}
+                            @if ($rec->acted_at)
+                                · {{ $rec->acted_at->format('d.m.Y H:i') }}
+                            @elseif ($rec->due_at)
+                                · {{ __('app.label.due') }} {{ $rec->due_at->format('d.m.Y') }}
+                            @endif
+                        </span>
+                    </div>
+
+                    {{-- Approver's own comment --}}
+                    @if ($rec->comment)
+                        <div style="margin-top:.55rem;font-size:.85rem;color:currentColor;line-height:1.45;">{{ $rec->comment }}</div>
+                    @endif
+
+                    {{-- System note --}}
+                    @if ($rec->system_comment)
+                        <div style="margin-top:.5rem;padding:.45rem .6rem;border-radius:.5rem;background:rgba(251,146,60,.09);border:1px solid rgba(251,146,60,.25);font-size:.8rem;color:#c2410c;line-height:1.4;">
+                            <span style="font-weight:650;">{{ __('app.label.system_note') }}:</span> {{ $rec->system_comment }}
+                        </div>
+                    @endif
+
+                    @if (! $rec->comment && ! $rec->system_comment)
+                        <div style="margin-top:.4rem;font-size:.8rem;color:currentColor;opacity:.45;">{{ __('app.label.no_comment') }}</div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Activity log for this person --}}
+    @if ($activities->isNotEmpty())
+        <div>
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:currentColor;opacity:.55;margin-bottom:.6rem;">
+                {{ __('app.label.approver_activity') }}
+                <span style="font-weight:700;color:currentColor;opacity:.75;">· {{ $activities->count() }}</span>
+            </div>
+
             <div style="border:1px solid rgba(127,127,127,.18);border-radius:.65rem;overflow:hidden;">
                 @foreach ($activities as $i => $a)
-                    <div style="display:grid;grid-template-columns:2.6rem 1.75rem 1fr auto;align-items:center;gap:.65rem;padding:.55rem .75rem;{{ $i % 2 === 0 ? 'background:rgba(127,127,127,.04);' : '' }}{{ $i > 0 ? 'border-top:1px solid rgba(127,127,127,.12);' : '' }}">
-                        <span style="font-size:.7rem;color:currentColor;opacity:.55;font-variant-numeric:tabular-nums;">{{ $a->created_at?->format('H:i') }}</span>
+                    <div style="display:grid;grid-template-columns:1.75rem 1fr auto;align-items:center;gap:.65rem;padding:.5rem .75rem;{{ $i % 2 === 0 ? 'background:rgba(127,127,127,.04);' : '' }}{{ $i > 0 ? 'border-top:1px solid rgba(127,127,127,.12);' : '' }}">
                         <span style="width:1.7rem;height:1.7rem;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(99,102,241,.14);color:#6366f1;flex-shrink:0;">
                             {!! svg($iconFor($a->event ?? ''), '', ['width' => 13, 'height' => 13])->toHtml() !!}
                         </span>
@@ -114,6 +129,6 @@
                     </div>
                 @endforeach
             </div>
-        @endif
-    </div>
+        </div>
+    @endif
 </div>

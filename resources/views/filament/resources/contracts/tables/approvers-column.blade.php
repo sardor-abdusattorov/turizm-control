@@ -4,8 +4,9 @@
     /** @var \App\Models\Contract $record */
     $record = $getRecord();
 
-    $approvers = $record->activeApprovers
-        ->concat($record->approvers->whereIn('status', [ContractApprover::STATUS_INVALIDATED, ContractApprover::STATUS_SKIPPED]));
+    // Only the current active chain — historical/invalidated rows live in the
+    // per-approver modal so the column stays short.
+    $approvers = $record->activeApprovers;
 
     $colorFor = function (string $status): array {
         return match ($status) {
@@ -21,9 +22,9 @@
 @endphp
 
 @if ($approvers->isEmpty())
-    <span style="font-size:.78rem;color:currentColor;opacity:.5;">—</span>
+    <span style="font-size:.82rem;color:currentColor;opacity:.5;">—</span>
 @else
-    <div style="display:flex;flex-direction:column;gap:.3rem;align-items:flex-start;">
+    <div style="display:flex;flex-direction:column;gap:.25rem;align-items:flex-start;padding:.15rem 0;">
         @foreach ($approvers as $a)
             @php $c = $colorFor($a->status); @endphp
             <button
@@ -31,15 +32,15 @@
                 wire:click="mountTableAction('approverTimeline', '{{ $record->getKey() }}', { approver: {{ $a->id }} })"
                 wire:loading.attr="disabled"
                 title="{{ $a->user?->name }} · {{ ContractApprover::getStatuses()[$a->status] ?? $a->status }}"
-                style="display:inline-flex;align-items:center;gap:.45rem;padding:.28rem .7rem .28rem .55rem;border-radius:999px;
+                style="display:inline-flex;align-items:center;gap:.4rem;padding:.22rem .65rem .22rem .5rem;border-radius:999px;
                        background:{{ $c['bg'] }};color:{{ $c['fg'] }};border:0;
-                       font-size:.875rem;font-weight:600;line-height:1.2;cursor:pointer;
+                       font-size:.8rem;font-weight:600;line-height:1.15;cursor:pointer;
                        white-space:nowrap;
                        transition:opacity .12s ease;"
-                onmouseenter="this.style.opacity='.82'"
+                onmouseenter="this.style.opacity='.78'"
                 onmouseleave="this.style.opacity='1'"
             >
-                <span style="flex-shrink:0;width:.5rem;height:.5rem;border-radius:50%;background:{{ $c['dot'] }};"></span>
+                <span style="flex-shrink:0;width:.45rem;height:.45rem;border-radius:50%;background:{{ $c['dot'] }};"></span>
                 <span>{{ $a->user?->name ?? '—' }}</span>
             </button>
         @endforeach
