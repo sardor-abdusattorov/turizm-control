@@ -403,12 +403,15 @@ class Contract extends Model
      * Mark every approver row attached to the contract as INVALIDATED.
      * Used when the contract is edited mid-flow — old rows stay for the
      * audit history, fresh pending rows are built next.
+     *
+     * The note is written to `system_comment` so an approver's original
+     * comment (e.g. "looks good") is preserved alongside the system reason.
      */
     public function invalidateAllApprovers(?string $note = null): int
     {
         return $this->approvers()->update([
             'status' => ContractApprover::STATUS_INVALIDATED,
-            'comment' => $note,
+            'system_comment' => $note,
             'acted_at' => now(),
         ]);
     }

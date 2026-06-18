@@ -134,6 +134,7 @@ return [
         'actions' => 'Actions',
         'more' => 'More',
         'comment' => 'Comment',
+        'system_note' => 'System note',
         'rejection_reason' => 'Reason for rejection',
         'return_reason' => 'What needs to be revised',
 

@@ -74,11 +74,19 @@
         @endif
     </div>
 
-    {{-- Comment --}}
+    {{-- Approver's own comment --}}
     @if ($approver->comment)
         <div style="padding:.7rem .9rem;border-radius:.6rem;background:rgba(127,127,127,.08);border:1px solid rgba(127,127,127,.18);font-size:.85rem;">
             <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:currentColor;opacity:.55;margin-bottom:.3rem;">{{ __('app.label.comment') }}</div>
             <div>{{ $approver->comment }}</div>
+        </div>
+    @endif
+
+    {{-- System note (e.g. "Cancelled — contract was edited") --}}
+    @if ($approver->system_comment)
+        <div style="padding:.7rem .9rem;border-radius:.6rem;background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.25);font-size:.85rem;">
+            <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:#c2410c;margin-bottom:.3rem;font-weight:650;">{{ __('app.label.system_note') }}</div>
+            <div>{{ $approver->system_comment }}</div>
         </div>
     @endif
 

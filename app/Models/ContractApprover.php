@@ -16,6 +16,7 @@ class ContractApprover extends Model
         'order',
         'status',
         'comment',
+        'system_comment',
         'acted_at',
         'due_at',
         'reminder_sent_at',

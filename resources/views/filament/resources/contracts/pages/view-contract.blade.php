@@ -335,6 +335,7 @@
                                             @endif
                                         </div>
                                         @if ($ap->comment)<div class="cw-cmt">{{ $ap->comment }}</div>@endif
+                                        @if ($ap->system_comment)<div class="cw-cmt" style="background:rgba(251,146,60,.10);border-color:rgba(251,146,60,.32);color:#c2410c;font-weight:550;">{{ $ap->system_comment }}</div>@endif
                                     </div>
                                     <button type="button" class="cw-eye" title="{{ __('app.label.approver_details') }}" @click="approver = {{ $ap->id }}">{!! $ic('heroicon-o-eye', 16) !!}</button>
                                 </div>
@@ -356,6 +357,8 @@
                                                     <span class="cw-pill cw-pill--gray">{{ $statusName($ap->status) }}</span>
                                                     @if ($ap->acted_at)<span class="cw-when">{{ $ap->acted_at->format('d.m.Y H:i') }}</span>@endif
                                                 </div>
+                                                @if ($ap->comment)<div class="cw-cmt">{{ $ap->comment }}</div>@endif
+                                                @if ($ap->system_comment)<div class="cw-cmt" style="background:rgba(251,146,60,.10);border-color:rgba(251,146,60,.32);color:#c2410c;font-weight:550;">{{ $ap->system_comment }}</div>@endif
                                             </div>
                                             <button type="button" class="cw-eye" title="{{ __('app.label.approver_details') }}" @click="approver = {{ $ap->id }}">{!! $ic('heroicon-o-eye', 16) !!}</button>
                                         </div>
@@ -499,6 +502,12 @@
                             <div class="cw-kv" style="align-items:flex-start;">
                                 <span class="cw-kv__lb" style="padding-top:.3rem;">{{ __('app.label.comment') }}</span>
                                 <span class="cw-kv__vl" style="font-weight:450;">{{ $ap->comment }}</span>
+                            </div>
+                        @endif
+                        @if ($ap->system_comment)
+                            <div class="cw-kv" style="align-items:flex-start;">
+                                <span class="cw-kv__lb" style="padding-top:.3rem;">{{ __('app.label.system_note') }}</span>
+                                <span class="cw-kv__vl" style="font-weight:450;color:#c2410c;">{{ $ap->system_comment }}</span>
                             </div>
                         @endif
 
