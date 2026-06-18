@@ -67,6 +67,8 @@ return [
         'order_plural' => 'Orders',
         'order_type_single' => 'Order Type',
         'no_category' => 'No category',
+        'select_order_type_first' => 'Select an order type first',
+        'select_option' => 'Select an option',
         'order_type_plural' => 'Order Types',
         'order_file' => 'Order File',
 
@@ -289,7 +291,7 @@ return [
         'template_file' => 'Upload the contract as a .docx with {{placeholders}} where values should be inserted. Max 10 MB.',
         'template_editor_independent' => 'Document content is edited in OnlyOffice — changes save automatically there. The "Save changes" button below only stores the metadata above (name, order type, sort, status).',
         'contract_template_choice' => 'Pick a template — its language is shown in brackets and sets the contract language.',
-        'contract_order_type' => 'Optional category to group contracts in reports.',
+        'contract_order_type' => 'Pick the order type first — it filters the templates available below.',
         'approval_chain_form' => 'Pre-filled from your profile. Drag rows to reorder, add or remove approvers for this contract specifically.',
         'approval_chain_global' => 'Contracts follow the approval queue configured in Settings → Approval Flow. These approvers will be assigned automatically.',
         'metrics_yandex' => 'Insert Yandex Metrica tracking code here',

@@ -17,6 +17,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -88,27 +90,23 @@ class ContractForm
                         Select::make('order_type_id')
                             ->label(__('app.label.order_type_single'))
                             ->options(OrderType::getActive())
+                            ->required()
                             ->searchable()
                             ->preload()
-                            ->placeholder(__('app.label.no_category'))
+                            ->live()
+                            ->afterStateUpdated(fn (Set $set) => $set('contract_template_id', null))
                             ->helperText(__('app.helper.contract_order_type'))
                             ->columnSpanFull(),
 
                         Select::make('contract_template_id')
                             ->label(__('app.label.contract_template_single'))
-                            ->options(
-                                ContractTemplate::query()
-                                    ->active()
-                                    ->orderBy('sort')
-                                    ->get()
-                                    ->mapWithKeys(fn (ContractTemplate $t): array => [
-                                        $t->id => $t->name.' ('.strtoupper($t->language).')',
-                                    ])
-                                    ->toArray()
-                            )
+                            ->options(fn (Get $get): array => self::templateOptions($get('order_type_id')))
+                            ->disabled(fn (Get $get): bool => blank($get('order_type_id')))
+                            ->placeholder(fn (Get $get): string => blank($get('order_type_id'))
+                                ? __('app.label.select_order_type_first')
+                                : __('app.label.select_option'))
                             ->required()
                             ->searchable()
-                            ->preload()
                             ->helperText(__('app.helper.contract_template_choice'))
                             ->columnSpanFull(),
 
@@ -169,6 +167,32 @@ class ContractForm
                             }),
                     ]),
             ]);
+    }
+
+    /**
+     * Active templates for the chosen order type, plus untyped "general"
+     * templates that apply to any type. Empty until a type is selected so the
+     * dropdown stays gated behind the order type.
+     *
+     * @return array<int, string>
+     */
+    protected static function templateOptions(?int $orderTypeId): array
+    {
+        if (blank($orderTypeId)) {
+            return [];
+        }
+
+        return ContractTemplate::query()
+            ->active()
+            ->where(fn ($query) => $query
+                ->where('order_type_id', $orderTypeId)
+                ->orWhereNull('order_type_id'))
+            ->orderBy('sort')
+            ->get()
+            ->mapWithKeys(fn (ContractTemplate $t): array => [
+                $t->id => $t->name.' ('.strtoupper($t->language).')',
+            ])
+            ->toArray();
     }
 
     /**
