@@ -36,7 +36,7 @@ class ViewContract extends ViewRecord
         return [
             Action::make('submitForApproval')
                 ->label(__('app.action.submit_for_approval'))
-                ->icon('heroicon-o-paper-airplane')
+                ->icon('heroicon-o-arrow-up-tray')
                 ->color('success')
                 ->requiresConfirmation()
                 ->modalHeading(__('app.action.submit_for_approval'))
@@ -207,7 +207,7 @@ class ViewContract extends ViewRecord
     public function activityVisual(string $event): array
     {
         return match ($event) {
-            'Contract Submitted' => ['icon' => 'heroicon-o-paper-airplane', 'color' => 'info'],
+            'Contract Submitted' => ['icon' => 'heroicon-o-arrow-up-tray', 'color' => 'info'],
             'Contract Step Approved', 'Contract Approved' => ['icon' => 'heroicon-o-check-circle', 'color' => 'success'],
             'Contract Rejected' => ['icon' => 'heroicon-o-x-circle', 'color' => 'danger'],
             'Contract Returned' => ['icon' => 'heroicon-o-arrow-uturn-left', 'color' => 'warning'],
