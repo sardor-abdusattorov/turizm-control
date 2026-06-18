@@ -10,6 +10,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -74,12 +75,18 @@ class ContractTemplateForm
                                 ->label(__('app.action.open_template_in_editor'))
                                 ->icon('heroicon-o-pencil-square')
                                 ->color('primary')
-                                ->url(fn (?ContractTemplate $record) => $record
-                                    ? route('contract-templates.editor', [
+                                ->url(function (?ContractTemplate $record, $livewire) {
+                                    if (! $record) {
+                                        return null;
+                                    }
+
+                                    $mode = $livewire instanceof ViewRecord ? 'view' : 'edit';
+
+                                    return route('contract-templates.editor', [
                                         'template' => $record,
-                                        'mode' => 'edit',
-                                    ])
-                                    : null)
+                                        'mode' => $mode,
+                                    ]);
+                                })
                                 ->visible(fn (?ContractTemplate $record) => $record?->templateExists() ?? false),
                         ])->columnSpanFull(),
 
