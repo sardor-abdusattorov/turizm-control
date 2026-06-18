@@ -15,6 +15,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
@@ -83,74 +84,82 @@ class ProfileSettings extends Page implements HasActions, HasForms
     {
         return $schema
             ->components([
-                Section::make(__('app.label.personal_information'))
-                    ->description(__('app.label.personal_information_description'))
-                    ->aside()
+                Grid::make(['default' => 1, 'md' => 3])
                     ->schema([
-                        Grid::make(['default' => 1, 'md' => 4])
+                        // Left rail: section heading, description, then the avatar.
+                        Group::make([
+                            TextEntry::make('personal_information_heading')
+                                ->hiddenLabel()
+                                ->state(
+                                    '<div style="font-weight:600;font-size:1rem;color:#111827;">'.e(__('app.label.personal_information')).'</div>'
+                                    .'<div style="margin-top:.25rem;font-size:.875rem;color:#6b7280;line-height:1.4;">'.e(__('app.label.personal_information_description')).'</div>'
+                                )
+                                ->html(),
+
+                            ImageUpload::make('users', 'avatar_url')
+                                ->hiddenLabel()
+                                ->avatar()
+                                ->imageEditorAspectRatios(['1:1'])
+                                ->placeholder(__('app.label.upload_photo'))
+                                ->extraAttributes(['style' => 'max-width:9rem;margin-top:1rem;']),
+                        ])->columnSpan(['md' => 1]),
+
+                        // Right card: the editable fields.
+                        Section::make()
+                            ->columnSpan(['md' => 2])
                             ->schema([
-                                ImageUpload::make('users', 'avatar_url')
-                                    ->hiddenLabel()
-                                    ->avatar()
-                                    ->imageEditorAspectRatios(['1:1'])
-                                    ->placeholder(__('app.label.upload_photo'))
-                                    ->extraAttributes(['style' => 'max-width:9rem'])
-                                    ->columnSpan(['md' => 1]),
+                                Grid::make(['default' => 1, 'sm' => 2])
+                                    ->schema([
+                                        TextInput::make('name')
+                                            ->label(__('app.label.name'))
+                                            ->required()
+                                            ->maxLength(255),
 
-                                Group::make([
-                                    Grid::make(['default' => 1, 'sm' => 2])
-                                        ->schema([
-                                            TextInput::make('name')
-                                                ->label(__('app.label.name'))
-                                                ->required()
-                                                ->maxLength(255),
+                                        TextInput::make('email')
+                                            ->label(__('app.label.email'))
+                                            ->email()
+                                            ->required()
+                                            ->unique('users', 'email', ignorable: Auth::user())
+                                            ->maxLength(255),
+                                    ]),
 
-                                            TextInput::make('email')
-                                                ->label(__('app.label.email'))
-                                                ->email()
-                                                ->required()
-                                                ->unique('users', 'email', ignorable: Auth::user())
-                                                ->maxLength(255),
-                                        ]),
+                                TextInput::make('telegram_chat_id')
+                                    ->label(__('app.label.telegram_chat_id'))
+                                    ->helperText(__('app.label.telegram_chat_id_help'))
+                                    ->maxLength(255),
 
-                                    TextInput::make('telegram_chat_id')
-                                        ->label(__('app.label.telegram_chat_id'))
-                                        ->helperText(__('app.label.telegram_chat_id_help'))
-                                        ->maxLength(255),
+                                Grid::make(['default' => 1, 'sm' => 2])
+                                    ->schema([
+                                        Select::make('department_id')
+                                            ->label(__('app.label.department'))
+                                            ->options(Department::getActive())
+                                            ->searchable()
+                                            ->preload(),
 
-                                    Grid::make(['default' => 1, 'sm' => 2])
-                                        ->schema([
-                                            Select::make('department_id')
-                                                ->label(__('app.label.department'))
-                                                ->options(Department::getActive())
-                                                ->searchable()
-                                                ->preload(),
+                                        Select::make('position_id')
+                                            ->label(__('app.label.position'))
+                                            ->options(Position::getActive())
+                                            ->searchable()
+                                            ->preload(),
+                                    ]),
 
-                                            Select::make('position_id')
-                                                ->label(__('app.label.position'))
-                                                ->options(Position::getActive())
-                                                ->searchable()
-                                                ->preload(),
-                                        ]),
-
-                                    Select::make('default_recipients')
-                                        ->label(__('app.label.default_recipients'))
-                                        ->helperText(__('app.label.default_recipients_help'))
-                                        ->multiple()
-                                        ->options($this->getGroupedRecipientOptions())
-                                        ->allowHtml()
-                                        ->searchable()
-                                        ->preload(),
-                                ])->columnSpan(['md' => 3]),
-                            ]),
-                    ])
-                    ->footerActions([
-                        Action::make('save_profile')
-                            ->label(__('app.action.update'))
-                            ->color('primary')
-                            ->submit('updateProfile'),
-                    ])
-                    ->footerActionsAlignment(Alignment::End),
+                                Select::make('default_recipients')
+                                    ->label(__('app.label.default_recipients'))
+                                    ->helperText(__('app.label.default_recipients_help'))
+                                    ->multiple()
+                                    ->options($this->getGroupedRecipientOptions())
+                                    ->allowHtml()
+                                    ->searchable()
+                                    ->preload(),
+                            ])
+                            ->footerActions([
+                                Action::make('save_profile')
+                                    ->label(__('app.action.update'))
+                                    ->color('primary')
+                                    ->submit('updateProfile'),
+                            ])
+                            ->footerActionsAlignment(Alignment::End),
+                    ]),
             ])
             ->statePath('profileData');
     }
