@@ -566,4 +566,35 @@ class Contract extends Model
             fn (Builder $q) => $q->where('user_id', $user->id),
         );
     }
+
+    /**
+     * Roles that may see every contract. Everyone else is limited to the
+     * contracts they are responsible for or appear in the approval chain of.
+     */
+    public const OVERSIGHT_ROLES = ['super_admin', 'director'];
+
+    public function scopeVisibleTo(Builder $query, ?User $user = null): Builder
+    {
+        $user ??= auth()->user();
+
+        if (! $user) {
+            return $query->whereRaw('0 = 1');
+        }
+
+        if ($user->hasAnyRole(self::OVERSIGHT_ROLES)) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $scoped) use ($user): void {
+            $scoped->where('responsible_id', $user->id)
+                ->orWhereHas('approvers', fn (Builder $q) => $q->where('user_id', $user->id));
+        });
+    }
+
+    public function isVisibleTo(User $user): bool
+    {
+        return $user->hasAnyRole(self::OVERSIGHT_ROLES)
+            || $this->responsible_id === $user->id
+            || $this->approvers()->where('user_id', $user->id)->exists();
+    }
 }

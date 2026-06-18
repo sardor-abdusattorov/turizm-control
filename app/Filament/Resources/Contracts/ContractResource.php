@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ContractResource extends Resource
 {
@@ -44,7 +45,7 @@ class ContractResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::$model::count();
+        return (string) static::getEloquentQuery()->count();
     }
 
     protected static ?string $recordTitleAttribute = 'number';
@@ -64,6 +65,16 @@ class ContractResource extends Resource
         return [
             ApproversRelationManager::class,
         ];
+    }
+
+    /**
+     * Scope every query (list, tabs, and record resolution for view/edit) to
+     * the contracts the current user is allowed to see, so managers and
+     * approvers can't reach other people's contracts — not even by URL.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->visibleTo();
     }
 
     public static function getPages(): array
