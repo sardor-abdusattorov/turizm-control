@@ -47,6 +47,13 @@ class AdminPanelProvider extends PanelProvider
 
             ])
             ->spa()
+            ->spaUrlExceptions([
+                // OnlyOffice editors are standalone full-page documents, not
+                // panel pages. Letting wire:navigate hijack them corrupts the
+                // SPA DOM and breaks the sidebar/scroll on return.
+                '*/editor',
+                '*/editor?*',
+            ])
             ->font('Inter')
             ->navigationItems([
 
