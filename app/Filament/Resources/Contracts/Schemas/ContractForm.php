@@ -144,7 +144,9 @@ class ContractForm
                 Section::make(__('app.label.approval_chain'))
                     ->description(__('app.helper.approval_chain_form'))
                     ->collapsible()
-                    ->hiddenOn('edit')
+                    // Editable on create, and on edit only while the contract is
+                    // still a draft — once submitted the chain is locked.
+                    ->visible(fn (?Contract $record): bool => $record === null || $record->status === Contract::STATUS_DRAFT)
                     ->schema([
                         Select::make('approver_chain')
                             ->hiddenLabel()
