@@ -178,6 +178,10 @@ return [
         'overdue' => 'Overdue',
         'overview' => 'Overview',
         'history' => 'History',
+        'workflow_events' => 'Workflow',
+        'edit_events' => 'Edits',
+        'load_more' => 'Show more',
+        'all' => 'All',
 
         // Currencies
         'currency_single' => 'Currency',

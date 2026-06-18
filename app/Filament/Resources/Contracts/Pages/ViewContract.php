@@ -211,8 +211,25 @@ class ViewContract extends ViewRecord
             'Contract Step Approved', 'Contract Approved' => ['icon' => 'heroicon-o-check-circle', 'color' => 'success'],
             'Contract Rejected' => ['icon' => 'heroicon-o-x-circle', 'color' => 'danger'],
             'Contract Returned' => ['icon' => 'heroicon-o-arrow-uturn-left', 'color' => 'warning'],
-            'Contract Document Saved', 'Contract Document Forcesave' => ['icon' => 'heroicon-o-document-text', 'color' => 'gray'],
+            'Contract Document Saved', 'Contract Document Forcesave' => ['icon' => 'heroicon-o-document-text', 'color' => 'info'],
+            'Contract Edit Invalidated' => ['icon' => 'heroicon-o-no-symbol', 'color' => 'warning'],
+            'created' => ['icon' => 'heroicon-o-sparkles', 'color' => 'info'],
+            'updated' => ['icon' => 'heroicon-o-pencil-square', 'color' => 'gray'],
+            'deleted' => ['icon' => 'heroicon-o-trash', 'color' => 'danger'],
             default => ['icon' => 'heroicon-o-information-circle', 'color' => 'gray'],
+        };
+    }
+
+    /**
+     * Coarse event group used by the history filter chips:
+     * workflow (submit/approve/reject/return) vs edit (created/updated/saved).
+     */
+    public function activityGroup(string $event): string
+    {
+        return match ($event) {
+            'Contract Submitted', 'Contract Step Approved', 'Contract Approved',
+            'Contract Rejected', 'Contract Returned' => 'workflow',
+            default => 'edit',
         };
     }
 }

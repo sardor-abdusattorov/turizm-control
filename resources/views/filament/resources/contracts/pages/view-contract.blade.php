@@ -120,6 +120,8 @@
         .cw-step:not(:last-child)::before{ content:''; position:absolute; left:2rem; top:2.95rem; bottom:-.45rem; width:2px; background:var(--track); border-radius:2px; }
         .cw-step--approved:not(:last-child)::before{ background:#86efac; }
         .cw-step--current{ background:linear-gradient(90deg, rgba(245,158,11,.08), transparent 70%); }
+        @keyframes cwPulse { 0%{ box-shadow:0 0 0 0 rgba(245,158,11,.55);} 70%{ box-shadow:0 0 0 8px rgba(245,158,11,0);} 100%{ box-shadow:0 0 0 0 rgba(245,158,11,0);} }
+        @media (prefers-reduced-motion: no-preference){ .cw-step--current .cw-badge--current{ animation:cwPulse 1.8s ease-out infinite; } }
         .cw-step:hover{ background:var(--soft); }
         .cw-node{ position:relative; flex-shrink:0; }
         .cw-node img{ width:2.75rem; height:2.75rem; border-radius:999px; object-fit:cover; display:block; box-shadow:0 0 0 2px var(--s), 0 0 0 3px var(--track); }
@@ -167,6 +169,14 @@
         .cw-row__vl{ font-size:.85rem; font-weight:600; color:var(--t); min-width:0; max-width:55%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:right; }
 
         /* execution timeline */
+        .cw-filters{ display:flex; gap:.3rem; padding:.95rem 1.25rem; border-bottom:1px solid var(--d); flex-wrap:wrap; }
+        .cw-chip{ display:inline-flex; align-items:center; gap:.35rem; padding:.34rem .7rem; font-size:.74rem; font-weight:600; color:var(--m); background:var(--soft); border:0; border-radius:999px; cursor:pointer; transition:all .15s; }
+        .cw-chip:hover{ color:var(--t); }
+        .cw-chip--active{ background:rgba(59,130,246,.12); color:var(--accent); }
+        .cw-chip__c{ font-size:.66rem; font-weight:700; padding:.02rem .35rem; border-radius:999px; background:rgba(0,0,0,.07); }
+        .dark .cw-chip__c{ background:rgba(255,255,255,.10); }
+        .cw-loadmore{ width:100%; padding:.7rem; margin-top:.5rem; font-size:.8rem; font-weight:600; color:var(--accent); background:var(--soft); border:1px dashed var(--d); border-radius:.7rem; cursor:pointer; transition:all .15s; }
+        .cw-loadmore:hover{ background:rgba(59,130,246,.06); border-style:solid; }
         .cw-day__hd{ font-size:.72rem; font-weight:650; color:var(--m); text-transform:uppercase; letter-spacing:.04em; padding:.2rem 0 .7rem; }
         .cw-day + .cw-day{ margin-top:.5rem; }
         .cw-tl{ position:relative; display:flex; gap:.85rem; padding-bottom:1.05rem; }
@@ -206,7 +216,9 @@
         .cw-modal__empty{ font-size:.82rem; color:var(--m2); padding:.4rem 0; }
     </style>
 
-    <div class="cw" x-data="{ approver: null, tab: 'overview' }" @keydown.escape.window="approver = null">
+    <div class="cw"
+        x-data="{ approver: null, tab: 'overview', historyShown: 8, historyFilter: 'all' }"
+        @keydown.escape.window="approver = null">
         {{-- Hero --}}
         <div class="cw-hero cw-hero--{{ $statusColor }}">
             <div class="cw-hero__l">
@@ -242,7 +254,11 @@
         </div>
 
         {{-- Overview --}}
-        <div x-show="tab === 'overview'" class="cw-panel">
+        <div x-show="tab === 'overview'"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-1"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="cw-panel">
             <section class="cw-card">
                 <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-document-text') !!}</span><h2 class="cw-hd__t">{{ __('app.label.attached_document') }}</h2></div>
                     <div class="cw-bd">
@@ -356,36 +372,77 @@
         </div>
 
         {{-- History --}}
-        <div x-show="tab === 'history'" x-cloak class="cw-panel">
-                <section class="cw-card">
-                    <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-clock') !!}</span><h2 class="cw-hd__t">{{ __('app.label.execution_history') }}</h2></div>
-                    <div class="cw-bd">
-                        @if ($activities->isEmpty())
-                            <p style="font-size:.85rem;color:var(--m)">{{ __('app.label.no_history') }}</p>
-                        @else
-                            @foreach ($activityDays as $day => $events)
-                                <div class="cw-day">
-                                    <div class="cw-day__hd">{{ $dayLabel($day) }}</div>
-                                    @foreach ($events as $a)
-                                        @php $v = $this->activityVisual($a->event ?? ''); @endphp
-                                        <div class="cw-tl">
-                                            <span class="cw-tl__ic cw-tl__ic--{{ $v['color'] }}">{!! $ic($v['icon'], 15) !!}</span>
-                                            <div class="cw-tl__bd">
-                                                <div class="cw-tl__ds">{{ $a->description ?: $a->event }}</div>
-                                                <div class="cw-tl__mt">
-                                                    <span>{{ $a->causer?->name ?? __('app.label.system') }}</span>
-                                                    <span class="cw-tl__dot"></span>
-                                                    <span>{{ $a->created_at?->format('H:i') }}</span>
-                                                </div>
-                                                @if ($cmt = data_get($a->properties, 'comment'))<div class="cw-cmt" style="margin-top:.45rem">{{ $cmt }}</div>@endif
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endforeach
-                        @endif
+        <div x-show="tab === 'history'" x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-1"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="cw-panel">
+            @php
+                $flat = $activities->map(function ($a, $i) {
+                    return (object) [
+                        'idx' => $i,
+                        'event' => $a->event ?? '',
+                        'description' => $a->description ?: $a->event,
+                        'causer' => $a->causer?->name ?? __('app.label.system'),
+                        'time' => $a->created_at?->format('H:i'),
+                        'day' => $a->created_at?->format('Y-m-d'),
+                        'group' => $this->activityGroup($a->event ?? ''),
+                        'comment' => data_get($a->properties, 'comment'),
+                    ];
+                })->values();
+                $workflowCount = $flat->where('group', 'workflow')->count();
+                $editCount = $flat->where('group', 'edit')->count();
+                $totalCount = $flat->count();
+            @endphp
+            <section class="cw-card">
+                <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-clock') !!}</span><h2 class="cw-hd__t">{{ __('app.label.execution_history') }}</h2></div>
+
+                @if ($flat->isEmpty())
+                    <div class="cw-bd"><p style="font-size:.85rem;color:var(--m)">{{ __('app.label.no_history') }}</p></div>
+                @else
+                    <div class="cw-filters">
+                        <button type="button" class="cw-chip" :class="historyFilter === 'all' ? 'cw-chip--active' : ''" @click="historyFilter = 'all'; historyShown = 8">
+                            {{ __('app.label.all') }} <span class="cw-chip__c">{{ $totalCount }}</span>
+                        </button>
+                        <button type="button" class="cw-chip" :class="historyFilter === 'workflow' ? 'cw-chip--active' : ''" @click="historyFilter = 'workflow'; historyShown = 8">
+                            {!! $ic('heroicon-o-paper-airplane', 13) !!} {{ __('app.label.workflow_events') }} <span class="cw-chip__c">{{ $workflowCount }}</span>
+                        </button>
+                        <button type="button" class="cw-chip" :class="historyFilter === 'edit' ? 'cw-chip--active' : ''" @click="historyFilter = 'edit'; historyShown = 8">
+                            {!! $ic('heroicon-o-pencil-square', 13) !!} {{ __('app.label.edit_events') }} <span class="cw-chip__c">{{ $editCount }}</span>
+                        </button>
                     </div>
-                </section>
+
+                    <div class="cw-bd">
+                        @php $lastDay = null; @endphp
+                        @foreach ($flat as $row)
+                            @php $v = $this->activityVisual($row->event); $dayHd = $row->day !== $lastDay ? $dayLabel($row->day) : null; $lastDay = $row->day; @endphp
+                            <div x-show="(historyFilter === 'all' || historyFilter === '{{ $row->group }}') && {{ $row->idx }} < historyShown">
+                                @if ($dayHd)
+                                    <div class="cw-day__hd" style="padding-top: {{ $loop->first ? '0' : '.6rem' }};">{{ $dayHd }}</div>
+                                @endif
+                                <div class="cw-tl">
+                                    <span class="cw-tl__ic cw-tl__ic--{{ $v['color'] }}">{!! $ic($v['icon'], 15) !!}</span>
+                                    <div class="cw-tl__bd">
+                                        <div class="cw-tl__ds">{{ $row->description }}</div>
+                                        <div class="cw-tl__mt">
+                                            <span>{{ $row->causer }}</span>
+                                            <span class="cw-tl__dot"></span>
+                                            <span>{{ $row->time }}</span>
+                                        </div>
+                                        @if ($row->comment)<div class="cw-cmt" style="margin-top:.45rem">{{ $row->comment }}</div>@endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+
+                        <button type="button" class="cw-loadmore"
+                                x-show="historyShown < {{ $totalCount }}"
+                                @click="historyShown = historyShown + 8">
+                            {{ __('app.label.load_more') }}
+                        </button>
+                    </div>
+                @endif
+            </section>
         </div>
 
         {{-- Per-approver detail modals --}}
