@@ -6,18 +6,20 @@ use App\Filament\Support\ImageUpload;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\User;
+use BackedEnum;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
@@ -26,19 +28,22 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules\Password;
-use BackedEnum;
 
-class ProfileSettings extends Page implements HasForms, HasActions
+class ProfileSettings extends Page implements HasActions, HasForms
 {
-    use InteractsWithForms;
     use InteractsWithActions;
+    use InteractsWithForms;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserCircle;
+
     protected string $view = 'filament.pages.profile-settings';
+
     protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $slug = 'profile';
 
     public ?array $profileData = [];
+
     public ?array $passwordData = [];
 
     public static function getNavigationLabel(): string
@@ -315,7 +320,7 @@ class ProfileSettings extends Page implements HasForms, HasActions
                     'browser' => $agent['browser'],
                     'platform' => $agent['platform'],
                     'is_current_device' => $session->id === Session::getId(),
-                    'last_active' => \Carbon\Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
+                    'last_active' => Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
                 ];
             })
             ->toArray();
@@ -341,11 +346,11 @@ class ProfileSettings extends Page implements HasForms, HasActions
             }
 
             // Browser detection
-            if (preg_match('/Chrome/i', $userAgent) && !preg_match('/Edge/i', $userAgent)) {
+            if (preg_match('/Chrome/i', $userAgent) && ! preg_match('/Edge/i', $userAgent)) {
                 $browser = 'Chrome';
             } elseif (preg_match('/Firefox/i', $userAgent)) {
                 $browser = 'Firefox';
-            } elseif (preg_match('/Safari/i', $userAgent) && !preg_match('/Chrome/i', $userAgent)) {
+            } elseif (preg_match('/Safari/i', $userAgent) && ! preg_match('/Chrome/i', $userAgent)) {
                 $browser = 'Safari';
             } elseif (preg_match('/Edge/i', $userAgent)) {
                 $browser = 'Edge';
@@ -368,36 +373,6 @@ class ProfileSettings extends Page implements HasForms, HasActions
      */
     protected function getGroupedRecipientOptions(): array
     {
-        $users = User::query()
-            ->where('status', 1)
-            ->where('id', '!=', Auth::id())
-            ->whereHas('department', fn ($q) => $q->approvers())
-            ->with(['department', 'position'])
-            ->get();
-
-        $grouped = [];
-
-        foreach ($users as $user) {
-            $departmentName = $user->department?->name ?? __('app.label.no_department');
-
-            if (! isset($grouped[$departmentName])) {
-                $grouped[$departmentName] = [];
-            }
-
-            $avatarUrl = $user->getFilamentAvatarUrl()
-                ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF';
-
-            $positionName = $user->position?->name;
-            $positionSuffix = $positionName ? ' · '.e($positionName) : '';
-
-            $grouped[$departmentName][$user->id] = sprintf(
-                '<div class="flex items-center gap-2"><img src="%s" class="w-6 h-6 rounded-full object-cover" alt=""><span>%s%s</span></div>',
-                e($avatarUrl),
-                e($user->name),
-                $positionSuffix
-            );
-        }
-
-        return $grouped;
+        return User::approverOptionsGroupedByDepartment(Auth::id());
     }
 }

@@ -11,7 +11,6 @@ use App\Models\Department;
 use App\Models\OrderType;
 use App\Models\User;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -147,24 +146,21 @@ class ContractForm
                     ->collapsible()
                     ->hiddenOn('edit')
                     ->schema([
-                        Repeater::make('approver_chain')
+                        Select::make('approver_chain')
                             ->hiddenLabel()
-                            ->reorderable()
-                            ->reorderableWithDragAndDrop()
-                            ->default(fn (): array => self::defaultApproverRows())
-                            ->addActionLabel(__('app.action.add_approver'))
-                            ->schema([
-                                Select::make('user_id')
-                                    ->label(__('app.label.approver'))
-                                    ->options(self::approverOptions())
-                                    ->required()
-                                    ->searchable(),
-                            ])
-                            ->itemLabel(function (array $state): ?string {
-                                $id = $state['user_id'] ?? null;
+                            ->multiple()
+                            ->options(fn (): array => User::approverOptionsGroupedByDepartment(Auth::id()))
+                            ->default(fn (): array => self::defaultApproverIds())
+                            ->allowHtml()
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->helperText(__('app.helper.approval_chain_pick')),
 
-                                return $id ? (User::find($id)?->name ?? '') : null;
-                            }),
+                        TextEntry::make('approver_chain_preview')
+                            ->hiddenLabel()
+                            ->state(fn (Get $get): string => self::approvalChainPreview($get('approver_chain')))
+                            ->html(),
                     ]),
             ]);
     }
@@ -196,34 +192,12 @@ class ContractForm
     }
 
     /**
-     * All active users as id => "Name · Department / Position" options.
+     * Pre-filled approver IDs (in order) from the manager's profile default
+     * recipients, falling back to the global settings flow when none are set.
      *
-     * @return array<int, string>
+     * @return array<int, int>
      */
-    protected static function approverOptions(): array
-    {
-        return User::query()
-            ->where('status', User::STATUS_ACTIVE)
-            ->with('department', 'position')
-            ->orderBy('name')
-            ->get()
-            ->mapWithKeys(function (User $user): array {
-                $dept = $user->department?->getTranslation('name', app()->getLocale()) ?? '—';
-                $pos = $user->position?->getTranslation('name', app()->getLocale()) ?? '';
-                $label = $user->name.' · '.$dept.($pos ? ' / '.$pos : '');
-
-                return [$user->id => $label];
-            })
-            ->toArray();
-    }
-
-    /**
-     * Pre-fill rows from the manager's profile default recipients, falling
-     * back to the global settings flow when the profile has none set.
-     *
-     * @return array<int, array{user_id: int}>
-     */
-    protected static function defaultApproverRows(): array
+    protected static function defaultApproverIds(): array
     {
         $user = Auth::user();
 
@@ -245,6 +219,49 @@ class ContractForm
                 ->all();
         }
 
-        return array_map(fn (int $id): array => ['user_id' => $id], $ids);
+        return array_map('intval', $ids);
+    }
+
+    /**
+     * Numbered preview of the selected approval chain — avatar, name and
+     * department per step, in the order they will approve. Re-rendered live as
+     * the picker above changes (the Select is ->live()).
+     */
+    protected static function approvalChainPreview(mixed $ids): string
+    {
+        $ids = array_values(array_filter(array_map('intval', (array) $ids)));
+
+        if ($ids === []) {
+            return '<p style="margin:0;color:#9ca3af;font-size:.875rem;">'.e(__('app.helper.approval_chain_empty')).'</p>';
+        }
+
+        $users = User::with(['department', 'position'])->whereIn('id', $ids)->get()->keyBy('id');
+
+        $rows = '';
+        $step = 1;
+
+        foreach ($ids as $id) {
+            $user = $users->get($id);
+
+            if (! $user) {
+                continue;
+            }
+
+            $avatar = $user->getFilamentAvatarUrl()
+                ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF';
+
+            $meta = trim(($user->department?->name ?? '').($user->position?->name ? ' · '.$user->position->name : ''), ' ·');
+
+            $rows .= '<div style="display:flex;align-items:center;gap:.65rem;padding:.55rem .75rem;border:1px solid #e5e7eb;border-radius:.65rem;background:#fff;">'
+                .'<span style="flex-shrink:0;width:1.4rem;height:1.4rem;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#eef2ff;color:#4338ca;font-size:.75rem;font-weight:700;">'.$step.'</span>'
+                .'<img src="'.e($avatar).'" alt="" style="width:1.9rem;height:1.9rem;border-radius:50%;object-fit:cover;flex-shrink:0;">'
+                .'<span style="min-width:0;"><span style="display:block;font-weight:600;color:#111827;">'.e($user->name).'</span>'
+                .'<span style="display:block;font-size:.75rem;color:#6b7280;">'.e($meta).'</span></span>'
+                .'</div>';
+
+            $step++;
+        }
+
+        return '<div style="display:flex;flex-direction:column;gap:.4rem;margin-top:.25rem;">'.$rows.'</div>';
     }
 }

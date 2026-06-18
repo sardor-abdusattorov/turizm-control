@@ -14,7 +14,7 @@ class CreateContract extends CreateRecord
 {
     protected static string $resource = ContractResource::class;
 
-    /** @var array<int, array{user_id?: int}> */
+    /** @var array<int, int> */
     protected array $approverChain = [];
 
     protected function mutateFormDataBeforeCreate(array $data): array
@@ -22,7 +22,7 @@ class CreateContract extends CreateRecord
         $data['responsible_id'] = Auth::id();
         $data['language'] = ContractTemplate::find($data['contract_template_id'] ?? null)?->language ?? 'ru';
 
-        $this->approverChain = $data['approver_chain'] ?? [];
+        $this->approverChain = array_values(array_filter(array_map('intval', (array) ($data['approver_chain'] ?? []))));
         unset($data['approver_chain']);
 
         return $data;
@@ -37,13 +37,7 @@ class CreateContract extends CreateRecord
 
         $order = 1;
 
-        foreach ($this->approverChain as $row) {
-            $userId = $row['user_id'] ?? null;
-
-            if (! $userId) {
-                continue;
-            }
-
+        foreach ($this->approverChain as $userId) {
             ContractApprover::create([
                 'contract_id' => $this->record->id,
                 'user_id' => $userId,
