@@ -5,6 +5,7 @@ use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 
@@ -59,6 +60,24 @@ it('renders the view page with an approval chain and history', function () {
     Livewire::test(ViewContract::class, ['record' => $contract->id])
         ->assertOk()
         ->assertSee($approvers->first()->name);
+});
+
+it('shows a preview button on the document card instead of an embedded pdf iframe', function () {
+    Storage::fake('local');
+
+    $user = viewerWithAccess();
+    $contract = Contract::factory()->create([
+        'responsible_id' => $user->id,
+        'status' => Contract::STATUS_IN_REVIEW,
+    ]);
+    Storage::disk('local')->put($contract->documentPath(), 'fake-docx');
+
+    actingAs($user);
+
+    $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
+
+    expect($html)->toContain(route('contracts.pdf.inline', ['contract' => $contract]))
+        ->and($html)->not->toContain('<iframe');
 });
 
 it('shows a per-approver detail modal trigger and renders queued steps distinctly', function () {

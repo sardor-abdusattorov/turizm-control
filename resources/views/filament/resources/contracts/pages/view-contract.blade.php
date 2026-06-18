@@ -245,14 +245,16 @@
                                     <x-filament::button tag="a" :href="$this->editorUrl($record->canBeEditedBy() ? 'edit' : 'view')" icon="heroicon-o-pencil-square" color="primary" size="sm">
                                         {{ __('app.action.open_editor') }}
                                     </x-filament::button>
+                                    @if ($url = $this->pdfPreviewUrl())
+                                        <x-filament::button tag="a" :href="$url" icon="heroicon-o-eye" color="gray" size="sm" target="_blank">
+                                            {{ __('app.label.preview') }}
+                                        </x-filament::button>
+                                    @endif
                                     @if ($record->status === Contract::STATUS_APPROVED)
                                         <x-filament::button tag="a" :href="route('contracts.pdf.download', ['contract' => $record])" icon="heroicon-o-document-arrow-down" color="gray" size="sm">PDF</x-filament::button>
                                     @endif
                                 </div>
                             </div>
-                            @if ($url = $this->pdfPreviewUrl())
-                                <div class="cw-pdf"><iframe src="{{ $url }}" loading="lazy"></iframe></div>
-                            @endif
                         @else
                             <div class="cw-empty">{!! $ic('heroicon-o-document', 36) !!}<span>{{ __('app.label.document_not_ready') }}</span></div>
                         @endif
