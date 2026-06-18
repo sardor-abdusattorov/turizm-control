@@ -170,6 +170,7 @@ return [
         'approved_lower' => 'approved',
         'due' => 'Due',
         'approver_details' => 'Approver details',
+        'approvers' => 'Approvers',
         'order_position' => 'Position in chain',
         'acted_at' => 'Acted on',
         'approver_activity' => 'Activity',

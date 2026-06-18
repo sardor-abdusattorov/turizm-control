@@ -4,6 +4,9 @@ namespace App\Filament\Resources\Contracts\Tables;
 
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
+use App\Models\Currency;
+use App\Models\OrderType;
+use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -14,6 +17,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -52,6 +56,10 @@ class ContractsTable
                     ->color(fn (string $state) => Contract::getStatusColors()[$state] ?? 'gray')
                     ->sortable(),
 
+                ViewColumn::make('approvers_chain')
+                    ->label(__('app.label.approvers'))
+                    ->view('filament.resources.contracts.tables.approvers-column'),
+
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))
                     ->toggleable(),
@@ -66,9 +74,44 @@ class ContractsTable
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
                     ->options(Contract::getStatuses()),
+
+                SelectFilter::make('responsible_id')
+                    ->label(__('app.label.responsible'))
+                    ->options(fn () => User::query()->where('status', User::STATUS_ACTIVE)->orderBy('name')->pluck('name', 'id'))
+                    ->searchable(),
+
+                SelectFilter::make('currency_id')
+                    ->label(__('app.label.currency_single'))
+                    ->options(fn () => Currency::query()->where('status', true)->orderBy('short_name')->pluck('short_name', 'id')),
+
+                SelectFilter::make('order_type_id')
+                    ->label(__('app.label.order_type_single'))
+                    ->options(fn () => OrderType::getActive())
+                    ->searchable(),
             ])
             ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))
             ->recordActions([
+                Action::make('approverTimeline')
+                    ->hiddenLabel()
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel(__('app.action.close'))
+                    ->modalWidth('lg')
+                    ->modalHeading(__('app.label.approver_details'))
+                    ->modalContent(function (Contract $record, Action $action) {
+                        $approverId = $action->getArguments()['approver'] ?? null;
+                        $approver = $approverId ? $record->approvers()->find($approverId) : null;
+
+                        if (! $approver) {
+                            return null;
+                        }
+
+                        return view('filament.resources.contracts.tables.approver-timeline-modal', [
+                            'contract' => $record,
+                            'approver' => $approver,
+                        ]);
+                    })
+                    ->extraAttributes(['style' => 'display:none;']),
+
                 ActionGroup::make([
                     ViewAction::make(),
 
