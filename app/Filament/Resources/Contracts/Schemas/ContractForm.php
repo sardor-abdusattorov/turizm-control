@@ -101,6 +101,7 @@ class ContractForm
                             ->required()
                             ->maxLength(50)
                             ->unique('contracts', 'number', ignoreRecord: true)
+                            ->live(onBlur: true)
                             ->columnSpanFull(),
 
                         Select::make('order_type_id')
@@ -132,6 +133,7 @@ class ContractForm
                             ->required()
                             ->searchable()
                             ->preload()
+                            ->live()
                             ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema))
                             ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey())
                             ->columnSpanFull(),
@@ -140,6 +142,7 @@ class ContractForm
                             ->label(__('app.label.contract_title'))
                             ->required()
                             ->maxLength(255)
+                            ->live(onBlur: true)
                             ->columnSpanFull(),
 
                         NumberInput::make('amount')
@@ -150,6 +153,7 @@ class ContractForm
                             ->decimalPlaces(2)
                             ->default(0)
                             ->required()
+                            ->live(onBlur: true)
                             ->columnSpanFull(),
 
                         Select::make('currency_id')
