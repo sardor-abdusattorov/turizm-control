@@ -111,7 +111,6 @@ class ContractForm
                             ->preload()
                             ->live()
                             ->afterStateUpdated(fn (Set $set) => $set('contract_template_id', null))
-                            ->helperText(__('app.helper.contract_order_type'))
                             ->columnSpanFull(),
 
                         Select::make('contract_template_id')
@@ -123,7 +122,6 @@ class ContractForm
                                 : __('app.label.select_option'))
                             ->required()
                             ->searchable()
-                            ->helperText(__('app.helper.contract_template_choice'))
                             ->columnSpanFull(),
 
                         Select::make('contact_id')
@@ -163,7 +161,6 @@ class ContractForm
                     ]),
 
                 Section::make(__('app.label.approval_chain'))
-                    ->description(__('app.helper.approval_chain_form'))
                     ->collapsible()
                     // Editable on create, and on edit only while the contract is
                     // still a draft — once submitted the chain is locked.
@@ -177,8 +174,7 @@ class ContractForm
                             ->allowHtml()
                             ->searchable()
                             ->preload()
-                            ->live()
-                            ->helperText(__('app.helper.approval_chain_pick')),
+                            ->live(),
 
                         TextEntry::make('approver_chain_preview')
                             ->hiddenLabel()
