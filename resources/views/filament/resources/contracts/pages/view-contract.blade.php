@@ -81,7 +81,7 @@
         .cw-tab--active .cw-tab__c{ background:rgba(99,102,241,.14); color:var(--accent); }
 
         /* hero */
-        .cw-hero{ position:relative; display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; border-radius:1.1rem; padding:1.35rem 1.5rem 1.35rem 1.65rem; overflow:hidden; box-shadow:0 0 0 1px var(--r), 0 1px 2px rgba(0,0,0,.04); }
+        .cw-hero{ position:sticky; top:.4rem; z-index:30; display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; border-radius:1.1rem; padding:1.35rem 1.5rem 1.35rem 1.65rem; overflow:hidden; box-shadow:0 0 0 1px var(--r), 0 6px 20px -8px rgba(15,20,25,.14); }
         .cw-hero::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:4px; }
         .cw-hero--gray{ background:linear-gradient(120deg,var(--soft),var(--s)); } .cw-hero--gray::before{ background:#94a3b8; }
         .cw-hero--warning{ background:linear-gradient(120deg,#fffbeb,var(--s)); } .cw-hero--warning::before{ background:#f59e0b; }
@@ -120,16 +120,16 @@
         .cw-step{ position:relative; display:flex; align-items:flex-start; gap:.9rem; padding:.6rem .65rem; border-radius:.85rem; transition:background .15s; }
         .cw-step:not(:last-child){ margin-bottom:.15rem; }
         .cw-step:not(:last-child)::before{ content:''; position:absolute; left:2rem; top:2.95rem; bottom:-.45rem; width:2px; background:var(--track); border-radius:2px; }
-        .cw-step--approved:not(:last-child)::before{ background:#86efac; }
+        .cw-step--approved:not(:last-child)::before{ background:linear-gradient(#34d399, var(--track)); }
         .cw-step--current{ background:linear-gradient(90deg, rgba(245,158,11,.08), transparent 70%); }
         @keyframes cwPulse { 0%{ box-shadow:0 0 0 0 rgba(245,158,11,.55);} 70%{ box-shadow:0 0 0 8px rgba(245,158,11,0);} 100%{ box-shadow:0 0 0 0 rgba(245,158,11,0);} }
         @media (prefers-reduced-motion: no-preference){ .cw-step--current .cw-badge--current{ animation:cwPulse 1.8s ease-out infinite; } }
         .cw-step:hover{ background:var(--soft); }
         .cw-node{ position:relative; flex-shrink:0; }
         .cw-node img{ width:2.75rem; height:2.75rem; border-radius:999px; object-fit:cover; display:block; box-shadow:0 0 0 2px var(--s), 0 0 0 3px var(--track); }
-        .cw-step--current .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #f59e0b; }
-        .cw-step--approved .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #34d399; }
-        .cw-step--rejected .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #f87171; }
+        .cw-step--current .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #f59e0b, 0 0 0 7px rgba(245,158,11,.16); }
+        .cw-step--approved .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #34d399, 0 0 0 7px rgba(52,211,153,.15); }
+        .cw-step--rejected .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #f87171, 0 0 0 7px rgba(248,113,113,.15); }
         .cw-badge{ position:absolute; bottom:-.25rem; right:-.25rem; width:1.4rem; height:1.4rem; border-radius:999px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px var(--s); color:#fff; }
         .cw-badge--approved{ background:#22c55e; } .cw-badge--rejected{ background:#ef4444; } .cw-badge--returned{ background:#3b82f6; }
         .cw-badge--current{ background:#f59e0b; } .cw-badge--queued{ background:#cbd5e1; color:#64748b; } .dark .cw-badge--queued{ background:#3f3f46; color:#a1a1aa; }
@@ -179,11 +179,12 @@
         .dark .cw-chip__c{ background:rgba(255,255,255,.10); }
         .cw-loadmore{ width:100%; padding:.7rem; margin-top:.5rem; font-size:0.805rem; font-weight:600; color:var(--accent); background:var(--soft); border:1px dashed var(--d); border-radius:.7rem; cursor:pointer; transition:all .15s; }
         .cw-loadmore:hover{ background:rgba(99,102,241,.07); border-style:solid; }
-        .cw-day__hd{ font-size:0.724rem; font-weight:650; color:var(--m); text-transform:uppercase; letter-spacing:.04em; padding:.2rem 0 .7rem; }
+        .cw-day__hd{ display:inline-flex; align-items:center; font-size:0.7rem; font-weight:700; color:var(--m); text-transform:uppercase; letter-spacing:.05em; padding:.24rem .6rem; margin:.15rem 0 .55rem; background:var(--soft); border-left:3px solid var(--accent); border-radius:.35rem; }
         .cw-day + .cw-day{ margin-top:.5rem; }
         .cw-tl{ position:relative; display:flex; gap:.85rem; padding-bottom:1.05rem; }
+        .cw-tl__time{ width:2.6rem; flex-shrink:0; text-align:right; font-size:0.7rem; color:var(--m2); padding-top:.45rem; font-variant-numeric:tabular-nums; }
         .cw-tl:last-child{ padding-bottom:0; }
-        .cw-tl:not(:last-child)::before{ content:''; position:absolute; left:1.05rem; top:2.3rem; bottom:-.2rem; width:2px; background:var(--track); border-radius:2px; }
+        .cw-tl:not(:last-child)::before{ content:''; position:absolute; left:4.5rem; top:2.3rem; bottom:-.2rem; width:2px; background:var(--track); border-radius:2px; }
         .cw-tl__ic{ width:2.1rem; height:2.1rem; border-radius:999px; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 0 0 3px var(--s); }
         .cw-tl__ic--success{ background:#dcfce7; color:#16a34a;} .dark .cw-tl__ic--success{ background:rgba(34,197,94,.18);}
         .cw-tl__ic--danger { background:#fee2e2; color:#dc2626;} .dark .cw-tl__ic--danger { background:rgba(239,68,68,.18);}
@@ -423,14 +424,11 @@
                                     <div class="cw-day__hd" style="padding-top: {{ $loop->first ? '0' : '.6rem' }};">{{ $dayHd }}</div>
                                 @endif
                                 <div class="cw-tl">
+                                    <span class="cw-tl__time">{{ $row->time }}</span>
                                     <span class="cw-tl__ic cw-tl__ic--{{ $v['color'] }}">{!! $ic($v['icon'], 15) !!}</span>
                                     <div class="cw-tl__bd">
                                         <div class="cw-tl__ds">{{ $row->description }}</div>
-                                        <div class="cw-tl__mt">
-                                            <span>{{ $row->causer }}</span>
-                                            <span class="cw-tl__dot"></span>
-                                            <span>{{ $row->time }}</span>
-                                        </div>
+                                        <div class="cw-tl__mt"><span>{{ $row->causer }}</span></div>
                                         @if ($row->comment)<div class="cw-cmt" style="margin-top:.45rem">{{ $row->comment }}</div>@endif
                                     </div>
                                 </div>
