@@ -180,6 +180,14 @@ class OnlyOfficeService
         string $fileType = 'docx',
         string $documentType = 'word',
     ): array {
+        // Read-only view mode never needs export affordances, so strip the
+        // download, print and save-as-PDF controls. A viewer just reads the
+        // document; only an editor (edit/review) keeps those buttons.
+        if ($mode === 'view') {
+            $permissions['download'] = false;
+            $permissions['print'] = false;
+        }
+
         $config = [
             'documentType' => $documentType,
             'type' => 'desktop',

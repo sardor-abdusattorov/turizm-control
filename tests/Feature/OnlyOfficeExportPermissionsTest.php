@@ -67,16 +67,19 @@ it('locks export while the contract is in review for the current approver', func
         ->and($permissions['print'])->toBeFalse();
 });
 
-it('unlocks download and print once the contract is approved', function () {
+it('keeps approved contracts read-only inside OnlyOffice (export goes through the PDF button)', function () {
     $responsible = User::factory()->create();
     $contract = Contract::factory()->approved()->create([
         'responsible_id' => $responsible->id,
     ]);
 
+    // An approved contract opens in view mode, so the in-editor export
+    // controls are hidden — the dedicated "Download PDF" action is the
+    // proper channel for the finished document.
     $permissions = editorPermissions($contract, $responsible);
 
-    expect($permissions['download'])->toBeTrue()
-        ->and($permissions['print'])->toBeTrue();
+    expect($permissions['download'])->toBeFalse()
+        ->and($permissions['print'])->toBeFalse();
 });
 
 it('always lets a super admin export, even on a draft', function () {
@@ -136,12 +139,24 @@ it('trims the editor chrome down to the document', function () {
         ->and($customization['help'])->toBeFalse();
 });
 
-it('still allows downloading working documents like templates', function () {
+it('allows export when a template is opened in edit mode', function () {
     $template = ContractTemplate::factory()->create();
     Storage::disk('public')->put($template->template_file, 'fake-docx');
 
     $permissions = app(OnlyOfficeService::class)
-        ->templateEditorConfig($template->fresh(), User::factory()->create())['document']['permissions'];
+        ->templateEditorConfig($template->fresh(), User::factory()->create(), 'edit')['document']['permissions'];
 
-    expect($permissions['download'])->toBeTrue();
+    expect($permissions['download'])->toBeTrue()
+        ->and($permissions['print'])->toBeTrue();
+});
+
+it('hides export when a template is opened in view mode', function () {
+    $template = ContractTemplate::factory()->create();
+    Storage::disk('public')->put($template->template_file, 'fake-docx');
+
+    $permissions = app(OnlyOfficeService::class)
+        ->templateEditorConfig($template->fresh(), User::factory()->create(), 'view')['document']['permissions'];
+
+    expect($permissions['download'])->toBeFalse()
+        ->and($permissions['print'])->toBeFalse();
 });
