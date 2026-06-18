@@ -95,13 +95,13 @@ class ContractForm
 
                 Section::make(__('app.label.basic_information'))
                     ->collapsible()
+                    ->columns(2)
                     ->schema([
                         TextInput::make('number')
                             ->label(__('app.label.contract_number'))
                             ->required()
                             ->maxLength(50)
-                            ->unique('contracts', 'number', ignoreRecord: true)
-                            ->columnSpanFull(),
+                            ->unique('contracts', 'number', ignoreRecord: true),
 
                         Select::make('order_type_id')
                             ->label(__('app.label.order_type_single'))
@@ -110,8 +110,7 @@ class ContractForm
                             ->searchable()
                             ->preload()
                             ->live()
-                            ->afterStateUpdated(fn (Set $set) => $set('contract_template_id', null))
-                            ->columnSpanFull(),
+                            ->afterStateUpdated(fn (Set $set) => $set('contract_template_id', null)),
 
                         Select::make('contract_template_id')
                             ->label(__('app.label.contract_template_single'))
@@ -121,8 +120,7 @@ class ContractForm
                                 ? __('app.label.select_order_type_first')
                                 : __('app.label.select_option'))
                             ->required()
-                            ->searchable()
-                            ->columnSpanFull(),
+                            ->searchable(),
 
                         Select::make('contact_id')
                             ->label(__('app.label.contact_single'))
@@ -131,8 +129,7 @@ class ContractForm
                             ->searchable()
                             ->preload()
                             ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema))
-                            ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey())
-                            ->columnSpanFull(),
+                            ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey()),
 
                         TextInput::make('title')
                             ->label(__('app.label.contract_title'))
@@ -147,8 +144,7 @@ class ContractForm
                             ->decimalSeparator('.')
                             ->decimalPlaces(2)
                             ->default(0)
-                            ->required()
-                            ->columnSpanFull(),
+                            ->required(),
 
                         Select::make('currency_id')
                             ->label(__('app.label.currency_single'))
@@ -156,12 +152,16 @@ class ContractForm
                             ->required()
                             ->live()
                             ->searchable()
-                            ->preload()
-                            ->columnSpanFull(),
+                            ->preload(),
                     ]),
 
                 Section::make(__('app.label.approval_chain'))
                     ->collapsible()
+                    // On create the section is collapsed by default — the picker
+                    // is pre-filled from profile defaults and most managers don't
+                    // need to touch it. Stays open on edit so the current chain
+                    // is visible at a glance.
+                    ->collapsed(fn (?Contract $record): bool => $record === null)
                     // Editable on create, and on edit only while the contract is
                     // still a draft — once submitted the chain is locked.
                     ->visible(fn (?Contract $record): bool => $record === null || $record->status === Contract::STATUS_DRAFT)
