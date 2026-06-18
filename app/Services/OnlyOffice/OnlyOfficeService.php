@@ -7,6 +7,7 @@ use App\Models\ContractTemplate;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class OnlyOfficeService
@@ -133,15 +134,35 @@ class OnlyOfficeService
 
     public function resolvePermissions(Contract $contract, User $user): array
     {
+        $canExport = $this->canExportContract($contract, $user);
+
         if ($contract->status === Contract::STATUS_DRAFT && $contract->canBeEditedBy($user)) {
-            return $this->permissionSet(edit: true, review: true, comment: true);
+            return $this->permissionSet(edit: true, review: true, comment: true, download: $canExport, print: $canExport);
         }
 
         if ($contract->status === Contract::STATUS_IN_REVIEW && $contract->isCurrentApprover($user)) {
-            return $this->permissionSet(edit: false, review: true, comment: true);
+            return $this->permissionSet(edit: false, review: true, comment: true, download: $canExport, print: $canExport);
         }
 
-        return $this->permissionSet(edit: false, review: false, comment: false);
+        return $this->permissionSet(edit: false, review: false, comment: false, download: $canExport, print: $canExport);
+    }
+
+    /**
+     * A contract can only be exported — downloaded, printed, or saved as PDF
+     * from OnlyOffice — once it has reached a final approved state, or by a
+     * super admin at any time. While it's a draft or still moving through the
+     * approval chain, export is locked so unapproved drafts can't leak out.
+     */
+    private function canExportContract(Contract $contract, User $user): bool
+    {
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        return in_array($contract->status, [
+            Contract::STATUS_APPROVED,
+            Contract::STATUS_ARCHIVED,
+        ], true);
     }
 
     /**
@@ -252,10 +273,17 @@ class OnlyOfficeService
     {
         $isReview = $mode === 'review';
 
-        return [
+        $customization = [
             'forcesave' => true,
             'autosave' => true,
             'compactHeader' => false,
+            // Strip the editor chrome we don't want managers/approvers poking
+            // at: third-party plugins, the help center, the about dialog and
+            // the feedback link. Keeps the surface focused on the document.
+            'plugins' => false,
+            'help' => false,
+            'about' => false,
+            'feedback' => ['visible' => false],
             'review' => [
                 'trackChanges' => $isReview,
                 'showReviewChanges' => $isReview,
@@ -263,16 +291,67 @@ class OnlyOfficeService
                 'hoverMode' => true,
             ],
         ];
+
+        if ($logo = $this->editorLogo()) {
+            $customization['logo'] = $logo;
+        }
+
+        return $customization;
     }
 
-    private function permissionSet(bool $edit, bool $review, bool $comment): array
+    /**
+     * Brand the editor header with the organization logo from Settings, or
+     * fall back to the application's own brand logo (the same one the panel
+     * uses). The URL is browser-reachable so it loads inside the editor frame.
+     *
+     * Note: full white-label (replacing the "about" logo) needs an OnlyOffice
+     * commercial license; the header logo swap below works on Community too.
+     *
+     * @return array{image: string, imageDark: string, url: string}|null
+     */
+    private function editorLogo(): ?array
     {
+        $url = $this->logoUrl();
+
+        if ($url === null) {
+            return null;
+        }
+
+        return [
+            'image' => $url,
+            'imageDark' => $url,
+            'url' => $this->trim(config('app.url')),
+        ];
+    }
+
+    private function logoUrl(): ?string
+    {
+        $path = settings('organization.logo_path');
+
+        if (is_string($path) && $path !== '') {
+            return Storage::disk('public')->url($path);
+        }
+
+        if (file_exists(public_path('images/logo.png'))) {
+            return asset('images/logo.png');
+        }
+
+        return null;
+    }
+
+    private function permissionSet(
+        bool $edit,
+        bool $review,
+        bool $comment,
+        bool $download = true,
+        bool $print = true,
+    ): array {
         return [
             'edit' => $edit,
             'review' => $review,
             'comment' => $comment,
-            'download' => true,
-            'print' => true,
+            'download' => $download,
+            'print' => $print,
             'fillForms' => $edit,
         ];
     }
