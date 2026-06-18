@@ -128,6 +128,7 @@ class ContractForm
 
                         NumberInput::make('amount')
                             ->label(__('app.label.amount'))
+                            ->prefix(fn (Get $get): ?string => Currency::find($get('currency_id'))?->short_name)
                             ->thousandsSeparator(' ')
                             ->decimalSeparator('.')
                             ->decimalPlaces(2)
@@ -139,6 +140,7 @@ class ContractForm
                             ->label(__('app.label.currency_single'))
                             ->options(Currency::query()->where('status', true)->pluck('short_name', 'id'))
                             ->required()
+                            ->live()
                             ->searchable()
                             ->preload()
                             ->columnSpanFull(),
