@@ -29,8 +29,9 @@
             @php $c = $colorFor($a->status); @endphp
             <button
                 type="button"
-                wire:click="mountTableAction('approverTimeline', '{{ $record->getKey() }}', { approver: {{ $a->id }} })"
+                wire:click.stop="mountTableAction('approverTimeline', '{{ $record->getKey() }}', { approver: {{ $a->id }} })"
                 wire:loading.attr="disabled"
+                x-on:click.stop
                 title="{{ $a->user?->name }} · {{ ContractApprover::getStatuses()[$a->status] ?? $a->status }}"
                 style="display:inline-flex;align-items:center;gap:.4rem;padding:.22rem .65rem .22rem .5rem;border-radius:999px;
                        background:{{ $c['bg'] }};color:{{ $c['fg'] }};border:0;

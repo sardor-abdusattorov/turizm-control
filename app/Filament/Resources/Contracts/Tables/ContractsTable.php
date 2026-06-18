@@ -60,6 +60,7 @@ class ContractsTable
                 ViewColumn::make('approvers_chain')
                     ->label(__('app.label.approvers'))
                     ->view('filament.resources.contracts.tables.approvers-column')
+                    ->disableClick()
                     ->extraHeaderAttributes(['style' => 'min-width:17rem;'])
                     ->extraAttributes(['style' => 'min-width:17rem;']),
 
