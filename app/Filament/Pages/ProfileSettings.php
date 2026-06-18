@@ -18,6 +18,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
@@ -86,52 +87,60 @@ class ProfileSettings extends Page implements HasActions, HasForms
                     ->description(__('app.label.personal_information_description'))
                     ->aside()
                     ->schema([
-                        ImageUpload::make('users', 'avatar_url')
-                            ->label(__('app.label.profile_image')),
-
-                        Grid::make(['default' => 1, 'md' => 2])
+                        Grid::make(['default' => 1, 'md' => 3])
                             ->schema([
-                                TextInput::make('name')
-                                    ->label(__('app.label.name'))
-                                    ->required()
-                                    ->maxLength(255),
+                                Group::make([
+                                    Grid::make(['default' => 1, 'sm' => 2])
+                                        ->schema([
+                                            TextInput::make('name')
+                                                ->label(__('app.label.name'))
+                                                ->required()
+                                                ->maxLength(255),
 
-                                TextInput::make('email')
-                                    ->label(__('app.label.email'))
-                                    ->email()
-                                    ->required()
-                                    ->unique('users', 'email', ignorable: Auth::user())
-                                    ->maxLength(255),
+                                            TextInput::make('email')
+                                                ->label(__('app.label.email'))
+                                                ->email()
+                                                ->required()
+                                                ->unique('users', 'email', ignorable: Auth::user())
+                                                ->maxLength(255),
+                                        ]),
+
+                                    TextInput::make('telegram_chat_id')
+                                        ->label(__('app.label.telegram_chat_id'))
+                                        ->helperText(__('app.label.telegram_chat_id_help'))
+                                        ->maxLength(255),
+
+                                    Grid::make(['default' => 1, 'sm' => 2])
+                                        ->schema([
+                                            Select::make('department_id')
+                                                ->label(__('app.label.department'))
+                                                ->options(Department::getActive())
+                                                ->searchable()
+                                                ->preload(),
+
+                                            Select::make('position_id')
+                                                ->label(__('app.label.position'))
+                                                ->options(Position::getActive())
+                                                ->searchable()
+                                                ->preload(),
+                                        ]),
+
+                                    Select::make('default_recipients')
+                                        ->label(__('app.label.default_recipients'))
+                                        ->helperText(__('app.label.default_recipients_help'))
+                                        ->multiple()
+                                        ->options($this->getGroupedRecipientOptions())
+                                        ->allowHtml()
+                                        ->searchable()
+                                        ->preload(),
+                                ])->columnSpan(['md' => 2]),
+
+                                ImageUpload::make('users', 'avatar_url')
+                                    ->label(__('app.label.profile_image'))
+                                    ->avatar()
+                                    ->imageEditorAspectRatios(['1:1'])
+                                    ->columnSpan(['md' => 1]),
                             ]),
-
-                        TextInput::make('telegram_chat_id')
-                            ->label(__('app.label.telegram_chat_id'))
-                            ->helperText(__('app.label.telegram_chat_id_help'))
-                            ->maxLength(255),
-
-                        Grid::make(['default' => 1, 'md' => 2])
-                            ->schema([
-                                Select::make('department_id')
-                                    ->label(__('app.label.department'))
-                                    ->options(Department::getActive())
-                                    ->searchable()
-                                    ->preload(),
-
-                                Select::make('position_id')
-                                    ->label(__('app.label.position'))
-                                    ->options(Position::getActive())
-                                    ->searchable()
-                                    ->preload(),
-                            ]),
-
-                        Select::make('default_recipients')
-                            ->label(__('app.label.default_recipients'))
-                            ->helperText(__('app.label.default_recipients_help'))
-                            ->multiple()
-                            ->options($this->getGroupedRecipientOptions())
-                            ->allowHtml()
-                            ->searchable()
-                            ->preload(),
                     ])
                     ->footerActions([
                         Action::make('save_profile')
