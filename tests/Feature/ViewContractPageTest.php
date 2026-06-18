@@ -60,3 +60,38 @@ it('renders the view page with an approval chain and history', function () {
         ->assertOk()
         ->assertSee($approvers->first()->name);
 });
+
+it('shows a per-approver detail modal trigger and renders queued steps distinctly', function () {
+    $user = viewerWithAccess();
+    $first = User::factory()->create();
+    $second = User::factory()->create();
+
+    $contract = Contract::factory()->create([
+        'responsible_id' => $user->id,
+        'status' => Contract::STATUS_IN_REVIEW,
+    ]);
+
+    // First reviewing now, second still queued behind them.
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $first->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING, 'due_at' => now()->addDays(2),
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $second->id, 'order' => 2,
+        'status' => ContractApprover::STATUS_QUEUED,
+    ]);
+
+    actingAs($user);
+
+    $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
+
+    // Eye-modal wiring + Alpine state.
+    expect($html)->toContain('x-data="{ approver: null }"')
+        ->and($html)->toContain('cw-eye')
+        ->and($html)->toContain('approver = '.$contract->approvers()->where('order', 1)->first()->id)
+        // Queued step shows the "In queue" pill, current shows "Reviewing".
+        ->and($html)->toContain('In queue')
+        ->and($html)->toContain('Reviewing')
+        // Timeline day grouping container.
+        ->and($html)->toContain('cw-day');
+});

@@ -166,6 +166,15 @@ return [
         'execution_history' => 'Execution history',
         'no_history' => 'No activity yet.',
         'system' => 'System',
+        'approved_lower' => 'approved',
+        'due' => 'Due',
+        'approver_details' => 'Approver details',
+        'order_position' => 'Position in chain',
+        'acted_at' => 'Acted on',
+        'approver_activity' => 'Activity',
+        'no_actions_yet' => 'No actions recorded yet.',
+        'today' => 'Today',
+        'yesterday' => 'Yesterday',
 
         // Currencies
         'currency_single' => 'Currency',

@@ -146,6 +146,21 @@ class ViewContract extends ViewRecord
     }
 
     /**
+     * Coarse lifecycle state for a chain step, used to colour the timeline
+     * rail and node: approved / rejected / returned / current / queued.
+     */
+    public function approverState(ContractApprover $approver): string
+    {
+        return match (true) {
+            $approver->status === ContractApprover::STATUS_APPROVED => 'approved',
+            $approver->status === ContractApprover::STATUS_REJECTED => 'rejected',
+            $approver->status === ContractApprover::STATUS_RETURNED => 'returned',
+            $this->isCurrentApprover($approver) => 'current',
+            default => 'queued',
+        };
+    }
+
+    /**
      * @return array{icon: string, color: string}
      */
     public function activityVisual(string $event): array
