@@ -182,6 +182,7 @@ return [
         'personal_information' => 'Personal Information',
         'personal_information_description' => 'Update your profile information and email address',
         'profile_image' => 'Profile Image',
+        'upload_photo' => 'Upload photo',
         'work_info' => 'Work Information',
         'security' => 'Security',
         'password' => 'Password',

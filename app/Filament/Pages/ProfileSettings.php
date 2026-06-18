@@ -87,8 +87,16 @@ class ProfileSettings extends Page implements HasActions, HasForms
                     ->description(__('app.label.personal_information_description'))
                     ->aside()
                     ->schema([
-                        Grid::make(['default' => 1, 'md' => 3])
+                        Grid::make(['default' => 1, 'md' => 4])
                             ->schema([
+                                ImageUpload::make('users', 'avatar_url')
+                                    ->hiddenLabel()
+                                    ->avatar()
+                                    ->imageEditorAspectRatios(['1:1'])
+                                    ->placeholder(__('app.label.upload_photo'))
+                                    ->extraAttributes(['style' => 'max-width:9rem'])
+                                    ->columnSpan(['md' => 1]),
+
                                 Group::make([
                                     Grid::make(['default' => 1, 'sm' => 2])
                                         ->schema([
@@ -133,13 +141,7 @@ class ProfileSettings extends Page implements HasActions, HasForms
                                         ->allowHtml()
                                         ->searchable()
                                         ->preload(),
-                                ])->columnSpan(['md' => 2]),
-
-                                ImageUpload::make('users', 'avatar_url')
-                                    ->label(__('app.label.profile_image'))
-                                    ->avatar()
-                                    ->imageEditorAspectRatios(['1:1'])
-                                    ->columnSpan(['md' => 1]),
+                                ])->columnSpan(['md' => 3]),
                             ]),
                     ])
                     ->footerActions([
