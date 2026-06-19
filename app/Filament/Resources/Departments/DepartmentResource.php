@@ -7,7 +7,6 @@ use App\Filament\Resources\Departments\Pages\EditDepartment;
 use App\Filament\Resources\Departments\Pages\ListDepartments;
 use App\Filament\Resources\Departments\Pages\ViewDepartment;
 use App\Filament\Resources\Departments\Schemas\DepartmentForm;
-use App\Filament\Resources\Departments\Schemas\DepartmentInfolist;
 use App\Filament\Resources\Departments\Tables\DepartmentsTable;
 use App\Models\Department;
 use BackedEnum;
@@ -53,11 +52,6 @@ class DepartmentResource extends Resource
     {
         return DepartmentForm::configure($schema);
     }
-
-//    public static function infolist(Schema $schema): Schema
-//    {
-//        return DepartmentInfolist::configure($schema);
-//    }
 
     public static function table(Table $table): Table
     {

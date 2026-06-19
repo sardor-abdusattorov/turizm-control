@@ -137,15 +137,6 @@ class ContractApprover extends Model
             && now()->greaterThan($this->due_at);
     }
 
-    public function hoursUntilDue(): ?int
-    {
-        if ($this->due_at === null) {
-            return null;
-        }
-
-        return (int) round(now()->diffInHours($this->due_at, false));
-    }
-
     /**
      * Whether a reminder should be sent now: once when the deadline is
      * within 12 hours, then again at most daily once overdue.

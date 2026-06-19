@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 
 class Settings extends Model
 {
@@ -42,6 +41,7 @@ class Settings extends Model
     {
         $this->attributes['value'] = json_encode($value, JSON_UNESCAPED_UNICODE);
     }
+
     public static function get(string $key, mixed $default = null): mixed
     {
         return Cache::remember("settings.{$key}", 86400, function () use ($key, $default) {
@@ -57,20 +57,5 @@ class Settings extends Model
             ['key' => $key],
             ['value' => $value]
         );
-    }
-
-    public static function getOgImage()
-    {
-        $path = settings('seo.og_image');
-
-        if (! $path) {
-            return null;
-        }
-
-        if (! str_starts_with($path, 'http')) {
-            return asset(Storage::url($path));
-        }
-
-        return $path;
     }
 }

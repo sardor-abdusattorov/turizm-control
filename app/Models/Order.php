@@ -72,11 +72,6 @@ class Order extends Model
             && Storage::disk('local')->exists($this->file_path);
     }
 
-    public function isDocx(): bool
-    {
-        return $this->extension() === 'docx';
-    }
-
     public function isOpenableInOnlyOffice(): bool
     {
         return in_array($this->extension(), ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'], true);

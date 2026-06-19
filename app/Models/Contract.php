@@ -323,42 +323,6 @@ class Contract extends Model
         return $rows;
     }
 
-    public function buildApproverChain(): int
-    {
-        $manager = $this->responsible;
-
-        if (! $manager) {
-            return 0;
-        }
-
-        $flow = Department::approvalFlow();
-
-        $recipients = $manager->defaultRecipients()
-            ->where('users.status', User::STATUS_ACTIVE)
-            ->with('department')
-            ->get()
-            ->filter(fn (User $user): bool => $user->department?->isApproverDepartment() ?? false)
-            ->groupBy(fn (User $user): string => (string) $user->department?->code);
-
-        $created = 0;
-        $order = 1;
-
-        foreach ($flow as $code) {
-            foreach ($recipients->get($code, collect()) as $recipient) {
-                ContractApprover::create([
-                    'contract_id' => $this->id,
-                    'user_id' => $recipient->id,
-                    'order' => $order++,
-                    'status' => ContractApprover::STATUS_QUEUED,
-                ]);
-
-                $created++;
-            }
-        }
-
-        return $created;
-    }
-
     public function template(): BelongsTo
     {
         return $this->belongsTo(ContractTemplate::class, 'contract_template_id');
@@ -541,33 +505,6 @@ class Contract extends Model
         ]);
     }
 
-    public function wasRejected(): bool
-    {
-        return $this->activeApprovers()->where('status', ContractApprover::STATUS_REJECTED)->exists();
-    }
-
-    public function resetApprovalState(): void
-    {
-        $this->approvers()->update([
-            'status' => ContractApprover::STATUS_QUEUED,
-            'comment' => null,
-            'acted_at' => null,
-        ]);
-
-        $this->update(['status' => self::STATUS_DRAFT]);
-    }
-
-    public function resetApproversAfterOrder(int $order): void
-    {
-        $this->approvers()
-            ->where('order', '>', $order)
-            ->update([
-                'status' => ContractApprover::STATUS_QUEUED,
-                'comment' => null,
-                'acted_at' => null,
-            ]);
-    }
-
     public function canBeSubmittedBy(?User $user = null): bool
     {
         $user ??= auth()->user();
@@ -717,12 +654,5 @@ class Contract extends Model
             $scoped->where('responsible_id', $user->id)
                 ->orWhereHas('approvers', fn (Builder $q) => $q->where('user_id', $user->id));
         });
-    }
-
-    public function isVisibleTo(User $user): bool
-    {
-        return $user->hasAnyRole(self::OVERSIGHT_ROLES)
-            || $this->responsible_id === $user->id
-            || $this->approvers()->where('user_id', $user->id)->exists();
     }
 }
