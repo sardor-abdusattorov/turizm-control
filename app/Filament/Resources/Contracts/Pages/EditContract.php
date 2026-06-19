@@ -31,6 +31,36 @@ class EditContract extends EditRecord
     }
 
     /**
+     * Wrap Save in a confirmation modal — for contracts mid-flow (in_review
+     * / approved / rejected) the message warns that the chain will be
+     * invalidated, otherwise it's a softer "save changes?" prompt.
+     */
+    protected function getSaveFormAction(): Action
+    {
+        $hasFormWrapper = $this->hasFormWrapper();
+        $isMidFlow = $this->record && in_array($this->record->status, [
+            Contract::STATUS_IN_REVIEW,
+            Contract::STATUS_APPROVED,
+            Contract::STATUS_REJECTED,
+        ], true);
+
+        return Action::make('save')
+            ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+            ->submit($hasFormWrapper ? $this->getSubmitFormLivewireMethodName() : null)
+            ->action($hasFormWrapper ? null : $this->getSubmitFormLivewireMethodName())
+            ->keyBindings(['mod+s'])
+            ->requiresConfirmation()
+            ->modalIcon($isMidFlow ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-question-mark-circle')
+            ->modalIconColor($isMidFlow ? 'warning' : 'primary')
+            ->modalHeading(__('app.label.save_changes'))
+            ->modalDescription($isMidFlow
+                ? __('app.message.save_warning_mid_flow')
+                : __('app.message.save_warning_draft'))
+            ->modalSubmitActionLabel(__('app.action.save_anyway'))
+            ->modalCancelActionLabel(__('app.action.keep_editing'));
+    }
+
+    /**
      * Pre-fill the approval-chain picker with the current queued chain so the
      * author can tweak it. If there are no queued rows (e.g. the contract just
      * came back to DRAFT because the previous chain was invalidated by an
