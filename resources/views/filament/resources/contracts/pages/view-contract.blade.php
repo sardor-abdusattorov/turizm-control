@@ -73,6 +73,23 @@
         @media(min-width:1024px){ .cw-cols{ grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); } }
         .cw-main,.cw-side{ display:flex; flex-direction:column; gap:1.1rem; min-width:0; }
         .cw-panel{ display:flex; flex-direction:column; gap:1.1rem; }
+
+        /* meta strip — clean, no gradient */
+        .cw-meta{ display:flex; align-items:center; justify-content:space-between; gap:1.25rem; flex-wrap:wrap;
+            padding:.85rem 1.1rem; background:var(--s); border-radius:.85rem; box-shadow:0 0 0 1px var(--r); }
+        .cw-meta__l{ display:flex; align-items:center; gap:.85rem; flex-wrap:wrap; min-width:0; }
+        .cw-meta__facts{ display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; }
+        .cw-meta__fact{ display:inline-flex; align-items:center; gap:.35rem; font-size:.815rem; color:var(--m);
+            white-space:nowrap; }
+        .cw-meta__fact--danger{ color:#dc2626; font-weight:600; }
+        .cw-meta__current{ display:flex; align-items:center; gap:.7rem; padding:.45rem .7rem .45rem .55rem;
+            border-radius:.7rem; background:rgba(99,102,241,.06); box-shadow:inset 0 0 0 1px rgba(99,102,241,.18); }
+        .cw-meta__cur-lb{ font-size:.64rem; color:var(--m2); text-transform:uppercase; letter-spacing:.05em; font-weight:650; }
+        .cw-meta__cur-row{ display:flex; align-items:center; gap:.45rem; margin-top:.15rem; }
+        .cw-meta__cur-row img{ width:1.55rem; height:1.55rem; border-radius:50%; object-fit:cover;
+            box-shadow:0 0 0 1.5px var(--accent); }
+        .cw-meta__cur-nm{ font-size:.85rem; font-weight:650; color:var(--t); }
+        .cw-pill__dot{ width:.45rem; height:.45rem; border-radius:50%; background:currentColor; margin-right:.3rem; }
         .cw-tabs{ display:flex; gap:.15rem; }
         .cw-tab{ display:flex; align-items:center; gap:.4rem; padding:.6rem .95rem; font-size:0.854rem; font-weight:600; color:var(--m); background:transparent; border:0; border-radius:.7rem; cursor:pointer; transition:all .15s; }
         .cw-tab:hover{ color:var(--t); background:var(--soft); }
@@ -233,32 +250,50 @@
     <div class="cw"
         x-data="{ approver: null, tab: 'overview', historyShown: 8, historyFilter: 'all' }"
         @keydown.escape.window="approver = null">
-        {{-- Hero --}}
-        <div class="cw-hero cw-hero--{{ $statusColor }}">
-            <div class="cw-hero__l">
-                <span class="cw-pill cw-pill--lg cw-pill--{{ $statusColor }}">{{ $statusLabel }}</span>
-                <div class="cw-hero__msg">{{ $hero['message'] }}</div>
-                @if ($hero['overdue'] && $hero['due'])
-                    <span class="cw-hero__sla">{!! $ic('heroicon-m-exclamation-triangle', 14) !!} {{ __('app.label.overdue') }} · {{ $hero['due']->diffForHumans() }}</span>
-                @elseif ($hero['due'])
-                    <span class="cw-hero__due">{!! $ic('heroicon-m-clock', 13) !!} {{ __('app.label.due') }} {{ $hero['due']->format('d.m.Y H:i') }}</span>
-                @endif
+        @php
+            $submittedAt = $this->submittedAt();
+            $remaining = $this->timeRemaining();
+        @endphp
+
+        {{-- Meta strip — replaces the gradient hero. Inline status pill, one
+             line of contract context, plus a compact "Awaiting X" tile on the
+             right while in-review. --}}
+        <div class="cw-meta">
+            <div class="cw-meta__l">
+                <span class="cw-pill cw-pill--{{ $statusColor }}">
+                    <span class="cw-pill__dot"></span>{{ $statusLabel }}
+                </span>
+                <div class="cw-meta__facts">
+                    @if ($submittedAt)
+                        <span class="cw-meta__fact" title="{{ $submittedAt->translatedFormat('d M Y H:i') }}">
+                            {!! $ic('heroicon-m-paper-airplane', 13) !!}
+                            {{ __('app.label.submitted') }} {{ $submittedAt->diffForHumans() }}
+                        </span>
+                    @endif
+                    @if ($remaining)
+                        <span class="cw-meta__fact {{ $remaining['overdue'] ? 'cw-meta__fact--danger' : '' }}">
+                            {!! $ic($remaining['overdue'] ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-clock', 13) !!}
+                            {{ $remaining['overdue'] ? __('app.label.overdue').' · '.$remaining['label'] : __('app.label.due_in', ['time' => $remaining['label']]) }}
+                        </span>
+                    @endif
+                    @if ($totalCount > 0)
+                        <span class="cw-meta__fact">
+                            {!! $ic('heroicon-m-check-badge', 13) !!}
+                            {{ $approvedCount }}/{{ $totalCount }} {{ __('app.contract_approver.status.approved_lower') }}
+                        </span>
+                    @endif
+                </div>
             </div>
 
-            <div class="cw-hero__r">
-                @if ($current && $record->status === Contract::STATUS_IN_REVIEW)
-                    <div class="cw-hero__cur">
+            @if ($current && $record->status === Contract::STATUS_IN_REVIEW)
+                <div class="cw-meta__current">
+                    <div class="cw-meta__cur-lb">{{ __('app.label.awaiting') }}</div>
+                    <div class="cw-meta__cur-row">
                         <img src="{{ $this->approverAvatar($current) }}" alt="">
-                        <div>
-                            <div class="cw-hero__lbl">{{ __('app.label.current_step') }}</div>
-                            <div class="cw-hero__nm">{{ $current->user?->name }}</div>
-                        </div>
+                        <span class="cw-meta__cur-nm">{{ $current->user?->name }}</span>
                     </div>
-                @endif
-                @if ($totalCount > 0)
-                    <div class="cw-ring" style="--p: {{ $progress }}"><span>{{ $approvedCount }}/{{ $totalCount }}</span></div>
-                @endif
-            </div>
+                </div>
+            @endif
         </div>
 
         {{-- Tabs --}}

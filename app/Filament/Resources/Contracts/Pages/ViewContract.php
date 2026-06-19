@@ -6,6 +6,7 @@ use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Services\Contracts\ContractWorkflow;
+use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
@@ -28,7 +29,51 @@ class ViewContract extends ViewRecord
 
     public function getSubheading(): ?string
     {
-        return $this->record->title;
+        return null;
+    }
+
+    /**
+     * When was the contract most recently submitted for approval. Read
+     * straight off the activity log so it picks up the latest re-submit
+     * after an edit-invalidation cycle.
+     */
+    public function submittedAt(): ?Carbon
+    {
+        $created = Activity::query()
+            ->where('subject_type', $this->record->getMorphClass())
+            ->where('subject_id', $this->record->getKey())
+            ->where('event', 'Contract Submitted')
+            ->latest('id')
+            ->value('created_at');
+
+        return $created ? Carbon::parse($created) : null;
+    }
+
+    /**
+     * Human-friendly time-remaining string for the current step (or null
+     * when the contract isn't in review).
+     *
+     * @return array{label: string, overdue: bool}|null
+     */
+    public function timeRemaining(): ?array
+    {
+        if ($this->record->status !== Contract::STATUS_IN_REVIEW) {
+            return null;
+        }
+
+        $due = $this->record->currentApprover()?->due_at;
+
+        if (! $due) {
+            return null;
+        }
+
+        $now = now();
+        $overdue = $now->greaterThan($due);
+
+        return [
+            'label' => $due->diffForHumans($now, ['parts' => 2, 'syntax' => CarbonInterface::DIFF_ABSOLUTE]),
+            'overdue' => $overdue,
+        ];
     }
 
     protected function getHeaderActions(): array
