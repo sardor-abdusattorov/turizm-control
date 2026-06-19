@@ -10,6 +10,8 @@ class OrderFileController extends Controller
 {
     public function inline(Order $order): BinaryFileResponse
     {
+        abort_unless(auth()->user()?->can('view', $order) ?? false, 403);
+
         if (! $order->fileExists()) {
             throw new NotFoundHttpException('Order file not found.');
         }

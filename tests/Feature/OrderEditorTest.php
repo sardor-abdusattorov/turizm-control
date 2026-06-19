@@ -41,15 +41,23 @@ it('issues a fresh document_key when the order is created', function () {
 it('renders the OnlyOffice editor view for an order with a docx', function () {
     $order = makeOrderWithDocx();
 
-    actingAs(User::factory()->create());
+    actingAs(userWithPermission('view_order'));
 
     get(route('orders.editor', $order))->assertOk();
+});
+
+it('forbids a user without the order permission from opening the editor', function () {
+    $order = makeOrderWithDocx();
+
+    actingAs(User::factory()->create());
+
+    get(route('orders.editor', $order))->assertForbidden();
 });
 
 it('returns 404 when the order file is missing', function () {
     $order = Order::factory()->create();
 
-    actingAs(User::factory()->create());
+    actingAs(userWithPermission('view_order'));
 
     get(route('orders.editor', $order))->assertNotFound();
 });
@@ -60,7 +68,7 @@ it('returns 404 when the order file is not a docx', function () {
     ]);
     Storage::disk('local')->put($order->file_path, '%PDF-fake');
 
-    actingAs(User::factory()->create());
+    actingAs(userWithPermission('view_order'));
 
     get(route('orders.editor', $order))->assertNotFound();
 });

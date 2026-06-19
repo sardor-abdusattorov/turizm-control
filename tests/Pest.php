@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 /*
@@ -44,7 +46,17 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Create an active user holding the given Shield permission(s) (web guard).
+ */
+function userWithPermission(string ...$permissions): User
 {
-    // ..
+    $user = User::factory()->create();
+
+    foreach ($permissions as $permission) {
+        Permission::findOrCreate($permission, 'web');
+        $user->givePermissionTo($permission);
+    }
+
+    return $user->fresh();
 }

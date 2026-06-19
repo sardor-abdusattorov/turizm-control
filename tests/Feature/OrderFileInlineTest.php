@@ -20,7 +20,7 @@ it('serves an order PDF inline so the browser renders it instead of downloading'
     ]);
     Storage::disk('local')->put($order->file_path, '%PDF-fake');
 
-    actingAs(User::factory()->create());
+    actingAs(userWithPermission('view_order'));
 
     $response = get(route('orders.file.inline', $order));
 
@@ -36,7 +36,7 @@ it('serves an order xlsx inline', function () {
     ]);
     Storage::disk('local')->put($order->file_path, 'fake-xlsx');
 
-    actingAs(User::factory()->create());
+    actingAs(userWithPermission('view_order'));
 
     $response = get(route('orders.file.inline', $order));
 
@@ -49,7 +49,18 @@ it('returns 404 when the order file is missing on disk', function () {
         'file_path' => 'uploads/files/orders/missing.pdf',
     ]);
 
-    actingAs(User::factory()->create());
+    actingAs(userWithPermission('view_order'));
 
     get(route('orders.file.inline', $order))->assertNotFound();
+});
+
+it('forbids a user without the order permission from viewing the inline file', function () {
+    $order = Order::factory()->create([
+        'file_path' => 'uploads/files/orders/test.pdf',
+    ]);
+    Storage::disk('local')->put($order->file_path, '%PDF-fake');
+
+    actingAs(User::factory()->create());
+
+    get(route('orders.file.inline', $order))->assertForbidden();
 });

@@ -51,17 +51,25 @@ it('keeps the document_key when template_file is mass-updated, leaving rotation 
 it('renders the OnlyOffice editor view for an existing template', function () {
     $template = makeTemplateWithFile();
 
-    actingAs(User::factory()->create());
+    actingAs(userWithPermission('view_contract_template'));
 
     $response = get(route('contract-templates.editor', $template));
 
     $response->assertOk();
 });
 
+it('forbids a user without the template permission from opening the editor', function () {
+    $template = makeTemplateWithFile();
+
+    actingAs(User::factory()->create());
+
+    get(route('contract-templates.editor', $template))->assertForbidden();
+});
+
 it('returns 404 from the editor when the template file is missing', function () {
     $template = ContractTemplate::factory()->create();
 
-    actingAs(User::factory()->create());
+    actingAs(userWithPermission('view_contract_template'));
 
     get(route('contract-templates.editor', $template))->assertNotFound();
 });

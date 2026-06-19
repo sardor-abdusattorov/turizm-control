@@ -13,6 +13,8 @@ class OrderEditorController extends Controller
 {
     public function show(Request $request, Order $order, OnlyOfficeService $service): Response
     {
+        abort_unless($request->user()->can('view', $order), 403);
+
         if (! $order->fileExists() || ! $order->isOpenableInOnlyOffice()) {
             throw new NotFoundHttpException('Order file is missing or unsupported by OnlyOffice.');
         }

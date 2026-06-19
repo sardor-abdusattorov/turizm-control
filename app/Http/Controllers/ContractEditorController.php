@@ -13,6 +13,8 @@ class ContractEditorController extends Controller
 {
     public function show(Request $request, Contract $contract, OnlyOfficeService $service): Response
     {
+        abort_unless($contract->canBeViewedBy(), 403);
+
         if (! $contract->documentExists()) {
             throw new NotFoundHttpException('Contract document not built yet.');
         }

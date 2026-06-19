@@ -13,6 +13,8 @@ class ContractTemplateEditorController extends Controller
 {
     public function show(Request $request, ContractTemplate $template, OnlyOfficeService $service): Response
     {
+        abort_unless($request->user()->can('view', $template), 403);
+
         if (! $template->templateExists()) {
             throw new NotFoundHttpException('Template document not uploaded yet.');
         }
