@@ -132,7 +132,6 @@
         .cw-meta__cur-row img{ width:1.55rem; height:1.55rem; border-radius:50%; object-fit:cover;
             box-shadow:0 0 0 1.5px var(--accent); }
         .cw-meta__cur-nm{ font-size:.85rem; font-weight:650; color:var(--t); }
-        .cw-pill__dot{ width:.45rem; height:.45rem; border-radius:50%; background:currentColor; margin-right:.3rem; }
         .cw-tabs{ display:flex; gap:.15rem; }
         .cw-tab{ display:flex; align-items:center; gap:.4rem; padding:.6rem .95rem; font-size:0.854rem; font-weight:600; color:var(--m); background:transparent; border:0; border-radius:.7rem; cursor:pointer; transition:all .15s; }
         .cw-tab:hover{ color:var(--t); background:var(--soft); }
@@ -240,6 +239,29 @@
             color:var(--accent); font-size:.815rem; font-weight:600; cursor:pointer;
             transition:background .12s ease; }
         .cw-show-more:hover{ background:rgba(99,102,241,.05); }
+
+        /* combined card — file block */
+        .cw-file{ display:flex; align-items:flex-start; gap:1.1rem; padding:1.25rem 1.5rem .5rem; }
+        .cw-file__thumb{ position:relative; width:5rem; height:6rem; flex-shrink:0;
+            background:rgba(99,102,241,.05); border-radius:.7rem; display:flex; align-items:center; justify-content:center;
+            box-shadow:inset 0 0 0 1px rgba(99,102,241,.10); }
+        .cw-file__thumb svg{ width:60%; height:auto; }
+        .cw-file__ext{ position:absolute; left:.45rem; bottom:.55rem; padding:.16rem .42rem;
+            border-radius:.3rem; background:var(--accent); color:#fff;
+            font-size:.6rem; font-weight:700; letter-spacing:.04em; line-height:1; }
+        .cw-file__body{ display:flex; flex-direction:column; gap:.6rem; min-width:0; flex:1; padding-top:.15rem; }
+        .cw-file__field{ display:flex; flex-direction:column; gap:.15rem; min-width:0; }
+        .cw-file__lb{ font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--m2); }
+        .cw-file__vl{ font-size:.86rem; font-weight:650; color:var(--t);
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .cw-file__act{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; padding:.75rem 1.5rem 1.2rem; }
+        .cw-btn{ display:inline-flex; align-items:center; gap:.4rem; padding:.5rem .85rem; border-radius:.5rem;
+            font-size:.81rem; font-weight:600; text-decoration:none; transition:opacity .12s ease, background .12s ease, box-shadow .12s ease; }
+        .cw-btn--primary{ background:var(--accent); color:#fff; }
+        .cw-btn--primary:hover{ opacity:.88; }
+        .cw-btn--ghost{ background:transparent; color:var(--t); box-shadow:inset 0 0 0 1px var(--d); }
+        .cw-btn--ghost:hover{ background:var(--soft); }
+        .cw-divider{ height:1px; background:var(--d); margin:0 1.5rem; }
         .cw-contact-group{ display:flex; flex-direction:column; gap:.1rem; }
         .cw-contact-group + .cw-contact-group{ margin-top:1.1rem; padding-top:.9rem; border-top:1px solid var(--d); }
         .cw-contact-group__t{ font-size:.7rem; font-weight:700; color:var(--m2); text-transform:uppercase; letter-spacing:.06em; padding:0 .25rem .35rem; }
@@ -320,9 +342,7 @@
              right while in-review. --}}
         <div class="cw-meta">
             <div class="cw-meta__l">
-                <span class="cw-pill cw-pill--{{ $statusColor }}">
-                    <span class="cw-pill__dot"></span>{{ $statusLabel }}
-                </span>
+                <span class="cw-pill cw-pill--{{ $statusColor }}">{{ $statusLabel }}</span>
                 <div class="cw-meta__facts">
                     @if ($submittedAt)
                         <span class="cw-meta__fact" title="{{ $submittedAt->translatedFormat('d M Y H:i') }}">
@@ -374,36 +394,6 @@
              x-transition:enter-start="opacity-0 -translate-y-1"
              x-transition:enter-end="opacity-100 translate-y-0"
              class="cw-panel">
-            <section class="cw-card">
-                <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-document-text') !!}</span><h2 class="cw-hd__t">{{ __('app.label.attached_document') }}</h2></div>
-                    <div class="cw-bd">
-                        @if ($record->documentExists())
-                            <div class="cw-doc">
-                                <div class="cw-doc__ic">{!! $ic('heroicon-o-document-text', 28) !!}</div>
-                                <div>
-                                    <div class="cw-doc__nm">{{ $record->number }}.docx</div>
-                                    <div class="cw-doc__mt">{{ $this->documentSizeLabel() }} · {{ $record->created_at->format('d.m.Y H:i') }}</div>
-                                </div>
-                                <div class="cw-doc__act">
-                                    <x-filament::button tag="a" :href="$this->editorUrl($record->canBeEditedBy() ? 'edit' : 'view')" icon="heroicon-o-pencil-square" color="primary" size="sm">
-                                        {{ __('app.action.open_editor') }}
-                                    </x-filament::button>
-                                    @if ($url = $this->pdfPreviewUrl())
-                                        <x-filament::button tag="a" :href="$url" icon="heroicon-o-eye" color="gray" size="sm" target="_blank">
-                                            {{ __('app.label.preview') }}
-                                        </x-filament::button>
-                                    @endif
-                                    @if ($record->status === Contract::STATUS_APPROVED)
-                                        <x-filament::button tag="a" :href="route('contracts.pdf.download', ['contract' => $record])" icon="heroicon-o-document-arrow-down" color="gray" size="sm">PDF</x-filament::button>
-                                    @endif
-                                </div>
-                            </div>
-                        @else
-                            <div class="cw-empty">{!! $ic('heroicon-o-document', 36) !!}<span>{{ __('app.label.document_not_ready') }}</span></div>
-                        @endif
-                    </div>
-                </section>
-
             <div class="cw-cols">
                 <div class="cw-main">
                 <section class="cw-card">
@@ -432,7 +422,16 @@
                                             @if ($ap->acted_at)
                                                 <span class="cw-when">{!! $ic('heroicon-m-check', 13) !!} {{ $ap->acted_at->format('d.m.Y H:i') }}</span>
                                             @elseif ($state === 'current' && $ap->due_at)
-                                                <span class="cw-when {{ $ap->isOverdue() ? 'cw-when--over' : '' }}">{!! $ic('heroicon-m-clock', 13) !!} {{ __('app.label.due') }} {{ $ap->due_at->format('d.m.Y H:i') }}</span>
+                                                @php $stepDueIso = $ap->due_at->toIso8601String(); @endphp
+                                                <span class="cw-when"
+                                                    x-data="contractCountdown('{{ $stepDueIso }}')"
+                                                    x-init="start()"
+                                                    :class="overdue ? 'cw-when--over' : ''"
+                                                    :title="absolute">
+                                                    <template x-if="overdue">{!! $ic('heroicon-m-exclamation-triangle', 13) !!}</template>
+                                                    <template x-if="! overdue">{!! $ic('heroicon-m-clock', 13) !!}</template>
+                                                    <span x-text="label"></span>
+                                                </span>
                                             @endif
                                         </div>
                                         @if ($ap->comment)<div class="cw-cmt">{{ $ap->comment }}</div>@endif
@@ -471,10 +470,69 @@
                 </section>
             </div>
 
-            {{-- SIDEBAR: details + history --}}
+            {{-- SIDEBAR: combined Document + Basic Information card --}}
             <div class="cw-side">
                 <section class="cw-card">
                     <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><h2 class="cw-hd__t">{{ __('app.label.basic_information') }}</h2></div>
+
+                    {{-- File card (top of merged section) --}}
+                    @if ($record->documentExists())
+                        @php
+                            $ext = 'DOCX';
+                            $createdLabel = $record->created_at?->translatedFormat('d M Y H:i');
+                            $editUrl = $this->editorUrl($record->canBeEditedBy() ? 'edit' : 'view');
+                            $previewUrl = $this->pdfPreviewUrl();
+                        @endphp
+                        <div class="cw-file">
+                            <div class="cw-file__thumb" aria-hidden="true">
+                                <svg viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 4 h36 l12 12 v60 H8 Z" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+                                    <path d="M44 4 v12 h12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+                                    <rect x="14" y="30" width="34" height="2" rx="1" fill="#e2e8f0"/>
+                                    <rect x="14" y="36" width="28" height="2" rx="1" fill="#e2e8f0"/>
+                                    <rect x="14" y="42" width="34" height="2" rx="1" fill="#e2e8f0"/>
+                                    <rect x="14" y="48" width="22" height="2" rx="1" fill="#e2e8f0"/>
+                                </svg>
+                                <span class="cw-file__ext">{{ $ext }}</span>
+                            </div>
+                            <div class="cw-file__body">
+                                <div class="cw-file__field">
+                                    <div class="cw-file__lb">{{ __('app.label.file_name') }}</div>
+                                    <div class="cw-file__vl">{{ $record->number }}.docx</div>
+                                </div>
+                                <div class="cw-file__field">
+                                    <div class="cw-file__lb">{{ __('app.label.size') }}</div>
+                                    <div class="cw-file__vl">{{ $this->documentSizeLabel() }}</div>
+                                </div>
+                                @if ($createdLabel)
+                                    <div class="cw-file__field">
+                                        <div class="cw-file__lb">{{ __('app.label.created_at') }}</div>
+                                        <div class="cw-file__vl">{{ $createdLabel }}</div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="cw-file__act">
+                            <a href="{{ $editUrl }}" class="cw-btn cw-btn--primary">
+                                {!! $ic('heroicon-o-pencil-square', 16) !!}
+                                <span>{{ __('app.action.open_editor') }}</span>
+                            </a>
+                            @if ($previewUrl)
+                                <a href="{{ $previewUrl }}" target="_blank" rel="noopener" class="cw-btn cw-btn--ghost">
+                                    {!! $ic('heroicon-o-arrow-top-right-on-square', 16) !!}
+                                    <span>{{ __('app.action.open_in_new_tab') }}</span>
+                                </a>
+                            @endif
+                            @if ($record->status === Contract::STATUS_APPROVED)
+                                <a href="{{ route('contracts.pdf.download', ['contract' => $record]) }}" class="cw-btn cw-btn--ghost">
+                                    {!! $ic('heroicon-o-document-arrow-down', 16) !!}
+                                    <span>PDF</span>
+                                </a>
+                            @endif
+                        </div>
+                        <div class="cw-divider"></div>
+                    @endif
+
                     <div class="cw-dets">
                         @foreach ($details as [$icon, $label, $value, $type, $extra])
                             @php $hasValue = ! empty($value); @endphp
