@@ -338,6 +338,18 @@
         .cw-act__toggle{ width:100%; padding:.55rem; font-size:0.74rem; font-weight:600; color:var(--accent); background:var(--soft); border:0; border-top:1px solid var(--d); cursor:pointer; transition:background .15s; }
         .cw-act__toggle:hover{ background:rgba(99,102,241,.06); }
         .cw-modal__empty{ font-size:0.825rem; color:var(--m2); padding:.4rem 0; }
+
+        /* Per-record cards inside the eye-modal (all rows of this user). */
+        .cw-recs{ display:flex; flex-direction:column; gap:.6rem; }
+        .cw-rec{ border:1px solid var(--d); border-radius:.7rem; padding:.7rem .85rem; }
+        .cw-rec--focus{ box-shadow:inset 0 0 0 1.5px var(--accent); }
+        .cw-rec__top{ display:flex; align-items:center; gap:.55rem; flex-wrap:wrap; }
+        .cw-rec__ord{ font-size:.74rem; font-weight:600; color:var(--m); font-variant-numeric:tabular-nums; }
+        .cw-rec__when{ display:inline-flex; align-items:center; gap:.3rem; font-size:.74rem; color:var(--m); margin-left:auto; }
+        .cw-rec__cmt{ margin-top:.5rem; font-size:.82rem; color:var(--t); line-height:1.45; }
+        .cw-rec__sys{ margin-top:.45rem; padding:.45rem .6rem; border-radius:.45rem;
+            background:rgba(251,146,60,.10); border:1px solid rgba(251,146,60,.32); font-size:.78rem; color:#c2410c; line-height:1.4; }
+        .cw-rec__sys-lb{ font-weight:700; margin-right:.35rem; }
     </style>
 
     <div class="cw"
@@ -713,57 +725,68 @@
             </div>
         @endif
 
-        {{-- Per-approver detail modals --}}
+        {{-- Per-approver detail modals — shows every record this person has
+             on the contract (current + invalidated attempts), newest first. --}}
         @foreach ($allApprovers as $ap)
-            @php $apActs = $activities->where('causer_id', $ap->user_id)->values(); @endphp
+            @php
+                $apActs = $activities->where('causer_id', $ap->user_id)->values();
+                // All ContractApprover rows for this user on this contract.
+                $allRecords = $record->approvers->where('user_id', $ap->user_id)->sortByDesc('id')->values();
+            @endphp
             <div class="cw-modal" x-show="approver === {{ $ap->id }}" x-cloak style="display:none;">
                 <div class="cw-modal__bg" @click="approver = null"
                      x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                      x-transition:leave="transition ease-in duration-120" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
-                <div class="cw-modal__card" @click.stop
+                <div class="cw-modal__card" style="max-width:36rem;" @click.stop
                      x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95 translate-y-2" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-120" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
                     <div class="cw-modal__hd">
                         <img src="{{ $this->approverAvatar($ap) }}" alt="">
-                        <div>
+                        <div style="min-width:0;flex:1;">
                             <div class="cw-modal__nm">{{ $ap->user?->name }}</div>
                             <div class="cw-modal__dp">{{ $ap->user?->department?->name }}{{ $ap->user?->position?->name ? ' · '.$ap->user->position->name : '' }}</div>
                         </div>
+                        @if ($allRecords->count() > 1)
+                            <span style="font-size:.72rem;font-weight:600;color:var(--m);background:var(--soft);padding:.25rem .55rem;border-radius:.35rem;white-space:nowrap;">
+                                {{ trans_choice('app.label.attempts_count', $allRecords->count(), ['count' => $allRecords->count()]) }}
+                            </span>
+                        @endif
                         <button type="button" class="cw-modal__x" @click="approver = null">{!! $ic('heroicon-o-x-mark', 16) !!}</button>
                     </div>
                     <div class="cw-modal__bd">
-                        <div class="cw-kv">
-                            <span class="cw-kv__lb">{{ __('app.label.status') }}</span>
-                            <span class="cw-kv__vl"><span class="cw-pill cw-pill--{{ $pillFor($ap->status) }}">{{ $statusName($ap->status) }}</span></span>
+                        <div class="cw-sub" style="margin-top:0;">
+                            <span>{{ __('app.label.approval_records') }}</span>
                         </div>
-                        <div class="cw-kv">
-                            <span class="cw-kv__lb">{{ __('app.label.order_position') }}</span>
-                            <span class="cw-kv__vl">#{{ $ap->order }}</span>
+
+                        {{-- Each ContractApprover record this user has on the contract --}}
+                        <div class="cw-recs">
+                            @foreach ($allRecords as $rec)
+                                <div class="cw-rec {{ $rec->id === $ap->id ? 'cw-rec--focus' : '' }}">
+                                    <div class="cw-rec__top">
+                                        <span class="cw-pill cw-pill--{{ $pillFor($rec->status) }}">{{ $statusName($rec->status) }}</span>
+                                        <span class="cw-rec__ord">#{{ $rec->order }}</span>
+                                        <span class="cw-rec__when">
+                                            @if ($rec->acted_at)
+                                                {!! $ic('heroicon-m-check', 12) !!} {{ $rec->acted_at->format('d.m.Y H:i') }}
+                                            @elseif ($rec->due_at)
+                                                {!! $ic('heroicon-m-clock', 12) !!} {{ __('app.label.due') }} {{ $rec->due_at->format('d.m.Y H:i') }}
+                                            @else
+                                                {!! $ic('heroicon-m-clock', 12) !!} {{ $rec->created_at?->format('d.m.Y H:i') }}
+                                            @endif
+                                        </span>
+                                    </div>
+                                    @if ($rec->comment)
+                                        <div class="cw-rec__cmt">{{ $rec->comment }}</div>
+                                    @endif
+                                    @if ($rec->system_comment)
+                                        <div class="cw-rec__sys">
+                                            <span class="cw-rec__sys-lb">{{ __('app.label.system_note') }}</span>
+                                            <span>{{ $rec->system_comment }}</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
                         </div>
-                        @if ($ap->due_at)
-                            <div class="cw-kv">
-                                <span class="cw-kv__lb">{{ __('app.label.deadline') }}</span>
-                                <span class="cw-kv__vl {{ $ap->isOverdue() ? 'cw-when--over' : '' }}">{{ $ap->due_at->format('d.m.Y H:i') }}</span>
-                            </div>
-                        @endif
-                        @if ($ap->acted_at)
-                            <div class="cw-kv">
-                                <span class="cw-kv__lb">{{ __('app.label.acted_at') }}</span>
-                                <span class="cw-kv__vl">{{ $ap->acted_at->format('d.m.Y H:i') }}</span>
-                            </div>
-                        @endif
-                        @if ($ap->comment)
-                            <div class="cw-kv" style="align-items:flex-start;">
-                                <span class="cw-kv__lb" style="padding-top:.3rem;">{{ __('app.label.comment') }}</span>
-                                <span class="cw-kv__vl" style="font-weight:450;">{{ $ap->comment }}</span>
-                            </div>
-                        @endif
-                        @if ($ap->system_comment)
-                            <div class="cw-kv" style="align-items:flex-start;">
-                                <span class="cw-kv__lb" style="padding-top:.3rem;">{{ __('app.label.system_note') }}</span>
-                                <span class="cw-kv__vl" style="font-weight:450;color:#c2410c;">{{ $ap->system_comment }}</span>
-                            </div>
-                        @endif
 
                         <div class="cw-sub">
                             <span>{{ __('app.label.approver_activity') }}</span>
