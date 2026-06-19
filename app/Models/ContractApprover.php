@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ContractApproverStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,24 +26,28 @@ class ContractApprover extends Model
 
     protected $casts = [
         'order' => 'integer',
+        'status' => ContractApproverStatus::class,
+        'original_status' => ContractApproverStatus::class,
         'acted_at' => 'datetime',
         'due_at' => 'datetime',
         'reminder_sent_at' => 'datetime',
     ];
 
-    public const STATUS_QUEUED = 'queued';
+    // Constants alias the enum cases so the existing `ContractApprover::STATUS_*`
+    // call sites keep working — they now compare as ContractApproverStatus.
+    public const STATUS_QUEUED = ContractApproverStatus::Queued;
 
-    public const STATUS_PENDING = 'pending';
+    public const STATUS_PENDING = ContractApproverStatus::Pending;
 
-    public const STATUS_APPROVED = 'approved';
+    public const STATUS_APPROVED = ContractApproverStatus::Approved;
 
-    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_REJECTED = ContractApproverStatus::Rejected;
 
-    public const STATUS_RETURNED = 'returned';
+    public const STATUS_RETURNED = ContractApproverStatus::Returned;
 
-    public const STATUS_SKIPPED = 'skipped';
+    public const STATUS_SKIPPED = ContractApproverStatus::Skipped;
 
-    public const STATUS_INVALIDATED = 'invalidated';
+    public const STATUS_INVALIDATED = ContractApproverStatus::Invalidated;
 
     /** Statuses that no longer participate in the active queue. */
     public const HISTORICAL_STATUSES = [
@@ -53,30 +58,16 @@ class ContractApprover extends Model
         self::STATUS_INVALIDATED,
     ];
 
+    /** @return array<string, string> value => label */
     public static function getStatuses(): array
     {
-        return [
-            self::STATUS_QUEUED => __('app.contract_approver.status.queued'),
-            self::STATUS_PENDING => __('app.contract_approver.status.pending'),
-            self::STATUS_APPROVED => __('app.contract_approver.status.approved'),
-            self::STATUS_REJECTED => __('app.contract_approver.status.rejected'),
-            self::STATUS_RETURNED => __('app.contract_approver.status.returned'),
-            self::STATUS_SKIPPED => __('app.contract_approver.status.skipped'),
-            self::STATUS_INVALIDATED => __('app.contract_approver.status.invalidated'),
-        ];
+        return ContractApproverStatus::options();
     }
 
+    /** @return array<string, string> value => Filament colour token */
     public static function getStatusColors(): array
     {
-        return [
-            self::STATUS_QUEUED => 'gray',
-            self::STATUS_PENDING => 'primary',
-            self::STATUS_APPROVED => 'success',
-            self::STATUS_REJECTED => 'danger',
-            self::STATUS_RETURNED => 'info',
-            self::STATUS_SKIPPED => 'gray',
-            self::STATUS_INVALIDATED => 'gray',
-        ];
+        return ContractApproverStatus::colors();
     }
 
     /** Scope: rows that count toward the active workflow (excludes invalidated/skipped). */
@@ -132,7 +123,7 @@ class ContractApprover extends Model
      * keeps its real decision in `original_status`, so the UI can still badge
      * it "Approved" (struck through) rather than a faceless "Cancelled".
      */
-    public function displayStatus(): string
+    public function displayStatus(): ContractApproverStatus
     {
         return $this->status === self::STATUS_INVALIDATED && $this->original_status
             ? $this->original_status

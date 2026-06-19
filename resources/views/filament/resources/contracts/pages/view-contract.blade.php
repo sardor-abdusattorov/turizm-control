@@ -1,4 +1,5 @@
 @php
+    use App\Enums\ContractApproverStatus;
     use App\Models\Contract;
     use App\Models\ContractApprover;
     use Illuminate\Support\Carbon;
@@ -27,8 +28,8 @@
     // modal shows every record that user has on the contract.
     $allApprovers = $active->concat($historicalOnly)->values();
 
-    $pillFor = fn (string $status): string => ContractApprover::getStatusColors()[$status] ?? 'gray';
-    $statusName = fn (string $status): string => ContractApprover::getStatuses()[$status] ?? $status;
+    $pillFor = fn (ContractApproverStatus $status): string => $status->color();
+    $statusName = fn (ContractApproverStatus $status): string => $status->label();
     $ic = fn (string $name, int $size = 18) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
     $activities = $this->getActivities()

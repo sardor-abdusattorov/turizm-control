@@ -13,13 +13,13 @@
     // (matches Filament's primary), red for rejection, cyan for return,
     // neutral gray for queued/draft.
     $palette = [
-        ContractApprover::STATUS_APPROVED => ['solid' => '#059669', 'soft' => 'rgba(5,150,105,.12)', 'icon' => 'heroicon-m-check'],
-        ContractApprover::STATUS_REJECTED => ['solid' => '#dc2626', 'soft' => 'rgba(220,38,38,.12)', 'icon' => 'heroicon-m-x-mark'],
-        ContractApprover::STATUS_RETURNED => ['solid' => '#0ea5e9', 'soft' => 'rgba(14,165,233,.14)', 'icon' => 'heroicon-m-arrow-uturn-left'],
-        ContractApprover::STATUS_PENDING => ['solid' => '#6366f1', 'soft' => 'rgba(99,102,241,.14)', 'icon' => 'heroicon-m-clock'],
-        ContractApprover::STATUS_QUEUED => ['solid' => '#cbd5e1', 'soft' => 'rgba(148,163,184,.18)', 'icon' => 'heroicon-m-ellipsis-horizontal'],
+        ContractApprover::STATUS_APPROVED->value => ['solid' => '#059669', 'soft' => 'rgba(5,150,105,.12)', 'icon' => 'heroicon-m-check'],
+        ContractApprover::STATUS_REJECTED->value => ['solid' => '#dc2626', 'soft' => 'rgba(220,38,38,.12)', 'icon' => 'heroicon-m-x-mark'],
+        ContractApprover::STATUS_RETURNED->value => ['solid' => '#0ea5e9', 'soft' => 'rgba(14,165,233,.14)', 'icon' => 'heroicon-m-arrow-uturn-left'],
+        ContractApprover::STATUS_PENDING->value => ['solid' => '#6366f1', 'soft' => 'rgba(99,102,241,.14)', 'icon' => 'heroicon-m-clock'],
+        ContractApprover::STATUS_QUEUED->value => ['solid' => '#cbd5e1', 'soft' => 'rgba(148,163,184,.18)', 'icon' => 'heroicon-m-ellipsis-horizontal'],
     ];
-    $colorFor = fn (string $s) => $palette[$s] ?? ['solid' => '#cbd5e1', 'soft' => 'rgba(148,163,184,.18)', 'icon' => 'heroicon-m-minus'];
+    $colorFor = fn (\App\Enums\ContractApproverStatus $s) => $palette[$s->value] ?? ['solid' => '#cbd5e1', 'soft' => 'rgba(148,163,184,.18)', 'icon' => 'heroicon-m-minus'];
 
     $approved = $active->where('status', ContractApprover::STATUS_APPROVED)->count();
     $hasRejected = $active->contains(fn ($a) => $a->status === ContractApprover::STATUS_REJECTED);
@@ -102,7 +102,7 @@
                     // haven't really started reviewing — keep them quiet.
                     $statusLabel = $isDraft
                         ? __('app.contract_approver.status.not_submitted')
-                        : (ContractApprover::getStatuses()[$a->status] ?? $a->status);
+                        : $a->status->label();
                 @endphp
                 <div class="ca__row">
                     <span class="ca__av">

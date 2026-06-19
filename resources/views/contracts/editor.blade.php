@@ -63,7 +63,7 @@
                 <span class="doc-title">{{ $contract->title }}</span>
             </div>
 
-            <span class="status-pill">{{ \App\Models\Contract::getStatuses()[$contract->status] ?? $contract->status }}</span>
+            <span class="status-pill">{{ $contract->status->label() }}</span>
         </div>
 
         <div class="editor-stage">

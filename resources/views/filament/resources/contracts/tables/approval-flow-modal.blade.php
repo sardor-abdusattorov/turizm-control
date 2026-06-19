@@ -1,4 +1,5 @@
 @php
+    use App\Enums\ContractApproverStatus;
     use App\Models\Contract;
     use App\Models\ContractApprover;
 
@@ -10,7 +11,7 @@
         ->values();
     $isDraft = $contract->status === Contract::STATUS_DRAFT;
 
-    $colorFor = function (string $status): array {
+    $colorFor = function (ContractApproverStatus $status): array {
         return match ($status) {
             ContractApprover::STATUS_APPROVED => ['bg' => 'rgba(16,185,129,.12)', 'fg' => '#047857', 'ring' => '#10b981'],
             ContractApprover::STATUS_REJECTED => ['bg' => 'rgba(239,68,68,.12)', 'fg' => '#b91c1c', 'ring' => '#ef4444'],
@@ -23,9 +24,9 @@
 
     // When the contract is still a draft no one is actually reviewing yet —
     // show a "Not submitted" label instead of "In queue" / "Reviewing".
-    $labelFor = fn (string $status): string => $isDraft
+    $labelFor = fn (ContractApproverStatus $status): string => $isDraft
         ? __('app.contract_approver.status.not_submitted')
-        : (ContractApprover::getStatuses()[$status] ?? $status);
+        : $status->label();
 
     $avatarOf = fn ($a) => $a->user?->getFilamentAvatarUrl()
         ?? 'https://ui-avatars.com/api/?name='.urlencode($a->user?->name ?? '?').'&color=7F9CF5&background=EBF4FF';
@@ -114,7 +115,7 @@
                             <span style="font-size:.85rem;font-weight:600;">{{ $h->user?->name }} <span style="font-weight:400;opacity:.5;">#{{ $h->order }}</span></span>
                             <span class="fl__badge" style="background:{{ $hc['bg'] }};color:{{ $hc['fg'] }};">
                                 <i style="background:{{ $hc['ring'] }};"></i>
-                                {{ ContractApprover::getStatuses()[$h->status] ?? $h->status }}
+                                {{ $h->status->label() }}
                             </span>
                         </div>
                         @if ($h->comment)<div style="margin-top:.3rem;font-size:.82rem;line-height:1.4;">{{ $h->comment }}</div>@endif
