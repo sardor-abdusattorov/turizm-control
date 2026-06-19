@@ -152,6 +152,42 @@ it('leaves a running approval untouched when the chain is saved unchanged', func
         ->and($contract->activeApprovers()->pluck('user_id')->map(fn ($id): int => (int) $id)->all())->toBe([$legal->id, $accounting->id]);
 });
 
+it('preserves the invalidated audit trail when the resulting draft chain is re-saved', function () {
+    $author = editorWithPerms();
+    $legal = chainApprover('legal');
+    $accounting = chainApprover('accounting');
+    $newLegal = chainApprover('legal');
+
+    $contract = inReviewContractFor($author);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $legal->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_APPROVED, 'acted_at' => now()->subHour(),
+        'comment' => 'Approved by legal',
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $accounting->id, 'order' => 2,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+
+    // Mid-flow edit invalidates both (audit) and drops the contract to draft.
+    $contract->update(['title' => 'Edited mid-flow']);
+    expect($contract->fresh()->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(2);
+
+    // Re-pick the chain on the resulting draft and save.
+    Livewire::test(EditContract::class, ['record' => $contract->getKey()])
+        ->fillForm(['approver_chain' => [$newLegal->id, $accounting->id]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $contract->refresh();
+
+    // The audit rows (incl. the approved verdict + its comment) MUST survive,
+    // and the live queue is the freshly picked pair.
+    expect($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(2)
+        ->and($contract->approvers()->where('comment', 'Approved by legal')->exists())->toBeTrue()
+        ->and($contract->activeApprovers()->pluck('user_id')->map(fn ($id): int => (int) $id)->all())->toBe([$newLegal->id, $accounting->id]);
+});
+
 it('rejects saving a chain that is missing the accounting approver', function () {
     $author = editorWithPerms();
     $legal = chainApprover('legal');

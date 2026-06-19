@@ -107,47 +107,41 @@ class EditContract extends EditRecord
     /**
      * Persist the approval-chain picker.
      *
-     * - Draft: we own the whole chain, so wipe and rebuild from the picker.
-     * - Submitted contract whose chain the author changed: drop back to DRAFT
-     *   (the Contract::maybeInvalidateOnEdit hook already does this when a
-     *   business field changed too), keep the old verdicts as an INVALIDATED
-     *   audit trail, and rebuild the queue from the new selection.
-     * - Unchanged chain: left untouched, so a no-op save never cancels a
-     *   running approval.
+     * The golden rule: only ever touch the LIVE queue (QUEUED / PENDING). Rows
+     * that already carry history — RETURNED, SKIPPED, and INVALIDATED audit
+     * verdicts — are never deleted, so the per-approver "Earlier attempts"
+     * trail on the View page survives every re-save.
+     *
+     * - Unchanged chain: no-op, so a plain save never disturbs the queue or
+     *   cancels a running approval.
+     * - Submitted contract whose chain changed: drop back to DRAFT and
+     *   invalidate the live verdicts as audit (unless the
+     *   Contract::maybeInvalidateOnEdit hook already did when a business field
+     *   changed too), then rebuild the queue from the new selection.
+     * - Draft whose chain changed: just replace the live queue.
      */
     protected function afterSave(): void
     {
-        if (! $this->syncChain) {
+        if (! $this->syncChain || $this->approverChain === $this->originalChain) {
             return;
         }
 
-        if ($this->originalStatus === Contract::STATUS_DRAFT) {
-            $this->record->approvers()->delete();
-            $this->rebuildQueuedChain();
-
-            return;
-        }
-
-        if ($this->approverChain === $this->originalChain) {
-            return;
-        }
-
-        if ($this->record->status === Contract::STATUS_DRAFT) {
-            // A business field changed too: the hook already invalidated the old
-            // chain and seeded mirror QUEUED rows. Swap those placeholders for
-            // the author's selection, leaving the audit rows in place.
-            $this->record->approvers()
-                ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
-                ->delete();
-        } else {
-            // Only the chain changed: reset to draft ourselves and invalidate
-            // the live verdicts so they survive as history.
+        // Submitted contract that the hook did NOT already reset: invalidate the
+        // live verdicts ourselves so they become audit history before the swap.
+        if ($this->originalStatus !== Contract::STATUS_DRAFT
+            && $this->record->status !== Contract::STATUS_DRAFT) {
             $this->record->forceFill([
                 'status' => Contract::STATUS_DRAFT,
                 'signed_at' => null,
             ])->saveQuietly();
             $this->record->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
         }
+
+        // Replace only the live queue; INVALIDATED / RETURNED / SKIPPED history
+        // rows stay put.
+        $this->record->approvers()
+            ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
+            ->delete();
 
         $this->rebuildQueuedChain();
     }
