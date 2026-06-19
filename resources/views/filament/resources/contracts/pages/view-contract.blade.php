@@ -208,10 +208,14 @@
         .cw-seg--approved{ background:#10b981; }
         .cw-seg--rejected{ background:#ef4444; }
         .cw-seg--returned{ background:#3b82f6; }
-        .cw-seg--current{ background:var(--accent); }
-        .cw-seg--current::after{ content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); }
-        @media (prefers-reduced-motion: no-preference){ .cw-seg--current::after{ animation:cwSeg 1.9s ease-in-out infinite; } }
-        @keyframes cwSeg{ 0%{ transform:translateX(-100%);} 60%,100%{ transform:translateX(220%);} }
+        /* Current step reads as "in progress", not "done": a track with a
+           narrow accent bar sliding across it, so only finished steps are
+           solid-filled and the filled count matches "N / M approved". */
+        .cw-seg--current{ background:var(--track); }
+        .cw-seg--current::after{ content:''; position:absolute; top:0; bottom:0; left:0; width:45%;
+            border-radius:999px; background:var(--accent); }
+        @media (prefers-reduced-motion: no-preference){ .cw-seg--current::after{ animation:cwSeg 1.5s ease-in-out infinite; } }
+        @keyframes cwSeg{ 0%{ left:-45%; } 100%{ left:100%; } }
 
         /* approval chain — vertical timeline */
         .cw-chain{ padding:.9rem 1.25rem 1.1rem; }
