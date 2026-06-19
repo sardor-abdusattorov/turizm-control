@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasDocumentKey;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ContractTemplate extends Model
 {
-    use HasFactory;
+    use HasDocumentKey, HasFactory;
 
     protected $fillable = [
         'order_type_id',
@@ -45,16 +45,6 @@ class ContractTemplate extends Model
                 Storage::disk('local')->delete($template->template_file);
             }
         });
-    }
-
-    public static function generateDocumentKey(): string
-    {
-        return Str::random(20);
-    }
-
-    public function refreshDocumentKey(): void
-    {
-        $this->update(['document_key' => static::generateDocumentKey()]);
     }
 
     public function templateAbsolutePath(): ?string

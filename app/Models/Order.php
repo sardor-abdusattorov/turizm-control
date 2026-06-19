@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasDocumentKey;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasDocumentKey, HasFactory;
 
     protected $fillable = [
         'order_type_id',
@@ -45,16 +45,6 @@ class Order extends Model
                 Storage::disk('local')->delete($order->file_path);
             }
         });
-    }
-
-    public static function generateDocumentKey(): string
-    {
-        return Str::random(20);
-    }
-
-    public function refreshDocumentKey(): void
-    {
-        $this->update(['document_key' => static::generateDocumentKey()]);
     }
 
     public function fileAbsolutePath(): ?string

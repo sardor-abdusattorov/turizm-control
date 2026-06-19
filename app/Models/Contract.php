@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ContractStatus;
+use App\Models\Concerns\HasDocumentKey;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,11 +13,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class Contract extends Model
 {
-    use HasFactory;
+    use HasDocumentKey, HasFactory;
 
     protected $fillable = [
         'number',
@@ -212,16 +212,6 @@ class Contract extends Model
             : 1;
 
         return sprintf('%s-%d-%03d', $prefix, $year, $next);
-    }
-
-    public static function generateDocumentKey(): string
-    {
-        return Str::random(20);
-    }
-
-    public function refreshDocumentKey(): void
-    {
-        $this->update(['document_key' => static::generateDocumentKey()]);
     }
 
     public function documentPath(): string
