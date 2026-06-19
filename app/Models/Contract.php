@@ -431,16 +431,38 @@ class Contract extends Model
      * Used when the contract is edited mid-flow — old rows stay for the
      * audit history, fresh pending rows are built next.
      *
-     * The note is written to `system_comment` so an approver's original
-     * comment (e.g. "looks good") is preserved alongside the system reason.
+     * A row that already reached a verdict (approved / rejected / returned)
+     * keeps that verdict in `original_status` and keeps its own `acted_at`,
+     * so the audit trail still reads "Approved · 14:30 · 'looks good'" after
+     * the edit cancels it. The system reason goes to `system_comment` so the
+     * approver's own `comment` is never overwritten.
      */
     public function invalidateAllApprovers(?string $note = null): int
     {
-        return $this->approvers()->update([
-            'status' => ContractApprover::STATUS_INVALIDATED,
-            'system_comment' => $note,
-            'acted_at' => now(),
-        ]);
+        $decided = [
+            ContractApprover::STATUS_APPROVED,
+            ContractApprover::STATUS_REJECTED,
+            ContractApprover::STATUS_RETURNED,
+        ];
+
+        $count = 0;
+
+        foreach ($this->approvers()->get() as $approver) {
+            $hadVerdict = in_array($approver->status, $decided, true);
+
+            $approver->update([
+                'original_status' => $hadVerdict ? $approver->status : $approver->original_status,
+                'status' => ContractApprover::STATUS_INVALIDATED,
+                'system_comment' => $note,
+                // Keep the verdict's own timestamp; only stamp the moment of
+                // cancellation onto rows that never acted.
+                'acted_at' => $hadVerdict ? $approver->acted_at : now(),
+            ]);
+
+            $count++;
+        }
+
+        return $count;
     }
 
     public function isCurrentApprover(User $user): bool

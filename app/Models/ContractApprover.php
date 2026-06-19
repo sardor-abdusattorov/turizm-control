@@ -17,6 +17,7 @@ class ContractApprover extends Model
         'status',
         'comment',
         'system_comment',
+        'original_status',
         'acted_at',
         'due_at',
         'reminder_sent_at',
@@ -124,6 +125,24 @@ class ContractApprover extends Model
     public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;
+    }
+
+    /**
+     * The verdict to display for this row. A row cancelled by a mid-flow edit
+     * keeps its real decision in `original_status`, so the UI can still badge
+     * it "Approved" (struck through) rather than a faceless "Cancelled".
+     */
+    public function displayStatus(): string
+    {
+        return $this->status === self::STATUS_INVALIDATED && $this->original_status
+            ? $this->original_status
+            : $this->status;
+    }
+
+    /** Did this row reach a real verdict before being cancelled by an edit? */
+    public function wasCancelledAfterVerdict(): bool
+    {
+        return $this->status === self::STATUS_INVALIDATED && $this->original_status !== null;
     }
 
     /**

@@ -62,6 +62,36 @@ it('renders the view page with an approval chain and history', function () {
         ->assertSee($approvers->first()->name);
 });
 
+it('keeps a cancelled approval verdict and comment in the per-approver modal', function () {
+    $user = viewerWithAccess();
+    $approver = User::factory()->create(['name' => 'Dilshod Approver']);
+
+    $contract = Contract::factory()->create([
+        'responsible_id' => $user->id,
+        'status' => Contract::STATUS_IN_REVIEW,
+        'number' => 'C-VIEW-CANCELLED',
+    ]);
+
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $approver->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_APPROVED, 'acted_at' => now()->subHour(),
+        'comment' => 'Looks good, ship it.',
+    ]);
+
+    // Editing a trigger field cancels the chain; the verdict must survive.
+    $contract->update(['title' => 'Edited mid-flow']);
+
+    actingAs($user);
+
+    $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
+
+    expect($html)->toContain('Looks good, ship it.')           // their own comment
+        ->and($html)->toContain('Earlier attempts')             // the past-attempts caption
+        ->and($html)->toContain(__('app.message.invalidated_on_edit'))
+        // The standalone history button/modal is gone — history lives in the eye.
+        ->and($html)->not->toContain('cw-history-btn');
+});
+
 it('shows a preview button on the document card instead of an embedded pdf iframe', function () {
     Storage::fake('local');
 
@@ -109,7 +139,9 @@ it('shows a per-approver detail modal trigger and renders queued steps distinctl
         ->and($html)->toContain("tab: 'overview'")
         ->and($html)->toContain('cw-tabs')
         ->and($html)->toContain('cw-eye')
-        ->and($html)->toContain('approver = '.$contract->approvers()->where('order', 1)->first()->id)
+        // Modals are keyed by user_id so one opener covers all of a person's records.
+        ->and($html)->toContain('approver = '.$contract->approvers()->where('order', 1)->first()->user_id)
+        ->and($html)->toContain('approver === '.$contract->approvers()->where('order', 1)->first()->user_id)
         // Queued step shows the "In queue" pill, current shows "Reviewing".
         ->and($html)->toContain('In queue')
         ->and($html)->toContain('Reviewing')
