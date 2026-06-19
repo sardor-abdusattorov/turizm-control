@@ -112,6 +112,15 @@ class ContractForm
                                     ->maxLength(255)
                                     ->columnSpanFull(),
 
+                                Select::make('currency_id')
+                                    ->label(__('app.label.currency_single'))
+                                    ->options(Currency::query()->where('status', true)->pluck('short_name', 'id'))
+                                    ->required()
+                                    ->live()
+                                    ->searchable()
+                                    ->preload()
+                                    ->columnSpanFull(),
+
                                 TextInput::make('amount')
                                     ->label(__('app.label.amount'))
                                     ->prefix(fn (Get $get): ?string => Currency::find($get('currency_id'))?->short_name)
@@ -120,15 +129,14 @@ class ContractForm
                                     ->minValue(0)
                                     ->default(0)
                                     ->required()
-                                    ->columnSpanFull(),
-
-                                Select::make('currency_id')
-                                    ->label(__('app.label.currency_single'))
-                                    ->options(Currency::query()->where('status', true)->pluck('short_name', 'id'))
-                                    ->required()
-                                    ->live()
-                                    ->searchable()
-                                    ->preload()
+                                    // Amount is meaningless without a currency — gate it behind
+                                    // the (live) currency picker above and keep it dehydrated so
+                                    // the value still saves once the field is enabled.
+                                    ->disabled(fn (Get $get): bool => blank($get('currency_id')))
+                                    ->dehydrated()
+                                    ->placeholder(fn (Get $get): ?string => blank($get('currency_id'))
+                                        ? __('app.label.select_currency_first')
+                                        : null)
                                     ->columnSpanFull(),
                             ]),
 

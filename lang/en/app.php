@@ -68,6 +68,7 @@ return [
         'order_type_single' => 'Order Type',
         'no_category' => 'No category',
         'select_order_type_first' => 'Select an order type first',
+        'select_currency_first' => 'Select a currency first',
         'select_option' => 'Select an option',
         'order_type_plural' => 'Order Types',
         'order_file' => 'Order File',
