@@ -32,40 +32,4 @@ enum ContractApproverStatus: string
             self::Returned => 'info',
         };
     }
-
-    /**
-     * value => label map.
-     *
-     * @return array<string, string>
-     */
-    public static function options(): array
-    {
-        return array_reduce(
-            self::cases(),
-            static function (array $carry, self $status): array {
-                $carry[$status->value] = $status->label();
-
-                return $carry;
-            },
-            [],
-        );
-    }
-
-    /**
-     * value => colour map.
-     *
-     * @return array<string, string>
-     */
-    public static function colors(): array
-    {
-        return array_reduce(
-            self::cases(),
-            static function (array $carry, self $status): array {
-                $carry[$status->value] = $status->color();
-
-                return $carry;
-            },
-            [],
-        );
-    }
 }

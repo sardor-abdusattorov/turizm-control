@@ -50,22 +50,4 @@ enum ContractStatus: string
             [],
         );
     }
-
-    /**
-     * value => colour map (kept for callers that index colours by raw value).
-     *
-     * @return array<string, string>
-     */
-    public static function colors(): array
-    {
-        return array_reduce(
-            self::cases(),
-            static function (array $carry, self $status): array {
-                $carry[$status->value] = $status->color();
-
-                return $carry;
-            },
-            [],
-        );
-    }
 }

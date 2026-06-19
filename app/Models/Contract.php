@@ -63,12 +63,6 @@ class Contract extends Model
         return ContractStatus::options();
     }
 
-    /** @return array<string, string> value => Filament colour token */
-    public static function getStatusColors(): array
-    {
-        return ContractStatus::colors();
-    }
-
     protected static function booted(): void
     {
         static::creating(function (self $contract): void {

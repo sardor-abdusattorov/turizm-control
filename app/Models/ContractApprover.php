@@ -49,27 +49,6 @@ class ContractApprover extends Model
 
     public const STATUS_INVALIDATED = ContractApproverStatus::Invalidated;
 
-    /** Statuses that no longer participate in the active queue. */
-    public const HISTORICAL_STATUSES = [
-        self::STATUS_APPROVED,
-        self::STATUS_REJECTED,
-        self::STATUS_RETURNED,
-        self::STATUS_SKIPPED,
-        self::STATUS_INVALIDATED,
-    ];
-
-    /** @return array<string, string> value => label */
-    public static function getStatuses(): array
-    {
-        return ContractApproverStatus::options();
-    }
-
-    /** @return array<string, string> value => Filament colour token */
-    public static function getStatusColors(): array
-    {
-        return ContractApproverStatus::colors();
-    }
-
     /** Scope: rows that count toward the active workflow (excludes invalidated/skipped). */
     public function scopeActive($query)
     {
