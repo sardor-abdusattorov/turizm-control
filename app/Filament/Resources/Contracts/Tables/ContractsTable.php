@@ -47,7 +47,6 @@ class ContractsTable
                 TextColumn::make('amount')
                     ->label(__('app.label.amount'))
                     ->formatStateUsing(fn (?string $state, Contract $record): string => number_format((float) $state, 2, ',', ' ').' '.($record->currency?->short_name ?? ''))
-                    ->alignEnd()
                     ->sortable(),
 
                 TextColumn::make('status')
@@ -61,8 +60,8 @@ class ContractsTable
                     ->label(__('app.label.approvers'))
                     ->view('filament.resources.contracts.tables.approvers-column')
                     ->disableClick()
-                    ->extraHeaderAttributes(['style' => 'min-width:11rem;'])
-                    ->extraAttributes(['style' => 'min-width:11rem;']),
+                    ->extraHeaderAttributes(['style' => 'min-width:14rem;'])
+                    ->extraAttributes(['style' => 'min-width:14rem;vertical-align:middle;']),
 
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))

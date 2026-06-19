@@ -4,56 +4,65 @@
     /** @var \App\Models\Contract $record */
     $record = $getRecord();
 
-    // Current active chain, in order.
     $active = $record->activeApprovers->sortBy('order')->values();
     $total = $active->count();
 
-    $segColor = fn (string $s): string => match ($s) {
-        ContractApprover::STATUS_APPROVED => '#22c55e',
-        ContractApprover::STATUS_REJECTED => '#ef4444',
-        ContractApprover::STATUS_RETURNED => '#3b82f6',
-        ContractApprover::STATUS_PENDING => '#fb923c',
-        ContractApprover::STATUS_QUEUED => '#c7d2fe',
-        default => '#e2e8f0',
-    };
-    $ringColor = fn (string $s): string => match ($s) {
-        ContractApprover::STATUS_APPROVED => '#22c55e',
-        ContractApprover::STATUS_REJECTED => '#ef4444',
-        ContractApprover::STATUS_RETURNED => '#3b82f6',
-        ContractApprover::STATUS_PENDING => '#fb923c',
-        ContractApprover::STATUS_QUEUED => '#a5b4fc',
-        default => '#cbd5e1',
-    };
+    // Indigo-accent palette: green only for the positive outcome, indigo for
+    // in-progress (matches Filament's primary), red for rejection, cyan for
+    // return, neutral gray for queued.
+    $palette = [
+        ContractApprover::STATUS_APPROVED => ['solid' => '#16a34a', 'soft' => 'rgba(22,163,74,.12)', 'icon' => 'heroicon-m-check'],
+        ContractApprover::STATUS_REJECTED => ['solid' => '#dc2626', 'soft' => 'rgba(220,38,38,.12)', 'icon' => 'heroicon-m-x-mark'],
+        ContractApprover::STATUS_RETURNED => ['solid' => '#0ea5e9', 'soft' => 'rgba(14,165,233,.14)', 'icon' => 'heroicon-m-arrow-uturn-left'],
+        ContractApprover::STATUS_PENDING => ['solid' => '#6366f1', 'soft' => 'rgba(99,102,241,.14)', 'icon' => 'heroicon-m-clock'],
+        ContractApprover::STATUS_QUEUED => ['solid' => '#cbd5e1', 'soft' => 'rgba(148,163,184,.18)', 'icon' => 'heroicon-m-ellipsis-horizontal'],
+    ];
+    $colorFor = fn (string $s) => $palette[$s] ?? ['solid' => '#cbd5e1', 'soft' => 'rgba(148,163,184,.18)', 'icon' => 'heroicon-m-minus'];
 
     $approved = $active->where('status', ContractApprover::STATUS_APPROVED)->count();
     $hasRejected = $active->contains(fn ($a) => $a->status === ContractApprover::STATUS_REJECTED);
 
-    [$label, $labelColor] = match (true) {
+    [$summary, $summaryColor] = match (true) {
         $total === 0 => ['—', '#94a3b8'],
-        $hasRejected => [ContractApprover::getStatuses()[ContractApprover::STATUS_REJECTED], '#dc2626'],
-        $approved === $total => [ContractApprover::getStatuses()[ContractApprover::STATUS_APPROVED], '#15803d'],
-        default => ["{$approved}/{$total}", '#64748b'],
+        $hasRejected => [__('app.contract_approver.status.rejected'), '#dc2626'],
+        $approved === $total => [__('app.contract_approver.status.approved'), '#16a34a'],
+        default => ["{$approved}/{$total}", '#6366f1'],
     };
 
-    $shown = $active->take(5);
-    $overflow = max(0, $total - 5);
+    $initials = function (?string $name): string {
+        if (! $name) {
+            return '?';
+        }
+        $parts = preg_split('/\s+/', trim($name));
+
+        return mb_strtoupper(mb_substr($parts[0] ?? '', 0, 1).mb_substr($parts[1] ?? '', 0, 1));
+    };
 @endphp
 
 @once
     <style>
-        .cf-appr { display:flex; flex-direction:column; gap:.4rem; align-items:flex-start; border:0; background:transparent;
-            cursor:pointer; padding:.2rem .3rem; border-radius:.55rem; min-width:9rem; transition:background .12s ease; }
-        .cf-appr:hover { background:rgba(127,127,127,.07); }
-        .cf-appr__bar { display:flex; align-items:center; gap:.5rem; width:100%; }
-        .cf-appr__seg { display:flex; gap:2px; flex:1; min-width:3.5rem; }
-        .cf-appr__seg > span { flex:1; height:.34rem; border-radius:99px; }
-        .cf-appr__count { font-size:.78rem; font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; }
-        .cf-appr__avs { display:flex; align-items:center; }
-        .cf-appr__av { width:1.65rem; height:1.65rem; border-radius:50%; object-fit:cover; position:relative;
-            --gap:#fff; box-shadow:0 0 0 2px var(--gap), 0 0 0 3.5px var(--ring,#cbd5e1); }
-        .dark .cf-appr__av { --gap:#1b1b1f; }
-        .cf-appr__av + .cf-appr__av { margin-left:-.5rem; }
-        .cf-appr__more { margin-left:.35rem; font-size:.72rem; font-weight:600; color:currentColor; opacity:.55; }
+        .ca { display:flex; flex-direction:column; gap:.45rem; align-items:stretch;
+            background:transparent; border:0; cursor:pointer; padding:.4rem .55rem;
+            border-radius:.6rem; min-width:13rem; max-width:18rem; transition:background .12s ease; text-align:left; }
+        .ca:hover { background:rgba(127,127,127,.07); }
+        .ca__hd { display:flex; align-items:center; gap:.55rem; }
+        .ca__seg { display:flex; gap:3px; flex:1; min-width:4rem; }
+        .ca__seg > span { flex:1; height:.45rem; border-radius:99px; }
+        .ca__count { font-size:.78rem; font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
+        .ca__list { display:flex; flex-direction:column; gap:.25rem; }
+        .ca__row { display:flex; align-items:center; gap:.5rem; font-size:.8rem; line-height:1.2; }
+        .ca__av { width:1.5rem; height:1.5rem; border-radius:50%; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center;
+            font-size:.62rem; font-weight:700; letter-spacing:.02em;
+            background:var(--av-bg,#e0e7ff); color:var(--av-fg,#4338ca);
+            object-fit:cover; overflow:hidden; }
+        .ca__av img { width:100%; height:100%; object-fit:cover; display:block; }
+        .ca__nm { color:currentColor; opacity:.95; flex:1; min-width:0;
+            overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .ca__ic { width:1rem; height:1rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+            border-radius:50%; }
+        .ca__ic svg { width:.7rem; height:.7rem; }
+        .ca__more { font-size:.72rem; color:currentColor; opacity:.55; padding-left:2rem; padding-top:.1rem; }
     </style>
 @endonce
 
@@ -66,35 +75,42 @@
         wire:loading.attr="disabled"
         x-on:click.stop
         title="{{ __('app.label.approval_chain') }}"
-        class="cf-appr"
+        class="ca"
     >
-        {{-- Progress: segmented bar + count --}}
-        <div class="cf-appr__bar">
-            <div class="cf-appr__seg">
+        {{-- Header: progress bar + summary --}}
+        <div class="ca__hd">
+            <div class="ca__seg">
                 @foreach ($active as $a)
-                    <span style="background:{{ $segColor($a->status) }};"></span>
+                    <span style="background:{{ $colorFor($a->status)['solid'] }};"></span>
                 @endforeach
             </div>
-            <span class="cf-appr__count" style="color:{{ $labelColor }};">{{ $label }}</span>
+            <span class="ca__count" style="color:{{ $summaryColor }};">{{ $summary }}</span>
         </div>
 
-        {{-- Avatars with status rings --}}
-        <div class="cf-appr__avs">
-            @foreach ($shown as $i => $a)
+        {{-- Compact list: avatar/initials + name + status icon --}}
+        <div class="ca__list">
+            @foreach ($active->take(3) as $a)
                 @php
-                    $av = $a->user?->getFilamentAvatarUrl()
-                        ?? 'https://ui-avatars.com/api/?name='.urlencode($a->user?->name ?? '?').'&color=7F9CF5&background=EBF4FF';
+                    $c = $colorFor($a->status);
+                    $av = $a->user?->getFilamentAvatarUrl();
                 @endphp
-                <img
-                    src="{{ $av }}"
-                    alt="{{ $a->user?->name }}"
-                    title="{{ $a->user?->name }} · {{ ContractApprover::getStatuses()[$a->status] ?? $a->status }}"
-                    class="cf-appr__av"
-                    style="--ring:{{ $ringColor($a->status) }};z-index:{{ 10 - $i }};"
-                >
+                <div class="ca__row">
+                    <span class="ca__av">
+                        @if ($av)
+                            <img src="{{ $av }}" alt="">
+                        @else
+                            {{ $initials($a->user?->name) }}
+                        @endif
+                    </span>
+                    <span class="ca__nm" title="{{ $a->user?->name }}">{{ $a->user?->name ?? '—' }}</span>
+                    <span class="ca__ic" style="background:{{ $c['soft'] }};color:{{ $c['solid'] }};" title="{{ ContractApprover::getStatuses()[$a->status] ?? $a->status }}">
+                        {!! svg($c['icon'], '', ['width' => 11, 'height' => 11])->toHtml() !!}
+                    </span>
+                </div>
             @endforeach
-            @if ($overflow > 0)
-                <span class="cf-appr__more">+{{ $overflow }}</span>
+
+            @if ($total > 3)
+                <span class="ca__more">+{{ $total - 3 }} {{ __('app.label.more') }}</span>
             @endif
         </div>
     </button>
