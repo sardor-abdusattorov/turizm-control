@@ -112,8 +112,7 @@
         .cw-bd{ padding:1.25rem; }
 
         /* layout */
-        .cw-cols{ display:grid; grid-template-columns:1fr; gap:1.5rem; align-items:start; }
-        @media(min-width:1024px){ .cw-cols{ grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); } }
+        .cw-cols{ display:flex; flex-direction:column; gap:1.5rem; align-items:stretch; }
         .cw-main,.cw-side{ display:flex; flex-direction:column; gap:1.5rem; min-width:0; }
         .cw-panel{ display:flex; flex-direction:column; gap:1.5rem; }
 
