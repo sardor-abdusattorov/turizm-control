@@ -9,7 +9,21 @@
     scrollbar-color: rgb(var(--primary-400)) transparent;
 }
 
-*::-webkit-scrollbar {
+/* Filament v5's button color picker uses WCAG-AA contrast and falls back to
+   `bg-400 + text-800` for palettes like Blue/Emerald/Red whose 500-shade hover
+   would otherwise need dark text — producing the pastel-with-dark-text look.
+   Override solid action buttons to the classic `bg-600 + light text` pairing
+   so success/danger/warning/primary read as a single intent at a glance. */
+.fi-btn:not(.fi-outlined):is(.fi-color-primary, .fi-color-success, .fi-color-danger, .fi-color-warning, .fi-color-info) {
+    --bg: var(--color-600);
+    --hover-bg: var(--color-700);
+    --text: var(--color-50);
+    --hover-text: var(--color-50);
+    --dark-bg: var(--color-500);
+    --dark-hover-bg: var(--color-400);
+    --dark-text: var(--color-50);
+    --dark-hover-text: var(--color-50);
+}*::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
