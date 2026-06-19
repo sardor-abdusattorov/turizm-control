@@ -15,8 +15,8 @@
             ContractApprover::STATUS_APPROVED => ['bg' => 'rgba(16,185,129,.12)', 'fg' => '#047857', 'ring' => '#10b981'],
             ContractApprover::STATUS_REJECTED => ['bg' => 'rgba(239,68,68,.12)', 'fg' => '#b91c1c', 'ring' => '#ef4444'],
             ContractApprover::STATUS_RETURNED => ['bg' => 'rgba(59,130,246,.12)', 'fg' => '#1d4ed8', 'ring' => '#3b82f6'],
-            ContractApprover::STATUS_PENDING => ['bg' => 'rgba(251,146,60,.14)', 'fg' => '#c2410c', 'ring' => '#fb923c'],
-            ContractApprover::STATUS_QUEUED => ['bg' => 'rgba(99,102,241,.10)', 'fg' => '#4f46e5', 'ring' => '#a5b4fc'],
+            ContractApprover::STATUS_PENDING => ['bg' => 'rgb(var(--primary-500) / 0.14)', 'fg' => 'rgb(var(--primary-700))', 'ring' => 'rgb(var(--primary-500))'],
+            ContractApprover::STATUS_QUEUED => ['bg' => 'rgb(var(--primary-500) / 0.10)', 'fg' => 'rgb(var(--primary-600))', 'ring' => 'rgb(var(--primary-400))'],
             default => ['bg' => 'rgba(127,127,127,.10)', 'fg' => 'currentColor', 'ring' => '#cbd5e1'],
         };
     };

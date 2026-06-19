@@ -69,20 +69,22 @@
 
 @once
     <style>
+        /* Accent driven by Filament's primary palette — re-skins automatically
+           when Color::* changes in AdminPanelProvider. */
         .cf-file{ display:flex; flex-direction:column; gap:1rem;
             padding:1.1rem 1.25rem; border-radius:.75rem;
-            background:rgba(99,102,241,.04); border:1px solid rgba(99,102,241,.18); }
-        .dark .cf-file{ background:rgba(99,102,241,.07); border-color:rgba(99,102,241,.22); }
+            background:rgb(var(--primary-500) / 0.04); border:1px solid rgb(var(--primary-500) / 0.18); }
+        .dark .cf-file{ background:rgb(var(--primary-400) / 0.07); border-color:rgb(var(--primary-400) / 0.22); }
 
         .cf-file__row{ display:flex; align-items:flex-start; gap:1.1rem; }
         .cf-file__thumb{ position:relative; width:5rem; height:6rem; flex-shrink:0;
             background:#fff; border-radius:.6rem;
             display:flex; align-items:center; justify-content:center;
-            box-shadow:0 1px 2px rgba(15,20,25,.06), inset 0 0 0 1px rgba(99,102,241,.10); }
-        .dark .cf-file__thumb{ background:rgba(255,255,255,.06); box-shadow:inset 0 0 0 1px rgba(99,102,241,.15); }
+            box-shadow:0 1px 2px rgba(15,20,25,.06), inset 0 0 0 1px rgb(var(--primary-500) / 0.10); }
+        .dark .cf-file__thumb{ background:rgba(255,255,255,.06); box-shadow:inset 0 0 0 1px rgb(var(--primary-400) / 0.15); }
         .cf-file__thumb svg{ width:60%; height:auto; }
         .cf-file__ext{ position:absolute; left:.45rem; bottom:.55rem; padding:.16rem .42rem;
-            border-radius:.3rem; background:#6366f1; color:#fff;
+            border-radius:.3rem; background:rgb(var(--primary-600)); color:#fff;
             font-size:.6rem; font-weight:700; letter-spacing:.04em; line-height:1; }
 
         .cf-file__body{ display:flex; flex-direction:column; gap:.6rem; min-width:0; flex:1; padding-top:.15rem; }
@@ -94,7 +96,7 @@
         .cf-file__act{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; }
         .cf-btn{ display:inline-flex; align-items:center; gap:.4rem; padding:.5rem .85rem; border-radius:.5rem;
             font-size:.81rem; font-weight:600; text-decoration:none; transition:opacity .12s, background .12s; }
-        .cf-btn--primary{ background:#6366f1; color:#fff; }
+        .cf-btn--primary{ background:rgb(var(--primary-600)); color:#fff; }
         .cf-btn--primary:hover{ opacity:.88; }
         .cf-btn--ghost{ background:transparent; color:currentColor; box-shadow:inset 0 0 0 1px rgba(127,127,127,.22); }
         .cf-btn--ghost:hover{ background:rgba(127,127,127,.08); }

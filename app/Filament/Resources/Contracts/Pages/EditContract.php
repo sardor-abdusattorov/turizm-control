@@ -31,13 +31,15 @@ class EditContract extends EditRecord
     }
 
     /**
-     * Wrap Save in a confirmation modal — for contracts mid-flow (in_review
-     * / approved / rejected) the message warns that the chain will be
-     * invalidated, otherwise it's a softer "save changes?" prompt.
+     * Wrap Save in a confirmation modal. For mid-flow contracts the modal
+     * warns that the chain will be cancelled and rebuilt; for drafts it's
+     * a softer "save changes?" prompt. Implemented as a plain ->action()
+     * instead of ->submit() because Filament skips ->requiresConfirmation()
+     * for true form-submit buttons (they go straight to the wire:submit
+     * handler), and that's why the dialog wasn't showing before.
      */
     protected function getSaveFormAction(): Action
     {
-        $hasFormWrapper = $this->hasFormWrapper();
         $isMidFlow = $this->record && in_array($this->record->status, [
             Contract::STATUS_IN_REVIEW,
             Contract::STATUS_APPROVED,
@@ -46,8 +48,6 @@ class EditContract extends EditRecord
 
         return Action::make('save')
             ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
-            ->submit($hasFormWrapper ? $this->getSubmitFormLivewireMethodName() : null)
-            ->action($hasFormWrapper ? null : $this->getSubmitFormLivewireMethodName())
             ->keyBindings(['mod+s'])
             ->requiresConfirmation()
             ->modalIcon($isMidFlow ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-question-mark-circle')
@@ -57,7 +57,8 @@ class EditContract extends EditRecord
                 ? __('app.message.save_warning_mid_flow')
                 : __('app.message.save_warning_draft'))
             ->modalSubmitActionLabel(__('app.action.save_anyway'))
-            ->modalCancelActionLabel(__('app.action.keep_editing'));
+            ->modalCancelActionLabel(__('app.action.keep_editing'))
+            ->action(fn () => $this->{$this->getSubmitFormLivewireMethodName()}());
     }
 
     /**
