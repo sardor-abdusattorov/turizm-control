@@ -49,11 +49,9 @@ class ContractsTable
                     ->formatStateUsing(fn (?string $state, Contract $record): string => number_format((float) $state, 2, ',', ' ').' '.($record->currency?->short_name ?? ''))
                     ->sortable(),
 
-                TextColumn::make('status')
+                ViewColumn::make('status')
                     ->label(__('app.label.status'))
-                    ->badge()
-                    ->formatStateUsing(fn (string $state) => Contract::getStatuses()[$state] ?? $state)
-                    ->color(fn (string $state) => Contract::getStatusColors()[$state] ?? 'gray')
+                    ->view('filament.resources.contracts.tables.status-column')
                     ->sortable(),
 
                 ViewColumn::make('approvers_chain')

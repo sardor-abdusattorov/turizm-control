@@ -11,19 +11,17 @@ use App\Models\Currency;
 use App\Models\Department;
 use App\Models\OrderType;
 use App\Models\User;
-use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class ContractForm
 {
@@ -59,41 +57,6 @@ class ContractForm
                             ->columnSpanFull(),
                     ]),
 
-                Section::make(__('app.label.attached_document'))
-                    ->visible(fn (?Contract $record): bool => $record !== null && $record->documentExists())
-                    ->schema([
-                        TextEntry::make('document_file')
-                            ->hiddenLabel()
-                            ->icon('heroicon-o-document-text')
-                            ->iconColor('primary')
-                            ->weight('bold')
-                            ->state(fn (Contract $record): string => $record->number.'.docx')
-                            ->columnSpanFull(),
-
-                        TextEntry::make('document_size')
-                            ->label(__('app.label.size'))
-                            ->state(function (Contract $record): string {
-                                $bytes = Storage::disk('local')->size($record->documentPath());
-
-                                return number_format($bytes / 1024, 1).' KB';
-                            }),
-
-                        TextEntry::make('created_at')
-                            ->label(__('app.label.created_at'))
-                            ->dateTime('d.m.Y H:i'),
-
-                        Actions::make([
-                            Action::make('openInEditor')
-                                ->label(__('app.action.open_editor'))
-                                ->icon('heroicon-o-pencil-square')
-                                ->color('primary')
-                                ->url(fn (Contract $record) => route('contracts.editor', [
-                                    'contract' => $record,
-                                    'mode' => 'edit',
-                                ])),
-                        ])->columnSpanFull(),
-                    ]),
-
                 Tabs::make('contract_tabs')
                     ->columnSpanFull()
                     // When editing a draft that already has a chain, jump to
@@ -106,6 +69,10 @@ class ContractForm
                         Tab::make(__('app.label.basic_information'))
                             ->icon('heroicon-o-clipboard-document-list')
                             ->schema([
+                                View::make('filament.resources.contracts.partials.file-card')
+                                    ->visible(fn (?Contract $record): bool => $record !== null && $record->documentExists())
+                                    ->columnSpanFull(),
+
                                 TextInput::make('number')
                                     ->label(__('app.label.contract_number'))
                                     ->required()
