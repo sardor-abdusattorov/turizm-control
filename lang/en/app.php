@@ -176,6 +176,8 @@ return [
         'show_more' => 'Show more',
         'show_less' => 'Show less',
         'not_set' => 'Not set',
+        'legal_details' => 'Legal details',
+        'contacts' => 'Contacts',
         'approver_details' => 'Approver details',
         'approvers' => 'Approvers',
         'not_submitted' => 'Not submitted',

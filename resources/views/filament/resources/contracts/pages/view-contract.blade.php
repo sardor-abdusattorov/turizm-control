@@ -58,17 +58,41 @@
     ];
 
     $contact = $record->contact;
-    $contactRows = $contact ? array_values(array_filter([
-        ['heroicon-o-building-office-2', __('app.label.name'), $contact->name],
-        ['heroicon-o-identification', __('app.label.legal_form'), $contact->legal_form ?? null],
-        ['heroicon-o-finger-print', __('app.label.inn'), $contact->inn ?? null],
-        ['heroicon-o-hashtag', 'PINFL', $contact->pinfl ?? null],
-        ['heroicon-o-bookmark', 'OKED', $contact->oked ?? null],
-        ['heroicon-o-map-pin', __('app.label.address'), $contact->address ?? null],
-        ['heroicon-o-phone', __('app.label.phone'), $contact->phone ?? null],
-        ['heroicon-o-envelope', __('app.label.email'), $contact->email ?? null],
-        ['heroicon-o-hashtag', 'MFO', $contact->mfo ?? null],
-    ], fn ($r) => ! empty($r[2]))) : [];
+    $contactType = $contact?->type === \App\Models\Contact::TYPE_INDIVIDUAL
+        ? __('app.contact.type.individual')
+        : __('app.contact.type.legal');
+
+    // Group fields exactly the way Filament's ContactForm splits them:
+    // identity + tax/legal + contacts + bank requisites.
+    $contactGroups = $contact ? [
+        [__('app.label.basic_information'), array_values(array_filter([
+            ['heroicon-o-building-office-2', __('app.label.name'), $contact->name],
+            ['heroicon-o-identification', __('app.label.contact_type'), $contactType],
+            ['heroicon-o-tag', __('app.label.legal_form'), $contact->legal_form],
+            ['heroicon-o-map-pin', __('app.label.address'), $contact->address],
+        ], fn ($r) => ! empty($r[2])))],
+
+        [__('app.label.legal_details'), array_values(array_filter([
+            ['heroicon-o-finger-print', __('app.label.inn'), $contact->inn],
+            ['heroicon-o-finger-print', 'PINFL', $contact->pinfl],
+            ['heroicon-o-bookmark', 'OKED', $contact->oked],
+            ['heroicon-o-user', __('app.label.director_name'), $contact->director_name],
+            ['heroicon-o-user-circle', __('app.label.contact_person'), $contact->contact_person],
+        ], fn ($r) => ! empty($r[2])))],
+
+        [__('app.label.contacts'), array_values(array_filter([
+            ['heroicon-o-phone', __('app.label.phone'), $contact->phone],
+            ['heroicon-o-envelope', __('app.label.email'), $contact->email],
+        ], fn ($r) => ! empty($r[2])))],
+
+        [__('app.label.bank_requisites'), array_values(array_filter([
+            ['heroicon-o-building-library', __('app.label.bank_name'), $contact->bank_name],
+            ['heroicon-o-banknotes', __('app.label.bank_account'), $contact->bank_account],
+            ['heroicon-o-hashtag', 'MFO', $contact->mfo],
+        ], fn ($r) => ! empty($r[2])))],
+    ] : [];
+    // Drop any group that ended up empty after filtering.
+    $contactGroups = array_values(array_filter($contactGroups, fn ($g) => count($g[1]) > 0));
 @endphp
 
 <x-filament-panels::page>
@@ -216,8 +240,12 @@
             color:var(--accent); font-size:.815rem; font-weight:600; cursor:pointer;
             transition:background .12s ease; }
         .cw-show-more:hover{ background:rgba(99,102,241,.05); }
+        .cw-contact-group{ display:flex; flex-direction:column; gap:.1rem; }
+        .cw-contact-group + .cw-contact-group{ margin-top:1.1rem; padding-top:.9rem; border-top:1px solid var(--d); }
+        .cw-contact-group__t{ font-size:.7rem; font-weight:700; color:var(--m2); text-transform:uppercase; letter-spacing:.06em; padding:0 .25rem .35rem; }
         .cw-contact-rows{ display:flex; flex-direction:column; }
-        .cw-contact-rows .cw-row{ padding:.6rem 0; }
+        .cw-contact-rows .cw-row{ padding:.45rem .25rem; border-bottom:0; }
+        .cw-contact-rows .cw-row + .cw-row{ border-top:1px dashed var(--d); }
 
         /* execution timeline */
         .cw-filters{ display:flex; gap:.3rem; padding:.95rem 1.25rem; border-bottom:1px solid var(--d); flex-wrap:wrap; }
@@ -555,7 +583,7 @@
         @if ($contact)
             <div class="cw-modal" x-show="contactOpen" x-cloak style="display:none;">
                 <div class="cw-modal__bg" @click="contactOpen = false"></div>
-                <div class="cw-modal__card"
+                <div class="cw-modal__card" style="max-width:34rem;"
                     x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 scale-95"
                     x-transition:enter-end="opacity-100 scale-100">
@@ -572,15 +600,20 @@
                         <button type="button" class="cw-modal__x" @click="contactOpen = false">{!! $ic('heroicon-m-x-mark', 16) !!}</button>
                     </div>
                     <div class="cw-modal__bd">
-                        <div class="cw-contact-rows">
-                            @foreach ($contactRows as [$ic_, $lb, $vl])
-                                <div class="cw-row" style="border:0;padding:.55rem 0;">
-                                    <span class="cw-row__ic">{!! $ic($ic_, 16) !!}</span>
-                                    <span class="cw-row__lb">{{ $lb }}</span>
-                                    <span class="cw-row__vl" style="max-width:65%;">{{ $vl }}</span>
+                        @foreach ($contactGroups as [$groupLabel, $rows])
+                            <div class="cw-contact-group">
+                                <div class="cw-contact-group__t">{{ $groupLabel }}</div>
+                                <div class="cw-contact-rows">
+                                    @foreach ($rows as [$ic_, $lb, $vl])
+                                        <div class="cw-row">
+                                            <span class="cw-row__ic">{!! $ic($ic_, 16) !!}</span>
+                                            <span class="cw-row__lb">{{ $lb }}</span>
+                                            <span class="cw-row__vl" style="max-width:62%;white-space:normal;text-align:right;">{{ $vl }}</span>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
-                        </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
