@@ -40,8 +40,18 @@
         return $c->translatedFormat('d F Y');
     };
 
+    // Friendly language label — fall back to the short code if the title is
+    // missing from the lang file.
+    $languageLabel = null;
+    if ($record->language) {
+        $key = 'app.label.'.strtolower($record->language);
+        $resolved = __($key);
+        $languageLabel = $resolved === $key ? strtoupper($record->language) : $resolved;
+    }
+
     // Core info visible by default; everything else lives behind "Show more".
     $details = [
+        ['heroicon-o-bolt', __('app.label.status'), $statusLabel, 'status', false],
         ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number, null, false],
         ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name, $record->contact ? 'contact' : null, false],
         ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name, null, false],
@@ -50,7 +60,7 @@
         ['heroicon-o-banknotes', __('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? ''), null, false],
 
         // Extra rows — collapsed by default.
-        ['heroicon-o-language', __('app.label.language'), strtoupper((string) $record->language) ?: null, null, true],
+        ['heroicon-o-language', __('app.label.language'), $languageLabel, null, true],
         ['heroicon-o-paper-airplane', __('app.label.submitted'), $this->submittedAt()?->format('d.m.Y H:i'), null, true],
         ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y'), null, true],
         ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i'), null, true],
@@ -550,6 +560,14 @@
                                         {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}
                                     </span>
                                 </button>
+                            @elseif ($type === 'status')
+                                <div class="cw-row" @if ($extra) x-show="basicExpanded" x-cloak @endif>
+                                    <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
+                                    <span class="cw-row__lb">{{ $label }}</span>
+                                    <span class="cw-row__vl" style="overflow:visible;">
+                                        <span class="cw-pill cw-pill--{{ $statusColor }}" style="padding:.32rem .7rem .32rem .55rem;font-size:.82rem;">{{ $value }}</span>
+                                    </span>
+                                </div>
                             @else
                                 <div class="cw-row" @if ($extra) x-show="basicExpanded" x-cloak @endif>
                                     <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
