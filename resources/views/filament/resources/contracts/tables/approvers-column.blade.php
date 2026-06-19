@@ -1,4 +1,5 @@
 @php
+    use App\Models\Contract;
     use App\Models\ContractApprover;
 
     /** @var \App\Models\Contract $record */
@@ -6,10 +7,11 @@
 
     $active = $record->activeApprovers->sortBy('order')->values();
     $total = $active->count();
+    $isDraft = $record->status === Contract::STATUS_DRAFT;
 
-    // Indigo-accent palette: green only for the positive outcome, indigo for
-    // in-progress (matches Filament's primary), red for rejection, cyan for
-    // return, neutral gray for queued.
+    // Indigo-accent palette: green only for approved, indigo for reviewing
+    // (matches Filament's primary), red for rejection, cyan for return,
+    // neutral gray for queued/draft.
     $palette = [
         ContractApprover::STATUS_APPROVED => ['solid' => '#16a34a', 'soft' => 'rgba(22,163,74,.12)', 'icon' => 'heroicon-m-check'],
         ContractApprover::STATUS_REJECTED => ['solid' => '#dc2626', 'soft' => 'rgba(220,38,38,.12)', 'icon' => 'heroicon-m-x-mark'],
@@ -22,8 +24,11 @@
     $approved = $active->where('status', ContractApprover::STATUS_APPROVED)->count();
     $hasRejected = $active->contains(fn ($a) => $a->status === ContractApprover::STATUS_REJECTED);
 
+    // Summary semantics differ between draft (nothing submitted) and an
+    // active workflow (X out of Y already approved).
     [$summary, $summaryColor] = match (true) {
         $total === 0 => ['—', '#94a3b8'],
+        $isDraft => [__('app.label.not_submitted'), '#64748b'],
         $hasRejected => [__('app.contract_approver.status.rejected'), '#dc2626'],
         $approved === $total => [__('app.contract_approver.status.approved'), '#16a34a'],
         default => ["{$approved}/{$total}", '#6366f1'],
@@ -93,6 +98,11 @@
                 @php
                     $c = $colorFor($a->status);
                     $av = $a->user?->getFilamentAvatarUrl();
+                    // While the contract is a draft, even PENDING/QUEUED rows
+                    // haven't really started reviewing — keep them quiet.
+                    $statusLabel = $isDraft
+                        ? __('app.contract_approver.status.not_submitted')
+                        : (ContractApprover::getStatuses()[$a->status] ?? $a->status);
                 @endphp
                 <div class="ca__row">
                     <span class="ca__av">
@@ -103,7 +113,7 @@
                         @endif
                     </span>
                     <span class="ca__nm" title="{{ $a->user?->name }}">{{ $a->user?->name ?? '—' }}</span>
-                    <span class="ca__ic" style="background:{{ $c['soft'] }};color:{{ $c['solid'] }};" title="{{ ContractApprover::getStatuses()[$a->status] ?? $a->status }}">
+                    <span class="ca__ic" style="background:{{ $c['soft'] }};color:{{ $c['solid'] }};" title="{{ $statusLabel }}">
                         {!! svg($c['icon'], '', ['width' => 11, 'height' => 11])->toHtml() !!}
                     </span>
                 </div>

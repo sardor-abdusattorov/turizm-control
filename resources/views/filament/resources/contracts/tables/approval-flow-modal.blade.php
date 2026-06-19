@@ -1,4 +1,5 @@
 @php
+    use App\Models\Contract;
     use App\Models\ContractApprover;
 
     /** @var \App\Models\Contract $contract */
@@ -7,6 +8,7 @@
         ->whereIn('status', [ContractApprover::STATUS_INVALIDATED, ContractApprover::STATUS_SKIPPED])
         ->sortByDesc('id')
         ->values();
+    $isDraft = $contract->status === Contract::STATUS_DRAFT;
 
     $colorFor = function (string $status): array {
         return match ($status) {
@@ -18,6 +20,12 @@
             default => ['bg' => 'rgba(127,127,127,.10)', 'fg' => 'currentColor', 'ring' => '#cbd5e1'],
         };
     };
+
+    // When the contract is still a draft no one is actually reviewing yet —
+    // show a "Not submitted" label instead of "In queue" / "Reviewing".
+    $labelFor = fn (string $status): string => $isDraft
+        ? __('app.contract_approver.status.not_submitted')
+        : (ContractApprover::getStatuses()[$status] ?? $status);
 
     $avatarOf = fn ($a) => $a->user?->getFilamentAvatarUrl()
         ?? 'https://ui-avatars.com/api/?name='.urlencode($a->user?->name ?? '?').'&color=7F9CF5&background=EBF4FF';
@@ -72,7 +80,7 @@
                         </div>
                         <span class="fl__badge" style="background:{{ $c['bg'] }};color:{{ $c['fg'] }};">
                             <i style="background:{{ $c['ring'] }};"></i>
-                            {{ ContractApprover::getStatuses()[$a->status] ?? $a->status }}
+                            {{ $labelFor($a->status) }}
                         </span>
                     </div>
 

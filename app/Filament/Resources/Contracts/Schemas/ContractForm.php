@@ -97,6 +97,12 @@ class ContractForm
 
                 Tabs::make('contract_tabs')
                     ->columnSpanFull()
+                    // When editing a draft that already has a chain, jump to
+                    // the Approval-chain tab so the author sees and can tweak
+                    // the approvers without hunting for the second tab.
+                    ->activeTab(fn (?Contract $record): int => ($record !== null
+                        && $record->status === Contract::STATUS_DRAFT
+                        && $record->approvers()->exists()) ? 2 : 1)
                     ->tabs([
                         Tab::make(__('app.label.basic_information'))
                             ->icon('heroicon-o-clipboard-document-list')

@@ -172,6 +172,7 @@ return [
         'due' => 'Due',
         'approver_details' => 'Approver details',
         'approvers' => 'Approvers',
+        'not_submitted' => 'Not submitted',
         'approval_records' => 'Approval records',
         'attempts_count' => ':count attempt|:count attempts',
         'no_comment' => 'No comment left',
@@ -410,6 +411,7 @@ return [
             'returned' => 'Returned',
             'skipped' => 'Skipped',
             'invalidated' => 'Cancelled (after edit)',
+            'not_submitted' => 'Not submitted for approval',
         ],
         'signature' => [
             'pending' => 'Pending',
