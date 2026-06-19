@@ -43,17 +43,14 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->defaultThemeMode(ThemeMode::Light)
             ->colors([
-                'primary' => Color::Indigo,
+                'primary' => Color::Blue,
             ])
             ->spa()
             ->spaUrlExceptions([
-                // OnlyOffice editors are standalone full-page documents, not
-                // panel pages. Letting wire:navigate hijack them corrupts the
-                // SPA DOM and breaks the sidebar/scroll on return.
                 '*/editor',
                 '*/editor?*',
             ])
-            ->font('Inter')
+            ->font('Poppins')
             ->navigationItems([
 
             ])
