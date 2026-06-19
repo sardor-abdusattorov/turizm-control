@@ -147,22 +147,8 @@
         .cw-main,.cw-side{ display:flex; flex-direction:column; gap:1.5rem; min-width:0; }
         .cw-panel{ display:flex; flex-direction:column; gap:1.5rem; }
 
-        /* meta strip — clean, no gradient */
-        .cw-meta{ display:flex; align-items:center; justify-content:space-between; gap:1.5rem; flex-wrap:wrap;
-            padding:1.1rem 1.5rem; background:var(--s); border-radius:.95rem; box-shadow:0 0 0 1px var(--r); }
-        .cw-meta__l{ display:flex; align-items:center; gap:.85rem; flex-wrap:wrap; min-width:0; }
-        .cw-meta__facts{ display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; }
-        .cw-meta__fact{ display:inline-flex; align-items:center; gap:.4rem; font-size:.8125rem; color:var(--t); font-weight:550;
-            white-space:nowrap; }
-        .cw-meta__fact--danger{ color:#dc2626; font-weight:600; }
-        .cw-meta__current{ display:flex; align-items:center; gap:.7rem; padding:.45rem .7rem .45rem .55rem;
-            border-radius:.7rem; background:var(--accent-softer); box-shadow:inset 0 0 0 1px var(--accent-ring); }
-        .cw-meta__cur-lb{ font-size:.64rem; color:var(--m2); text-transform:uppercase; letter-spacing:.05em; font-weight:650; }
-        .cw-meta__cur-row{ display:flex; align-items:center; gap:.45rem; margin-top:.15rem; }
-        .cw-meta__cur-row img{ width:1.55rem; height:1.55rem; border-radius:50%; object-fit:cover;
-            box-shadow:0 0 0 1.5px var(--accent); }
-        .cw-meta__cur-nm{ font-size:.85rem; font-weight:650; color:var(--t); }
-        .cw-tabs{ display:flex; gap:.15rem; }
+        .cw-tabs{ display:flex; align-items:center; gap:.15rem; flex-wrap:wrap; }
+        .cw-tabs__status{ margin-left:auto; }
         .cw-tab{ display:flex; align-items:center; gap:.4rem; padding:.6rem .95rem; font-size:0.854rem; font-weight:600; color:var(--m); background:transparent; border:0; border-radius:.7rem; cursor:pointer; transition:all .15s; }
         .cw-tab:hover{ color:var(--t); background:var(--soft); }
         .cw-tab--active{ color:var(--accent); background:var(--s); box-shadow:0 0 0 1px var(--r), 0 1px 2px rgba(0,0,0,.05); }
@@ -205,6 +191,28 @@
         .cw-pill--primary{ background:var(--accent-soft); color:var(--accent-strong);} .dark .cw-pill--primary{ background:var(--accent-ring); color:var(--accent);}
         .cw-pill--gray   { background:#f1f5f9; color:#64748b;} .dark .cw-pill--gray   { background:rgba(255,255,255,.07); color:#cbd5e1;}
 
+        /* approval chain — progress band */
+        .cw-prog{ display:flex; flex-direction:column; gap:.8rem; padding:1.05rem 1.5rem 1.2rem; border-bottom:1px solid var(--d); }
+        .cw-prog__top{ display:flex; align-items:center; justify-content:space-between; gap:.65rem 1.25rem; flex-wrap:wrap; }
+        .cw-prog__l{ display:flex; align-items:center; gap:.3rem .7rem; flex-wrap:wrap; min-width:0; }
+        .cw-prog__count{ font-size:.85rem; color:var(--m); font-weight:550; white-space:nowrap; }
+        .cw-prog__count b{ color:var(--t); font-weight:750; font-size:.95rem; }
+        .cw-prog__sub{ font-size:.745rem; color:var(--m2); display:inline-flex; align-items:center; gap:.3rem; white-space:nowrap; }
+        .cw-prog__await{ display:inline-flex; align-items:center; gap:.5rem; padding:.28rem .65rem .28rem .42rem;
+            border-radius:999px; background:var(--accent-softer); box-shadow:inset 0 0 0 1px var(--accent-ring); }
+        .cw-prog__await-lb{ font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-strong); }
+        .cw-prog__await img{ width:1.5rem; height:1.5rem; border-radius:50%; object-fit:cover; box-shadow:0 0 0 1.5px var(--accent); }
+        .cw-prog__await-nm{ font-size:.8rem; font-weight:650; color:var(--t); white-space:nowrap; }
+        .cw-prog__bar{ display:flex; gap:4px; height:.5rem; }
+        .cw-seg{ flex:1 1 0; min-width:0; border-radius:999px; background:var(--track); position:relative; overflow:hidden; transition:background .2s ease; }
+        .cw-seg--approved{ background:#10b981; }
+        .cw-seg--rejected{ background:#ef4444; }
+        .cw-seg--returned{ background:#3b82f6; }
+        .cw-seg--current{ background:var(--accent); }
+        .cw-seg--current::after{ content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); }
+        @media (prefers-reduced-motion: no-preference){ .cw-seg--current::after{ animation:cwSeg 1.9s ease-in-out infinite; } }
+        @keyframes cwSeg{ 0%{ transform:translateX(-100%);} 60%,100%{ transform:translateX(220%);} }
+
         /* approval chain — vertical timeline */
         .cw-chain{ padding:.9rem 1.25rem 1.1rem; }
         .cw-step{ position:relative; display:flex; align-items:flex-start; gap:.9rem; padding:.6rem .65rem; border-radius:.85rem; transition:background .15s; }
@@ -230,6 +238,7 @@
         .cw-step__meta{ display:flex; align-items:center; gap:.6rem; margin-top:.5rem; flex-wrap:wrap; }
         .cw-when{ font-size:0.724rem; color:var(--m2); display:inline-flex; align-items:center; gap:.25rem; }
         .cw-when--over{ color:#dc2626; font-weight:650; }
+        .cw-when--soon{ color:var(--accent); font-weight:600; }
         .cw-cmt{ margin-top:.55rem; padding:.45rem .7rem; border-radius:.55rem; background:var(--soft); font-size:0.784rem; color:var(--m); border:1px solid var(--d); }
         .cw-eye{ flex-shrink:0; width:2rem; height:2rem; border-radius:.6rem; display:flex; align-items:center; justify-content:center; color:var(--m2); background:transparent; border:1px solid var(--d); cursor:pointer; transition:all .15s; }
         .cw-eye:hover{ color:var(--accent); border-color:var(--accent); background:var(--soft); }
@@ -389,58 +398,14 @@
         @keydown.escape.window="approver = null; contactOpen = false">
         @php
             $submittedAt = $this->submittedAt();
-            $remaining = $this->timeRemaining();
         @endphp
 
-        {{-- Meta strip — replaces the gradient hero. Inline status pill, one
-             line of contract context, plus a compact "Awaiting X" tile on the
-             right while in-review. --}}
-        <div class="cw-meta">
-            <div class="cw-meta__l">
-                <span class="cw-pill cw-pill--{{ $statusColor }}">{{ $statusLabel }}</span>
-                <div class="cw-meta__facts">
-                    @if ($submittedAt)
-                        <span class="cw-meta__fact" title="{{ $submittedAt->translatedFormat('d M Y H:i') }}">
-                            {!! $ic('heroicon-m-paper-airplane', 13) !!}
-                            {{ __('app.label.submitted') }} {{ $submittedAt->diffForHumans() }}
-                        </span>
-                    @endif
-                    @if ($current?->due_at && $record->status === Contract::STATUS_IN_REVIEW)
-                        @php $dueIso = $current->due_at->toIso8601String(); @endphp
-                        <span class="cw-meta__fact"
-                            x-data="contractCountdown('{{ $dueIso }}')"
-                            x-init="start()"
-                            :class="overdue ? 'cw-meta__fact--danger' : ''"
-                            :title="absolute">
-                            <template x-if="overdue">{!! $ic('heroicon-m-exclamation-triangle', 13) !!}</template>
-                            <template x-if="! overdue">{!! $ic('heroicon-m-clock', 13) !!}</template>
-                            <span x-text="label"></span>
-                        </span>
-                    @endif
-                    @if ($totalCount > 0)
-                        <span class="cw-meta__fact">
-                            {!! $ic('heroicon-m-check-badge', 13) !!}
-                            {{ $approvedCount }}/{{ $totalCount }} {{ __('app.label.approved_lower') }}
-                        </span>
-                    @endif
-                </div>
-            </div>
-
-            @if ($current && $record->status === Contract::STATUS_IN_REVIEW)
-                <div class="cw-meta__current">
-                    <div class="cw-meta__cur-lb">{{ __('app.label.awaiting') }}</div>
-                    <div class="cw-meta__cur-row">
-                        <img src="{{ $this->approverAvatar($current) }}" alt="">
-                        <span class="cw-meta__cur-nm">{{ $current->user?->name }}</span>
-                    </div>
-                </div>
-            @endif
-        </div>
-
-        {{-- Tabs --}}
+        {{-- Tabs — overall status pill rides on the right so it stays visible
+             on both tabs without a redundant full-width strip up top. --}}
         <div class="cw-tabs">
             <button type="button" class="cw-tab" :class="tab === 'overview' ? 'cw-tab--active' : ''" @click="tab = 'overview'">{!! $ic('heroicon-o-rectangle-group', 16) !!} {{ __('app.label.overview') }}</button>
             <button type="button" class="cw-tab" :class="tab === 'history' ? 'cw-tab--active' : ''" @click="tab = 'history'">{!! $ic('heroicon-o-clock', 16) !!} {{ __('app.label.history') }}@if ($activities->isNotEmpty())<span class="cw-tab__c">{{ $activities->count() }}</span>@endif</button>
+            <span class="cw-pill cw-pill--{{ $statusColor }} cw-pill--lg cw-tabs__status">{{ $statusLabel }}</span>
         </div>
 
         {{-- Overview --}}
@@ -455,8 +420,36 @@
                     <div class="cw-hd">
                         <span class="cw-hd__ic">{!! $ic('heroicon-o-users') !!}</span>
                         <h2 class="cw-hd__t">{{ __('app.label.approval_chain') }}</h2>
-                        @if ($totalCount > 0)<span class="cw-hd__c">{{ $approvedCount }}/{{ $totalCount }}</span>@endif
                     </div>
+
+                    {{-- Progress band — segmented bar (one cell per approver,
+                         tinted by state, live shimmer on the current step),
+                         the approved counter, when it was submitted, and a
+                         compact "Awaiting X" tile while in-review. --}}
+                    @if ($totalCount > 0)
+                        <div class="cw-prog">
+                            <div class="cw-prog__top">
+                                <div class="cw-prog__l">
+                                    <span class="cw-prog__count"><b>{{ $approvedCount }}</b> / {{ $totalCount }} {{ __('app.label.approved_lower') }}</span>
+                                    @if ($submittedAt)
+                                        <span class="cw-prog__sub">{!! $ic('heroicon-m-paper-airplane', 12) !!} {{ __('app.label.submitted') }} {{ $submittedAt->diffForHumans() }}</span>
+                                    @endif
+                                </div>
+                                @if ($current && $record->status === Contract::STATUS_IN_REVIEW)
+                                    <span class="cw-prog__await">
+                                        <span class="cw-prog__await-lb">{{ __('app.label.awaiting') }}</span>
+                                        <img src="{{ $this->approverAvatar($current) }}" alt="">
+                                        <span class="cw-prog__await-nm">{{ $current->user?->name }}</span>
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="cw-prog__bar">
+                                @foreach ($active as $ap)
+                                    <span class="cw-seg cw-seg--{{ $this->approverState($ap) }}" title="{{ $ap->user?->name }} · {{ $statusName($ap->status) }}"></span>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
 
                     @if ($active->isEmpty() && $historical->isEmpty())
                         <div class="cw-bd"><p style="font-size:0.854rem;color:var(--m)">{{ __('app.label.no_approvers') }}</p></div>
@@ -481,7 +474,7 @@
                                                 <span class="cw-when"
                                                     x-data="contractCountdown('{{ $stepDueIso }}')"
                                                     x-init="start()"
-                                                    :class="overdue ? 'cw-when--over' : ''"
+                                                    :class="overdue ? 'cw-when--over' : 'cw-when--soon'"
                                                     :title="absolute">
                                                     <template x-if="overdue">{!! $ic('heroicon-m-exclamation-triangle', 13) !!}</template>
                                                     <template x-if="! overdue">{!! $ic('heroicon-m-clock', 13) !!}</template>

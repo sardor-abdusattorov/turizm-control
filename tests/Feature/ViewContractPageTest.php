@@ -139,6 +139,14 @@ it('shows a per-approver detail modal trigger and renders queued steps distinctl
         ->and($html)->toContain("tab: 'overview'")
         ->and($html)->toContain('cw-tabs')
         ->and($html)->toContain('cw-eye')
+        // Status pill now rides on the tab bar instead of a separate strip.
+        ->and($html)->toContain('cw-tabs__status')
+        ->and($html)->not->toContain('cw-meta')
+        // Progress band: segmented bar tinted per state + the "Awaiting" tile.
+        ->and($html)->toContain('cw-prog__bar')
+        ->and($html)->toContain('cw-seg cw-seg--current')
+        ->and($html)->toContain('cw-seg cw-seg--queued')
+        ->and($html)->toContain('cw-prog__await')
         // Modals are keyed by user_id so one opener covers all of a person's records.
         ->and($html)->toContain('approver = '.$contract->approvers()->where('order', 1)->first()->user_id)
         ->and($html)->toContain('approver === '.$contract->approvers()->where('order', 1)->first()->user_id)
