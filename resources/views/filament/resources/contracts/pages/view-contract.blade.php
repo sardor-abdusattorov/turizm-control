@@ -588,6 +588,7 @@
                 </section>
             </div>
         </div>
+        </div>
 
         {{-- History --}}
         <div x-show="tab === 'history'" x-cloak
