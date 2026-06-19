@@ -180,7 +180,7 @@ class ViewContract extends ViewRecord
         }
 
         if ($this->isCurrentApprover($approver)) {
-            return ['icon' => 'heroicon-s-clock', 'color' => 'warning'];
+            return ['icon' => 'heroicon-s-clock', 'color' => 'primary'];
         }
 
         return ['icon' => 'heroicon-o-minus-circle', 'color' => 'gray'];

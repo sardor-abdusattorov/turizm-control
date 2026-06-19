@@ -64,7 +64,7 @@ class Contract extends Model
     {
         return [
             self::STATUS_DRAFT => 'gray',
-            self::STATUS_IN_REVIEW => 'warning',
+            self::STATUS_IN_REVIEW => 'primary',
             self::STATUS_APPROVED => 'success',
             self::STATUS_REJECTED => 'danger',
             self::STATUS_ARCHIVED => 'gray',

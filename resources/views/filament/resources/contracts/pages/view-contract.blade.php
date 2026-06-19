@@ -40,15 +40,21 @@
         return $c->translatedFormat('d F Y');
     };
 
+    // Core info visible by default; everything else lives behind "Show more".
     $details = [
-        ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number, null],
-        ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name, $record->contact ? 'contact' : null],
-        ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name, null],
-        ['heroicon-o-tag', __('app.label.order_type_single'), $record->orderType?->title ?: '—', null],
-        ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name, null],
-        ['heroicon-o-banknotes', __('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? ''), null],
-        ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y') ?: '—', null],
-        ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i'), null],
+        ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number, null, false],
+        ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name, $record->contact ? 'contact' : null, false],
+        ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name, null, false],
+        ['heroicon-o-tag', __('app.label.order_type_single'), $record->orderType?->title, null, false],
+        ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name, null, false],
+        ['heroicon-o-banknotes', __('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? ''), null, false],
+
+        // Extra rows — collapsed by default.
+        ['heroicon-o-language', __('app.label.language'), strtoupper((string) $record->language) ?: null, null, true],
+        ['heroicon-o-paper-airplane', __('app.label.submitted'), $this->submittedAt()?->format('d.m.Y H:i'), null, true],
+        ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y'), null, true],
+        ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i'), null, true],
+        ['heroicon-o-pencil', __('app.label.updated_at'), $record->updated_at?->format('d.m.Y H:i'), null, true],
     ];
 
     $contact = $record->contact;
@@ -68,28 +74,28 @@
 <x-filament-panels::page>
     <style>
         [x-cloak]{ display:none !important; }
-        .cw{ display:flex; flex-direction:column; gap:1.1rem;
+        .cw{ display:flex; flex-direction:column; gap:1.5rem;
             --s:#fff; --r:rgba(15,20,25,.08); --t:#0f1419; --m:#57606a; --m2:#8b949e; --d:rgba(15,20,25,.07);
             --soft:#f8fafc; --track:#e6ebf1; --accent:#6366f1; }
         .dark .cw{ --s:#18181b; --r:rgba(255,255,255,.08); --t:#f0f6fc; --m:#9aa4b2; --m2:#6e7681; --d:rgba(255,255,255,.07);
             --soft:rgba(255,255,255,.03); --track:rgba(255,255,255,.10); --accent:#818cf8; }
 
         .cw-card{ background:var(--s); border-radius:1rem; box-shadow:0 0 0 1px var(--r), 0 1px 3px rgba(15,20,25,.06), 0 1px 2px rgba(15,20,25,.04); overflow:hidden; }
-        .cw-hd{ display:flex; align-items:center; gap:.6rem; padding:.9rem 1.25rem; border-bottom:1px solid var(--d); }
+        .cw-hd{ display:flex; align-items:center; gap:.6rem; padding:1.15rem 1.5rem; border-bottom:1px solid var(--d); }
         .cw-hd__ic{ color:var(--m2); display:inline-flex; }
         .cw-hd__t{ font-size:0.88rem; font-weight:650; color:var(--t); margin:0; flex:1; letter-spacing:-.01em; }
         .cw-hd__c{ font-size:0.724rem; font-weight:600; color:var(--m); background:var(--soft); padding:.18rem .6rem; border-radius:999px; }
         .cw-bd{ padding:1.25rem; }
 
         /* layout */
-        .cw-cols{ display:grid; grid-template-columns:1fr; gap:1.1rem; align-items:start; }
+        .cw-cols{ display:grid; grid-template-columns:1fr; gap:1.5rem; align-items:start; }
         @media(min-width:1024px){ .cw-cols{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); } }
-        .cw-main,.cw-side{ display:flex; flex-direction:column; gap:1.1rem; min-width:0; }
-        .cw-panel{ display:flex; flex-direction:column; gap:1.1rem; }
+        .cw-main,.cw-side{ display:flex; flex-direction:column; gap:1.5rem; min-width:0; }
+        .cw-panel{ display:flex; flex-direction:column; gap:1.5rem; }
 
         /* meta strip — clean, no gradient */
-        .cw-meta{ display:flex; align-items:center; justify-content:space-between; gap:1.25rem; flex-wrap:wrap;
-            padding:.85rem 1.1rem; background:var(--s); border-radius:.85rem; box-shadow:0 0 0 1px var(--r); }
+        .cw-meta{ display:flex; align-items:center; justify-content:space-between; gap:1.5rem; flex-wrap:wrap;
+            padding:1.1rem 1.5rem; background:var(--s); border-radius:.95rem; box-shadow:0 0 0 1px var(--r); }
         .cw-meta__l{ display:flex; align-items:center; gap:.85rem; flex-wrap:wrap; min-width:0; }
         .cw-meta__facts{ display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; }
         .cw-meta__fact{ display:inline-flex; align-items:center; gap:.35rem; font-size:.815rem; color:var(--m);
@@ -143,6 +149,7 @@
         .cw-pill--warning{ background:#ffedd5; color:#c2410c;} .dark .cw-pill--warning{ background:rgba(251,146,60,.16); color:#fdba74;}
         .cw-pill--danger { background:#fee2e2; color:#b91c1c;} .dark .cw-pill--danger { background:rgba(239,68,68,.16); color:#fca5a5;}
         .cw-pill--info   { background:#dbeafe; color:#1d4ed8;} .dark .cw-pill--info   { background:rgba(59,130,246,.16); color:#93c5fd;}
+        .cw-pill--primary{ background:#e0e7ff; color:#4338ca;} .dark .cw-pill--primary{ background:rgba(99,102,241,.18); color:#a5b4fc;}
         .cw-pill--gray   { background:#f1f5f9; color:#64748b;} .dark .cw-pill--gray   { background:rgba(255,255,255,.07); color:#cbd5e1;}
 
         /* approval chain — vertical timeline */
@@ -151,18 +158,18 @@
         .cw-step:not(:last-child){ margin-bottom:.15rem; }
         .cw-step:not(:last-child)::before{ content:''; position:absolute; left:2rem; top:2.95rem; bottom:-.45rem; width:2px; background:var(--track); border-radius:2px; }
         .cw-step--approved:not(:last-child)::before{ background:linear-gradient(#34d399, var(--track)); }
-        .cw-step--current{ background:linear-gradient(90deg, rgba(251,146,60,.08), transparent 70%); }
-        @keyframes cwPulse { 0%{ box-shadow:0 0 0 0 rgba(251,146,60,.55);} 70%{ box-shadow:0 0 0 8px rgba(251,146,60,0);} 100%{ box-shadow:0 0 0 0 rgba(251,146,60,0);} }
+        .cw-step--current{ background:linear-gradient(90deg, rgba(99,102,241,.08), transparent 70%); }
+        @keyframes cwPulse { 0%{ box-shadow:0 0 0 0 rgba(99,102,241,.55);} 70%{ box-shadow:0 0 0 8px rgba(99,102,241,0);} 100%{ box-shadow:0 0 0 0 rgba(99,102,241,0);} }
         @media (prefers-reduced-motion: no-preference){ .cw-step--current .cw-badge--current{ animation:cwPulse 1.8s ease-out infinite; } }
         .cw-step:hover{ background:var(--soft); }
         .cw-node{ position:relative; flex-shrink:0; }
         .cw-node img{ width:2.75rem; height:2.75rem; border-radius:999px; object-fit:cover; display:block; box-shadow:0 0 0 2px var(--s), 0 0 0 3px var(--track); }
-        .cw-step--current .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #fb923c, 0 0 0 7px rgba(251,146,60,.16); }
+        .cw-step--current .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #6366f1, 0 0 0 7px rgba(99,102,241,.16); }
         .cw-step--approved .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #34d399, 0 0 0 7px rgba(52,211,153,.15); }
         .cw-step--rejected .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #f87171, 0 0 0 7px rgba(248,113,113,.15); }
         .cw-badge{ position:absolute; bottom:-.25rem; right:-.25rem; width:1.4rem; height:1.4rem; border-radius:999px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px var(--s); color:#fff; }
         .cw-badge--approved{ background:#22c55e; } .cw-badge--rejected{ background:#ef4444; } .cw-badge--returned{ background:#3b82f6; }
-        .cw-badge--current{ background:#fb923c; } .cw-badge--queued{ background:#cbd5e1; color:#64748b; } .dark .cw-badge--queued{ background:#3f3f46; color:#a1a1aa; }
+        .cw-badge--current{ background:#6366f1; } .cw-badge--queued{ background:#cbd5e1; color:#64748b; } .dark .cw-badge--queued{ background:#3f3f46; color:#a1a1aa; }
         .cw-step__bd{ min-width:0; flex:1; padding-top:.15rem; }
         .cw-step__nm{ font-size:0.908rem; font-weight:650; color:var(--t); display:flex; align-items:center; gap:.4rem; }
         .cw-ord{ font-size:0.664rem; font-weight:700; color:var(--m2); background:var(--soft); border-radius:999px; padding:.05rem .42rem; }
@@ -193,15 +200,22 @@
         .cw-empty span{ font-size:0.825rem; }
 
         /* details (sidebar, stacked) */
-        .cw-dets{ display:flex; flex-direction:column; }
-        .cw-row{ display:flex; align-items:center; gap:.7rem; padding:.78rem 1.25rem; border-bottom:1px solid var(--d); }
+        .cw-dets{ display:flex; flex-direction:column; padding:.4rem 0; }
+        .cw-row{ display:flex; align-items:center; gap:.7rem; padding:.95rem 1.5rem; border-bottom:1px solid var(--d); transition:background .12s ease; }
         .cw-row:last-child{ border-bottom:0; }
+        .cw-row:hover{ background:rgba(99,102,241,.04); }
         .cw-row__ic{ color:var(--m2); display:inline-flex; flex-shrink:0; }
         .cw-row__lb{ font-size:0.784rem; color:var(--m); flex:1; }
         .cw-row__vl{ font-size:0.854rem; font-weight:600; color:var(--t); min-width:0; max-width:55%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:right; }
-        button.cw-row{ width:100%; background:transparent; border:0; cursor:pointer; text-align:left; transition:background .12s ease; }
-        button.cw-row:hover{ background:rgba(99,102,241,.05); }
+        .cw-row__vl--muted{ color:var(--m2); font-weight:500; font-style:italic; }
+        button.cw-row{ width:100%; background:transparent; border:0; cursor:pointer; text-align:left; }
+        button.cw-row:hover{ background:rgba(99,102,241,.07); }
         .cw-row--link .cw-row__vl{ color:var(--accent); display:inline-flex; align-items:center; gap:.35rem; justify-content:flex-end; }
+        .cw-show-more{ display:flex; align-items:center; justify-content:center; gap:.4rem; width:100%;
+            padding:.85rem 1.5rem; background:transparent; border:0; border-top:1px solid var(--d);
+            color:var(--accent); font-size:.815rem; font-weight:600; cursor:pointer;
+            transition:background .12s ease; }
+        .cw-show-more:hover{ background:rgba(99,102,241,.05); }
         .cw-contact-rows{ display:flex; flex-direction:column; }
         .cw-contact-rows .cw-row{ padding:.6rem 0; }
 
@@ -266,7 +280,7 @@
     </style>
 
     <div class="cw"
-        x-data="{ approver: null, contactOpen: false, tab: 'overview', historyShown: 8, historyFilter: 'all' }"
+        x-data="{ approver: null, contactOpen: false, basicExpanded: false, tab: 'overview', historyShown: 8, historyFilter: 'all' }"
         @keydown.escape.window="approver = null; contactOpen = false">
         @php
             $submittedAt = $this->submittedAt();
@@ -434,9 +448,10 @@
                 <section class="cw-card">
                     <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><h2 class="cw-hd__t">{{ __('app.label.basic_information') }}</h2></div>
                     <div class="cw-dets">
-                        @foreach ($details as [$icon, $label, $value, $type])
-                            @if ($type === 'contact' && $value)
-                                <button type="button" class="cw-row cw-row--link" @click="contactOpen = true">
+                        @foreach ($details as [$icon, $label, $value, $type, $extra])
+                            @php $hasValue = ! empty($value); @endphp
+                            @if ($type === 'contact' && $hasValue)
+                                <button type="button" class="cw-row cw-row--link" @click="contactOpen = true" @if ($extra) x-show="basicExpanded" x-cloak @endif>
                                     <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
                                     <span class="cw-row__lb">{{ $label }}</span>
                                     <span class="cw-row__vl">
@@ -445,16 +460,23 @@
                                     </span>
                                 </button>
                             @else
-                                <div class="cw-row">
+                                <div class="cw-row" @if ($extra) x-show="basicExpanded" x-cloak @endif>
                                     <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
                                     <span class="cw-row__lb">{{ $label }}</span>
-                                    <span class="cw-row__vl">{{ $value ?: '—' }}</span>
+                                    @if ($hasValue)
+                                        <span class="cw-row__vl">{{ $value }}</span>
+                                    @else
+                                        <span class="cw-row__vl cw-row__vl--muted">{{ __('app.label.not_set') }}</span>
+                                    @endif
                                 </div>
                             @endif
                         @endforeach
                     </div>
+                    <button type="button" class="cw-show-more" @click="basicExpanded = ! basicExpanded">
+                        <span x-show="! basicExpanded">{!! $ic('heroicon-m-chevron-down', 14) !!} {{ __('app.label.show_more') }}</span>
+                        <span x-show="basicExpanded" x-cloak>{!! $ic('heroicon-m-chevron-up', 14) !!} {{ __('app.label.show_less') }}</span>
+                    </button>
                 </section>
-                </div>
             </div>
         </div>
 

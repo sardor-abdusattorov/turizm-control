@@ -69,7 +69,7 @@ class ContractApprover extends Model
     {
         return [
             self::STATUS_QUEUED => 'gray',
-            self::STATUS_PENDING => 'warning',
+            self::STATUS_PENDING => 'primary',
             self::STATUS_APPROVED => 'success',
             self::STATUS_REJECTED => 'danger',
             self::STATUS_RETURNED => 'info',
