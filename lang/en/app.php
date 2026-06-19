@@ -176,6 +176,7 @@ return [
         'show_more' => 'Show more',
         'show_less' => 'Show less',
         'not_set' => 'Not set',
+        'view_history' => 'View history',
         'legal_details' => 'Legal details',
         'contacts' => 'Contacts',
         'approver_details' => 'Approver details',

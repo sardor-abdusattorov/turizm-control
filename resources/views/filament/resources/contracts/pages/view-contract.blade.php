@@ -113,7 +113,7 @@
 
         /* layout */
         .cw-cols{ display:grid; grid-template-columns:1fr; gap:1.5rem; align-items:start; }
-        @media(min-width:1024px){ .cw-cols{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); } }
+        @media(min-width:1024px){ .cw-cols{ grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); } }
         .cw-main,.cw-side{ display:flex; flex-direction:column; gap:1.5rem; min-width:0; }
         .cw-panel{ display:flex; flex-direction:column; gap:1.5rem; }
 
@@ -204,11 +204,22 @@
         .cw-eye{ flex-shrink:0; width:2rem; height:2rem; border-radius:.6rem; display:flex; align-items:center; justify-content:center; color:var(--m2); background:transparent; border:1px solid var(--d); cursor:pointer; transition:all .15s; }
         .cw-eye:hover{ color:var(--accent); border-color:var(--accent); background:var(--soft); }
 
-        .cw-more{ margin-top:.4rem; }
-        .cw-more>summary{ list-style:none; padding:.5rem .65rem; cursor:pointer; font-size:0.784rem; color:var(--m); display:flex; align-items:center; gap:.4rem; user-select:none; border-radius:.6rem; }
-        .cw-more>summary::-webkit-details-marker{ display:none; }
-        .cw-more>summary:hover{ background:var(--soft); color:var(--t); }
-        .cw-more .cw-step{ opacity:.7; }
+        .cw-history-btn{ display:flex; align-items:center; justify-content:center; gap:.4rem;
+            margin:.6rem 1.25rem 1.1rem; padding:.55rem .9rem;
+            background:transparent; border:1px solid var(--d); border-radius:.55rem;
+            color:var(--m); font-size:.78rem; font-weight:600; cursor:pointer;
+            transition:background .12s ease, color .12s ease, border-color .12s ease; }
+        .cw-history-btn:hover{ background:var(--soft); color:var(--t); border-color:var(--m2); }
+
+        .cw-hist{ display:flex; gap:.85rem; padding:.85rem 0; }
+        .cw-hist + .cw-hist{ border-top:1px solid var(--d); }
+        .cw-hist__av{ width:2.4rem; height:2.4rem; border-radius:50%; object-fit:cover; flex-shrink:0; opacity:.85; }
+        .cw-hist__bd{ flex:1; min-width:0; }
+        .cw-hist__top{ display:flex; align-items:center; justify-content:space-between; gap:.6rem; flex-wrap:wrap; }
+        .cw-hist__nm{ font-size:.9rem; font-weight:650; color:var(--t); }
+        .cw-hist__dt{ font-size:.74rem; color:var(--m2); }
+        .cw-hist__dp{ font-size:.78rem; color:var(--m); margin-top:.1rem; }
+        .cw-hist__meta{ margin-top:.45rem; }
 
         /* document */
         .cw-doc{ display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
@@ -330,8 +341,8 @@
     </style>
 
     <div class="cw"
-        x-data="{ approver: null, contactOpen: false, basicExpanded: false, tab: 'overview', historyShown: 8, historyFilter: 'all' }"
-        @keydown.escape.window="approver = null; contactOpen = false">
+        x-data="{ approver: null, contactOpen: false, historyOpen: false, basicExpanded: false, tab: 'overview', historyShown: 8, historyFilter: 'all' }"
+        @keydown.escape.window="approver = null; contactOpen = false; historyOpen = false">
         @php
             $submittedAt = $this->submittedAt();
             $remaining = $this->timeRemaining();
@@ -441,31 +452,13 @@
                                 </div>
                             @endforeach
 
-                            @if ($historical->isNotEmpty())
-                                <details class="cw-more">
-                                    <summary>{!! $ic('heroicon-m-chevron-down', 14) !!} {{ __('app.label.previous_attempts') }} ({{ $historical->count() }})</summary>
-                                    @foreach ($historical as $ap)
-                                        <div class="cw-step">
-                                            <div class="cw-node">
-                                                <img src="{{ $this->approverAvatar($ap) }}" alt="">
-                                                <span class="cw-badge cw-badge--queued">{!! $ic('heroicon-m-minus', 13) !!}</span>
-                                            </div>
-                                            <div class="cw-step__bd">
-                                                <div class="cw-step__nm">{{ $ap->user?->name }} <span class="cw-ord">#{{ $ap->order }}</span></div>
-                                                <div class="cw-step__dp">{{ $ap->user?->department?->name }}</div>
-                                                <div class="cw-step__meta">
-                                                    <span class="cw-pill cw-pill--gray">{{ $statusName($ap->status) }}</span>
-                                                    @if ($ap->acted_at)<span class="cw-when">{{ $ap->acted_at->format('d.m.Y H:i') }}</span>@endif
-                                                </div>
-                                                @if ($ap->comment)<div class="cw-cmt">{{ $ap->comment }}</div>@endif
-                                                @if ($ap->system_comment)<div class="cw-cmt" style="background:rgba(251,146,60,.10);border-color:rgba(251,146,60,.32);color:#c2410c;font-weight:550;">{{ $ap->system_comment }}</div>@endif
-                                            </div>
-                                            <button type="button" class="cw-eye" title="{{ __('app.label.approver_details') }}" @click="approver = {{ $ap->id }}">{!! $ic('heroicon-o-eye', 16) !!}</button>
-                                        </div>
-                                    @endforeach
-                                </details>
-                            @endif
                         </div>
+                    @endif
+                    @if ($historical->isNotEmpty())
+                        <button type="button" class="cw-history-btn" @click="historyOpen = true">
+                            {!! $ic('heroicon-o-eye', 14) !!}
+                            <span>{{ __('app.label.view_history') }} ({{ $historical->count() }})</span>
+                        </button>
                     @endif
                 </section>
             </div>
@@ -669,6 +662,49 @@
                                             <span class="cw-row__vl" style="max-width:62%;white-space:normal;text-align:right;">{{ $vl }}</span>
                                         </div>
                                     @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- History modal: every invalidated / skipped attempt in one place --}}
+        @if ($historical->isNotEmpty())
+            <div class="cw-modal" x-show="historyOpen" x-cloak style="display:none;">
+                <div class="cw-modal__bg" @click="historyOpen = false"></div>
+                <div class="cw-modal__card" style="max-width:36rem;" @click.stop
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100">
+                    <div class="cw-modal__hd">
+                        <span class="cw-row__ic" style="background:rgba(99,102,241,.10);width:2.6rem;height:2.6rem;border-radius:.7rem;display:inline-flex;align-items:center;justify-content:center;color:var(--accent);">
+                            {!! $ic('heroicon-o-clock', 22) !!}
+                        </span>
+                        <div style="min-width:0;flex:1;">
+                            <div class="cw-modal__nm">{{ __('app.label.view_history') }}</div>
+                            <div class="cw-modal__dp">{{ trans_choice('app.label.attempts_count', $historical->count(), ['count' => $historical->count()]) }}</div>
+                        </div>
+                        <button type="button" class="cw-modal__x" @click="historyOpen = false">{!! $ic('heroicon-m-x-mark', 16) !!}</button>
+                    </div>
+                    <div class="cw-modal__bd">
+                        @foreach ($historical as $ap)
+                            <div class="cw-hist">
+                                <img class="cw-hist__av" src="{{ $this->approverAvatar($ap) }}" alt="">
+                                <div class="cw-hist__bd">
+                                    <div class="cw-hist__top">
+                                        <span class="cw-hist__nm">{{ $ap->user?->name }} <span class="cw-ord">#{{ $ap->order }}</span></span>
+                                        @if ($ap->acted_at)
+                                            <span class="cw-hist__dt">{{ $ap->acted_at->format('d.m.Y H:i') }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="cw-hist__dp">{{ $ap->user?->department?->name }}{{ $ap->user?->position?->name ? ' · '.$ap->user->position->name : '' }}</div>
+                                    <div class="cw-hist__meta">
+                                        <span class="cw-pill cw-pill--gray">{{ $statusName($ap->status) }}</span>
+                                    </div>
+                                    @if ($ap->comment)<div class="cw-cmt" style="margin-top:.45rem;">{{ $ap->comment }}</div>@endif
+                                    @if ($ap->system_comment)<div class="cw-cmt" style="margin-top:.4rem;background:rgba(251,146,60,.10);border-color:rgba(251,146,60,.32);color:#c2410c;font-weight:550;">{{ $ap->system_comment }}</div>@endif
                                 </div>
                             </div>
                         @endforeach
