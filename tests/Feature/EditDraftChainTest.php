@@ -50,10 +50,11 @@ function draftContractEditor(): User
 it('lets the author swap the approver chain while the contract is a draft', function () {
     $author = draftContractEditor();
 
-    $department = Department::factory()->create(['code' => 'legal']);
-    $first = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $department->id]);
-    $second = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $department->id]);
-    $third = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $department->id]);
+    $legalDept = Department::factory()->create(['code' => 'legal']);
+    $accountingDept = Department::factory()->create(['code' => 'accounting']);
+    $first = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legalDept->id]);
+    $accountant = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $accountingDept->id]);
+    $newLawyer = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legalDept->id]);
 
     $contract = validDraftContract($author);
     ContractApprover::factory()->create([
@@ -61,19 +62,19 @@ it('lets the author swap the approver chain while the contract is a draft', func
         'status' => ContractApprover::STATUS_QUEUED,
     ]);
 
-    // Replace [first] with [third, second] — order matters.
+    // Replace [first] with [newLawyer, accountant] — order matters, both depts present.
     Livewire::test(EditContract::class, ['record' => $contract->id])
-        ->fillForm(['approver_chain' => [$third->id, $second->id]])
+        ->fillForm(['approver_chain' => [$newLawyer->id, $accountant->id]])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $rows = $contract->fresh()->approvers()->orderBy('order')->get();
 
     expect($rows)->toHaveCount(2)
-        ->and($rows[0]->user_id)->toBe($third->id)
+        ->and($rows[0]->user_id)->toBe($newLawyer->id)
         ->and($rows[0]->order)->toBe(1)
         ->and($rows[0]->status)->toBe(ContractApprover::STATUS_QUEUED)
-        ->and($rows[1]->user_id)->toBe($second->id)
+        ->and($rows[1]->user_id)->toBe($accountant->id)
         ->and($rows[1]->order)->toBe(2);
 });
 

@@ -344,7 +344,7 @@ return [
         'contract_order_type' => 'Pick the order type first — it filters the templates available below.',
         'approval_chain_form' => 'Pre-filled from your profile. Add or remove approvers for this contract — the order below is the order they approve in.',
         'approval_chain_pick' => 'Pick approvers in the order they should approve. Search by name or department.',
-        'approval_chain_empty' => 'No approvers selected yet — the contract will fall back to the default approval queue from settings.',
+        'approval_chain_empty' => 'No approvers selected yet — pick at least one Legal and one Accounting approver.',
         'approval_chain_global' => 'Contracts follow the approval queue configured in Settings → Approval Flow. These approvers will be assigned automatically.',
         'metrics_yandex' => 'Insert Yandex Metrica tracking code here',
         'metrics_google' => 'Insert Google Analytics tracking code here',
@@ -361,6 +361,9 @@ return [
         'organization_logo' => 'Recommended: PNG or SVG with a transparent background, max ~200px tall. Used in the document header via {{logo}}.',
         'available_placeholders' => 'Available placeholders (click to expand)',
         'user_field_placeholders' => 'Plus any field key you defined in "Document fields" above — e.g. {{employee_name}} for a field with key employee_name.',
+    ],
+    'validation' => [
+        'approver_chain_required_departments' => 'The approval chain must include at least one Legal approver and one Accounting approver.',
     ],
     'placeholder' => [
         'logo' => 'Organization logo (image)',

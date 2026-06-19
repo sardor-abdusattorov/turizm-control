@@ -11,6 +11,7 @@ use App\Models\Currency;
 use App\Models\Department;
 use App\Models\OrderType;
 use App\Models\User;
+use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -59,12 +60,6 @@ class ContractForm
 
                 Tabs::make('contract_tabs')
                     ->columnSpanFull()
-                    // When editing a draft that already has a chain, jump to
-                    // the Approval-chain tab so the author sees and can tweak
-                    // the approvers without hunting for the second tab.
-                    ->activeTab(fn (?Contract $record): int => ($record !== null
-                        && $record->status === Contract::STATUS_DRAFT
-                        && $record->approvers()->exists()) ? 2 : 1)
                     ->tabs([
                         Tab::make(__('app.label.basic_information'))
                             ->icon('heroicon-o-clipboard-document-list')
@@ -155,6 +150,12 @@ class ContractForm
                                     ->searchable()
                                     ->preload()
                                     ->live()
+                                    ->required()
+                                    ->rules([
+                                        fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                                            self::validateRequiredApproverDepartments($value, $fail);
+                                        },
+                                    ])
                                     ->columnSpanFull(),
 
                                 TextEntry::make('approver_chain_preview')
@@ -191,6 +192,36 @@ class ContractForm
                 $t->id => $t->name.' ('.strtoupper($t->language).')',
             ])
             ->toArray();
+    }
+
+    /**
+     * Validation rule for the approval-chain picker: the selected approvers
+     * must cover every department in Department::REQUIRED_APPROVER_CODES (at
+     * least one Legal and one Accounting approver). The empty case is handled
+     * by ->required() upstream, so an empty value passes through silently here.
+     */
+    public static function validateRequiredApproverDepartments(mixed $value, Closure $fail): void
+    {
+        $ids = array_values(array_filter(array_map('intval', (array) $value)));
+
+        if ($ids === []) {
+            return;
+        }
+
+        $presentCodes = User::query()
+            ->whereIn('id', $ids)
+            ->with('department')
+            ->get()
+            ->map(fn (User $user): ?string => $user->department?->code)
+            ->filter()
+            ->unique();
+
+        $missing = collect(Department::REQUIRED_APPROVER_CODES)
+            ->reject(fn (string $code): bool => $presentCodes->contains($code));
+
+        if ($missing->isNotEmpty()) {
+            $fail(__('app.validation.approver_chain_required_departments'));
+        }
     }
 
     /**

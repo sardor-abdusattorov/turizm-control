@@ -65,9 +65,10 @@ it('renders the approval chain picker and a live numbered preview of the selecte
 it('creates approvers in the order they were picked', function () {
     Storage::fake('local');
 
-    $department = Department::factory()->create(['code' => 'legal']);
-    $first = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $department->id]);
-    $second = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $department->id]);
+    $legalDept = Department::factory()->create(['code' => 'legal']);
+    $accountingDept = Department::factory()->create(['code' => 'accounting']);
+    $first = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legalDept->id]);
+    $second = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $accountingDept->id]);
 
     $orderType = OrderType::factory()->create();
     $template = ContractTemplate::factory()->create([
@@ -105,4 +106,46 @@ it('creates approvers in the order they were picked', function () {
         ->and($approvers[0]->order)->toBe(1)
         ->and($approvers[1]->user_id)->toBe($first->id)
         ->and($approvers[1]->order)->toBe(2);
+});
+
+it('rejects creating a contract whose chain has no accounting approver', function () {
+    Storage::fake('local');
+
+    $legalDept = Department::factory()->create(['code' => 'legal']);
+    $lawyer = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legalDept->id]);
+
+    $orderType = OrderType::factory()->create();
+    $template = ContractTemplate::factory()->create([
+        'order_type_id' => $orderType->id, 'status' => true, 'language' => 'ru',
+    ]);
+    Storage::disk('local')->put($template->template_file, file_get_contents(fillableDocx()));
+    $contact = Contact::factory()->create(['status' => true]);
+    $currency = Currency::factory()->create(['status' => true]);
+
+    contractCreatorActing();
+
+    Livewire::test(CreateContract::class)
+        ->fillForm([
+            'number' => 'C-901',
+            'order_type_id' => $orderType->id,
+            'contract_template_id' => $template->id,
+            'contact_id' => $contact->id,
+            'title' => 'Missing accountant',
+            'amount' => 1000,
+            'currency_id' => $currency->id,
+            'approver_chain' => [$lawyer->id],
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['approver_chain']);
+
+    expect(Contract::where('number', 'C-901')->exists())->toBeFalse();
+});
+
+it('rejects creating a contract with an empty chain', function () {
+    contractCreatorActing();
+
+    Livewire::test(CreateContract::class)
+        ->fillForm(['approver_chain' => []])
+        ->call('create')
+        ->assertHasFormErrors(['approver_chain']);
 });

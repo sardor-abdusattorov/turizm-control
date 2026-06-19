@@ -43,8 +43,10 @@ function editorAuthor(User $profileDefault): User
 
 it('keeps the invalidated chain visible and pre-fills the picker from the mirrored queue', function () {
     $legal = Department::factory()->create(['code' => 'legal']);
+    $accounting = Department::factory()->create(['code' => 'accounting']);
     $profileDefault = approver($legal->id);
-    $oldApprover = approver($legal->id);
+    $oldLegal = approver($legal->id);
+    $oldAccounting = approver($accounting->id);
 
     $author = editorAuthor($profileDefault);
 
@@ -63,10 +65,12 @@ it('keeps the invalidated chain visible and pre-fills the picker from the mirror
     ]);
 
     ContractApprover::factory()->create([
-        'contract_id' => $contract->id,
-        'user_id' => $oldApprover->id,
-        'order' => 1,
+        'contract_id' => $contract->id, 'user_id' => $oldLegal->id, 'order' => 1,
         'status' => ContractApprover::STATUS_PENDING,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $oldAccounting->id, 'order' => 2,
+        'status' => ContractApprover::STATUS_QUEUED,
     ]);
 
     // Author edits a trigger field (title) and saves while it's in review.
@@ -77,15 +81,15 @@ it('keeps the invalidated chain visible and pre-fills the picker from the mirror
 
     $contract->refresh();
 
-    // 1) The hook flipped status to DRAFT, marked the old row INVALIDATED
-    //    (audit), AND rebuilt a fresh QUEUED row mirroring the old chain —
+    // 1) The hook flipped status to DRAFT, marked the old rows INVALIDATED
+    //    (audit), AND rebuilt fresh QUEUED rows mirroring the old chain —
     //    so the manager can see what will run on the next submit.
     expect($contract->status)->toBe(Contract::STATUS_DRAFT);
-    expect($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(1);
-    expect($contract->approvers()->where('status', ContractApprover::STATUS_QUEUED)->count())->toBe(1);
+    expect($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(2);
+    expect($contract->approvers()->where('status', ContractApprover::STATUS_QUEUED)->count())->toBe(2);
 
     // 2) Reopen edit — picker pre-fills with the mirrored queued chain (same
-    //    person as before the edit) rather than the author's profile defaults.
+    //    people as before the edit) rather than the author's profile defaults.
     Livewire::test(EditContract::class, ['record' => $contract->id])
-        ->assertFormSet(['approver_chain' => [$oldApprover->id]]);
+        ->assertFormSet(['approver_chain' => [$oldLegal->id, $oldAccounting->id]]);
 });

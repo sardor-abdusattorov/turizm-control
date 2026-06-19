@@ -31,11 +31,11 @@ function editorWithPerms(): User
     return $user;
 }
 
-/** An active user in an approver department, so the picker accepts them. */
-function chainApprover(): User
+/** An active user in the given approver department, so the picker accepts them. */
+function chainApprover(string $code = 'legal'): User
 {
-    $dept = Department::firstOrCreate(['code' => 'legal'], [
-        'name' => ['ru' => 'Legal', 'uz' => 'Legal', 'en' => 'Legal'],
+    $dept = Department::firstOrCreate(['code' => $code], [
+        'name' => ['ru' => ucfirst($code), 'uz' => ucfirst($code), 'en' => ucfirst($code)],
         'sort' => 1,
         'status' => true,
     ]);
@@ -94,9 +94,10 @@ it('shows the approval chain tab on edit and pre-fills it with the queued chain'
 
 it('reassigns the chain on an in-review contract: resets to draft, keeps the old chain as audit', function () {
     $author = editorWithPerms();
-    $current = chainApprover();
-    $next = chainApprover();
-    $replacement = chainApprover();
+    $current = chainApprover('legal');
+    $next = chainApprover('accounting');
+    $newLegal = chainApprover('legal');
+    $newAccounting = chainApprover('accounting');
 
     $contract = inReviewContractFor($author);
 
@@ -109,10 +110,10 @@ it('reassigns the chain on an in-review contract: resets to draft, keeps the old
         'status' => ContractApprover::STATUS_QUEUED,
     ]);
 
-    // Swap the whole chain to one new approver — no business field touched.
+    // Swap the whole chain to two new approvers — no business field touched.
     Livewire::test(EditContract::class, ['record' => $contract->getKey()])
         ->assertFormSet(['approver_chain' => [$current->id, $next->id]])
-        ->fillForm(['approver_chain' => [$replacement->id]])
+        ->fillForm(['approver_chain' => [$newLegal->id, $newAccounting->id]])
         ->call('save')
         ->assertHasNoFormErrors();
 
@@ -121,17 +122,22 @@ it('reassigns the chain on an in-review contract: resets to draft, keeps the old
     // Reset to draft, old chain invalidated for audit, new queue from the picker.
     expect($contract->status)->toBe(Contract::STATUS_DRAFT)
         ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(2)
-        ->and($contract->activeApprovers()->pluck('user_id')->map(fn ($id): int => (int) $id)->all())->toBe([$replacement->id]);
+        ->and($contract->activeApprovers()->pluck('user_id')->map(fn ($id): int => (int) $id)->all())->toBe([$newLegal->id, $newAccounting->id]);
 });
 
 it('leaves a running approval untouched when the chain is saved unchanged', function () {
     $author = editorWithPerms();
-    $current = chainApprover();
+    $legal = chainApprover('legal');
+    $accounting = chainApprover('accounting');
 
     $contract = inReviewContractFor($author);
     ContractApprover::factory()->create([
-        'contract_id' => $contract->id, 'user_id' => $current->id, 'order' => 1,
+        'contract_id' => $contract->id, 'user_id' => $legal->id, 'order' => 1,
         'status' => ContractApprover::STATUS_PENDING,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $accounting->id, 'order' => 2,
+        'status' => ContractApprover::STATUS_QUEUED,
     ]);
 
     // Open and save without changing the chain or any business field.
@@ -143,5 +149,31 @@ it('leaves a running approval untouched when the chain is saved unchanged', func
 
     expect($contract->status)->toBe(Contract::STATUS_IN_REVIEW)
         ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(0)
-        ->and($contract->activeApprovers()->pluck('user_id')->map(fn ($id): int => (int) $id)->all())->toBe([$current->id]);
+        ->and($contract->activeApprovers()->pluck('user_id')->map(fn ($id): int => (int) $id)->all())->toBe([$legal->id, $accounting->id]);
+});
+
+it('rejects saving a chain that is missing the accounting approver', function () {
+    $author = editorWithPerms();
+    $legal = chainApprover('legal');
+
+    $contract = inReviewContractFor($author);
+    $accounting = chainApprover('accounting');
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $legal->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $accounting->id, 'order' => 2,
+        'status' => ContractApprover::STATUS_QUEUED,
+    ]);
+
+    // Drop the accountant — chain now has Legal only.
+    Livewire::test(EditContract::class, ['record' => $contract->getKey()])
+        ->fillForm(['approver_chain' => [$legal->id]])
+        ->call('save')
+        ->assertHasFormErrors(['approver_chain']);
+
+    // Nothing changed: still in review with both originals active.
+    expect($contract->fresh()->status)->toBe(Contract::STATUS_IN_REVIEW)
+        ->and($contract->fresh()->activeApprovers()->count())->toBe(2);
 });

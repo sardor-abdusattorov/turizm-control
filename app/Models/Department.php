@@ -37,6 +37,14 @@ class Department extends Model
     public const APPROVER_CODES = ['legal', 'accounting', 'direction'];
 
     /**
+     * Departments that MUST be represented in every contract approval chain —
+     * a chain is invalid unless it contains at least one approver from each.
+     *
+     * @var array<int, string>
+     */
+    public const REQUIRED_APPROVER_CODES = ['legal', 'accounting'];
+
+    /**
      * Get available statuses
      */
     public static function getStatuses(): array
