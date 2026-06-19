@@ -490,6 +490,64 @@ class Contract extends Model
             && $this->activeApprovers()->where('status', '!=', ContractApprover::STATUS_APPROVED)->doesntExist();
     }
 
+    /** The single active user holding the director role — the final approver. */
+    public function directorUser(): ?User
+    {
+        // whereHas (not the role() scope) so a missing role just yields null
+        // instead of throwing RoleDoesNotExist.
+        return User::query()
+            ->whereHas('roles', fn (Builder $query) => $query->where('name', self::DIRECTOR_ROLE))
+            ->where('status', User::STATUS_ACTIVE)
+            ->first();
+    }
+
+    /** Has the role-based director already been added to the active chain? */
+    public function hasDirectorApprover(): bool
+    {
+        $director = $this->directorUser();
+
+        return $director !== null
+            && $this->activeApprovers()->where('user_id', $director->id)->exists();
+    }
+
+    /**
+     * True while the contract is parked with the director for final sign-off
+     * (director appended and still pending/queued). Used to lock editing once
+     * the lawyer + accountant stage is done.
+     */
+    public function isInDirectorStage(): bool
+    {
+        $director = $this->directorUser();
+
+        return $director !== null
+            && $this->activeApprovers()
+                ->where('user_id', $director->id)
+                ->whereIn('status', [ContractApprover::STATUS_PENDING, ContractApprover::STATUS_QUEUED])
+                ->exists();
+    }
+
+    /**
+     * Append the role-based director as the final approver once the
+     * lawyer + accountant stage is complete. Returns the fresh QUEUED row, or
+     * null when no director is configured or one is already in the chain (so
+     * the caller can finalize as APPROVED instead).
+     */
+    public function appendDirectorApprover(): ?ContractApprover
+    {
+        $director = $this->directorUser();
+
+        if (! $director || $this->hasDirectorApprover()) {
+            return null;
+        }
+
+        return ContractApprover::create([
+            'contract_id' => $this->id,
+            'user_id' => $director->id,
+            'order' => ((int) $this->activeApprovers()->max('order')) + 1,
+            'status' => ContractApprover::STATUS_QUEUED,
+        ]);
+    }
+
     public function wasRejected(): bool
     {
         return $this->activeApprovers()->where('status', ContractApprover::STATUS_REJECTED)->exists();
@@ -572,7 +630,10 @@ class Contract extends Model
                 self::STATUS_DRAFT,
                 self::STATUS_IN_REVIEW,
                 self::STATUS_REJECTED,
-            ], true);
+            ], true)
+            // Once it's handed to the director for final sign-off, the document
+            // is frozen — the author can no longer edit.
+            && ! $this->isInDirectorStage();
     }
 
     public function canBeDeletedBy(?User $user = null): bool
@@ -636,7 +697,10 @@ class Contract extends Model
      * Roles that may see every contract. Everyone else is limited to the
      * contracts they are responsible for or appear in the approval chain of.
      */
-    public const OVERSIGHT_ROLES = ['super_admin', 'director'];
+    /** The role whose single holder is the final (director) approver. */
+    public const DIRECTOR_ROLE = 'director';
+
+    public const OVERSIGHT_ROLES = ['super_admin', self::DIRECTOR_ROLE];
 
     public function scopeVisibleTo(Builder $query, ?User $user = null): Builder
     {

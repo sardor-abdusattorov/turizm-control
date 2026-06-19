@@ -15,10 +15,9 @@
 
     $createdLabel = $record->created_at?->translatedFormat('d M Y H:i');
     $editUrl = route('contracts.editor', ['contract' => $record, 'mode' => $record->canBeEditedBy() ? 'edit' : 'view']);
-    $previewUrl = $record->documentExists() && in_array($record->status, [
-        \App\Models\Contract::STATUS_IN_REVIEW,
-        \App\Models\Contract::STATUS_APPROVED,
-    ], true) ? route('contracts.pdf.inline', ['contract' => $record]) : null;
+    $previewUrl = $record->documentExists() && $record->status === \App\Models\Contract::STATUS_APPROVED
+        ? route('contracts.pdf.inline', ['contract' => $record])
+        : null;
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 @endphp

@@ -144,7 +144,9 @@ class ViewContract extends ViewRecord
             return null;
         }
 
-        if (! in_array($this->record->status, [Contract::STATUS_IN_REVIEW, Contract::STATUS_APPROVED], true)) {
+        // PDF preview unlocks only once the director has signed off (APPROVED).
+        // Until then approvers review the document in the OnlyOffice editor.
+        if ($this->record->status !== Contract::STATUS_APPROVED) {
             return null;
         }
 
@@ -253,6 +255,7 @@ class ViewContract extends ViewRecord
     {
         return match ($event) {
             'Contract Submitted' => ['icon' => 'heroicon-o-arrow-up-tray', 'color' => 'info'],
+            'Contract Sent To Director' => ['icon' => 'heroicon-o-arrow-up-circle', 'color' => 'primary'],
             'Contract Step Approved', 'Contract Approved' => ['icon' => 'heroicon-o-check-circle', 'color' => 'success'],
             'Contract Rejected' => ['icon' => 'heroicon-o-x-circle', 'color' => 'danger'],
             'Contract Returned' => ['icon' => 'heroicon-o-arrow-uturn-left', 'color' => 'warning'],
@@ -272,8 +275,8 @@ class ViewContract extends ViewRecord
     public function activityGroup(string $event): string
     {
         return match ($event) {
-            'Contract Submitted', 'Contract Step Approved', 'Contract Approved',
-            'Contract Rejected', 'Contract Returned' => 'workflow',
+            'Contract Submitted', 'Contract Sent To Director', 'Contract Step Approved',
+            'Contract Approved', 'Contract Rejected', 'Contract Returned' => 'workflow',
             default => 'edit',
         };
     }

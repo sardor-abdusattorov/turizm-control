@@ -88,35 +88,21 @@ class ContractWorkflow
             $current->markApproved($comment);
 
             if ($contract->fresh()->allApproved()) {
-                $contract->update([
-                    'status' => Contract::STATUS_APPROVED,
-                    'signed_at' => now()->toDateString(),
-                ]);
-                $this->notifier->notifyApproved($contract);
-
-                $this->logWorkflowEvent(
-                    event: 'Contract Approved',
-                    contract: $contract,
-                    user: $user,
-                    properties: ['comment' => $comment, 'final' => true],
-                );
+                $this->finalizeOrSendToDirector($contract, $user, $comment);
 
                 return;
             }
 
             $next = $this->advanceToActiveApprover($contract);
 
-            if (! $next) {
-                // Skipping all remaining inactive approvers cleared the
-                // queue — treat the contract as fully approved.
-                if ($contract->fresh()->allApproved()) {
-                    $contract->update([
-                        'status' => Contract::STATUS_APPROVED,
-                        'signed_at' => now()->toDateString(),
-                    ]);
-                    $this->notifier->notifyApproved($contract);
-                }
-            } else {
+            if (! $next && $contract->fresh()->allApproved()) {
+                // Skipping all remaining inactive approvers cleared the queue.
+                $this->finalizeOrSendToDirector($contract, $user, $comment);
+
+                return;
+            }
+
+            if ($next) {
                 $next->startReview($this->slaDays());
                 $this->notifier->notifyApprovalRequested($next);
             }
@@ -133,6 +119,41 @@ class ContractWorkflow
         });
 
         return true;
+    }
+
+    /**
+     * The lawyer + accountant stage is done. Hand the contract to the
+     * role-based director for a final sign-off if one exists and hasn't acted
+     * yet; otherwise mark the contract fully APPROVED.
+     */
+    private function finalizeOrSendToDirector(Contract $contract, User $user, ?string $comment): void
+    {
+        if ($director = $contract->fresh()->appendDirectorApprover()) {
+            $director->startReview($this->slaDays());
+            $this->notifier->notifyApprovalRequested($director);
+
+            $this->logWorkflowEvent(
+                event: 'Contract Sent To Director',
+                contract: $contract,
+                user: $user,
+                properties: ['comment' => $comment, 'director_id' => $director->user_id],
+            );
+
+            return;
+        }
+
+        $contract->update([
+            'status' => Contract::STATUS_APPROVED,
+            'signed_at' => now()->toDateString(),
+        ]);
+        $this->notifier->notifyApproved($contract);
+
+        $this->logWorkflowEvent(
+            event: 'Contract Approved',
+            contract: $contract,
+            user: $user,
+            properties: ['comment' => $comment, 'final' => true],
+        );
     }
 
     public function reject(Contract $contract, User $user, ?string $comment = null): bool

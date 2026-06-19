@@ -96,6 +96,25 @@ it('shows a preview button on the document card instead of an embedded pdf ifram
     Storage::fake('local');
 
     $user = viewerWithAccess();
+    // PDF preview unlocks only once approved (after the director signs off).
+    $contract = Contract::factory()->create([
+        'responsible_id' => $user->id,
+        'status' => Contract::STATUS_APPROVED,
+    ]);
+    Storage::disk('local')->put($contract->documentPath(), 'fake-docx');
+
+    actingAs($user);
+
+    $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
+
+    expect($html)->toContain(route('contracts.pdf.inline', ['contract' => $contract]))
+        ->and($html)->not->toContain('<iframe');
+});
+
+it('hides the PDF preview link until the contract is approved', function () {
+    Storage::fake('local');
+
+    $user = viewerWithAccess();
     $contract = Contract::factory()->create([
         'responsible_id' => $user->id,
         'status' => Contract::STATUS_IN_REVIEW,
@@ -106,8 +125,7 @@ it('shows a preview button on the document card instead of an embedded pdf ifram
 
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
-    expect($html)->toContain(route('contracts.pdf.inline', ['contract' => $contract]))
-        ->and($html)->not->toContain('<iframe');
+    expect($html)->not->toContain(route('contracts.pdf.inline', ['contract' => $contract]));
 });
 
 it('shows a per-approver detail modal trigger and renders queued steps distinctly', function () {
