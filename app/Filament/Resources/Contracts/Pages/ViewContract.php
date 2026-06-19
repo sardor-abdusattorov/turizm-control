@@ -229,7 +229,7 @@ class ViewContract extends ViewRecord
                 'overdue' => false,
                 'due' => null,
             ],
-            Contract::STATUS_IN_REVIEW => [
+            Contract::STATUS_IN_REVIEW, Contract::STATUS_IN_REVIEW_DIRECTOR => [
                 'message' => $current?->user
                     ? __('app.message.hero_in_review', ['name' => $current->user->name])
                     : __('app.message.hero_in_review_generic'),

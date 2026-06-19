@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ContractStatus;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
 use Illuminate\Database\Eloquent\Builder;
@@ -37,43 +38,35 @@ class Contract extends Model
     protected $casts = [
         'amount' => 'decimal:2',
         'signed_at' => 'date',
+        'status' => ContractStatus::class,
     ];
 
-    public const STATUS_DRAFT = 'draft';
+    // Constants alias the enum cases so the existing `Contract::STATUS_*` call
+    // sites keep working — they now resolve to (and compare as) ContractStatus.
+    public const STATUS_DRAFT = ContractStatus::Draft;
 
-    public const STATUS_IN_REVIEW = 'in_review';
+    public const STATUS_IN_REVIEW = ContractStatus::InReview;
 
     /** Lawyer + accountant signed off; waiting for the manager to send it to the director. */
-    public const STATUS_PENDING_DIRECTOR = 'pending_director';
+    public const STATUS_PENDING_DIRECTOR = ContractStatus::PendingDirector;
 
-    public const STATUS_APPROVED = 'approved';
+    /** Sent to the director for the final sign-off. */
+    public const STATUS_IN_REVIEW_DIRECTOR = ContractStatus::InReviewDirector;
 
-    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_APPROVED = ContractStatus::Approved;
 
-    public const STATUS_ARCHIVED = 'archived';
+    public const STATUS_REJECTED = ContractStatus::Rejected;
 
+    /** @return array<string, string> value => label */
     public static function getStatuses(): array
     {
-        return [
-            self::STATUS_DRAFT => __('app.contract.status.draft'),
-            self::STATUS_IN_REVIEW => __('app.contract.status.in_review'),
-            self::STATUS_PENDING_DIRECTOR => __('app.contract.status.pending_director'),
-            self::STATUS_APPROVED => __('app.contract.status.approved'),
-            self::STATUS_REJECTED => __('app.contract.status.rejected'),
-            self::STATUS_ARCHIVED => __('app.contract.status.archived'),
-        ];
+        return ContractStatus::options();
     }
 
+    /** @return array<string, string> value => Filament colour token */
     public static function getStatusColors(): array
     {
-        return [
-            self::STATUS_DRAFT => 'gray',
-            self::STATUS_IN_REVIEW => 'primary',
-            self::STATUS_PENDING_DIRECTOR => 'warning',
-            self::STATUS_APPROVED => 'success',
-            self::STATUS_REJECTED => 'danger',
-            self::STATUS_ARCHIVED => 'gray',
-        ];
+        return ContractStatus::colors();
     }
 
     protected static function booted(): void
@@ -154,10 +147,11 @@ class Contract extends Model
             return;
         }
 
-        // Mid-flow only — drafts and already-cancelled rejected ones don't
-        // have anything to invalidate yet, archived is read-only.
+        // Mid-flow only — drafts have nothing to invalidate yet.
         if (! in_array($this->getOriginal('status'), [
             self::STATUS_IN_REVIEW,
+            self::STATUS_PENDING_DIRECTOR,
+            self::STATUS_IN_REVIEW_DIRECTOR,
             self::STATUS_APPROVED,
             self::STATUS_REJECTED,
         ], true)) {
@@ -595,7 +589,7 @@ class Contract extends Model
         $user ??= auth()->user();
 
         return $user
-            && $this->status === self::STATUS_IN_REVIEW
+            && in_array($this->status, [self::STATUS_IN_REVIEW, self::STATUS_IN_REVIEW_DIRECTOR], true)
             && $this->isCurrentApprover($user);
     }
 
@@ -642,18 +636,18 @@ class Contract extends Model
         }
 
         if ($user->hasRole('super_admin')) {
-            return $this->status !== self::STATUS_ARCHIVED;
+            return true;
         }
 
+        // Editable only before the director stage: drafts, the lawyer+accountant
+        // review, and rejected. PENDING_DIRECTOR and IN_REVIEW_DIRECTOR are
+        // intentionally absent, so the document freezes once it's with the director.
         return $this->responsible_id === $user->id
             && in_array($this->status, [
                 self::STATUS_DRAFT,
                 self::STATUS_IN_REVIEW,
                 self::STATUS_REJECTED,
-            ], true)
-            // Once it's handed to the director for final sign-off, the document
-            // is frozen — the author can no longer edit.
-            && ! $this->isInDirectorStage();
+            ], true);
     }
 
     public function canBeDeletedBy(?User $user = null): bool
@@ -663,15 +657,6 @@ class Contract extends Model
         return $user
             && $this->status === self::STATUS_DRAFT
             && ($this->responsible_id === $user->id || $user->hasRole('super_admin'));
-    }
-
-    public function canBeArchivedBy(?User $user = null): bool
-    {
-        $user ??= auth()->user();
-
-        return $user
-            && $this->status !== self::STATUS_ARCHIVED
-            && $user->hasRole('super_admin');
     }
 
     public function scopeAwaitingApprovalBy(Builder $query, ?User $user = null): Builder

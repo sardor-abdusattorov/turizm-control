@@ -416,9 +416,9 @@ return [
             'draft' => 'Draft',
             'in_review' => 'In Review',
             'pending_director' => 'Awaiting director',
+            'in_review_director' => 'With the director',
             'approved' => 'Approved',
             'rejected' => 'Rejected',
-            'archived' => 'Archived',
         ],
     ],
     'telegram' => [

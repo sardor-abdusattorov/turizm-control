@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Contracts\Pages;
 
+use App\Enums\ContractStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Contracts\Schemas\ContractForm;
 use App\Models\Contract;
@@ -31,7 +32,7 @@ class EditContract extends EditRecord
     protected bool $syncChain = false;
 
     /** The contract's status BEFORE save — used to detect mid-flow edits. */
-    protected ?string $originalStatus = null;
+    protected ?ContractStatus $originalStatus = null;
 
     protected function getRedirectUrl(): string
     {

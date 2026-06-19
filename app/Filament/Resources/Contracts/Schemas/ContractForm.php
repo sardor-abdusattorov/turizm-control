@@ -142,11 +142,10 @@ class ContractForm
 
                         Tab::make(__('app.label.approval_chain'))
                             ->icon('heroicon-o-users')
-                            // Editable on create and on every editable status. On a
-                            // submitted contract changing the chain cancels the running
-                            // approvals and rebuilds from the new selection (see the
-                            // warning banner above) — archived contracts are read-only.
-                            ->visible(fn (?Contract $record): bool => $record === null || $record->status !== Contract::STATUS_ARCHIVED)
+                            // Always available on the form — reaching the Edit page is
+                            // already gated by canBeEditedBy. Changing the chain on a
+                            // submitted contract cancels the running approvals and
+                            // rebuilds from the new selection (see the warning above).
                             ->badge(fn (Get $get): ?int => ($n = count(array_filter((array) $get('approver_chain')))) ? $n : null)
                             ->schema([
                                 Select::make('approver_chain')

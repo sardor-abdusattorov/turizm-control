@@ -178,7 +178,7 @@ class ContractWorkflow
                 return;
             }
 
-            $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
+            $contract->update(['status' => Contract::STATUS_IN_REVIEW_DIRECTOR]);
             $director->startReview($this->slaDays());
             $this->notifier->notifyApprovalRequested($director);
 

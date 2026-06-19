@@ -162,10 +162,7 @@ class OnlyOfficeService
             return true;
         }
 
-        return in_array($contract->status, [
-            Contract::STATUS_APPROVED,
-            Contract::STATUS_ARCHIVED,
-        ], true);
+        return $contract->status === Contract::STATUS_APPROVED;
     }
 
     /**

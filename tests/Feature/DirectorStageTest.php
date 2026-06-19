@@ -87,7 +87,7 @@ it('sends to the director manually and finalizes on the director sign-off', func
     expect(app(ContractWorkflow::class)->submitToDirector($contract->fresh()))->toBeTrue();
 
     $contract->refresh();
-    expect($contract->status)->toBe(Contract::STATUS_IN_REVIEW)
+    expect($contract->status)->toBe(Contract::STATUS_IN_REVIEW_DIRECTOR)
         ->and($contract->isInDirectorStage())->toBeTrue();
 
     $directorRow = $contract->activeApprovers()->where('user_id', $director->id)->first();

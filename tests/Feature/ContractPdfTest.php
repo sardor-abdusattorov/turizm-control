@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ContractStatus;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
@@ -24,7 +25,7 @@ beforeEach(function () {
     ]);
 });
 
-function makeContractWithDocx(string $status = Contract::STATUS_APPROVED): Contract
+function makeContractWithDocx(ContractStatus $status = Contract::STATUS_APPROVED): Contract
 {
     $responsible = User::factory()->create();
 

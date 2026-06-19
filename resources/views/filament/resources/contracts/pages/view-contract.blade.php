@@ -3,8 +3,8 @@
     use App\Models\ContractApprover;
     use Illuminate\Support\Carbon;
 
-    $statusColor = Contract::getStatusColors()[$record->status] ?? 'gray';
-    $statusLabel = Contract::getStatuses()[$record->status] ?? $record->status;
+    $statusColor = $record->status->color();
+    $statusLabel = $record->status->label();
     $current = $record->currentApprover();
     $directorUserId = $record->directorUser()?->id;
     $hero = $this->heroContext();
