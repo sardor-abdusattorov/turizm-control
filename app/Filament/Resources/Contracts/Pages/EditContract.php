@@ -173,7 +173,7 @@ class EditContract extends EditRecord
             Action::make('returnForRevision')
                 ->label(__('app.action.return_for_revision'))
                 ->icon('heroicon-o-arrow-uturn-left')
-                ->color('warning')
+                ->color('gray')
                 ->modalHeading(__('app.action.return_for_revision'))
                 ->schema([
                     Textarea::make('comment')

@@ -15,8 +15,6 @@
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
         "mradder/filament-logger": "^1.2",
-        "openplain/filament-shadcn-theme": "^1.1",
-        "ptplugins/filament-number-input": "*",
         "spatie/laravel-translatable": "^6.14"
     },
     "require-dev": {

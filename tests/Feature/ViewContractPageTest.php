@@ -105,7 +105,8 @@ it('shows a per-approver detail modal trigger and renders queued steps distinctl
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
     // Eye-modal wiring + Alpine state + tabs.
-    expect($html)->toContain('x-data="{ approver: null, tab:')
+    expect($html)->toContain('approver: null')
+        ->and($html)->toContain("tab: 'overview'")
         ->and($html)->toContain('cw-tabs')
         ->and($html)->toContain('cw-eye')
         ->and($html)->toContain('approver = '.$contract->approvers()->where('order', 1)->first()->id)

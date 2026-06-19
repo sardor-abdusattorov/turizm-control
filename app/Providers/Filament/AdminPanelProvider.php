@@ -18,6 +18,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -25,7 +26,6 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Openplain\FilamentShadcnTheme\Color;
 use Spatie\Permission\Models\Role;
 
 class AdminPanelProvider extends PanelProvider
@@ -43,8 +43,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->defaultThemeMode(ThemeMode::Light)
             ->colors([
-                'primary' => Color::Default,
-
+                'primary' => Color::Indigo,
             ])
             ->spa()
             ->spaUrlExceptions([

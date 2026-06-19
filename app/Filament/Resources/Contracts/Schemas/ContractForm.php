@@ -24,7 +24,6 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use PtPlugins\FilamentNumberInput\Fields\NumberInput;
 
 class ContractForm
 {
@@ -151,12 +150,12 @@ class ContractForm
                                     ->maxLength(255)
                                     ->columnSpanFull(),
 
-                                NumberInput::make('amount')
+                                TextInput::make('amount')
                                     ->label(__('app.label.amount'))
                                     ->prefix(fn (Get $get): ?string => Currency::find($get('currency_id'))?->short_name)
-                                    ->thousandsSeparator(' ')
-                                    ->decimalSeparator('.')
-                                    ->decimalPlaces(2)
+                                    ->numeric()
+                                    ->step(0.01)
+                                    ->minValue(0)
                                     ->default(0)
                                     ->required()
                                     ->columnSpanFull(),

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "10cb779e8e9a78ae28c6e08ea3112b01",
+    "content-hash": "377aab8b53a69f7079dbc3704a7877b9",
     "packages": [
         {
             "name": "abdulmajeed-jamaan/filament-translatable-tabs",
@@ -4393,65 +4393,6 @@
             "time": "2026-02-16T23:10:27+00:00"
         },
         {
-            "name": "openplain/filament-shadcn-theme",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/openplain/filament-shadcn-theme.git",
-                "reference": "e4918c8a34d6089326af25d21ff26ed069f0d05a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/openplain/filament-shadcn-theme/zipball/e4918c8a34d6089326af25d21ff26ed069f0d05a",
-                "reference": "e4918c8a34d6089326af25d21ff26ed069f0d05a",
-                "shasum": ""
-            },
-            "require": {
-                "filament/filament": "^4.0|^5.0",
-                "php": "^8.2|^8.3|^8.4"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Openplain\\FilamentShadcnTheme\\FilamentShadcnThemeServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Openplain\\FilamentShadcnTheme\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Openplain",
-                    "email": "hello@openplain.dev"
-                }
-            ],
-            "description": "Shadcn UI theme for Filament - Beautiful color themes with the iconic Shadcn design system",
-            "homepage": "https://github.com/openplain/filament-shadcn-theme",
-            "keywords": [
-                "colors",
-                "dark-mode",
-                "filament",
-                "filament-theme",
-                "light-mode",
-                "shadcn",
-                "shadcn-ui",
-                "theme"
-            ],
-            "support": {
-                "issues": "https://github.com/openplain/filament-shadcn-theme/issues",
-                "source": "https://github.com/openplain/filament-shadcn-theme/tree/v1.1.0"
-            },
-            "time": "2026-01-19T14:22:59+00:00"
-        },
-        {
             "name": "openspout/openspout",
             "version": "v4.32.0",
             "source": {
@@ -5298,68 +5239,6 @@
                 "source": "https://github.com/bobthecow/psysh/tree/v0.12.23"
             },
             "time": "2026-05-23T13:41:31+00:00"
-        },
-        {
-            "name": "ptplugins/filament-number-input",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ptplugins/filament-number-input.git",
-                "reference": "6be91c8df10971a62acbf33fd3e01d11dcc3b37c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ptplugins/filament-number-input/zipball/6be91c8df10971a62acbf33fd3e01d11dcc3b37c",
-                "reference": "6be91c8df10971a62acbf33fd3e01d11dcc3b37c",
-                "shasum": ""
-            },
-            "require": {
-                "filament/filament": "^3.0 || ^4.0 || ^5.0",
-                "php": "^8.1",
-                "spatie/laravel-package-tools": "^1.16"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "PtPlugins\\FilamentNumberInput\\FilamentNumberInputServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PtPlugins\\FilamentNumberInput\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Premtech Plugins",
-                    "email": "mihailo@ptplugins.com",
-                    "homepage": "https://ptplugins.com"
-                }
-            ],
-            "description": "Locale-aware number input for FilamentPHP v3, v4, and v5. Users see 12.345,67 or 12,345.67 while your database always stores a clean float — no more broken SUM()s or cast errors from localized number strings.",
-            "homepage": "https://ptplugins.com/filament-number-input",
-            "keywords": [
-                "currency",
-                "filament",
-                "filamentphp",
-                "form-field",
-                "formatting",
-                "input",
-                "laravel",
-                "locale",
-                "number"
-            ],
-            "support": {
-                "issues": "https://github.com/ptplugins/filament-number-input/issues",
-                "source": "https://github.com/ptplugins/filament-number-input"
-            },
-            "time": "2026-06-13T18:33:04+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

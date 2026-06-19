@@ -41,15 +41,28 @@
     };
 
     $details = [
-        ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number],
-        ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name],
-        ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name],
-        ['heroicon-o-tag', __('app.label.order_type_single'), $record->orderType?->title ?: '—'],
-        ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name],
-        ['heroicon-o-banknotes', __('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? '')],
-        ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y') ?: '—'],
-        ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i')],
+        ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number, null],
+        ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name, $record->contact ? 'contact' : null],
+        ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name, null],
+        ['heroicon-o-tag', __('app.label.order_type_single'), $record->orderType?->title ?: '—', null],
+        ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name, null],
+        ['heroicon-o-banknotes', __('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? ''), null],
+        ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y') ?: '—', null],
+        ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i'), null],
     ];
+
+    $contact = $record->contact;
+    $contactRows = $contact ? array_values(array_filter([
+        ['heroicon-o-building-office-2', __('app.label.name'), $contact->name],
+        ['heroicon-o-identification', __('app.label.legal_form'), $contact->legal_form ?? null],
+        ['heroicon-o-finger-print', __('app.label.inn'), $contact->inn ?? null],
+        ['heroicon-o-hashtag', 'PINFL', $contact->pinfl ?? null],
+        ['heroicon-o-bookmark', 'OKED', $contact->oked ?? null],
+        ['heroicon-o-map-pin', __('app.label.address'), $contact->address ?? null],
+        ['heroicon-o-phone', __('app.label.phone'), $contact->phone ?? null],
+        ['heroicon-o-envelope', __('app.label.email'), $contact->email ?? null],
+        ['heroicon-o-hashtag', 'MFO', $contact->mfo ?? null],
+    ], fn ($r) => ! empty($r[2]))) : [];
 @endphp
 
 <x-filament-panels::page>
@@ -70,7 +83,7 @@
 
         /* layout */
         .cw-cols{ display:grid; grid-template-columns:1fr; gap:1.1rem; align-items:start; }
-        @media(min-width:1024px){ .cw-cols{ grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); } }
+        @media(min-width:1024px){ .cw-cols{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); } }
         .cw-main,.cw-side{ display:flex; flex-direction:column; gap:1.1rem; min-width:0; }
         .cw-panel{ display:flex; flex-direction:column; gap:1.1rem; }
 
@@ -186,6 +199,11 @@
         .cw-row__ic{ color:var(--m2); display:inline-flex; flex-shrink:0; }
         .cw-row__lb{ font-size:0.784rem; color:var(--m); flex:1; }
         .cw-row__vl{ font-size:0.854rem; font-weight:600; color:var(--t); min-width:0; max-width:55%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:right; }
+        button.cw-row{ width:100%; background:transparent; border:0; cursor:pointer; text-align:left; transition:background .12s ease; }
+        button.cw-row:hover{ background:rgba(99,102,241,.05); }
+        .cw-row--link .cw-row__vl{ color:var(--accent); display:inline-flex; align-items:center; gap:.35rem; justify-content:flex-end; }
+        .cw-contact-rows{ display:flex; flex-direction:column; }
+        .cw-contact-rows .cw-row{ padding:.6rem 0; }
 
         /* execution timeline */
         .cw-filters{ display:flex; gap:.3rem; padding:.95rem 1.25rem; border-bottom:1px solid var(--d); flex-wrap:wrap; }
@@ -248,8 +266,8 @@
     </style>
 
     <div class="cw"
-        x-data="{ approver: null, tab: 'overview', historyShown: 8, historyFilter: 'all' }"
-        @keydown.escape.window="approver = null">
+        x-data="{ approver: null, contactOpen: false, tab: 'overview', historyShown: 8, historyFilter: 'all' }"
+        @keydown.escape.window="approver = null; contactOpen = false">
         @php
             $submittedAt = $this->submittedAt();
             $remaining = $this->timeRemaining();
@@ -270,16 +288,22 @@
                             {{ __('app.label.submitted') }} {{ $submittedAt->diffForHumans() }}
                         </span>
                     @endif
-                    @if ($remaining)
-                        <span class="cw-meta__fact {{ $remaining['overdue'] ? 'cw-meta__fact--danger' : '' }}">
-                            {!! $ic($remaining['overdue'] ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-clock', 13) !!}
-                            {{ $remaining['overdue'] ? __('app.label.overdue').' · '.$remaining['label'] : __('app.label.due_in', ['time' => $remaining['label']]) }}
+                    @if ($current?->due_at && $record->status === Contract::STATUS_IN_REVIEW)
+                        @php $dueIso = $current->due_at->toIso8601String(); @endphp
+                        <span class="cw-meta__fact"
+                            x-data="contractCountdown('{{ $dueIso }}')"
+                            x-init="start()"
+                            :class="overdue ? 'cw-meta__fact--danger' : ''"
+                            :title="absolute">
+                            <template x-if="overdue">{!! $ic('heroicon-m-exclamation-triangle', 13) !!}</template>
+                            <template x-if="! overdue">{!! $ic('heroicon-m-clock', 13) !!}</template>
+                            <span x-text="label"></span>
                         </span>
                     @endif
                     @if ($totalCount > 0)
                         <span class="cw-meta__fact">
                             {!! $ic('heroicon-m-check-badge', 13) !!}
-                            {{ $approvedCount }}/{{ $totalCount }} {{ __('app.contract_approver.status.approved_lower') }}
+                            {{ $approvedCount }}/{{ $totalCount }} {{ __('app.label.approved_lower') }}
                         </span>
                     @endif
                 </div>
@@ -410,12 +434,23 @@
                 <section class="cw-card">
                     <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><h2 class="cw-hd__t">{{ __('app.label.basic_information') }}</h2></div>
                     <div class="cw-dets">
-                        @foreach ($details as [$icon, $label, $value])
-                            <div class="cw-row">
-                                <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
-                                <span class="cw-row__lb">{{ $label }}</span>
-                                <span class="cw-row__vl">{{ $value ?: '—' }}</span>
-                            </div>
+                        @foreach ($details as [$icon, $label, $value, $type])
+                            @if ($type === 'contact' && $value)
+                                <button type="button" class="cw-row cw-row--link" @click="contactOpen = true">
+                                    <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
+                                    <span class="cw-row__lb">{{ $label }}</span>
+                                    <span class="cw-row__vl">
+                                        {{ $value }}
+                                        {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}
+                                    </span>
+                                </button>
+                            @else
+                                <div class="cw-row">
+                                    <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
+                                    <span class="cw-row__lb">{{ $label }}</span>
+                                    <span class="cw-row__vl">{{ $value ?: '—' }}</span>
+                                </div>
+                            @endif
                         @endforeach
                     </div>
                 </section>
@@ -493,6 +528,41 @@
                 @endif
             </section>
         </div>
+
+        {{-- Contact detail modal --}}
+        @if ($contact)
+            <div class="cw-modal" x-show="contactOpen" x-cloak style="display:none;">
+                <div class="cw-modal__bg" @click="contactOpen = false"></div>
+                <div class="cw-modal__card"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100">
+                    <div class="cw-modal__hd">
+                        <span class="cw-row__ic" style="background:rgba(99,102,241,.10);width:2.6rem;height:2.6rem;border-radius:.7rem;display:inline-flex;align-items:center;justify-content:center;color:var(--accent);">
+                            {!! $ic('heroicon-o-building-office-2', 22) !!}
+                        </span>
+                        <div style="min-width:0;flex:1;">
+                            <div class="cw-modal__nm">{{ $contact->name }}</div>
+                            @if ($contact->legal_form)
+                                <div class="cw-modal__dp">{{ $contact->legal_form }}</div>
+                            @endif
+                        </div>
+                        <button type="button" class="cw-modal__x" @click="contactOpen = false">{!! $ic('heroicon-m-x-mark', 16) !!}</button>
+                    </div>
+                    <div class="cw-modal__bd">
+                        <div class="cw-contact-rows">
+                            @foreach ($contactRows as [$ic_, $lb, $vl])
+                                <div class="cw-row" style="border:0;padding:.55rem 0;">
+                                    <span class="cw-row__ic">{!! $ic($ic_, 16) !!}</span>
+                                    <span class="cw-row__lb">{{ $lb }}</span>
+                                    <span class="cw-row__vl" style="max-width:65%;">{{ $vl }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         {{-- Per-approver detail modals --}}
         @foreach ($allApprovers as $ap)
@@ -576,4 +646,50 @@
             </div>
         @endforeach
     </div>
+
+    <script>
+        // Live SLA countdown for the current approver's due_at. Re-ticks every
+        // second so the meta-strip pill reads "1d 12h 04m" / "3h 22m" / "12m".
+        // Switches to a red "Overdue · X ago" once the deadline passes.
+        window.contractCountdown = (iso) => ({
+            due: new Date(iso),
+            overdue: false,
+            label: '',
+            absolute: '',
+            _t: null,
+
+            start() {
+                this.absolute = this.due.toLocaleString();
+                this.tick();
+                this._t = setInterval(() => this.tick(), 1000);
+            },
+
+            tick() {
+                const now = new Date();
+                let diff = Math.floor((this.due - now) / 1000);
+                this.overdue = diff < 0;
+                if (this.overdue) {
+                    diff = -diff;
+                }
+
+                const d = Math.floor(diff / 86400);
+                const h = Math.floor((diff % 86400) / 3600);
+                const m = Math.floor((diff % 3600) / 60);
+                const s = diff % 60;
+
+                let pretty;
+                if (d > 0) {
+                    pretty = `${d}d ${h}h ${m}m`;
+                } else if (h > 0) {
+                    pretty = `${h}h ${m}m ${s}s`;
+                } else {
+                    pretty = `${m}m ${s}s`;
+                }
+
+                this.label = this.overdue
+                    ? @json(__('app.label.overdue')) + ' · ' + pretty
+                    : @json(__('app.label.due_in', ['time' => ''])) + pretty;
+            },
+        });
+    </script>
 </x-filament-panels::page>
