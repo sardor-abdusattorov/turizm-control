@@ -98,6 +98,25 @@ class ViewContract extends ViewRecord
                     $this->refreshFormData(['status']);
                 }),
 
+            Action::make('sendToDirector')
+                ->label(__('app.action.send_to_director'))
+                ->icon('heroicon-o-arrow-up-circle')
+                ->color('warning')
+                ->requiresConfirmation()
+                ->modalHeading(__('app.action.send_to_director'))
+                ->modalDescription(__('app.message.send_to_director_confirm'))
+                ->visible(fn () => $this->record?->canBeSentToDirectorBy())
+                ->action(function (ContractWorkflow $workflow): void {
+                    if (! $workflow->submitToDirector($this->record)) {
+                        Notification::make()->title(__('app.message.action_not_allowed'))->danger()->send();
+
+                        return;
+                    }
+
+                    Notification::make()->title(__('app.message.sent_to_director'))->success()->send();
+                    $this->refreshFormData(['status']);
+                }),
+
             ...EditContract::approvalActions($this->record),
 
             Action::make('downloadPdf')
@@ -216,6 +235,11 @@ class ViewContract extends ViewRecord
                     : __('app.message.hero_in_review_generic'),
                 'overdue' => (bool) $current?->isOverdue(),
                 'due' => $current?->due_at,
+            ],
+            Contract::STATUS_PENDING_DIRECTOR => [
+                'message' => __('app.message.hero_pending_director'),
+                'overdue' => false,
+                'due' => null,
             ],
             Contract::STATUS_APPROVED => [
                 'message' => $contract->signed_at

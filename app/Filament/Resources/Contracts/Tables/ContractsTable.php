@@ -116,10 +116,9 @@ class ContractsTable
                             fn (Contract $record) => route('contracts.pdf.inline', ['contract' => $record]),
                             shouldOpenInNewTab: true,
                         )
-                        ->visible(fn (Contract $record) => $record->documentExists() && in_array($record->status, [
-                            Contract::STATUS_IN_REVIEW,
-                            Contract::STATUS_APPROVED,
-                        ], true)),
+                        // PDF preview unlocks only once approved (after the director signs off).
+                        ->visible(fn (Contract $record) => $record->documentExists()
+                            && $record->status === Contract::STATUS_APPROVED),
 
                     Action::make('downloadPdf')
                         ->label(__('app.action.download_pdf'))

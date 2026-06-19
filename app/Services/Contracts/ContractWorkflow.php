@@ -88,7 +88,7 @@ class ContractWorkflow
             $current->markApproved($comment);
 
             if ($contract->fresh()->allApproved()) {
-                $this->finalizeOrSendToDirector($contract, $user, $comment);
+                $this->finalizeOrAwaitDirector($contract, $user, $comment);
 
                 return;
             }
@@ -97,7 +97,7 @@ class ContractWorkflow
 
             if (! $next && $contract->fresh()->allApproved()) {
                 // Skipping all remaining inactive approvers cleared the queue.
-                $this->finalizeOrSendToDirector($contract, $user, $comment);
+                $this->finalizeOrAwaitDirector($contract, $user, $comment);
 
                 return;
             }
@@ -122,21 +122,23 @@ class ContractWorkflow
     }
 
     /**
-     * The lawyer + accountant stage is done. Hand the contract to the
-     * role-based director for a final sign-off if one exists and hasn't acted
-     * yet; otherwise mark the contract fully APPROVED.
+     * The lawyer + accountant stage is done. If a director is configured and
+     * hasn't acted yet, park the contract in PENDING_DIRECTOR so the manager
+     * can hand it over manually (see submitToDirector). Otherwise — no director
+     * configured, or the director just gave the final approval — finalize.
      */
-    private function finalizeOrSendToDirector(Contract $contract, User $user, ?string $comment): void
+    private function finalizeOrAwaitDirector(Contract $contract, User $user, ?string $comment): void
     {
-        if ($director = $contract->fresh()->appendDirectorApprover()) {
-            $director->startReview($this->slaDays());
-            $this->notifier->notifyApprovalRequested($director);
+        $fresh = $contract->fresh();
+
+        if ($fresh->directorUser() && ! $fresh->hasDirectorApprover()) {
+            $contract->update(['status' => Contract::STATUS_PENDING_DIRECTOR]);
 
             $this->logWorkflowEvent(
-                event: 'Contract Sent To Director',
+                event: 'Contract Awaiting Director',
                 contract: $contract,
                 user: $user,
-                properties: ['comment' => $comment, 'director_id' => $director->user_id],
+                properties: ['comment' => $comment],
             );
 
             return;
@@ -154,6 +156,41 @@ class ContractWorkflow
             user: $user,
             properties: ['comment' => $comment, 'final' => true],
         );
+    }
+
+    /**
+     * Hand a PENDING_DIRECTOR contract to the role-based director for the final
+     * sign-off — appends them as the last approver, flips back to IN_REVIEW and
+     * starts their review clock.
+     */
+    public function submitToDirector(Contract $contract, ?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        if (! $contract->canBeSentToDirectorBy($user)) {
+            return false;
+        }
+
+        DB::transaction(function () use ($contract, $user): void {
+            $director = $contract->appendDirectorApprover();
+
+            if (! $director) {
+                return;
+            }
+
+            $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
+            $director->startReview($this->slaDays());
+            $this->notifier->notifyApprovalRequested($director);
+
+            $this->logWorkflowEvent(
+                event: 'Contract Sent To Director',
+                contract: $contract,
+                user: $user,
+                properties: ['director_id' => $director->user_id],
+            );
+        });
+
+        return true;
     }
 
     public function reject(Contract $contract, User $user, ?string $comment = null): bool

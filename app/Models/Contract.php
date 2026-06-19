@@ -43,6 +43,9 @@ class Contract extends Model
 
     public const STATUS_IN_REVIEW = 'in_review';
 
+    /** Lawyer + accountant signed off; waiting for the manager to send it to the director. */
+    public const STATUS_PENDING_DIRECTOR = 'pending_director';
+
     public const STATUS_APPROVED = 'approved';
 
     public const STATUS_REJECTED = 'rejected';
@@ -54,6 +57,7 @@ class Contract extends Model
         return [
             self::STATUS_DRAFT => __('app.contract.status.draft'),
             self::STATUS_IN_REVIEW => __('app.contract.status.in_review'),
+            self::STATUS_PENDING_DIRECTOR => __('app.contract.status.pending_director'),
             self::STATUS_APPROVED => __('app.contract.status.approved'),
             self::STATUS_REJECTED => __('app.contract.status.rejected'),
             self::STATUS_ARCHIVED => __('app.contract.status.archived'),
@@ -65,6 +69,7 @@ class Contract extends Model
         return [
             self::STATUS_DRAFT => 'gray',
             self::STATUS_IN_REVIEW => 'primary',
+            self::STATUS_PENDING_DIRECTOR => 'warning',
             self::STATUS_APPROVED => 'success',
             self::STATUS_REJECTED => 'danger',
             self::STATUS_ARCHIVED => 'gray',
@@ -592,6 +597,21 @@ class Contract extends Model
         return $user
             && $this->status === self::STATUS_IN_REVIEW
             && $this->isCurrentApprover($user);
+    }
+
+    /**
+     * The lawyer + accountant stage is done (status PENDING_DIRECTOR) and a
+     * director exists — the responsible manager (or an admin) may now hand it
+     * to the director for final sign-off.
+     */
+    public function canBeSentToDirectorBy(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        return $user
+            && $this->status === self::STATUS_PENDING_DIRECTOR
+            && ($this->responsible_id === $user->id || $user->hasRole('super_admin'))
+            && $this->directorUser() !== null;
     }
 
     public function canBeViewedBy(?User $user = null): bool
