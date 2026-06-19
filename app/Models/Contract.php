@@ -171,10 +171,37 @@ class Contract extends Model
         $this->status = self::STATUS_DRAFT;
         $this->signed_at = null;
 
-        // Invalidate prior approvers — keeps the audit trail, frees the
-        // queue. Fresh rows are NOT rebuilt here: the manager re-submits,
-        // and at submit time the queue is read from settings as usual.
+        // Snapshot the chain BEFORE invalidating so we can mirror the same
+        // people, in the same order, into the fresh QUEUED rows. Falling
+        // back to the org's default flow only if there's nothing to mirror.
+        $previousUserIds = $this->activeApprovers()
+            ->orderBy('order')
+            ->pluck('user_id')
+            ->all();
+
+        // Invalidate prior approvers — keeps the audit trail, frees the queue.
         $this->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
+
+        // Rebuild fresh QUEUED rows so the manager can see the chain that
+        // will run on the next submit, and so the per-approver eye-modal on
+        // the View page shows the old INVALIDATED record next to the new
+        // QUEUED one (matches the audit pattern seen in legacy systems).
+        if ($previousUserIds === []) {
+            $this->buildApprovalChainFromFlow();
+
+            return;
+        }
+
+        $order = 1;
+
+        foreach ($previousUserIds as $userId) {
+            ContractApprover::create([
+                'contract_id' => $this->id,
+                'user_id' => $userId,
+                'order' => $order++,
+                'status' => ContractApprover::STATUS_QUEUED,
+            ]);
+        }
     }
 
     public static function generateNumber(): string

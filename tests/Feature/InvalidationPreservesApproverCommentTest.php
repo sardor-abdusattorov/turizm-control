@@ -51,3 +51,47 @@ it('preserves an approver original comment when the chain is invalidated by an e
         ->and($row->comment)->toBe('Looks good, ship it.')
         ->and($row->system_comment)->toBe(__('app.message.invalidated_on_edit'));
 });
+
+it('rebuilds a fresh queued chain mirroring the previous one after an in-flow edit', function () {
+    $author = User::factory()->create(['status' => User::STATUS_ACTIVE]);
+    $first = User::factory()->create(['name' => 'Olim First', 'status' => User::STATUS_ACTIVE]);
+    $second = User::factory()->create(['name' => 'Madina Second', 'status' => User::STATUS_ACTIVE]);
+
+    $orderType = OrderType::factory()->create();
+    $template = ContractTemplate::factory()->create(['order_type_id' => $orderType->id, 'status' => true]);
+
+    $contract = Contract::factory()->create([
+        'responsible_id' => $author->id,
+        'status' => Contract::STATUS_IN_REVIEW,
+        'order_type_id' => $orderType->id,
+        'contract_template_id' => $template->id,
+        'contact_id' => Contact::factory()->create(['status' => true])->id,
+        'currency_id' => Currency::factory()->create(['status' => true])->id,
+        'number' => 'C-INV-REBUILD',
+        'amount' => 1000,
+    ]);
+
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $first->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_APPROVED, 'comment' => 'OK from #1',
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $second->id, 'order' => 2,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+
+    // Trigger an in-flow edit on a re-approval field.
+    $contract->update(['amount' => 5000]);
+
+    $rows = $contract->approvers()->get();
+
+    // 4 rows total — two old INVALIDATED + two fresh QUEUED, same users + order.
+    expect($rows)->toHaveCount(4)
+        ->and($contract->fresh()->status)->toBe(Contract::STATUS_DRAFT)
+        ->and($rows->where('status', ContractApprover::STATUS_INVALIDATED))->toHaveCount(2)
+        ->and($rows->where('status', ContractApprover::STATUS_QUEUED))->toHaveCount(2);
+
+    $newRows = $rows->where('status', ContractApprover::STATUS_QUEUED)->sortBy('order')->values();
+    expect($newRows->pluck('user_id')->all())->toBe([$first->id, $second->id])
+        ->and($newRows->pluck('order')->all())->toBe([1, 2]);
+});

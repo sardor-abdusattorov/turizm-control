@@ -41,7 +41,7 @@ function editorAuthor(User $profileDefault): User
     return $author->fresh();
 }
 
-it('keeps the invalidated chain visible and pre-fills the picker from profile defaults', function () {
+it('keeps the invalidated chain visible and pre-fills the picker from the mirrored queue', function () {
     $legal = Department::factory()->create(['code' => 'legal']);
     $profileDefault = approver($legal->id);
     $oldApprover = approver($legal->id);
@@ -77,13 +77,15 @@ it('keeps the invalidated chain visible and pre-fills the picker from profile de
 
     $contract->refresh();
 
-    // 1) The hook flipped status back to DRAFT and the old chain stays as
-    //    INVALIDATED audit rows — afterSave must NOT have wiped them.
+    // 1) The hook flipped status to DRAFT, marked the old row INVALIDATED
+    //    (audit), AND rebuilt a fresh QUEUED row mirroring the old chain —
+    //    so the manager can see what will run on the next submit.
     expect($contract->status)->toBe(Contract::STATUS_DRAFT);
     expect($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(1);
+    expect($contract->approvers()->where('status', ContractApprover::STATUS_QUEUED)->count())->toBe(1);
 
-    // 2) Reopen edit — picker pre-fills from the author's profile default
-    //    recipient because there are no queued/pending rows left.
+    // 2) Reopen edit — picker pre-fills with the mirrored queued chain (same
+    //    person as before the edit) rather than the author's profile defaults.
     Livewire::test(EditContract::class, ['record' => $contract->id])
-        ->assertFormSet(['approver_chain' => [$profileDefault->id]]);
+        ->assertFormSet(['approver_chain' => [$oldApprover->id]]);
 });
