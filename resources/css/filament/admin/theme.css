@@ -4,6 +4,12 @@
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../resources/views/livewire/**/*';
 
+/* Thin accent scrollbars via the STANDARD properties only. We intentionally
+   do NOT use ::-webkit-scrollbar: a webkit custom scrollbar is painted off the
+   compositor, which forces main-thread scrolling — that's what made the page
+   feel heavy and the fixed sidebar's icons jitter a frame behind the scroll.
+   scrollbar-width / scrollbar-color keep the native, GPU-composited scrollbar,
+   so it stays thin AND smooth. */
 * {
     scrollbar-width: thin;
     scrollbar-color: rgb(var(--primary-400)) transparent;
@@ -30,34 +36,8 @@
     --dark-hover-text: oklch(100% 0 0);
 }
 
-*::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-*::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-*::-webkit-scrollbar-thumb {
-    background-color: rgb(var(--primary-400));
-    border-radius: 3px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(var(--primary-500));
-}
-
 .dark * {
     scrollbar-color: rgb(var(--primary-500)) transparent;
-}
-
-.dark *::-webkit-scrollbar-thumb {
-    background-color: rgb(var(--primary-500));
-}
-
-.dark *::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(var(--primary-400));
 }
 
 .fi-fo-rich-editor.fullscreen {
