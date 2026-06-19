@@ -249,6 +249,7 @@
             color:var(--accent); font-size:.815rem; font-weight:600; cursor:pointer;
             transition:background .12s ease; }
         .cw-show-more:hover{ background:rgba(99,102,241,.05); }
+        .cw-show-more > span{ display:inline-flex; align-items:center; gap:.4rem; }
 
         /* combined card — file block */
         .cw-file{ display:flex; align-items:flex-start; gap:1.1rem; padding:1.25rem 1.5rem .5rem; }
