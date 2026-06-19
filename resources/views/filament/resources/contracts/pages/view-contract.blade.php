@@ -6,6 +6,7 @@
     $statusColor = Contract::getStatusColors()[$record->status] ?? 'gray';
     $statusLabel = Contract::getStatuses()[$record->status] ?? $record->status;
     $current = $record->currentApprover();
+    $directorUserId = $record->directorUser()?->id;
     $hero = $this->heroContext();
 
     $active = $record->activeApprovers;
@@ -232,12 +233,19 @@
         .cw-step--current .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px var(--accent), 0 0 0 7px var(--accent-ring); }
         .cw-step--approved .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #34d399, 0 0 0 7px rgba(52,211,153,.15); }
         .cw-step--rejected .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #f87171, 0 0 0 7px rgba(248,113,113,.15); }
+        /* Director = final sign-off: gold ring on the node, kept after the state
+           rules so it wins. The state badge (check/clock) still shows on top. */
+        .cw-step--director .cw-node img{ box-shadow:0 0 0 2px var(--s), 0 0 0 3px #f59e0b, 0 0 0 7px rgba(245,158,11,.18); }
         .cw-badge{ position:absolute; bottom:-.25rem; right:-.25rem; width:1.4rem; height:1.4rem; border-radius:999px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px var(--s); color:#fff; }
         .cw-badge--approved{ background:#10b981; } .cw-badge--rejected{ background:#ef4444; } .cw-badge--returned{ background:#3b82f6; }
         .cw-badge--current{ background:var(--accent); color:var(--accent-on); } .cw-badge--queued{ background:#cbd5e1; color:#64748b; } .dark .cw-badge--queued{ background:#3f3f46; color:#a1a1aa; }
         .cw-step__bd{ min-width:0; flex:1; padding-top:.15rem; }
         .cw-step__nm{ font-size:0.9rem; font-weight:650; color:var(--t); display:flex; align-items:center; gap:.4rem; }
         .cw-ord{ font-size:0.664rem; font-weight:700; color:var(--m2); background:var(--soft); border-radius:999px; padding:.05rem .42rem; }
+        .cw-director{ display:inline-flex; align-items:center; gap:.22rem; font-size:.6rem; font-weight:700;
+            text-transform:uppercase; letter-spacing:.04em; color:#b45309; background:rgba(245,158,11,.15);
+            padding:.12rem .42rem; border-radius:999px; white-space:nowrap; }
+        .dark .cw-director{ color:#fcd34d; background:rgba(245,158,11,.22); }
         .cw-step__dp{ font-size:0.8rem; font-weight:450; color:var(--m); margin-top:.15rem; }
         .cw-step__meta{ display:flex; align-items:center; gap:.6rem; margin-top:.5rem; flex-wrap:wrap; }
         .cw-when{ font-size:0.724rem; color:var(--m2); display:inline-flex; align-items:center; gap:.25rem; }
@@ -460,14 +468,18 @@
                     @else
                         <div class="cw-chain">
                             @foreach ($active as $ap)
-                                @php $state = $this->approverState($ap); $v = $this->approverVisual($ap); @endphp
-                                <div class="cw-step cw-step--{{ $state }}">
+                                @php
+                                    $state = $this->approverState($ap);
+                                    $v = $this->approverVisual($ap);
+                                    $isDirector = $directorUserId && $ap->user_id === $directorUserId;
+                                @endphp
+                                <div class="cw-step cw-step--{{ $state }}{{ $isDirector ? ' cw-step--director' : '' }}">
                                     <div class="cw-node">
                                         <img src="{{ $this->approverAvatar($ap) }}" alt="">
                                         <span class="cw-badge cw-badge--{{ $state }}">{!! $ic($v['icon'], 13) !!}</span>
                                     </div>
                                     <div class="cw-step__bd">
-                                        <div class="cw-step__nm">{{ $ap->user?->name }} <span class="cw-ord">#{{ $ap->order }}</span></div>
+                                        <div class="cw-step__nm">{{ $ap->user?->name }} <span class="cw-ord">#{{ $ap->order }}</span>@if ($isDirector)<span class="cw-director">{!! $ic('heroicon-s-shield-check', 11) !!} {{ __('app.label.final_sign_off') }}</span>@endif</div>
                                         <div class="cw-step__dp">{{ $ap->user?->department?->name }}{{ $ap->user?->position?->name ? ' · '.$ap->user->position->name : '' }}</div>
                                         <div class="cw-step__meta">
                                             <span class="cw-pill cw-pill--{{ $pillFor($ap->status) }}">{{ $statusName($ap->status) }}</span>

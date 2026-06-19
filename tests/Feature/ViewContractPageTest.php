@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 
@@ -109,6 +110,33 @@ it('shows a preview button on the document card instead of an embedded pdf ifram
 
     expect($html)->toContain(route('contracts.pdf.inline', ['contract' => $contract]))
         ->and($html)->not->toContain('<iframe');
+});
+
+it('marks the director step as the final sign-off in the chain', function () {
+    Role::firstOrCreate(['name' => Contract::DIRECTOR_ROLE, 'guard_name' => 'web']);
+    $director = User::factory()->create(['status' => User::STATUS_ACTIVE]);
+    $director->assignRole(Contract::DIRECTOR_ROLE);
+
+    $user = viewerWithAccess();
+    $contract = Contract::factory()->create([
+        'responsible_id' => $user->id,
+        'status' => Contract::STATUS_IN_REVIEW,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => User::factory()->create()->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_APPROVED,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $director->id, 'order' => 2,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+
+    actingAs($user);
+
+    $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
+
+    expect($html)->toContain('cw-step--director')
+        ->and($html)->toContain('Final sign-off');
 });
 
 it('hides the PDF preview link until the contract is approved', function () {

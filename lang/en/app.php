@@ -174,6 +174,7 @@ return [
         'due_in' => 'Due in :time',
         'submitted' => 'Submitted',
         'awaiting' => 'Awaiting',
+        'final_sign_off' => 'Final sign-off',
         'show_more' => 'Show more',
         'show_less' => 'Show less',
         'not_set' => 'Not set',
