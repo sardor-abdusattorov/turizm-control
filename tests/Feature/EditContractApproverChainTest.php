@@ -181,10 +181,9 @@ it('preserves the invalidated audit trail when the resulting draft chain is re-s
 
     $contract->refresh();
 
-    // The audit rows (incl. the approved verdict + its comment) MUST survive,
+    // The approved verdict + its comment MUST survive as audit (never deleted),
     // and the live queue is the freshly picked pair.
-    expect($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(2)
-        ->and($contract->approvers()->where('comment', 'Approved by legal')->exists())->toBeTrue()
+    expect($contract->approvers()->where('comment', 'Approved by legal')->where('status', ContractApprover::STATUS_INVALIDATED)->exists())->toBeTrue()
         ->and($contract->activeApprovers()->pluck('user_id')->map(fn ($id): int => (int) $id)->all())->toBe([$newLegal->id, $accounting->id]);
 });
 

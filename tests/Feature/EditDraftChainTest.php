@@ -68,14 +68,20 @@ it('lets the author swap the approver chain while the contract is a draft', func
         ->call('save')
         ->assertHasNoFormErrors();
 
-    $rows = $contract->fresh()->approvers()->orderBy('order')->get();
+    // The new chain is live, in order...
+    $active = $contract->fresh()->activeApprovers()->orderBy('order')->get();
+    expect($active)->toHaveCount(2)
+        ->and($active[0]->user_id)->toBe($newLawyer->id)
+        ->and($active[0]->order)->toBe(1)
+        ->and($active[0]->status)->toBe(ContractApprover::STATUS_QUEUED)
+        ->and($active[1]->user_id)->toBe($accountant->id)
+        ->and($active[1]->order)->toBe(2);
 
-    expect($rows)->toHaveCount(2)
-        ->and($rows[0]->user_id)->toBe($newLawyer->id)
-        ->and($rows[0]->order)->toBe(1)
-        ->and($rows[0]->status)->toBe(ContractApprover::STATUS_QUEUED)
-        ->and($rows[1]->user_id)->toBe($accountant->id)
-        ->and($rows[1]->order)->toBe(2);
+    // ...and the removed approver was INVALIDATED, never deleted.
+    expect($contract->fresh()->approvers()
+        ->where('user_id', $first->id)
+        ->where('status', ContractApprover::STATUS_INVALIDATED)
+        ->exists())->toBeTrue();
 });
 
 it('shows and pre-fills the chain picker once the contract is in review', function () {

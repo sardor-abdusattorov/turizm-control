@@ -107,10 +107,11 @@ class EditContract extends EditRecord
     /**
      * Persist the approval-chain picker.
      *
-     * The golden rule: only ever touch the LIVE queue (QUEUED / PENDING). Rows
-     * that already carry history — RETURNED, SKIPPED, and INVALIDATED audit
-     * verdicts — are never deleted, so the per-approver "Earlier attempts"
-     * trail on the View page survives every re-save.
+     * The golden rule: an edit NEVER deletes an approver row. Approver rows
+     * only ever leave the table via the contract's cascadeOnDelete foreign
+     * key. Whenever the chain changes, the current live queue is marked
+     * INVALIDATED (kept as audit history) and a fresh QUEUED chain is laid
+     * down from the new selection.
      *
      * - Unchanged chain: no-op, so a plain save never disturbs the queue or
      *   cancels a running approval.
@@ -118,7 +119,6 @@ class EditContract extends EditRecord
      *   invalidate the live verdicts as audit (unless the
      *   Contract::maybeInvalidateOnEdit hook already did when a business field
      *   changed too), then rebuild the queue from the new selection.
-     * - Draft whose chain changed: just replace the live queue.
      */
     protected function afterSave(): void
     {
@@ -137,11 +137,15 @@ class EditContract extends EditRecord
             $this->record->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
         }
 
-        // Replace only the live queue; INVALIDATED / RETURNED / SKIPPED history
-        // rows stay put.
+        // Retire the remaining live queue by INVALIDATING it (never deleting),
+        // then rebuild the fresh queue from the picker.
         $this->record->approvers()
             ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
-            ->delete();
+            ->update([
+                'status' => ContractApprover::STATUS_INVALIDATED,
+                'system_comment' => __('app.message.invalidated_on_edit'),
+                'acted_at' => now(),
+            ]);
 
         $this->rebuildQueuedChain();
     }
