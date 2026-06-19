@@ -118,26 +118,22 @@
 <x-filament-panels::page>
     <style>
         [x-cloak]{ display:none !important; }
-        /* Tint variables — derived from Filament's primary palette via the
-           --primary-XXX CSS vars, so changing Color::* in AdminPanelProvider
-           re-skins the whole page automatically. Same trick for the muted
-           tones; only true neutrals stay literal. */
         .cw{ display:flex; flex-direction:column; gap:1.5rem;
             --s:#fff; --r:rgba(15,20,25,.08); --t:#0f1419; --m:#57606a; --m2:#8b949e; --d:rgba(15,20,25,.07);
             --soft:#f8fafc; --track:#e6ebf1;
-            --accent: rgb(var(--primary-600));
-            --accent-strong: rgb(var(--primary-700));
-            --accent-soft: rgb(var(--primary-500) / 0.12);
-            --accent-softer: rgb(var(--primary-500) / 0.05);
-            --accent-ring: rgb(var(--primary-500) / 0.18);
-            --accent-on: #fff; }
+            --accent:#6366f1;
+            --accent-strong:#4338ca;
+            --accent-soft:rgba(99,102,241,.12);
+            --accent-softer:rgba(99,102,241,.05);
+            --accent-ring:rgba(99,102,241,.18);
+            --accent-on:#fff; }
         .dark .cw{ --s:#18181b; --r:rgba(255,255,255,.08); --t:#f0f6fc; --m:#9aa4b2; --m2:#6e7681; --d:rgba(255,255,255,.07);
             --soft:rgba(255,255,255,.03); --track:rgba(255,255,255,.10);
-            --accent: rgb(var(--primary-400));
-            --accent-strong: rgb(var(--primary-300));
-            --accent-soft: rgb(var(--primary-400) / 0.16);
-            --accent-softer: rgb(var(--primary-400) / 0.08);
-            --accent-ring: rgb(var(--primary-400) / 0.25); }
+            --accent:#818cf8;
+            --accent-strong:#a5b4fc;
+            --accent-soft:rgba(129,140,248,.16);
+            --accent-softer:rgba(129,140,248,.08);
+            --accent-ring:rgba(129,140,248,.25); }
 
         .cw-card{ background:var(--s); border-radius:1rem; box-shadow:0 0 0 1px var(--r), 0 1px 3px rgba(15,20,25,.06), 0 1px 2px rgba(15,20,25,.04); overflow:hidden; }
         .cw-hd{ display:flex; align-items:center; gap:.6rem; padding:1.15rem 1.5rem; border-bottom:1px solid var(--d); }
@@ -216,7 +212,7 @@
         .cw-step:not(:last-child)::before{ content:''; position:absolute; left:2rem; top:2.95rem; bottom:-.45rem; width:2px; background:var(--track); border-radius:2px; }
         .cw-step--approved:not(:last-child)::before{ background:linear-gradient(#34d399, var(--track)); }
         .cw-step--current{ background:linear-gradient(90deg, var(--accent-soft), transparent 70%); }
-        @keyframes cwPulse { 0%{ box-shadow:0 0 0 0 rgb(var(--primary-500) / 0.55);} 70%{ box-shadow:0 0 0 8px rgb(var(--primary-500) / 0);} 100%{ box-shadow:0 0 0 0 rgb(var(--primary-500) / 0);} }
+        @keyframes cwPulse { 0%{ box-shadow:0 0 0 0 rgba(99,102,241,.55);} 70%{ box-shadow:0 0 0 8px rgba(99,102,241,0);} 100%{ box-shadow:0 0 0 0 rgba(99,102,241,0);} }
         @media (prefers-reduced-motion: no-preference){ .cw-step--current .cw-badge--current{ animation:cwPulse 1.8s ease-out infinite; } }
         .cw-step:hover{ background:var(--soft); }
         .cw-node{ position:relative; flex-shrink:0; }
