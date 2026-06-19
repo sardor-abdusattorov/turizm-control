@@ -242,18 +242,19 @@
         .cw-empty{ display:flex; flex-direction:column; align-items:center; gap:.6rem; padding:2.75rem 0; color:var(--m2); }
         .cw-empty span{ font-size:0.825rem; }
 
-        /* details (sidebar, stacked) */
-        .cw-dets{ display:flex; flex-direction:column; padding:.4rem 0; }
-        .cw-row{ display:flex; align-items:center; gap:.85rem; padding:.95rem 1.5rem; border-bottom:1px solid var(--d); transition:background .12s ease; }
+        /* details — table grid (label cell tinted, value cell) */
+        .cw-dets{ display:flex; flex-direction:column; border-top:1px solid var(--d); }
+        .cw-row{ display:grid; grid-template-columns:minmax(10rem,15rem) 1fr; align-items:stretch; border-bottom:1px solid var(--d); }
         .cw-row:last-child{ border-bottom:0; }
-        .cw-row:hover{ background:rgba(99,102,241,.04); }
-        .cw-row__ic{ color:var(--m); display:inline-flex; flex-shrink:0; }
-        .cw-row__lb{ font-size:0.8125rem; font-weight:550; color:var(--m); }
-        .cw-row__vl{ font-size:0.8125rem; font-weight:600; color:var(--t); margin-left:auto; flex-shrink:0; min-width:0; max-width:60%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:right; }
+        .cw-row__k{ display:flex; align-items:center; gap:.6rem; padding:.85rem 1.25rem; background:var(--soft); border-right:1px solid var(--d); }
+        .cw-row__ic{ color:var(--m2); display:inline-flex; flex-shrink:0; }
+        .cw-row__lb{ font-size:0.8125rem; font-weight:600; color:var(--m); }
+        .cw-row__v{ display:flex; align-items:center; padding:.85rem 1.25rem; min-width:0; transition:background .12s ease; }
+        .cw-row__vl{ font-size:0.8125rem; font-weight:600; color:var(--t); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .cw-row__vl--muted{ color:var(--m2); font-weight:500; font-style:italic; }
-        button.cw-row{ width:100%; background:transparent; border:0; cursor:pointer; text-align:left; }
-        button.cw-row:hover{ background:rgba(99,102,241,.07); }
-        .cw-row--link .cw-row__vl{ color:var(--accent); display:inline-flex; align-items:center; gap:.35rem; justify-content:flex-end; }
+        button.cw-row{ width:100%; background:transparent; border:0; border-bottom:1px solid var(--d); cursor:pointer; text-align:left; font:inherit; padding:0; }
+        .cw-row--link:hover .cw-row__v{ background:rgba(99,102,241,.05); }
+        .cw-row--link .cw-row__vl{ color:var(--accent); display:inline-flex; align-items:center; gap:.35rem; }
         .cw-show-more{ display:flex; align-items:center; justify-content:center; gap:.4rem; width:100%;
             padding:.85rem 1.5rem; background:transparent; border:0; border-top:1px solid var(--d);
             color:var(--accent); font-size:.815rem; font-weight:600; cursor:pointer;
@@ -287,8 +288,11 @@
         .cw-contact-group + .cw-contact-group{ margin-top:1.1rem; padding-top:.9rem; border-top:1px solid var(--d); }
         .cw-contact-group__t{ font-size:.7rem; font-weight:700; color:var(--m2); text-transform:uppercase; letter-spacing:.06em; padding:0 .25rem .35rem; }
         .cw-contact-rows{ display:flex; flex-direction:column; }
-        .cw-contact-rows .cw-row{ padding:.45rem .25rem; border-bottom:0; }
-        .cw-contact-rows .cw-row + .cw-row{ border-top:1px dashed var(--d); }
+        .cw-crow{ display:flex; align-items:center; gap:.7rem; padding:.55rem .25rem; }
+        .cw-crow + .cw-crow{ border-top:1px dashed var(--d); }
+        .cw-crow__ic{ color:var(--m2); display:inline-flex; flex-shrink:0; }
+        .cw-crow__lb{ font-size:0.8125rem; color:var(--m); flex:1; }
+        .cw-crow__vl{ font-size:0.8125rem; font-weight:600; color:var(--t); max-width:62%; text-align:right; }
 
         /* execution timeline */
         .cw-filters{ display:flex; gap:.3rem; padding:.95rem 1.25rem; border-bottom:1px solid var(--d); flex-wrap:wrap; }
@@ -545,7 +549,6 @@
                                 </a>
                             @endif
                         </div>
-                        <div class="cw-divider"></div>
                     @endif
 
                     <div class="cw-dets">
@@ -553,30 +556,24 @@
                             @php $hasValue = ! empty($value); @endphp
                             @if ($type === 'contact' && $hasValue)
                                 <button type="button" class="cw-row cw-row--link" @click="contactOpen = true" @if ($extra) x-show="basicExpanded" x-cloak @endif>
-                                    <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
-                                    <span class="cw-row__lb">{{ $label }}</span>
-                                    <span class="cw-row__vl">
-                                        {{ $value }}
-                                        {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}
-                                    </span>
+                                    <span class="cw-row__k"><span class="cw-row__ic">{!! $ic($icon, 16) !!}</span><span class="cw-row__lb">{{ $label }}</span></span>
+                                    <span class="cw-row__v"><span class="cw-row__vl">{{ $value }} {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}</span></span>
                                 </button>
                             @elseif ($type === 'status')
                                 <div class="cw-row" @if ($extra) x-show="basicExpanded" x-cloak @endif>
-                                    <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
-                                    <span class="cw-row__lb">{{ $label }}</span>
-                                    <span class="cw-row__vl" style="overflow:visible;">
-                                        <span class="cw-pill cw-pill--{{ $statusColor }}" style="padding:.32rem .7rem .32rem .55rem;font-size:.82rem;">{{ $value }}</span>
-                                    </span>
+                                    <span class="cw-row__k"><span class="cw-row__ic">{!! $ic($icon, 16) !!}</span><span class="cw-row__lb">{{ $label }}</span></span>
+                                    <span class="cw-row__v"><span class="cw-pill cw-pill--{{ $statusColor }}" style="padding:.32rem .7rem .32rem .55rem;font-size:.8rem;">{{ $value }}</span></span>
                                 </div>
                             @else
                                 <div class="cw-row" @if ($extra) x-show="basicExpanded" x-cloak @endif>
-                                    <span class="cw-row__ic">{!! $ic($icon, 16) !!}</span>
-                                    <span class="cw-row__lb">{{ $label }}</span>
-                                    @if ($hasValue)
-                                        <span class="cw-row__vl">{{ $value }}</span>
-                                    @else
-                                        <span class="cw-row__vl cw-row__vl--muted">{{ __('app.label.not_set') }}</span>
-                                    @endif
+                                    <span class="cw-row__k"><span class="cw-row__ic">{!! $ic($icon, 16) !!}</span><span class="cw-row__lb">{{ $label }}</span></span>
+                                    <span class="cw-row__v">
+                                        @if ($hasValue)
+                                            <span class="cw-row__vl">{{ $value }}</span>
+                                        @else
+                                            <span class="cw-row__vl cw-row__vl--muted">{{ __('app.label.not_set') }}</span>
+                                        @endif
+                                    </span>
                                 </div>
                             @endif
                         @endforeach
@@ -687,10 +684,10 @@
                                 <div class="cw-contact-group__t">{{ $groupLabel }}</div>
                                 <div class="cw-contact-rows">
                                     @foreach ($rows as [$ic_, $lb, $vl])
-                                        <div class="cw-row">
-                                            <span class="cw-row__ic">{!! $ic($ic_, 16) !!}</span>
-                                            <span class="cw-row__lb">{{ $lb }}</span>
-                                            <span class="cw-row__vl" style="max-width:62%;white-space:normal;text-align:right;">{{ $vl }}</span>
+                                        <div class="cw-crow">
+                                            <span class="cw-crow__ic">{!! $ic($ic_, 16) !!}</span>
+                                            <span class="cw-crow__lb">{{ $lb }}</span>
+                                            <span class="cw-crow__vl">{{ $vl }}</span>
                                         </div>
                                     @endforeach
                                 </div>
