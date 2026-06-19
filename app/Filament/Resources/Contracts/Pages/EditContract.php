@@ -20,6 +20,14 @@ class EditContract extends EditRecord
     /** @var array<int, int> */
     protected array $approverChain = [];
 
+    /**
+     * The live chain (active approver user IDs, in order) BEFORE save — used
+     * to tell whether the author actually changed the chain on this edit.
+     *
+     * @var array<int, int>
+     */
+    protected array $originalChain = [];
+
     protected bool $syncChain = false;
 
     /** The contract's status BEFORE save — used to detect mid-flow edits. */
@@ -62,27 +70,20 @@ class EditContract extends EditRecord
     }
 
     /**
-     * Pre-fill the approval-chain picker with the current queued chain so the
-     * author can tweak it. If there are no queued rows (e.g. the contract just
-     * came back to DRAFT because the previous chain was invalidated by an
-     * edit), leave the key absent so the picker's default() pulls the user's
-     * profile recipients — matching the create flow.
+     * Pre-fill the approval-chain picker with the contract's live chain
+     * (active rows, in order) so the author can see and tweak it — on drafts
+     * and, now, on submitted contracts too. A draft with no live chain falls
+     * back to the author's profile recipients, matching the create flow.
      */
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        if ($this->record->status !== Contract::STATUS_DRAFT) {
-            return $data;
+        $ids = $this->liveChainIds();
+
+        if ($ids === [] && $this->record->status === Contract::STATUS_DRAFT) {
+            $ids = ContractForm::defaultApproverIds();
         }
 
-        $ids = $this->record->approvers()
-            ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
-            ->orderBy('order')
-            ->pluck('user_id')
-            ->all();
-
-        $data['approver_chain'] = empty($ids)
-            ? ContractForm::defaultApproverIds()
-            : array_map('intval', $ids);
+        $data['approver_chain'] = $ids;
 
         return $data;
     }
@@ -90,28 +91,87 @@ class EditContract extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $this->originalStatus = $this->record->status;
+        $this->originalChain = $this->liveChainIds();
         $this->syncChain = array_key_exists('approver_chain', $data);
-        $this->approverChain = array_values(array_filter(array_map('intval', (array) ($data['approver_chain'] ?? []))));
+        $this->approverChain = collect((array) ($data['approver_chain'] ?? []))
+            ->map(fn ($id): int => (int) $id)
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
         unset($data['approver_chain']);
 
         return $data;
     }
 
     /**
-     * Only rebuild the chain from the picker when the user was actually
-     * editing a draft (and the picker was on screen). After an in-flow edit
-     * the Contract::maybeInvalidateOnEdit hook flips the status to DRAFT and
-     * marks the old chain as INVALIDATED on its own — we must not blow those
-     * audit rows away here, and the picker would have been hidden anyway.
+     * Persist the approval-chain picker.
+     *
+     * - Draft: we own the whole chain, so wipe and rebuild from the picker.
+     * - Submitted contract whose chain the author changed: drop back to DRAFT
+     *   (the Contract::maybeInvalidateOnEdit hook already does this when a
+     *   business field changed too), keep the old verdicts as an INVALIDATED
+     *   audit trail, and rebuild the queue from the new selection.
+     * - Unchanged chain: left untouched, so a no-op save never cancels a
+     *   running approval.
      */
     protected function afterSave(): void
     {
-        if (! $this->syncChain || $this->originalStatus !== Contract::STATUS_DRAFT) {
+        if (! $this->syncChain) {
             return;
         }
 
-        $this->record->approvers()->delete();
+        if ($this->originalStatus === Contract::STATUS_DRAFT) {
+            $this->record->approvers()->delete();
+            $this->rebuildQueuedChain();
 
+            return;
+        }
+
+        if ($this->approverChain === $this->originalChain) {
+            return;
+        }
+
+        if ($this->record->status === Contract::STATUS_DRAFT) {
+            // A business field changed too: the hook already invalidated the old
+            // chain and seeded mirror QUEUED rows. Swap those placeholders for
+            // the author's selection, leaving the audit rows in place.
+            $this->record->approvers()
+                ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
+                ->delete();
+        } else {
+            // Only the chain changed: reset to draft ourselves and invalidate
+            // the live verdicts so they survive as history.
+            $this->record->forceFill([
+                'status' => Contract::STATUS_DRAFT,
+                'signed_at' => null,
+            ])->saveQuietly();
+            $this->record->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
+        }
+
+        $this->rebuildQueuedChain();
+    }
+
+    /**
+     * Active approver user IDs (excludes invalidated/skipped), in chain order.
+     *
+     * @return array<int, int>
+     */
+    protected function liveChainIds(): array
+    {
+        return $this->record->activeApprovers()
+            ->pluck('user_id')
+            ->map(fn ($id): int => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Lay down a fresh QUEUED chain from the captured picker selection, in order.
+     */
+    protected function rebuildQueuedChain(): void
+    {
         $order = 1;
 
         foreach ($this->approverChain as $userId) {

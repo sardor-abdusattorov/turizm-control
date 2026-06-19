@@ -77,12 +77,18 @@ it('lets the author swap the approver chain while the contract is a draft', func
         ->and($rows[1]->order)->toBe(2);
 });
 
-it('hides the chain picker once the contract is in review', function () {
+it('shows and pre-fills the chain picker once the contract is in review', function () {
     $author = draftContractEditor();
+    $approver = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
     $contract = validDraftContract($author);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $approver->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
     $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
 
     Livewire::test(EditContract::class, ['record' => $contract->id])
-        ->assertFormFieldDoesNotExist('approver_chain');
+        ->assertFormFieldExists('approver_chain')
+        ->assertFormSet(['approver_chain' => [$approver->id]]);
 });
