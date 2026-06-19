@@ -12,7 +12,7 @@
 
     $colorFor = function (string $status): array {
         return match ($status) {
-            ContractApprover::STATUS_APPROVED => ['bg' => 'rgba(34,197,94,.12)', 'fg' => '#15803d', 'ring' => '#22c55e'],
+            ContractApprover::STATUS_APPROVED => ['bg' => 'rgba(16,185,129,.12)', 'fg' => '#047857', 'ring' => '#10b981'],
             ContractApprover::STATUS_REJECTED => ['bg' => 'rgba(239,68,68,.12)', 'fg' => '#b91c1c', 'ring' => '#ef4444'],
             ContractApprover::STATUS_RETURNED => ['bg' => 'rgba(59,130,246,.12)', 'fg' => '#1d4ed8', 'ring' => '#3b82f6'],
             ContractApprover::STATUS_PENDING => ['bg' => 'rgba(251,146,60,.14)', 'fg' => '#c2410c', 'ring' => '#fb923c'],

@@ -44,6 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ->defaultThemeMode(ThemeMode::Light)
             ->colors([
                 'primary' => Color::Blue,
+                'success' => Color::Emerald,
             ])
             ->spa()
             ->spaUrlExceptions([

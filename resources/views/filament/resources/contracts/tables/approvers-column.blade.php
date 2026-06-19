@@ -13,7 +13,7 @@
     // (matches Filament's primary), red for rejection, cyan for return,
     // neutral gray for queued/draft.
     $palette = [
-        ContractApprover::STATUS_APPROVED => ['solid' => '#16a34a', 'soft' => 'rgba(22,163,74,.12)', 'icon' => 'heroicon-m-check'],
+        ContractApprover::STATUS_APPROVED => ['solid' => '#059669', 'soft' => 'rgba(5,150,105,.12)', 'icon' => 'heroicon-m-check'],
         ContractApprover::STATUS_REJECTED => ['solid' => '#dc2626', 'soft' => 'rgba(220,38,38,.12)', 'icon' => 'heroicon-m-x-mark'],
         ContractApprover::STATUS_RETURNED => ['solid' => '#0ea5e9', 'soft' => 'rgba(14,165,233,.14)', 'icon' => 'heroicon-m-arrow-uturn-left'],
         ContractApprover::STATUS_PENDING => ['solid' => '#6366f1', 'soft' => 'rgba(99,102,241,.14)', 'icon' => 'heroicon-m-clock'],
@@ -30,7 +30,7 @@
         $total === 0 => ['—', '#94a3b8'],
         $isDraft => [__('app.label.not_submitted'), '#64748b'],
         $hasRejected => [__('app.contract_approver.status.rejected'), '#dc2626'],
-        $approved === $total => [__('app.contract_approver.status.approved'), '#16a34a'],
+        $approved === $total => [__('app.contract_approver.status.approved'), '#059669'],
         default => ["{$approved}/{$total}", '#6366f1'],
     };
 
