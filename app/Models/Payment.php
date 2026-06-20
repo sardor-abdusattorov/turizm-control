@@ -42,17 +42,17 @@ class Payment extends Model
         });
 
         static::deleting(function (self $payment): void {
-            if ($payment->screenshot && Storage::disk('public')->exists($payment->screenshot)) {
-                Storage::disk('public')->delete($payment->screenshot);
+            if ($payment->screenshot && Storage::disk('local')->exists($payment->screenshot)) {
+                Storage::disk('local')->delete($payment->screenshot);
             }
         });
     }
 
-    /** Public URL of the uploaded proof screenshot, or null when absent. */
+    /** Short-lived signed URL of the uploaded proof screenshot, or null. */
     public function screenshotUrl(): ?string
     {
         return $this->screenshot
-            ? Storage::disk('public')->url($this->screenshot)
+            ? Storage::disk('local')->temporaryUrl($this->screenshot, now()->addMinutes(30))
             : null;
     }
 
