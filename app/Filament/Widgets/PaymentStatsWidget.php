@@ -115,15 +115,15 @@ class PaymentStatsWidget extends StatsOverviewWidget
     private static function formatUzs(float $value): string
     {
         if ($value >= 1_000_000_000) {
-            return number_format($value / 1_000_000_000, 2, '.', ' ').' млрд UZS';
+            return number_format($value / 1_000_000_000, 2, '.', ' ').__('app.unit.billion_short').' UZS';
         }
 
         if ($value >= 1_000_000) {
-            return number_format($value / 1_000_000, 1, '.', ' ').' млн UZS';
+            return number_format($value / 1_000_000, 1, '.', ' ').__('app.unit.million_short').' UZS';
         }
 
         if ($value >= 1_000) {
-            return number_format($value / 1_000, 1, '.', ' ').' тыс UZS';
+            return number_format($value / 1_000, 1, '.', ' ').__('app.unit.thousand_short').' UZS';
         }
 
         return number_format(round($value), 0, '.', ' ').' UZS';

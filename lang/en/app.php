@@ -471,6 +471,11 @@ return [
         'partially_paid' => 'Partially paid',
         'fully_paid' => 'Fully paid',
     ],
+    'unit' => [
+        'thousand_short' => 'K',
+        'million_short' => 'M',
+        'billion_short' => 'B',
+    ],
     'telegram' => [
         'link_missing_token' => 'Open the “Connect Telegram” link from the app to link your account.',
         'link_expired' => 'This link has expired. Generate a new one from the app.',
