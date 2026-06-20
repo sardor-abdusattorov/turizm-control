@@ -125,7 +125,8 @@ class ContractsTable
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('gray')
                         ->url(fn (Contract $record) => route('contracts.pdf.download', ['contract' => $record]))
-                        ->visible(fn (Contract $record) => $record->status === Contract::STATUS_APPROVED),
+                        ->visible(fn (Contract $record) => $record->status === Contract::STATUS_APPROVED
+                            && (auth()->user()?->can('export_contract') ?? false)),
 
                     Action::make('openEditor')
                         ->label(__('app.action.open_editor'))

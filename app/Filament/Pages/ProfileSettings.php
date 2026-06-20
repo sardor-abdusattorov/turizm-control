@@ -115,15 +115,30 @@ class ProfileSettings extends Page implements HasActions, HasForms
 
                         Grid::make(['default' => 1, 'sm' => 2])
                             ->schema([
+                                // Department + position are HR-owned: a regular user can see
+                                // theirs (read-only), but only admins may change them. The
+                                // disabled + dehydrated(false) pair both greys out the field
+                                // and strips it from the saved state, so a tampered request
+                                // can't smuggle a value through.
                                 Select::make('department_id')
                                     ->label(__('app.label.department'))
                                     ->options(Department::getActive())
+                                    ->disabled(fn (): bool => ! Auth::user()?->can('update_user'))
+                                    ->dehydrated(fn (): bool => (bool) Auth::user()?->can('update_user'))
+                                    ->helperText(fn (): ?string => Auth::user()?->can('update_user')
+                                        ? null
+                                        : __('app.label.managed_by_admin'))
                                     ->searchable()
                                     ->preload(),
 
                                 Select::make('position_id')
                                     ->label(__('app.label.position'))
                                     ->options(Position::getActive())
+                                    ->disabled(fn (): bool => ! Auth::user()?->can('update_user'))
+                                    ->dehydrated(fn (): bool => (bool) Auth::user()?->can('update_user'))
+                                    ->helperText(fn (): ?string => Auth::user()?->can('update_user')
+                                        ? null
+                                        : __('app.label.managed_by_admin'))
                                     ->searchable()
                                     ->preload(),
                             ]),
@@ -204,14 +219,25 @@ class ProfileSettings extends Page implements HasActions, HasForms
             $data = $this->profileForm->getState();
 
             $user = Auth::user();
-            $user->update([
+            $payload = [
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'avatar_url' => $data['avatar_url'] ?? null,
                 'telegram_chat_id' => $data['telegram_chat_id'] ?? null,
-                'department_id' => $data['department_id'],
-                'position_id' => $data['position_id'],
-            ]);
+            ];
+
+            // department_id/position_id only land in $data when the user can
+            // update users; ignore them entirely otherwise so a regular user
+            // cannot self-promote themselves into a different department.
+            if (array_key_exists('department_id', $data)) {
+                $payload['department_id'] = $data['department_id'];
+            }
+
+            if (array_key_exists('position_id', $data)) {
+                $payload['position_id'] = $data['position_id'];
+            }
+
+            $user->update($payload);
 
             $user->defaultRecipients()->sync($data['default_recipients'] ?? []);
 

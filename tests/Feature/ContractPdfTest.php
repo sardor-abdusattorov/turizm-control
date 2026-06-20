@@ -8,11 +8,21 @@ use App\Services\Contracts\ContractPdfService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
 uses(RefreshDatabase::class);
+
+/** Grant the Shield export_contract permission to an existing user. */
+function grantExportContract(User $user): User
+{
+    Permission::findOrCreate('export_contract', 'web');
+    $user->givePermissionTo('export_contract');
+
+    return $user->fresh();
+}
 
 beforeEach(function () {
     Storage::fake('local');
@@ -79,7 +89,7 @@ it('downloads the PDF for the responsible user', function () {
     ]);
 
     $contract = makeContractWithDocx();
-    actingAs($contract->responsible);
+    actingAs(grantExportContract($contract->responsible));
 
     $response = get(route('contracts.pdf.download', $contract));
 
@@ -100,9 +110,22 @@ it('allows an approver in the chain to download the PDF', function () {
         'user_id' => $approver->id,
     ]);
 
-    actingAs($approver);
+    actingAs(grantExportContract($approver));
 
     get(route('contracts.pdf.download', $contract))->assertOk();
+});
+
+it('forbids downloading the PDF without the export_contract permission', function () {
+    Http::fake([
+        '*/converter' => Http::response(['fileUrl' => 'http://onlyoffice/cache/files/abc.pdf']),
+        '*/cache/files/*' => Http::response('%PDF-binary'),
+    ]);
+
+    // Responsible can VIEW but cannot EXPORT — export is gated separately.
+    $contract = makeContractWithDocx();
+    actingAs($contract->responsible);
+
+    get(route('contracts.pdf.download', $contract))->assertForbidden();
 });
 
 it('forbids outsiders from downloading the PDF', function () {
@@ -120,7 +143,7 @@ it('returns 404 when the docx has not been built yet', function () {
         'status' => Contract::STATUS_APPROVED,
     ]);
 
-    actingAs($contract->responsible);
+    actingAs(grantExportContract($contract->responsible));
 
     get(route('contracts.pdf.download', $contract))->assertNotFound();
 });

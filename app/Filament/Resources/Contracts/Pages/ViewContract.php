@@ -124,7 +124,8 @@ class ViewContract extends ViewRecord
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('success')
                 ->url(fn () => route('contracts.pdf.download', ['contract' => $this->record]))
-                ->visible(fn () => $this->record?->status === Contract::STATUS_APPROVED),
+                ->visible(fn () => $this->record?->status === Contract::STATUS_APPROVED
+                    && (auth()->user()?->can('export_contract') ?? false)),
 
             EditAction::make()
                 ->icon('heroicon-o-pencil-square')

@@ -51,6 +51,20 @@ class Settings extends Page implements HasForms
         return __('app.label.administration');
     }
 
+    /**
+     * Gate the whole page on a single Shield permission so non-admins can
+     * neither see it in the sidebar nor reach it by URL.
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('manage_settings') ?? false;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canAccess();
+    }
+
     public function getTitle(): string
     {
         return __('app.label.main_settings');
@@ -182,19 +196,6 @@ class Settings extends Page implements HasForms
                                     ->downloadable()
                                     ->acceptedFileTypes(['image/png', 'image/jpeg'])
                                     ->helperText(__('app.helper.seo_og_image')),
-                            ]),
-
-                        Tabs\Tab::make(__('app.label.tab_metrics'))
-                            ->schema([
-                                Textarea::make('metrics.yandex')
-                                    ->label(__('app.label.metrics_yandex'))
-                                    ->rows(6)
-                                    ->helperText(__('app.helper.metrics_yandex')),
-
-                                Textarea::make('metrics.google')
-                                    ->label(__('app.label.metrics_google'))
-                                    ->rows(6)
-                                    ->helperText(__('app.helper.metrics_google')),
                             ]),
 
                         Tabs\Tab::make(__('app.label.tab_approval_flow'))

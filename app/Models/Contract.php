@@ -537,7 +537,8 @@ class Contract extends Model
             return false;
         }
 
-        if ($user->hasRole('super_admin')) {
+        // Oversight: super_admin or anyone holding the view_all_contracts permission.
+        if ($user->hasRole('super_admin') || $user->can('view_all_contracts')) {
             return true;
         }
 
@@ -619,13 +620,14 @@ class Contract extends Model
         );
     }
 
-    /**
-     * Roles that may see every contract. Everyone else is limited to the
-     * contracts they are responsible for or appear in the approval chain of.
-     */
     /** The role whose single holder is the final (director) approver. */
     public const DIRECTOR_ROLE = 'director';
 
+    /**
+     * Roles whose holders see every contract. The director is included so
+     * they can review what's coming through the chain. Granular oversight
+     * for other roles is controlled by the `view_all_contracts` permission.
+     */
     public const OVERSIGHT_ROLES = ['super_admin', self::DIRECTOR_ROLE];
 
     public function scopeVisibleTo(Builder $query, ?User $user = null): Builder
@@ -636,7 +638,7 @@ class Contract extends Model
             return $query->whereRaw('0 = 1');
         }
 
-        if ($user->hasAnyRole(self::OVERSIGHT_ROLES)) {
+        if ($user->hasAnyRole(self::OVERSIGHT_ROLES) || $user->can('view_all_contracts')) {
             return $query;
         }
 
