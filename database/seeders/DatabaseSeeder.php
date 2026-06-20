@@ -15,14 +15,10 @@ class DatabaseSeeder extends Seeder
             OrderTypeSeeder::class,
             ContactSeeder::class,
             UserSeeder::class,
-            // RolesAndPermissions must run AFTER users (so the super_admin can be wired)
-            // but BEFORE TestUsersSeeder, which assigns roles to its test accounts.
             RolesAndPermissionsSeeder::class,
             TestUsersSeeder::class,
             SettingsSeeder::class,
             OrdersSeeder::class,
-            // Contracts depend on templates, contacts, currencies, and test users —
-            // everything they need is seeded above.
             ContractTemplateSeeder::class,
             ContractSeeder::class,
         ]);

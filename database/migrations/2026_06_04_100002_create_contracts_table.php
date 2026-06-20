@@ -21,10 +21,6 @@ return new class extends Migration
             $table->decimal('amount', 15, 2)->default(0);
             $table->string('status', 30)->default('draft');
 
-            // Denormalised summary of the contract's payment progress, kept in
-            // sync by Payment's saved/deleted observers. Stored (rather than
-            // recomputed on the fly) so the contracts list can index and
-            // filter by it cheaply.
             $table->string('payment_status', 20)->default('not_paid');
             $table->decimal('paid_percent', 5, 2)->default(0);
 

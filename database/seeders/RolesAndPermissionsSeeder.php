@@ -8,36 +8,19 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
-/**
- * Single source of truth for application roles + their permission sets.
- *
- * Assumes Shield has already generated the per-resource permissions
- * (view_any_x, update_x, ...) — `project:update init` does that for you
- * by running `shield:generate` before the seeders. We do NOT call
- * `shield:generate` from here: that command is interactive and would
- * hang on `db:seed`. The seeder is idempotent — re-running it only
- * assigns existing permissions and never destroys data.
- */
 class RolesAndPermissionsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Reset Spatie's in-memory permission cache so the role -> permission
-        // sync below sees every permission that's currently in the DB.
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        // 1) super_admin — sees and does everything.
         $superAdmin = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
         $superAdmin->syncPermissions(Permission::where('guard_name', 'web')->pluck('name'));
 
-        // 2) director — final-sign-off role. Sees every contract, exports them,
-        //    runs settings. No need to manage users/roles.
         $this->syncRole('director', [
-            // Settings + admin oversight
             'manage_settings',
             'view_all_contracts',
             'export_contract',
-            // Contracts + adjacent reference data
             ...$this->resourcePermissions('contract', ['view_any', 'view', 'update']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
             ...$this->resourcePermissions('order', ['view_any', 'view']),
@@ -47,12 +30,9 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('position', ['view_any', 'view']),
             ...$this->resourcePermissions('order_type', ['view_any', 'view']),
             ...$this->resourcePermissions('activity', ['view_any', 'view']),
-            // Payments: oversight-only — read every payment, no editing.
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
         ]);
 
-        // 3) manager — creates and edits their own contracts, no oversight,
-        //    no export. They see only their own (the visibleTo scope handles that).
         $this->syncRole('manager', [
             ...$this->resourcePermissions('contract', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
@@ -62,20 +42,15 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('department', ['view_any']),
             ...$this->resourcePermissions('position', ['view_any']),
             ...$this->resourcePermissions('order_type', ['view_any']),
-            // Payments: read-only on their own contracts (scope handles ownership).
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
         ]);
 
-        // 4) legal_officer — approves contracts. They see only contracts where
-        //    they appear in the approval chain (or are responsible), no export.
         $this->syncRole('legal_officer', [
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),
         ]);
 
-        // 5) accountant — books payments. Sees every contract they need to bill
-        //    against and every payment they (or anyone else) have recorded.
         $this->syncRole('accountant', [
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),

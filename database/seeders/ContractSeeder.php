@@ -44,8 +44,6 @@ class ContractSeeder extends Seeder
         $filler = app(TemplateFiller::class);
         $values = app(ContractPlaceholderValues::class);
 
-        // Spread the seeded contracts across the trailing 6 months so the
-        // dashboard chart has shape to plot, not a single spike on today.
         $contracts = [
             [
                 'title' => 'Аренда офисного помещения на 2026 год',
@@ -127,12 +125,6 @@ class ContractSeeder extends Seeder
 
             $contract->buildDocumentFromTemplate($filler, $values);
 
-            // buildDocumentFromTemplate writes document_file via update(), which
-            // trips Contract::maybeInvalidateOnEdit and drops everything back to
-            // draft. Re-apply the seeded status straight through the query
-            // builder so the observer doesn't touch it again. The same write
-            // also backdates created_at so the dashboard chart has historical
-            // shape instead of every contract piling up on today.
             Contract::query()->whereKey($contract->id)->update([
                 'status' => $data['status']->value,
                 'signed_at' => $data['signed_at'] ?? null,
@@ -141,10 +133,6 @@ class ContractSeeder extends Seeder
             ]);
             $contract->refresh();
 
-            // buildDocumentFromTemplate's invalidation cascade may have left a
-            // fresh QUEUED chain behind (rebuilt from the global flow). Wipe it
-            // so seedApprovers is the single author of the chain — otherwise
-            // each approver shows up twice (queued + approved).
             $contract->approvers()->delete();
 
             $this->seedApprovers($contract, $manager, $legal, $accountant, $director, $data['status']);
@@ -152,13 +140,6 @@ class ContractSeeder extends Seeder
         }
     }
 
-    /**
-     * Build the approval chain for the seeded contract to match its stage:
-     * - draft: queued chain, nothing decided yet
-     * - in_review: legal is currently pending, accountant queued, director queued
-     * - approved: every step approved
-     * - rejected: legal approved, accountant rejected
-     */
     private function seedApprovers(
         Contract $contract,
         User $manager,
@@ -173,8 +154,6 @@ class ContractSeeder extends Seeder
             return;
         }
 
-        // Realistic per-step comments so the approver detail modal has
-        // something to show in the seeded demo, not just a status + date.
         $approvedComments = [
             'Согласовано с юридической стороны, замечаний нет.',
             'Финансовых возражений нет, сумма подтверждена.',
@@ -228,9 +207,6 @@ class ContractSeeder extends Seeder
                 'created_by' => $accountant->id,
                 'percent' => $percent,
                 'paid_at' => now()->subDays(15 - $index * 5),
-                // Real screenshots would live on the public disk; the seeded
-                // record just points to a deterministic placeholder path so the
-                // row is valid. Replace with an actual file when QA needs it.
                 'screenshot' => 'uploads/images/payments/seeded/'.$contract->id.'-'.($index + 1).'.png',
             ]);
         }

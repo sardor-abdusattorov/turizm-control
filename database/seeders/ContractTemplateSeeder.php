@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Storage;
 
 class ContractTemplateSeeder extends Seeder
 {
-    /** Sample .docx shipped with the repo, copied as the stub for every seeded template. */
     private const STUB_PATH = 'documents/template-example.docx';
 
     public function run(): void
