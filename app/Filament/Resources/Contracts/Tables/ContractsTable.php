@@ -73,13 +73,13 @@ class ContractsTable
                     ->label(__('app.label.responsible'))
                     ->toggleable(),
 
-                TextColumn::make('payment_status')
+                // Payment state as a colour pill (status + percent) in the same
+                // visual family as the status column — visible by default so
+                // payment progress reads at a glance.
+                ViewColumn::make('payment_status')
                     ->label(__('app.label.payment_status'))
-                    ->badge()
-                    ->formatStateUsing(fn (?PaymentStatus $state): string => $state?->label() ?? PaymentStatus::NotPaid->label())
-                    ->color(fn (?PaymentStatus $state): string => ($state ?? PaymentStatus::NotPaid)->color())
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->view('filament.resources.contracts.tables.payment-column')
+                    ->sortable(),
 
                 TextColumn::make('paid_percent')
                     ->label(__('app.label.paid_percent'))
