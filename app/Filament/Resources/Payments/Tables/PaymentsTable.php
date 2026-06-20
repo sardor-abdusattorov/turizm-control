@@ -86,8 +86,7 @@ class PaymentsTable
                             : null)
                         ->visible(fn (Payment $record): bool => $record->contract !== null),
                 ])
-                    ->icon('heroicon-m-ellipsis-vertical')
-                    ->color('gray'),
+                    ->icon('heroicon-m-ellipsis-vertical'),
             ]);
     }
 }

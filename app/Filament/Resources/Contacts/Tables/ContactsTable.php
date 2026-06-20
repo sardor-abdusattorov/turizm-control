@@ -89,8 +89,7 @@ class ContactsTable
                     EditAction::make(),
                     DeleteAction::make(),
                 ])
-                    ->icon('heroicon-m-ellipsis-vertical')
-                    ->color('gray'),
+                    ->icon('heroicon-m-ellipsis-vertical'),
             ])
             ->headerActions([
                 Action::make('exportXlsx')

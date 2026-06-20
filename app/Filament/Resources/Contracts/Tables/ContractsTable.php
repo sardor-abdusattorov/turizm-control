@@ -192,8 +192,7 @@ class ContractsTable
                     DeleteAction::make()
                         ->visible(fn (Contract $record) => $record->canBeDeletedBy()),
                 ])
-                    ->icon('heroicon-m-ellipsis-vertical')
-                    ->color('gray'),
+                    ->icon('heroicon-m-ellipsis-vertical'),
             ])
             ->headerActions([
                 Action::make('exportXlsx')

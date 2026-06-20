@@ -129,7 +129,7 @@ class AppServiceProvider extends ServiceProvider
             fn (ActionGroup $group) => $group
                 ->label(fn (): string => __('app.label.actions'))
                 ->button()
-                ->color('gray')
+                ->color('primary')
                 ->tooltip(fn (): string => __('app.label.actions')),
         );
     }

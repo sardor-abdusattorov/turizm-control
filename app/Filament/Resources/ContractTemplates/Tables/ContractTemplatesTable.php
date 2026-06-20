@@ -84,8 +84,7 @@ class ContractTemplatesTable
                     EditAction::make(),
                     DeleteAction::make(),
                 ])
-                    ->icon('heroicon-m-ellipsis-vertical')
-                    ->color('gray'),
+                    ->icon('heroicon-m-ellipsis-vertical'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
