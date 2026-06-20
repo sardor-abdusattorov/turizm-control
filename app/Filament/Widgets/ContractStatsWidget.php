@@ -8,12 +8,6 @@ use App\Services\Dashboard\DashboardContext;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-/**
- * The manager's personal pipeline — only the counts that map to an action
- * they own: drafts they still have to submit, contracts in review, and the
- * ones that have stalled on an overdue approver. "Awaiting me" moved to its
- * own actionable table; "my approved" was a vanity number and is gone.
- */
 class ContractStatsWidget extends StatsOverviewWidget
 {
     protected ?string $pollingInterval = null;
@@ -22,9 +16,6 @@ class ContractStatsWidget extends StatsOverviewWidget
 
     public static function canView(): bool
     {
-        // Strictly the manager role — they're the only ones who actually own a
-        // draft/in-review pipeline. super_admin isn't a contract owner, so for
-        // them this was just two "0" cards; they get oversight widgets instead.
         return auth()->user()?->hasRole('manager') ?? false;
     }
 

@@ -23,9 +23,6 @@ class Position extends Model
         'status' => 'boolean',
     ];
 
-    /**
-     * Departments that have this position
-     */
     public function departments()
     {
         return $this->belongsToMany(Department::class, 'department_position');

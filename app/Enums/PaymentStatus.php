@@ -2,11 +2,6 @@
 
 namespace App\Enums;
 
-/**
- * Aggregate payment progress on a contract. Stored on the contracts table
- * (denormalised) so the contracts list can filter on it cheaply; recomputed
- * by PaymentObserver whenever a payment is created, updated or deleted.
- */
 enum PaymentStatus: string
 {
     case NotPaid = 'not_paid';
@@ -18,7 +13,6 @@ enum PaymentStatus: string
         return __('app.payment_status.'.$this->value);
     }
 
-    /** Filament colour token used for the status pill. */
     public function color(): string
     {
         return match ($this) {
@@ -28,11 +22,6 @@ enum PaymentStatus: string
         };
     }
 
-    /**
-     * Resolve the status for a given paid percentage. Anything ≥ 100 is
-     * considered fully paid so rounding noise on the last instalment doesn't
-     * leave the contract stuck at "partially paid".
-     */
     public static function fromPercent(float $percent): self
     {
         if ($percent <= 0) {

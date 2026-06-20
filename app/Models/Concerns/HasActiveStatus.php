@@ -4,12 +4,6 @@ namespace App\Models\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * Shared active/inactive boolean-status pattern used by every reference
- * model (Department, Position, Currency, Contact, OrderType, Order,
- * ContractTemplate). Owners of this trait still need `'status' => 'boolean'`
- * in their own $casts.
- */
 trait HasActiveStatus
 {
     public const STATUS_INACTIVE = 0;

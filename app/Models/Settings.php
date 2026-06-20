@@ -11,9 +11,6 @@ class Settings extends Model
 
     protected $fillable = ['key', 'value'];
 
-    /**
-     * Get the value attribute - decode JSON if it's a valid JSON string
-     */
     public function getValueAttribute($value)
     {
         if ($value === null) {
@@ -30,13 +27,9 @@ class Settings extends Model
             return $decoded;
         }
 
-        // Otherwise return as-is
         return $value;
     }
 
-    /**
-     * Set the value attribute - encode arrays to JSON, store strings as-is
-     */
     public function setValueAttribute($value)
     {
         $this->attributes['value'] = json_encode($value, JSON_UNESCAPED_UNICODE);

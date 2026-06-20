@@ -10,17 +10,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-/**
- * Pulls the daily UZS exchange rate from the Central Bank of Uzbekistan
- * (cbu.uz) for every active foreign currency and stores it on the
- * `currencies` table so contract totals stay in line with the official
- * rate. UZS itself is the base — its value is permanently 1.
- *
- * Scheduled in routes/console.php to run every day at 07:00. Wrapped in
- * withoutOverlapping() so a long-running fetch can't double up if the
- * scheduler runs while the previous invocation is still talking to the
- * CBU API.
- */
 final class UpdateCurrencyRates extends Command
 {
     protected $signature = 'currency:update';

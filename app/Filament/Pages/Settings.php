@@ -51,13 +51,6 @@ class Settings extends Page implements HasForms
         return __('app.label.administration');
     }
 
-    /**
-     * Gate the whole page on a single Shield permission so non-admins can
-     * neither see it in the sidebar nor reach it by URL. super_admin is
-     * checked by role directly so the page stays reachable even before the
-     * RolesAndPermissionsSeeder has actually created the permission, or
-     * if the permission cache hasn't been refreshed yet.
-     */
     public static function canAccess(): bool
     {
         $user = auth()->user();
@@ -83,8 +76,6 @@ class Settings extends Page implements HasForms
     {
         $data = $this->getSettingsData();
 
-        // Repeater expects an array of associative items, while the
-        // setting itself is stored as a flat list of department codes.
         $flow = $data['approval']['flow'] ?? [];
         $data['approval']['flow'] = array_map(
             fn (string $code) => ['code' => $code],
@@ -253,8 +244,6 @@ class Settings extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        // Repeater state is [['code' => 'legal'], ['code' => 'financial']];
-        // collapse it back to a flat list of unique codes for storage.
         if (isset($data['approval']['flow']) && is_array($data['approval']['flow'])) {
             $data['approval']['flow'] = array_values(array_unique(array_filter(
                 array_map(fn (array $item) => $item['code'] ?? null, $data['approval']['flow'])

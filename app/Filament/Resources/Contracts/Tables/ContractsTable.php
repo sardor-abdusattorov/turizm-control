@@ -35,8 +35,6 @@ class ContractsTable
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
-                // Identity first (number), then state right after so the eye
-                // catches "what is it / what shape is it in" before the details.
                 TextColumn::make('number')
                     ->label(__('app.label.contract_number'))
                     ->weight('semibold')
@@ -76,9 +74,6 @@ class ContractsTable
                     ->label(__('app.label.responsible'))
                     ->toggleable(),
 
-                // Payment state as a colour pill (status + percent) in the same
-                // visual family as the status column — visible by default so
-                // payment progress reads at a glance.
                 ViewColumn::make('payment_status')
                     ->label(__('app.label.payment_status'))
                     ->view('filament.resources.contracts.tables.payment-column')
@@ -113,8 +108,6 @@ class ContractsTable
                     ->label(__('app.label.payment_status'))
                     ->options(PaymentStatus::options()),
 
-                // Period filter — answers "what was created this quarter" for
-                // the finance / exec view without scrolling through pages.
                 Filter::make('created_at')
                     ->label(__('app.label.created_at'))
                     ->schema([
@@ -151,7 +144,6 @@ class ContractsTable
                             fn (Contract $record) => route('contracts.pdf.inline', ['contract' => $record]),
                             shouldOpenInNewTab: true,
                         )
-                        // PDF preview unlocks only once approved (after the director signs off).
                         ->visible(fn (Contract $record) => $record->documentExists()
                             && $record->status === Contract::STATUS_APPROVED),
 
@@ -210,9 +202,6 @@ class ContractsTable
                     ->color('gray')
                     ->visible(fn (): bool => ViewContract::userCanExportContract())
                     ->action(function ($livewire) {
-                        // getFilteredTableQuery() respects every tab, filter and
-                        // sort the user has applied — so the file only contains
-                        // what they're seeing on screen.
                         return Excel::download(
                             new ContractsExport($livewire->getFilteredTableQuery()),
                             'contracts-'.now()->format('Y-m-d').'.xlsx',

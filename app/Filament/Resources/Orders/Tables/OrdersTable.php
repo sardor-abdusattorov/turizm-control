@@ -105,7 +105,6 @@ class OrdersTable
                     ->label(__('app.label.status'))
                     ->options(Order::getStatuses()),
 
-                // Accountability filter — who issued each order.
                 SelectFilter::make('created_by')
                     ->label(__('app.label.created_by'))
                     ->options(fn () => User::query()

@@ -30,7 +30,6 @@ class Payment extends Model
         'paid_at' => 'date',
     ];
 
-    /** Folder (on the public disk) the payment proof screenshots upload into. */
     public const SCREENSHOT_DIR = 'payments';
 
     protected static function booted(): void
@@ -48,7 +47,6 @@ class Payment extends Model
         });
     }
 
-    /** Short-lived signed URL of the uploaded proof screenshot, or null. */
     public function screenshotUrl(): ?string
     {
         return $this->screenshot
@@ -66,11 +64,6 @@ class Payment extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    /**
-     * Limit the query to payments the given user is allowed to see. Mirrors
-     * the contract-level scope: oversight roles see everything, the manager
-     * who owns the contract sees their own, everyone else sees nothing.
-     */
     public function scopeVisibleTo(Builder $query, ?User $user = null): Builder
     {
         $user ??= auth()->user();

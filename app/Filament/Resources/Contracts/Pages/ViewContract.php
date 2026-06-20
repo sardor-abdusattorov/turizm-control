@@ -37,11 +37,6 @@ class ViewContract extends ViewRecord
         return null;
     }
 
-    /**
-     * When was the contract most recently submitted for approval. Read
-     * straight off the activity log so it picks up the latest re-submit
-     * after an edit-invalidation cycle.
-     */
     public function submittedAt(): ?Carbon
     {
         $created = Activity::query()
@@ -200,11 +195,6 @@ class ViewContract extends ViewRecord
         ];
     }
 
-    /**
-     * Whether the current user may export contract PDFs. super_admin is
-     * matched by role directly so the action stays available before the
-     * permission seeder has been run.
-     */
     public static function userCanExportContract(): bool
     {
         $user = auth()->user();
@@ -213,9 +203,6 @@ class ViewContract extends ViewRecord
             && ($user->hasRole('super_admin') || $user->can('export_contract'));
     }
 
-    /**
-     * Activity-log trail for this contract — the "execution history".
-     */
     public function getActivities(): Collection
     {
         return Activity::query()
@@ -244,8 +231,6 @@ class ViewContract extends ViewRecord
             return null;
         }
 
-        // PDF preview unlocks only once the director has signed off (APPROVED).
-        // Until then approvers review the document in the OnlyOffice editor.
         if ($this->record->status !== Contract::STATUS_APPROVED) {
             return null;
         }
@@ -284,7 +269,6 @@ class ViewContract extends ViewRecord
         ];
     }
 
-    /** Public URL of a payment's uploaded proof screenshot. */
     public function paymentScreenshotUrl(Payment $payment): ?string
     {
         return $payment->screenshotUrl();
@@ -370,10 +354,6 @@ class ViewContract extends ViewRecord
         };
     }
 
-    /**
-     * Coarse lifecycle state for a chain step, used to colour the timeline
-     * rail and node: approved / rejected / returned / current / queued.
-     */
     public function approverState(ContractApprover $approver): string
     {
         return match (true) {
@@ -405,10 +385,6 @@ class ViewContract extends ViewRecord
         };
     }
 
-    /**
-     * Coarse event group used by the history filter chips:
-     * workflow (submit/approve/reject/return) vs edit (created/updated/saved).
-     */
     public function activityGroup(string $event): string
     {
         return match ($event) {

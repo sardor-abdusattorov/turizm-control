@@ -81,7 +81,6 @@ class UsersTable
                     ->searchable()
                     ->preload(),
 
-                // Big admin filter — find all managers, accountants, etc.
                 SelectFilter::make('roles')
                     ->label(__('app.label.role'))
                     ->relationship('roles', 'name')

@@ -9,15 +9,6 @@ use Carbon\CarbonInterface;
 use Filament\Widgets\Widget;
 use Illuminate\Support\Collection;
 
-/**
- * The loudest thing on the dashboard — a red strip that only appears when
- * something the user is responsible for has blown its SLA. For approvers
- * that's "contracts waiting on you are overdue"; for managers it's "someone
- * is sitting on your contract past the deadline".
- *
- * canView() returns false when there's nothing overdue, so on a healthy day
- * the banner is simply absent rather than a green "all good" box.
- */
 class OverdueAlertBanner extends Widget
 {
     protected string $view = 'filament.widgets.dashboard.overdue-alert';
@@ -26,8 +17,6 @@ class OverdueAlertBanner extends Widget
 
     protected static ?int $sort = -10;
 
-    // Render immediately — an overdue alert that pops in a second late defeats
-    // the point of being the loudest thing on the page.
     protected static bool $isLazy = false;
 
     public static function canView(): bool
@@ -55,15 +44,13 @@ class OverdueAlertBanner extends Widget
     {
         $context = app(DashboardContext::class);
 
-        // Approver perspective wins — if it's waiting on me, that's the most
-        // actionable framing. Managers see who is holding their contract.
         if ($context->isApprover() && $context->overdueForMe()->isNotEmpty()) {
             return $context->overdueForMe()->map(function (Contract $contract) use ($context) {
                 $due = $context->myApproverRow($contract)?->due_at;
 
                 return [
                     'contract' => $contract,
-                    'who' => null, // it's on me
+                    'who' => null,
                     'days' => $due ? (int) abs($due->diffInDays(now())) : 0,
                     'role' => 'mine',
                 ];

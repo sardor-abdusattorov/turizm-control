@@ -8,11 +8,6 @@ use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Activitylog\Models\Activity;
 
-/**
- * A super-admin's "what just happened across the system" glance — the last
- * handful of audit-log entries (who did what, when), without leaving the
- * dashboard for the full Activity Logs screen.
- */
 class RecentActivityWidget extends TableWidget
 {
     protected int|string|array $columnSpan = 'full';

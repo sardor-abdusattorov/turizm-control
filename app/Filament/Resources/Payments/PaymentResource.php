@@ -58,10 +58,6 @@ class PaymentResource extends Resource
         return PaymentsTable::configure($table);
     }
 
-    /**
-     * Scope every query (list + record resolution for view) to the payments
-     * the current user is allowed to see — mirrors Payment::scopeVisibleTo.
-     */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->visibleTo();

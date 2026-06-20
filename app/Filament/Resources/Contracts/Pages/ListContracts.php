@@ -26,9 +26,6 @@ class ListContracts extends ListRecords
 
         $tabs = [];
 
-        // "All" only makes sense for oversight roles (everyone else is already
-        // limited to their own contracts by the resource query). When present
-        // it leads — it's their primary, broadest view and where they land.
         if (auth()->user()?->hasAnyRole(Contract::OVERSIGHT_ROLES)) {
             $tabs['all'] = Tab::make(__('app.tab.all_contracts'))
                 ->icon('heroicon-o-rectangle-stack');
@@ -51,11 +48,6 @@ class ListContracts extends ListRecords
         return $tabs;
     }
 
-    /**
-     * Land each user on the tab that is actually useful to them instead of a
-     * fixed first tab that is often empty: their approval queue if anything is
-     * waiting, the full list for oversight roles, otherwise their own contracts.
-     */
     public function getDefaultActiveTab(): string|int|null
     {
         $user = auth()->user();

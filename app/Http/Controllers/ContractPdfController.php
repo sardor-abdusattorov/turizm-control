@@ -12,10 +12,6 @@ class ContractPdfController extends Controller
     public function download(Contract $contract, ContractPdfService $pdf): BinaryFileResponse
     {
         abort_unless($contract->canBeViewedBy(), 403);
-        // PDF download is gated separately so view access alone doesn't grant
-        // the ability to walk away with a rendered, signed contract.
-        // super_admin is allowed by role directly so the action stays reachable
-        // before the permission seeder has run.
         $user = auth()->user();
         abort_unless($user && ($user->hasRole('super_admin') || $user->can('export_contract')), 403);
 

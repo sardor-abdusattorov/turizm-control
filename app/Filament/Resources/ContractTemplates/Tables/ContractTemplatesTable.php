@@ -73,8 +73,6 @@ class ContractTemplatesTable
                     ->label(__('app.label.language'))
                     ->options(ContractTemplate::getLanguages()),
 
-                // Templates are tied to an order type — natural way to drill
-                // down to "all HR templates" or "all procurement templates".
                 SelectFilter::make('order_type_id')
                     ->label(__('app.label.order_type_single'))
                     ->relationship('orderType', 'title')

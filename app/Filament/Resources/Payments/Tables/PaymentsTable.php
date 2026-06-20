@@ -26,11 +26,6 @@ class PaymentsTable
     {
         return $table
             ->defaultSort('paid_at', 'desc')
-            // Grouping by contract is offered as an opt-in (via the "Group by"
-            // control) rather than forced on: the per-group percent sum then
-            // shows how much of each contract is settled. The page/grand totals
-            // are hidden since summing percentages across contracts is
-            // meaningless — only the per-group summary makes sense.
             ->groups([
                 Group::make('contract.number')
                     ->label(__('app.label.contract'))
@@ -82,16 +77,12 @@ class PaymentsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // Focus the list on a single contract — the right tool when you
-                // want one contract's instalments rather than every contract.
                 SelectFilter::make('contract_id')
                     ->label(__('app.label.contract'))
                     ->relationship('contract', 'number')
                     ->searchable()
                     ->preload(),
 
-                // Filter by the parent contract's payment progress — useful for
-                // audits ("which payments belong to still-open contracts?").
                 SelectFilter::make('contract_payment_status')
                     ->label(__('app.label.payment_status'))
                     ->options(PaymentStatus::options())
@@ -104,7 +95,6 @@ class PaymentsTable
                             ),
                         )),
 
-                // Accountability filter — who recorded each payment.
                 SelectFilter::make('created_by')
                     ->label(__('app.label.created_by'))
                     ->options(fn () => User::query()

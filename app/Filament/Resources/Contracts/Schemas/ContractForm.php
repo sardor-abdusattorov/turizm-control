@@ -43,8 +43,6 @@ class ContractForm
                             ->columnSpanFull(),
                     ]),
 
-                // Post-invalidation notice — shown right after the edit hook
-                // demoted the contract back to DRAFT and cancelled the prior chain.
                 Section::make()
                     ->hiddenLabel()
                     ->visible(fn (?Contract $record): bool => $record !== null
@@ -129,9 +127,6 @@ class ContractForm
                                     ->minValue(0)
                                     ->default(0)
                                     ->required()
-                                    // Amount is meaningless without a currency — gate it behind
-                                    // the (live) currency picker above and keep it dehydrated so
-                                    // the value still saves once the field is enabled.
                                     ->disabled(fn (Get $get): bool => blank($get('currency_id')))
                                     ->dehydrated()
                                     ->placeholder(fn (Get $get): ?string => blank($get('currency_id'))
@@ -142,10 +137,6 @@ class ContractForm
 
                         Tab::make(__('app.label.approval_chain'))
                             ->icon('heroicon-o-users')
-                            // Always available on the form — reaching the Edit page is
-                            // already gated by canBeEditedBy. Changing the chain on a
-                            // submitted contract cancels the running approvals and
-                            // rebuilds from the new selection (see the warning above).
                             ->badge(fn (Get $get): ?int => ($n = count(array_filter((array) $get('approver_chain')))) ? $n : null)
                             ->schema([
                                 Select::make('approver_chain')
@@ -201,12 +192,6 @@ class ContractForm
             ->toArray();
     }
 
-    /**
-     * Validation rule for the approval-chain picker: the selected approvers
-     * must cover every department in Department::REQUIRED_APPROVER_CODES (at
-     * least one Legal and one Accounting approver). The empty case is handled
-     * by ->required() upstream, so an empty value passes through silently here.
-     */
     public static function validateRequiredApproverDepartments(mixed $value, Closure $fail): void
     {
         $ids = array_values(array_filter(array_map('intval', (array) $value)));
@@ -262,11 +247,6 @@ class ContractForm
         return array_map('intval', $ids);
     }
 
-    /**
-     * Numbered preview of the selected approval chain — avatar, name and
-     * department per step, in the order they will approve. Re-rendered live as
-     * the picker above changes (the Select is ->live()).
-     */
     protected static function approvalChainPreview(mixed $ids): string
     {
         $ids = array_values(array_filter(array_map('intval', (array) $ids)));
@@ -277,9 +257,6 @@ class ContractForm
 
         $users = User::with(['department', 'position'])->whereIn('id', $ids)->get()->keyBy('id');
 
-        // Inline styles only — Filament strips <style> from TextEntry HTML state,
-        // so a <style> block won't apply here. Use semi-transparent neutrals that
-        // read against both light and dark surfaces.
         $rowStyle = 'display:flex;align-items:center;gap:.7rem;padding:.6rem .8rem;'
             .'border:1px solid rgba(127,127,127,.22);border-radius:.65rem;'
             .'background:rgba(127,127,127,.05);';

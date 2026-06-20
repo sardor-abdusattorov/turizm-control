@@ -19,8 +19,6 @@ class PaymentObserver
     {
         $this->syncContractPaymentStatus($payment->contract_id);
 
-        // Moving a payment between contracts must refresh the previous one
-        // too, otherwise the source contract keeps a stale total.
         $original = (int) ($payment->getOriginal('contract_id') ?? 0);
 
         if ($original && $original !== (int) $payment->contract_id) {
@@ -36,11 +34,6 @@ class PaymentObserver
         PaymentStatsWidget::bustCache();
     }
 
-    /**
-     * Recompute the contract's paid_percent + payment_status from the sum of
-     * its payments. Writes directly via the query builder so we don't trip
-     * Contract's own observers (the contract isn't being edited business-wise).
-     */
     private function syncContractPaymentStatus(?int $contractId): void
     {
         if (! $contractId) {

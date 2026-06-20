@@ -16,13 +16,10 @@ class PaymentStatsWidget extends StatsOverviewWidget
 
     protected static ?int $sort = 3;
 
-    /** Bumped by Payment/Contract observers to invalidate the cached totals. */
     public const CACHE_VERSION_KEY = 'dashboard.financial_version';
 
     public static function bustCache(): void
     {
-        // forever()+1 rather than increment() so it works on file/database
-        // cache drivers where increment() on a missing key is a no-op.
         Cache::forever(self::CACHE_VERSION_KEY, ((int) Cache::get(self::CACHE_VERSION_KEY, 1)) + 1);
     }
 
@@ -43,8 +40,6 @@ class PaymentStatsWidget extends StatsOverviewWidget
         $contractsUrl = ContractResource::getUrl('index');
         $paymentsUrl = PaymentResource::getUrl('index');
 
-        // No per-card sparkline — a chart on one card made it taller than its
-        // neighbours and broke the row's alignment. Three clean, equal cards.
         return [
             Stat::make(__('app.stats.approved_value'), self::formatUzs($totals['approved']))
                 ->description(__('app.stats.approved_value_description'))
@@ -80,8 +75,6 @@ class PaymentStatsWidget extends StatsOverviewWidget
     private function financialTotals(): array
     {
         $userId = (int) (auth()->id() ?? 0);
-        // Version segment so a booked payment / signed contract can bust every
-        // per-user key at once (see Payment + Contract observers).
         $version = Cache::get(self::CACHE_VERSION_KEY, 1);
 
         return Cache::remember("dashboard.financial_totals.{$userId}.v{$version}", 300, function (): array {
@@ -89,8 +82,6 @@ class PaymentStatsWidget extends StatsOverviewWidget
             $collected = 0.0;
             $outstanding = 0.0;
 
-            // Convert each amount to UZS via the snapshot rate on the currency
-            // record so cross-currency totals are comparable (UZS rate = 1).
             $contracts = Contract::query()
                 ->visibleTo()
                 ->where('status', Contract::STATUS_APPROVED)
@@ -111,7 +102,6 @@ class PaymentStatsWidget extends StatsOverviewWidget
         });
     }
 
-    /** Render a UZS amount short (123 456 789 → "123.5M UZS") so it fits the card. */
     private static function formatUzs(float $value): string
     {
         if ($value >= 1_000_000_000) {

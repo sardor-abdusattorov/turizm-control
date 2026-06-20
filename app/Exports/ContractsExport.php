@@ -78,8 +78,6 @@ class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHead
 
     public function styles(Worksheet $sheet): array
     {
-        // Heading row — bold Times New Roman 12 on the same light-blue tint
-        // the sample registry uses.
         return [
             1 => [
                 'font' => ['bold' => true, 'name' => 'Times New Roman', 'size' => 12],
@@ -100,8 +98,6 @@ class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHead
                 $lastColumn = $sheet->getHighestColumn();
                 $lastRow = $sheet->getHighestRow();
 
-                // Title row above the headings — "Реестр контрактов 2026"
-                // merged across every column, styled like the sample file.
                 $sheet->insertNewRowBefore(1, 1);
                 $titleRange = "A1:{$lastColumn}1";
                 $sheet->mergeCells($titleRange);
@@ -112,11 +108,9 @@ class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHead
                 ]);
                 $sheet->getRowDimension(1)->setRowHeight(28);
 
-                // Body font — Times New Roman for everything below the title.
                 $bodyRange = "A2:{$lastColumn}".($lastRow + 1);
                 $sheet->getStyle($bodyRange)->getFont()->setName('Times New Roman')->setSize(11);
 
-                // Borders around the whole data block (title row excluded).
                 $tableRange = "A2:{$lastColumn}".($lastRow + 1);
                 $sheet->getStyle($tableRange)->applyFromArray([
                     'borders' => [
@@ -125,13 +119,11 @@ class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHead
                     'alignment' => ['vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true],
                 ]);
 
-                // Freeze the header so it stays visible when the user scrolls.
                 $sheet->freezePane('A3');
             },
         ];
     }
 
-    /** Resolve translatable JSON columns to the current-locale string. */
     private static function localized(mixed $value): ?string
     {
         if (is_array($value)) {

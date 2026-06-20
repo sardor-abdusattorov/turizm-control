@@ -21,9 +21,6 @@ class ContractWorkflow
         }
 
         DB::transaction(function () use ($contract, $user): void {
-            // If there are no active approvers (every row is INVALIDATED
-            // because the contract was edited mid-flow), rebuild the
-            // queue from the global settings flow before sending.
             if (! $contract->activeApprovers()->exists()) {
                 $contract->buildApprovalChainFromFlow();
             }
@@ -48,13 +45,6 @@ class ContractWorkflow
         return true;
     }
 
-    /**
-     * Walk the chain and return the next approver that can actually act —
-     * the first row that is QUEUED (not yet started) or PENDING (already
-     * reviewing). Skips rows whose user is no longer active, marking them
-     * SKIPPED so the chain still reads cleanly. Caller promotes a QUEUED
-     * row by invoking startReview() on the returned approver.
-     */
     private function advanceToActiveApprover(Contract $contract): ?ContractApprover
     {
         while ($next = $contract->fresh()->nextInLineApprover()) {
@@ -96,7 +86,6 @@ class ContractWorkflow
             $next = $this->advanceToActiveApprover($contract);
 
             if (! $next && $contract->fresh()->allApproved()) {
-                // Skipping all remaining inactive approvers cleared the queue.
                 $this->finalizeOrAwaitDirector($contract, $user, $comment);
 
                 return;
@@ -121,12 +110,6 @@ class ContractWorkflow
         return true;
     }
 
-    /**
-     * The lawyer + accountant stage is done. If a director is configured and
-     * hasn't acted yet, park the contract in PENDING_DIRECTOR so the manager
-     * can hand it over manually (see submitToDirector). Otherwise — no director
-     * configured, or the director just gave the final approval — finalize.
-     */
     private function finalizeOrAwaitDirector(Contract $contract, User $user, ?string $comment): void
     {
         $fresh = $contract->fresh();
@@ -158,11 +141,6 @@ class ContractWorkflow
         );
     }
 
-    /**
-     * Hand a PENDING_DIRECTOR contract to the role-based director for the final
-     * sign-off — appends them as the last approver, flips back to IN_REVIEW and
-     * starts their review clock.
-     */
     public function submitToDirector(Contract $contract, ?User $user = null): bool
     {
         $user ??= auth()->user();

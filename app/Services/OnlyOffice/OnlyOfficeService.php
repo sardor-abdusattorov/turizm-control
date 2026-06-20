@@ -52,8 +52,6 @@ class OnlyOfficeService
 
     public function templateEditorConfig(ContractTemplate $template, User $user, ?string $forceMode = null): array
     {
-        // Templates are internal blanks with placeholders — there's nothing to
-        // export, so download and print stay off in every mode.
         $permissions = $this->permissionSet(edit: true, review: true, comment: true, download: false, print: false);
         $mode = $this->resolveMode($forceMode, 'edit', $permissions);
 
@@ -71,8 +69,6 @@ class OnlyOfficeService
 
     public function orderEditorConfig(Order $order, User $user, ?string $forceMode = null): array
     {
-        // Orders are reference documents people legitimately need to grab, so
-        // download and print stay available in both view and edit modes.
         $permissions = $this->permissionSet(edit: true, review: true, comment: true, download: true, print: true);
         $mode = $this->resolveMode($forceMode, 'edit', $permissions);
         $extension = $order->extension() ?: 'docx';
@@ -150,12 +146,6 @@ class OnlyOfficeService
         return $this->permissionSet(edit: false, review: false, comment: false, download: $canExport, print: $canExport);
     }
 
-    /**
-     * A contract can only be exported — downloaded, printed, or saved as PDF
-     * from OnlyOffice — once it has reached a final approved state, or by a
-     * super admin at any time. While it's a draft or still moving through the
-     * approval chain, export is locked so unapproved drafts can't leak out.
-     */
     private function canExportContract(Contract $contract, User $user): bool
     {
         if ($user->hasRole('super_admin')) {
@@ -219,13 +209,6 @@ class OnlyOfficeService
         };
     }
 
-    /**
-     * Map our internal language code to one OnlyOffice ships a locale
-     * JSON for. Uzbek (uz) isn't bundled with Document Server (CE or
-     * Enterprise), so requesting it triggers a /locale/uz.json 404 and
-     * the editor falls back silently. Send 'ru' for uz (most managers
-     * in UZ are bilingual), and 'en' for anything else we don't know.
-     */
     private function normaliseLang(string $lang): string
     {
         $supported = [
@@ -277,9 +260,6 @@ class OnlyOfficeService
             'forcesave' => true,
             'autosave' => true,
             'compactHeader' => false,
-            // Strip the editor chrome we don't want managers/approvers poking
-            // at: third-party plugins, the help center, the about dialog and
-            // the feedback link. Keeps the surface focused on the document.
             'plugins' => false,
             'help' => false,
             'about' => false,
@@ -292,11 +272,6 @@ class OnlyOfficeService
             ],
         ];
 
-        // NB: we deliberately do NOT set `customization.logo` here. Community
-        // Edition ignores it for rendering but still blanks the header logo
-        // element via JS on init, which wiped the logo we mount over the
-        // editor's own asset file (see docker-compose `header-logo*.svg`).
-        // Branding is handled entirely by that on-disk file override.
         return $customization;
     }
 

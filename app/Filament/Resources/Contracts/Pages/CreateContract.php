@@ -46,7 +46,6 @@ class CreateContract extends CreateRecord
             ]);
         }
 
-        // Fall back to the configured settings queue when nothing was picked.
         if (! $this->record->hasApprovers()) {
             $this->record->buildApprovalChainFromFlow();
         }

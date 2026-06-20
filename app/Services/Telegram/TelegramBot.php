@@ -15,11 +15,6 @@ class TelegramBot
         public ContractWorkflow $workflow,
     ) {}
 
-    /**
-     * Build a one-shot deep link the user can tap to connect their chat
-     * to their account. The token maps to the user id in the cache for
-     * 15 minutes. Returns null when the bot username isn't configured.
-     */
     public function connectUrl(User $user): ?string
     {
         $username = $this->telegram->botUsername();

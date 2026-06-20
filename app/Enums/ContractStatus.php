@@ -2,11 +2,6 @@
 
 namespace App\Enums;
 
-/**
- * Contract lifecycle status. String-backed so the database stays readable and
- * adding a case is trivial, while the enum gives type-safety and a single home
- * for each status' label and pill colour.
- */
 enum ContractStatus: string
 {
     case Draft = 'draft';
@@ -21,7 +16,6 @@ enum ContractStatus: string
         return __('app.contract.status.'.$this->value);
     }
 
-    /** Filament colour token used for the status pill. */
     public function color(): string
     {
         return match ($this) {

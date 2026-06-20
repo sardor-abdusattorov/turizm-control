@@ -46,16 +46,12 @@ class Contract extends Model
         'payment_status' => PaymentStatus::class,
     ];
 
-    // Constants alias the enum cases so the existing `Contract::STATUS_*` call
-    // sites keep working — they now resolve to (and compare as) ContractStatus.
     public const STATUS_DRAFT = ContractStatus::Draft;
 
     public const STATUS_IN_REVIEW = ContractStatus::InReview;
 
-    /** Lawyer + accountant signed off; waiting for the manager to send it to the director. */
     public const STATUS_PENDING_DIRECTOR = ContractStatus::PendingDirector;
 
-    /** Sent to the director for the final sign-off. */
     public const STATUS_IN_REVIEW_DIRECTOR = ContractStatus::InReviewDirector;
 
     public const STATUS_APPROVED = ContractStatus::Approved;
@@ -121,11 +117,6 @@ class Contract extends Model
 
     private bool $preserveApprovedStatus = false;
 
-    /**
-     * Allow the next save to keep the APPROVED status and skip
-     * invalidation. Used by the "edit approved contract" path —
-     * caller must enforce the permission upstream.
-     */
     public function preserveApprovedOnNextSave(): self
     {
         $this->preserveApprovedStatus = true;
@@ -133,20 +124,12 @@ class Contract extends Model
         return $this;
     }
 
-    /**
-     * Run from the `updating` hook. When meaningful fields change on a
-     * contract that's already past the draft stage, cancel every
-     * existing approver row and drop the contract back to DRAFT so the
-     * manager re-submits the queue (which rebuilds fresh pending rows
-     * via ContractObserver / afterSave).
-     */
     private function maybeInvalidateOnEdit(): void
     {
         if ($this->preserveApprovedStatus) {
             return;
         }
 
-        // Mid-flow only — drafts have nothing to invalidate yet.
         if (! in_array($this->getOriginal('status'), [
             self::STATUS_IN_REVIEW,
             self::STATUS_PENDING_DIRECTOR,
@@ -164,26 +147,16 @@ class Contract extends Model
             return;
         }
 
-        // The hook fires *before* the update is persisted, so we modify
-        // the in-flight attributes directly — status falls back to draft.
         $this->status = self::STATUS_DRAFT;
         $this->signed_at = null;
 
-        // Snapshot the chain BEFORE invalidating so we can mirror the same
-        // people, in the same order, into the fresh QUEUED rows. Falling
-        // back to the org's default flow only if there's nothing to mirror.
         $previousUserIds = $this->activeApprovers()
             ->orderBy('order')
             ->pluck('user_id')
             ->all();
 
-        // Invalidate prior approvers — keeps the audit trail, frees the queue.
         $this->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
 
-        // Rebuild fresh QUEUED rows so the manager can see the chain that
-        // will run on the next submit, and so the per-approver eye-modal on
-        // the View page shows the old INVALIDATED record next to the new
-        // QUEUED one (matches the audit pattern seen in legacy systems).
         if ($previousUserIds === []) {
             $this->buildApprovalChainFromFlow();
 
@@ -256,12 +229,6 @@ class Contract extends Model
         ]);
     }
 
-    /**
-     * Build the approval chain from the global settings queue: for each
-     * department in the configured approval flow, add its approver user
-     * (head, or first active member) in order. Skips departments without
-     * a usable approver and never adds the same user twice.
-     */
     public function buildApprovalChainFromFlow(): int
     {
         $order = 1;
@@ -343,13 +310,11 @@ class Contract extends Model
         return $this->belongsTo(User::class, 'responsible_id');
     }
 
-    /** Every row ever attached, oldest first — for history modal. */
     public function approvers(): HasMany
     {
         return $this->hasMany(ContractApprover::class)->orderBy('order');
     }
 
-    /** Only the rows that count toward the current workflow. */
     public function activeApprovers(): HasMany
     {
         return $this->hasMany(ContractApprover::class)
@@ -365,11 +330,6 @@ class Contract extends Model
             ->first();
     }
 
-    /**
-     * The next approver who will (or already does) act — first row that is
-     * either actively pending or still queued in the chain. Used by the
-     * workflow to advance the queue and promote the next QUEUED row.
-     */
     public function nextInLineApprover(): ?ContractApprover
     {
         return $this->activeApprovers()
@@ -378,17 +338,6 @@ class Contract extends Model
             ->first();
     }
 
-    /**
-     * Mark every approver row attached to the contract as INVALIDATED.
-     * Used when the contract is edited mid-flow — old rows stay for the
-     * audit history, fresh pending rows are built next.
-     *
-     * A row that already reached a verdict (approved / rejected / returned)
-     * keeps that verdict in `original_status` and keeps its own `acted_at`,
-     * so the audit trail still reads "Approved · 14:30 · 'looks good'" after
-     * the edit cancels it. The system reason goes to `system_comment` so the
-     * approver's own `comment` is never overwritten.
-     */
     public function invalidateAllApprovers(?string $note = null): int
     {
         $decided = [
@@ -406,8 +355,6 @@ class Contract extends Model
                 'original_status' => $hadVerdict ? $approver->status : $approver->original_status,
                 'status' => ContractApprover::STATUS_INVALIDATED,
                 'system_comment' => $note,
-                // Keep the verdict's own timestamp; only stamp the moment of
-                // cancellation onto rows that never acted.
                 'acted_at' => $hadVerdict ? $approver->acted_at : now(),
             ]);
 
@@ -429,7 +376,6 @@ class Contract extends Model
         return $this->approvers()->exists();
     }
 
-    /** Submit needs either an active queue OR the global settings flow to fall back on. */
     public function canRebuildChainOnSubmit(): bool
     {
         return $this->activeApprovers()->doesntExist()
@@ -442,18 +388,14 @@ class Contract extends Model
             && $this->activeApprovers()->where('status', '!=', ContractApprover::STATUS_APPROVED)->doesntExist();
     }
 
-    /** The single active user holding the director role — the final approver. */
     public function directorUser(): ?User
     {
-        // whereHas (not the role() scope) so a missing role just yields null
-        // instead of throwing RoleDoesNotExist.
         return User::query()
             ->whereHas('roles', fn (Builder $query) => $query->where('name', self::DIRECTOR_ROLE))
             ->where('status', User::STATUS_ACTIVE)
             ->first();
     }
 
-    /** Has the role-based director already been added to the active chain? */
     public function hasDirectorApprover(): bool
     {
         $director = $this->directorUser();
@@ -462,11 +404,6 @@ class Contract extends Model
             && $this->activeApprovers()->where('user_id', $director->id)->exists();
     }
 
-    /**
-     * True while the contract is parked with the director for final sign-off
-     * (director appended and still pending/queued). Used to lock editing once
-     * the lawyer + accountant stage is done.
-     */
     public function isInDirectorStage(): bool
     {
         $director = $this->directorUser();
@@ -478,12 +415,6 @@ class Contract extends Model
                 ->exists();
     }
 
-    /**
-     * Append the role-based director as the final approver once the
-     * lawyer + accountant stage is complete. Returns the fresh QUEUED row, or
-     * null when no director is configured or one is already in the chain (so
-     * the caller can finalize as APPROVED instead).
-     */
     public function appendDirectorApprover(): ?ContractApprover
     {
         $director = $this->directorUser();
@@ -519,11 +450,6 @@ class Contract extends Model
             && $this->isCurrentApprover($user);
     }
 
-    /**
-     * The lawyer + accountant stage is done (status PENDING_DIRECTOR) and a
-     * director exists — the responsible manager (or an admin) may now hand it
-     * to the director for final sign-off.
-     */
     public function canBeSentToDirectorBy(?User $user = null): bool
     {
         $user ??= auth()->user();
@@ -542,7 +468,6 @@ class Contract extends Model
             return false;
         }
 
-        // Oversight: super_admin or anyone holding the view_all_contracts permission.
         if ($user->hasRole('super_admin') || $user->can('view_all_contracts')) {
             return true;
         }
@@ -566,9 +491,6 @@ class Contract extends Model
             return true;
         }
 
-        // Editable only before the director stage: drafts, the lawyer+accountant
-        // review, and rejected. PENDING_DIRECTOR and IN_REVIEW_DIRECTOR are
-        // intentionally absent, so the document freezes once it's with the director.
         return $this->responsible_id === $user->id
             && in_array($this->status, [
                 self::STATUS_DRAFT,
@@ -630,11 +552,6 @@ class Contract extends Model
         return $this->hasMany(Payment::class)->orderByDesc('paid_at');
     }
 
-    /**
-     * Sum of percent across all payments on this contract. Reads the cached
-     * `paid_percent` column maintained by PaymentObserver, falling back to a
-     * fresh sum() when the column isn't loaded (e.g. inside the observer).
-     */
     public function paidPercent(): float
     {
         if (array_key_exists('paid_percent', $this->attributes)) {
@@ -644,10 +561,6 @@ class Contract extends Model
         return (float) $this->payments()->sum('percent');
     }
 
-    /**
-     * Percent that may still be paid before the contract is fully settled.
-     * Never negative, even if the totals briefly overshoot 100%.
-     */
     public function remainingPercent(): float
     {
         return max(0.0, round(100 - $this->paidPercent(), 2));
@@ -658,23 +571,13 @@ class Contract extends Model
         return $this->payment_status === PaymentStatus::FullyPaid;
     }
 
-    /**
-     * Whether a new payment may be recorded against this contract: it must
-     * be approved (signed by the director) and not already fully paid.
-     */
     public function canAcceptPayment(): bool
     {
         return $this->status === self::STATUS_APPROVED && ! $this->isFullyPaid();
     }
 
-    /** The role whose single holder is the final (director) approver. */
     public const DIRECTOR_ROLE = 'director';
 
-    /**
-     * Roles whose holders see every contract. The director is included so
-     * they can review what's coming through the chain. Granular oversight
-     * for other roles is controlled by the `view_all_contracts` permission.
-     */
     public const OVERSIGHT_ROLES = ['super_admin', self::DIRECTOR_ROLE];
 
     public function scopeVisibleTo(Builder $query, ?User $user = null): Builder

@@ -72,18 +72,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->belongsTo(Position::class);
     }
 
-    /**
-     * Default recipients for approval workflow
-     */
     public function defaultRecipients(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'recipients', 'user_id', 'recipient_id')
             ->withTimestamps();
     }
 
-    /**
-     * Get default recipient IDs as array
-     */
     public function getDefaultRecipientIds(): array
     {
         return $this->defaultRecipients()->pluck('users.id')->toArray();

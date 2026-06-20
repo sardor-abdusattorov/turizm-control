@@ -97,10 +97,6 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
-                // Order on screen is driven by each widget's $sort; this list is
-                // just registration. Greeting (-20) and overdue banner (-10) lead,
-                // then the approval queue (1), personal stats (2), money (3),
-                // latest payments (4), recent activity (5), trend chart (20).
                 DashboardHeaderWidget::class,
                 OverdueAlertBanner::class,
                 MyApprovalQueueWidget::class,

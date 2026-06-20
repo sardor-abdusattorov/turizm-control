@@ -9,16 +9,6 @@ use App\Models\ContractApprover;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
-/**
- * Single source of truth for "who is looking at the dashboard and what do
- * they care about". Every dashboard widget resolves its visibility and its
- * data through this object instead of re-deriving role logic inline, so the
- * role rules live in exactly one place.
- *
- * Resolved once per request and memoised — the dashboard renders several
- * widgets that each ask the same "is this an approver / is there anything
- * overdue" questions.
- */
 final class DashboardContext
 {
     private ?User $user;
@@ -47,25 +37,21 @@ final class DashboardContext
         return explode(' ', $name)[0];
     }
 
-    /** Roles that ever appear in an approval chain — they get the "awaiting me" queue. */
     public function isApprover(): bool
     {
         return $this->user?->hasAnyRole(['director', 'legal_officer', 'accountant', 'super_admin']) ?? false;
     }
 
-    /** Owns and pushes contracts through the chain. */
     public function isManager(): bool
     {
         return $this->user?->hasAnyRole(['manager', 'super_admin']) ?? false;
     }
 
-    /** Sees money: books payments, signs off, or oversees. */
     public function isFinance(): bool
     {
         return $this->user?->hasAnyRole(['accountant', 'director', 'super_admin']) ?? false;
     }
 
-    /** Company-wide visibility. */
     public function isOversight(): bool
     {
         return $this->user?->hasAnyRole(Contract::OVERSIGHT_ROLES) ?? false;
@@ -123,7 +109,6 @@ final class DashboardContext
             ->values();
     }
 
-    /** The current user's own pending approver row on a contract (or null). */
     public function myApproverRow(Contract $contract): ?ContractApprover
     {
         if (! $this->user) {

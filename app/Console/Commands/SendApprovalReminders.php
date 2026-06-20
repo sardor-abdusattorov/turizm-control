@@ -25,7 +25,6 @@ class SendApprovalReminders extends Command
         $sent = 0;
 
         foreach ($candidates as $approver) {
-            // Only the current (front-of-queue) approver should be nudged.
             if (! $approver->contract?->isCurrentApprover($approver->user)) {
                 continue;
             }

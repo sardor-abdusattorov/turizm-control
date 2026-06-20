@@ -23,16 +23,10 @@ use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         Gate::policy(Activity::class, ActivityPolicy::class);
 
-        // Per-request singleton so every dashboard widget shares one resolved
-        // context (and its memoised "awaiting me" / counts queries) instead of
-        // each widget re-running them.
         $this->app->scoped(DashboardContext::class);
 
         $this->configureRenderHooks();
@@ -56,20 +50,12 @@ class AppServiceProvider extends ServiceProvider
             '
         );
 
-        // When the SPA panel page is restored from the browser back/forward
-        // cache (e.g. after returning from the full-page OnlyOffice editor),
-        // Alpine/Livewire come back frozen and the sidebar breaks. Force a
-        // clean reload only on bfcache restore — normal SPA navigation is
-        // untouched.
         FilamentView::registerRenderHook(
             'panels::body.end',
             fn (): string => '<script>window.addEventListener("pageshow",function(e){if(e.persisted){window.location.reload();}});</script>'
         );
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         $this->configureDB();
@@ -122,9 +108,6 @@ class AppServiceProvider extends ServiceProvider
             ->paginationPageOptions([10, 25, 50])
         );
 
-        // Every group trigger renders as a labelled "Actions" button (not a
-        // bare "…" icon) and keeps the tooltip. Closures keep both label and
-        // tooltip locale-aware; the hover surface is defined in the panel theme.
         ActionGroup::configureUsing(
             fn (ActionGroup $group) => $group
                 ->label(fn (): string => __('app.label.actions'))

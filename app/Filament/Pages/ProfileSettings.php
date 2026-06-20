@@ -115,11 +115,6 @@ class ProfileSettings extends Page implements HasActions, HasForms
 
                         Grid::make(['default' => 1, 'sm' => 2])
                             ->schema([
-                                // Department + position are HR-owned: a regular user can see
-                                // theirs (read-only), but only admins may change them. The
-                                // disabled + dehydrated(false) pair both greys out the field
-                                // and strips it from the saved state, so a tampered request
-                                // can't smuggle a value through.
                                 Select::make('department_id')
                                     ->label(__('app.label.department'))
                                     ->options(Department::getActive())
@@ -226,9 +221,6 @@ class ProfileSettings extends Page implements HasActions, HasForms
                 'telegram_chat_id' => $data['telegram_chat_id'] ?? null,
             ];
 
-            // department_id/position_id only land in $data when the user can
-            // update users; ignore them entirely otherwise so a regular user
-            // cannot self-promote themselves into a different department.
             if (array_key_exists('department_id', $data)) {
                 $payload['department_id'] = $data['department_id'];
             }
@@ -307,11 +299,6 @@ class ProfileSettings extends Page implements HasActions, HasForms
                     ->where('id', '!=', Session::getId())
                     ->delete();
 
-                // logoutOtherDevices() re-hashes the user's password but does NOT
-                // sync the new hash into the current session. AuthenticateSession
-                // middleware would then see a mismatch and kick us out on the next
-                // request, same as the other sessions. Mirror Jetstream and store
-                // the new hash so the current device stays logged in.
                 request()->session()->put([
                     'password_hash_'.Auth::getDefaultDriver() => Auth::user()->getAuthPassword(),
                 ]);
@@ -362,7 +349,6 @@ class ProfileSettings extends Page implements HasActions, HasForms
         $platform = 'Unknown';
 
         if ($userAgent) {
-            // Platform detection
             if (preg_match('/Windows/i', $userAgent)) {
                 $platform = 'Windows';
             } elseif (preg_match('/Macintosh|Mac OS/i', $userAgent)) {
@@ -375,7 +361,6 @@ class ProfileSettings extends Page implements HasActions, HasForms
                 $platform = 'Android';
             }
 
-            // Browser detection
             if (preg_match('/Chrome/i', $userAgent) && ! preg_match('/Edge/i', $userAgent)) {
                 $browser = 'Chrome';
             } elseif (preg_match('/Firefox/i', $userAgent)) {

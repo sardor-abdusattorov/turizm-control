@@ -33,7 +33,6 @@ class Order extends Model
         'issued_at' => 'date',
     ];
 
-    /** Prefix used by generateNumber() — matches the existing КОНТ-… contract style. */
     public const NUMBER_PREFIX = 'ПРК';
 
     protected static function booted(): void
@@ -55,11 +54,6 @@ class Order extends Model
         });
     }
 
-    /**
-     * Sequential register number — "ПРК-2026-001". Uses the issued_at
-     * year when present, otherwise the current year. The numbering loops
-     * back to 001 every year.
-     */
     public static function generateNumber(\DateTimeInterface|CarbonInterface|null $issuedAt = null): string
     {
         $year = $issuedAt ? (int) $issuedAt->format('Y') : now()->year;
@@ -77,7 +71,6 @@ class Order extends Model
         return sprintf('%s-%d-%03d', $prefix, $year, $next);
     }
 
-    /** Year the order belongs to — driven by issued_at, falls back to created_at. */
     public function registerYear(): ?int
     {
         return ($this->issued_at ?? $this->created_at)?->year;

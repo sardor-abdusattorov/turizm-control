@@ -42,27 +42,16 @@ class Department extends Model
      */
     public const REQUIRED_APPROVER_CODES = ['legal', 'accounting'];
 
-    /**
-     * Relationship with User (head of department)
-     */
     public function head()
     {
         return $this->belongsTo(User::class, 'head_of_department');
     }
 
-    /**
-     * Members of this department.
-     */
     public function users()
     {
         return $this->hasMany(User::class);
     }
 
-    /**
-     * The user who approves on behalf of this department in the global
-     * flow — the department head when active, otherwise the first active
-     * member. Returns null when the department has no usable approver.
-     */
     public function approverUser(): ?User
     {
         if ($this->head && (bool) $this->head->status) {
@@ -75,33 +64,21 @@ class Department extends Model
             ->first();
     }
 
-    /**
-     * Check if this is an approver department (Legal, Financial, Accounting, Direction)
-     */
     public function isApproverDepartment(): bool
     {
         return in_array($this->code, self::APPROVER_CODES, true);
     }
 
-    /**
-     * Scope for approver departments
-     */
     public function scopeApprovers($query)
     {
         return $query->whereIn('code', self::APPROVER_CODES);
     }
 
-    /**
-     * Positions available in this department
-     */
     public function positions()
     {
         return $this->belongsToMany(Position::class, 'department_position');
     }
 
-    /**
-     * Get department by code
-     */
     public static function findByCode(string $code): ?self
     {
         return static::where('code', $code)->first();

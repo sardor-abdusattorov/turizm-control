@@ -13,8 +13,6 @@ class DashboardHeaderWidget extends Widget
 
     protected static ?int $sort = -20;
 
-    // Never lazy — the greeting is the "what should I care about" line and must
-    // be in the very first paint, not pop in after a deferred load.
     protected static bool $isLazy = false;
 
     /**
@@ -32,7 +30,6 @@ class DashboardHeaderWidget extends Widget
             ? __('app.dashboard.greeting_named', ['name' => $name])
             : __('app.dashboard.greeting');
 
-        // Priority order: overdue beats pending beats stalled beats "all clear".
         $overdue = $context->isApprover() ? $context->overdueForMe()->count() : 0;
         $awaiting = $context->isApprover() ? $context->awaitingMe()->count() : 0;
         $stalled = $context->isManager() ? $context->managerCounts()['stalled'] : 0;

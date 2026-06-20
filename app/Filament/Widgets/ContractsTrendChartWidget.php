@@ -13,8 +13,6 @@ class ContractsTrendChartWidget extends ChartWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    // Pushed to the very bottom — the trend chart is a weekly-glance analytic,
-    // not part of the daily action loop, so it sits under everything else.
     protected static ?int $sort = 20;
 
     protected ?string $maxHeight = '240px';
@@ -37,10 +35,6 @@ class ContractsTrendChartWidget extends ChartWidget
             return false;
         }
 
-        // The chart aggregates across every contract the user can see (via
-        // visibleTo). For a manager that is just their own contracts and the
-        // line is mostly empty — they get more value from the action-oriented
-        // stats above, so we hide the chart for them.
         return $user->hasAnyRole(['super_admin', 'director', 'accountant'])
             || $user->can('view_all_contracts');
     }
@@ -50,9 +44,6 @@ class ContractsTrendChartWidget extends ChartWidget
         $months = $this->buildMonthBuckets(6);
         $windowStart = $months->first()['start'];
 
-        // Bucket in PHP rather than SQL — the dataset is small (a few months
-        // of contracts at most) and it keeps the query driver-agnostic instead
-        // of leaning on sqlite's strftime / mysql's DATE_FORMAT.
         $contracts = Contract::query()
             ->visibleTo()
             ->where(function ($query) use ($windowStart): void {

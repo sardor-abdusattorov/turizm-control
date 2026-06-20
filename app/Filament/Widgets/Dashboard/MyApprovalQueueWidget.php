@@ -13,12 +13,6 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * The dashboard's primary call-to-action: the actual list of contracts parked
- * on the current user, newest-deadline first, with a one-click way into each
- * one. Replaces the old "Awaiting my approval: 5" stat card — a number told
- * you there was work, this tells you *which* work and lets you start it.
- */
 class MyApprovalQueueWidget extends TableWidget
 {
     protected int|string|array $columnSpan = 'full';
@@ -29,8 +23,6 @@ class MyApprovalQueueWidget extends TableWidget
     {
         $context = app(DashboardContext::class);
 
-        // Only approvers have a queue, and only show the widget when it isn't
-        // empty — an empty table is noise on the manager's / nobody's dashboard.
         return $context->isApprover() && $context->awaitingMe()->isNotEmpty();
     }
 

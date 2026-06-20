@@ -23,11 +23,6 @@ class ContactsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
 {
     use Exportable;
 
-    /**
-     * Indexes of columns whose value must be forced to text in Excel so that
-     * leading zeros on INN / PINFL / OKED / bank account / MFO are not lost
-     * when Excel auto-detects them as numbers.
-     */
     private const TEXT_COLUMNS = ['E', 'F', 'G', 'M', 'O'];
 
     /** @param  Builder<Contact>  $query */
@@ -114,7 +109,6 @@ class ContactsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
                 $lastColumn = $sheet->getHighestColumn();
                 $lastRow = $sheet->getHighestRow();
 
-                // Title above the headings.
                 $sheet->insertNewRowBefore(1, 1);
                 $titleRange = "A1:{$lastColumn}1";
                 $sheet->mergeCells($titleRange);
@@ -125,7 +119,6 @@ class ContactsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
                 ]);
                 $sheet->getRowDimension(1)->setRowHeight(28);
 
-                // Body font + borders.
                 $tableRange = "A2:{$lastColumn}".($lastRow + 1);
                 $sheet->getStyle($tableRange)->getFont()->setName('Times New Roman')->setSize(11);
                 $sheet->getStyle($tableRange)->applyFromArray([
@@ -135,8 +128,6 @@ class ContactsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
                     'alignment' => ['vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true],
                 ]);
 
-                // Force INN / PINFL / OKED / bank account / MFO to text so Excel
-                // doesn't reformat them and strip leading zeros.
                 foreach (self::TEXT_COLUMNS as $column) {
                     $sheet->getStyle("{$column}3:{$column}".($lastRow + 1))
                         ->getNumberFormat()

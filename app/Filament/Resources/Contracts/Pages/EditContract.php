@@ -31,7 +31,6 @@ class EditContract extends EditRecord
 
     protected bool $syncChain = false;
 
-    /** The contract's status BEFORE save — used to detect mid-flow edits. */
     protected ?ContractStatus $originalStatus = null;
 
     protected function getRedirectUrl(): string
@@ -39,14 +38,6 @@ class EditContract extends EditRecord
         return ContractResource::getUrl('view', ['record' => $this->record]);
     }
 
-    /**
-     * Wrap Save in a confirmation modal. For mid-flow contracts the modal
-     * warns that the chain will be cancelled and rebuilt; for drafts it's
-     * a softer "save changes?" prompt. Implemented as a plain ->action()
-     * instead of ->submit() because Filament skips ->requiresConfirmation()
-     * for true form-submit buttons (they go straight to the wire:submit
-     * handler), and that's why the dialog wasn't showing before.
-     */
     protected function getSaveFormAction(): Action
     {
         $isMidFlow = $this->record && in_array($this->record->status, [
@@ -70,12 +61,6 @@ class EditContract extends EditRecord
             ->action(fn () => $this->{$this->getSubmitFormLivewireMethodName()}());
     }
 
-    /**
-     * Pre-fill the approval-chain picker with the contract's live chain
-     * (active rows, in order) so the author can see and tweak it — on drafts
-     * and, now, on submitted contracts too. A draft with no live chain falls
-     * back to the author's profile recipients, matching the create flow.
-     */
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $ids = $this->liveChainIds();
@@ -105,30 +90,12 @@ class EditContract extends EditRecord
         return $data;
     }
 
-    /**
-     * Persist the approval-chain picker.
-     *
-     * The golden rule: an edit NEVER deletes an approver row. Approver rows
-     * only ever leave the table via the contract's cascadeOnDelete foreign
-     * key. Whenever the chain changes, the current live queue is marked
-     * INVALIDATED (kept as audit history) and a fresh QUEUED chain is laid
-     * down from the new selection.
-     *
-     * - Unchanged chain: no-op, so a plain save never disturbs the queue or
-     *   cancels a running approval.
-     * - Submitted contract whose chain changed: drop back to DRAFT and
-     *   invalidate the live verdicts as audit (unless the
-     *   Contract::maybeInvalidateOnEdit hook already did when a business field
-     *   changed too), then rebuild the queue from the new selection.
-     */
     protected function afterSave(): void
     {
         if (! $this->syncChain || $this->approverChain === $this->originalChain) {
             return;
         }
 
-        // Submitted contract that the hook did NOT already reset: invalidate the
-        // live verdicts ourselves so they become audit history before the swap.
         if ($this->originalStatus !== Contract::STATUS_DRAFT
             && $this->record->status !== Contract::STATUS_DRAFT) {
             $this->record->forceFill([
@@ -138,8 +105,6 @@ class EditContract extends EditRecord
             $this->record->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
         }
 
-        // Retire the remaining live queue by INVALIDATING it (never deleting),
-        // then rebuild the fresh queue from the picker.
         $this->record->approvers()
             ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
             ->update([
@@ -166,9 +131,6 @@ class EditContract extends EditRecord
             ->all();
     }
 
-    /**
-     * Lay down a fresh QUEUED chain from the captured picker selection, in order.
-     */
     protected function rebuildQueuedChain(): void
     {
         $order = 1;

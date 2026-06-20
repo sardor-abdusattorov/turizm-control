@@ -33,8 +33,6 @@ class ContractApprover extends Model
         'reminder_sent_at' => 'datetime',
     ];
 
-    // Constants alias the enum cases so the existing `ContractApprover::STATUS_*`
-    // call sites keep working — they now compare as ContractApproverStatus.
     public const STATUS_QUEUED = ContractApproverStatus::Queued;
 
     public const STATUS_PENDING = ContractApproverStatus::Pending;
@@ -49,7 +47,6 @@ class ContractApprover extends Model
 
     public const STATUS_INVALIDATED = ContractApproverStatus::Invalidated;
 
-    /** Scope: rows that count toward the active workflow (excludes invalidated/skipped). */
     public function scopeActive($query)
     {
         return $query->whereNotIn('status', [self::STATUS_INVALIDATED, self::STATUS_SKIPPED]);
@@ -97,11 +94,6 @@ class ContractApprover extends Model
         return $this->status === self::STATUS_PENDING;
     }
 
-    /**
-     * The verdict to display for this row. A row cancelled by a mid-flow edit
-     * keeps its real decision in `original_status`, so the UI can still badge
-     * it "Approved" (struck through) rather than a faceless "Cancelled".
-     */
     public function displayStatus(): ContractApproverStatus
     {
         return $this->status === self::STATUS_INVALIDATED && $this->original_status
@@ -109,18 +101,11 @@ class ContractApprover extends Model
             : $this->status;
     }
 
-    /** Did this row reach a real verdict before being cancelled by an edit? */
     public function wasCancelledAfterVerdict(): bool
     {
         return $this->status === self::STATUS_INVALIDATED && $this->original_status !== null;
     }
 
-    /**
-     * Start the review clock for this step — called when the approver
-     * becomes the current one in the chain. Promotes the row from
-     * QUEUED to PENDING (the canonical promotion point), sets the SLA
-     * deadline, and clears any prior reminder flag.
-     */
     public function startReview(int $slaDays): void
     {
         $this->update([
@@ -137,10 +122,6 @@ class ContractApprover extends Model
             && now()->greaterThan($this->due_at);
     }
 
-    /**
-     * Whether a reminder should be sent now: once when the deadline is
-     * within 12 hours, then again at most daily once overdue.
-     */
     public function needsReminder(): bool
     {
         if ($this->status !== self::STATUS_PENDING || $this->due_at === null) {

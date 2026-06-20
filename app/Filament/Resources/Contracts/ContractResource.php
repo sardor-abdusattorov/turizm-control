@@ -61,16 +61,9 @@ class ContractResource extends Resource
 
     public static function getRelations(): array
     {
-        // The approval chain is managed by the in-form picker (draft) and shown
-        // as a timeline on the view page, so no relation-manager table is needed.
         return [];
     }
 
-    /**
-     * Scope every query (list, tabs, and record resolution for view/edit) to
-     * the contracts the current user is allowed to see, so managers and
-     * approvers can't reach other people's contracts — not even by URL.
-     */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->visibleTo();

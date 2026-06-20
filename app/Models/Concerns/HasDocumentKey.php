@@ -4,10 +4,6 @@ namespace App\Models\Concerns;
 
 use Illuminate\Support\Str;
 
-/**
- * Shared OnlyOffice document-key handling. The key identifies an editing
- * session; rotating it invalidates the cached document in OnlyOffice.
- */
 trait HasDocumentKey
 {
     public static function generateDocumentKey(): string
