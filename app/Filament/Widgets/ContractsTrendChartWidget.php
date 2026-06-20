@@ -11,9 +11,11 @@ class ContractsTrendChartWidget extends ChartWidget
 {
     protected ?string $pollingInterval = null;
 
-    protected int|string|array $columnSpan = ['default' => 'full', 'md' => 2];
+    protected int|string|array $columnSpan = ['default' => 'full', 'md' => 1];
 
     protected static ?int $sort = 3;
+
+    protected ?string $maxHeight = '260px';
 
     public function getHeading(): ?string
     {
@@ -99,6 +101,14 @@ class ContractsTrendChartWidget extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'maintainAspectRatio' => false,
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'position' => 'bottom',
+                    'labels' => ['boxWidth' => 12, 'padding' => 12],
+                ],
+            ],
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,

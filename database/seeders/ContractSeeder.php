@@ -44,6 +44,8 @@ class ContractSeeder extends Seeder
         $filler = app(TemplateFiller::class);
         $values = app(ContractPlaceholderValues::class);
 
+        // Spread the seeded contracts across the trailing 6 months so the
+        // dashboard chart has shape to plot, not a single spike on today.
         $contracts = [
             [
                 'title' => 'Аренда офисного помещения на 2026 год',
@@ -52,7 +54,8 @@ class ContractSeeder extends Seeder
                 'template' => $templates->first(fn ($t) => str_contains($t->name, 'аренды')) ?? $templates->first(),
                 'contact' => $contacts->first(),
                 'status' => Contract::STATUS_APPROVED,
-                'signed_at' => now()->subDays(20),
+                'created_at' => now()->subMonths(5)->startOfMonth()->addDays(8),
+                'signed_at' => now()->subMonths(4)->startOfMonth()->addDays(12),
                 'payments' => [40, 60],
             ],
             [
@@ -62,7 +65,8 @@ class ContractSeeder extends Seeder
                 'template' => $templates->first(fn ($t) => str_contains($t->name, 'услуг')) ?? $templates->first(),
                 'contact' => $contacts->skip(1)->first() ?? $contacts->first(),
                 'status' => Contract::STATUS_APPROVED,
-                'signed_at' => now()->subDays(7),
+                'created_at' => now()->subMonths(3)->startOfMonth()->addDays(5),
+                'signed_at' => now()->subMonths(2)->startOfMonth()->addDays(10),
                 'payments' => [30],
             ],
             [
@@ -72,6 +76,7 @@ class ContractSeeder extends Seeder
                 'template' => $templates->first(fn ($t) => str_contains($t->name, 'услуг')) ?? $templates->first(),
                 'contact' => $contacts->skip(2)->first() ?? $contacts->first(),
                 'status' => Contract::STATUS_IN_REVIEW,
+                'created_at' => now()->subMonths(1)->startOfMonth()->addDays(14),
                 'payments' => [],
             ],
             [
@@ -81,6 +86,7 @@ class ContractSeeder extends Seeder
                 'template' => $templates->first(fn ($t) => str_contains($t->name, 'услуг')) ?? $templates->first(),
                 'contact' => $contacts->first(),
                 'status' => Contract::STATUS_DRAFT,
+                'created_at' => now()->subDays(14),
                 'payments' => [],
             ],
             [
@@ -90,6 +96,7 @@ class ContractSeeder extends Seeder
                 'template' => $templates->first(fn ($t) => str_contains(strtolower($t->name), 'uz')) ?? $templates->first(),
                 'contact' => $contacts->firstWhere('type', Contact::TYPE_INDIVIDUAL) ?? $contacts->last(),
                 'status' => Contract::STATUS_REJECTED,
+                'created_at' => now()->subMonths(4)->startOfMonth()->addDays(20),
                 'payments' => [],
             ],
         ];
@@ -123,10 +130,14 @@ class ContractSeeder extends Seeder
             // buildDocumentFromTemplate writes document_file via update(), which
             // trips Contract::maybeInvalidateOnEdit and drops everything back to
             // draft. Re-apply the seeded status straight through the query
-            // builder so the observer doesn't touch it again.
+            // builder so the observer doesn't touch it again. The same write
+            // also backdates created_at so the dashboard chart has historical
+            // shape instead of every contract piling up on today.
             Contract::query()->whereKey($contract->id)->update([
                 'status' => $data['status']->value,
                 'signed_at' => $data['signed_at'] ?? null,
+                'created_at' => $data['created_at'] ?? $contract->created_at,
+                'updated_at' => $data['signed_at'] ?? $data['created_at'] ?? $contract->updated_at,
             ]);
             $contract->refresh();
 
