@@ -498,6 +498,14 @@ return [
         'my_approved' => 'My approved contracts',
         'my_drafts' => 'My drafts',
 
+        // ContractStatsWidget — oversight variants (counts across the company)
+        'in_review_total' => 'In review (total)',
+        'in_review_description' => 'Currently being approved',
+        'approved_total' => 'Approved (total)',
+        'approved_description' => 'Signed off and active',
+        'drafts_total' => 'Drafts (total)',
+        'drafts_description' => 'Not submitted for approval yet',
+
         // PaymentStatsWidget
         'approved_value' => 'Approved value',
         'approved_value_description' => 'Total value of signed contracts',
@@ -513,6 +521,9 @@ return [
         'contracts_trend_description' => 'Comparing new contracts vs. signed contracts month-over-month.',
         'contracts_created' => 'Created',
         'contracts_signed' => 'Signed',
+
+        // LatestPaymentsWidget
+        'latest_payments_heading' => 'Latest payments',
     ],
     'filter' => [
         'awaiting_my_approval' => 'Awaiting my approval',

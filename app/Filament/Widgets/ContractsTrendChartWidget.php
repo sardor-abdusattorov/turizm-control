@@ -11,7 +11,9 @@ class ContractsTrendChartWidget extends ChartWidget
 {
     protected ?string $pollingInterval = null;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = ['default' => 'full', 'md' => 2];
+
+    protected static ?int $sort = 3;
 
     public function getHeading(): ?string
     {
