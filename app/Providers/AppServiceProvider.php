@@ -7,6 +7,7 @@ use App\Policies\ActivityPolicy;
 use App\Services\Dashboard\DashboardContext;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
+use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
 use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Columns\Column;
@@ -119,6 +120,13 @@ class AppServiceProvider extends ServiceProvider
             ->deferColumnManager(false)
             ->deferFilters(false)
             ->paginationPageOptions([10, 25, 50])
+        );
+
+        // Every "…" group trigger gets an "Actions" tooltip so the bare
+        // three-dots icon says what it does on hover — paired with the hover
+        // surface defined in the panel theme. Closure keeps it locale-aware.
+        ActionGroup::configureUsing(
+            fn (ActionGroup $group) => $group->tooltip(fn (): string => __('app.label.actions')),
         );
     }
 
