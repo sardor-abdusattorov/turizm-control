@@ -22,7 +22,7 @@ class PaymentFactory extends Factory
             'created_by' => User::factory(),
             'percent' => $this->faker->randomFloat(2, 1, 100),
             'paid_at' => $this->faker->dateTimeBetween('-1 month', 'now')->format('Y-m-d'),
-            'screenshot' => 'payments/dummy/'.$this->faker->uuid().'.png',
+            'screenshot' => 'uploads/images/payments/dummy/'.$this->faker->uuid().'.png',
         ];
     }
 

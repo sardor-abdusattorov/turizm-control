@@ -228,10 +228,10 @@ class ContractSeeder extends Seeder
                 'created_by' => $accountant->id,
                 'percent' => $percent,
                 'paid_at' => now()->subDays(15 - $index * 5),
-                // Real screenshots would live on disk; the seeded record just
-                // points to a deterministic placeholder path so the row is
-                // valid. Replace with an actual file when QA needs it.
-                'screenshot' => 'payments/seeded/'.$contract->id.'-'.($index + 1).'.png',
+                // Real screenshots would live on the public disk; the seeded
+                // record just points to a deterministic placeholder path so the
+                // row is valid. Replace with an actual file when QA needs it.
+                'screenshot' => 'uploads/images/payments/seeded/'.$contract->id.'-'.($index + 1).'.png',
             ]);
         }
     }

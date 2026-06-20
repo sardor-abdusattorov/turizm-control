@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    Storage::fake('local');
+    Storage::fake('public');
 });
 
 function paymentContract(array $overrides = []): Contract
@@ -86,7 +86,7 @@ it('deletes the screenshot file from disk when the payment is deleted', function
     $contract = paymentContract();
     $user = User::factory()->create();
 
-    $path = UploadedFile::fake()->image('proof.png')->storeAs(Payment::SCREENSHOT_DIR, 'proof.png', 'local');
+    $path = UploadedFile::fake()->image('proof.png')->storeAs(Payment::SCREENSHOT_DIR, 'proof.png', 'public');
 
     $payment = Payment::create([
         'contract_id' => $contract->id,
@@ -96,11 +96,11 @@ it('deletes the screenshot file from disk when the payment is deleted', function
         'screenshot' => $path,
     ]);
 
-    Storage::disk('local')->assertExists($path);
+    Storage::disk('public')->assertExists($path);
 
     $payment->delete();
 
-    Storage::disk('local')->assertMissing($path);
+    Storage::disk('public')->assertMissing($path);
 });
 
 it('cascades delete: removing a contract removes its payments', function () {

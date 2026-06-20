@@ -3,10 +3,10 @@
 namespace App\Filament\Resources\Payments\Schemas;
 
 use App\Enums\PaymentStatus;
+use App\Filament\Support\ImageUpload;
 use App\Models\Contract;
 use App\Models\Payment;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -77,16 +77,9 @@ class PaymentForm
                             ->native(false)
                             ->maxDate(now()),
 
-                        FileUpload::make('screenshot')
+                        ImageUpload::make(Payment::SCREENSHOT_DIR, 'screenshot')
                             ->label(__('app.label.screenshot'))
                             ->required()
-                            ->image()
-                            ->disk('local')
-                            ->visibility('private')
-                            ->directory(Payment::SCREENSHOT_DIR)
-                            ->openable()
-                            ->downloadable()
-                            ->maxSize(5120)
                             ->columnSpanFull(),
                     ]),
             ]);

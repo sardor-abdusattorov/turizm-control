@@ -37,10 +37,6 @@ class ViewPayment extends ViewRecord
 
     public function screenshotUrl(): ?string
     {
-        if (! $this->record->screenshot) {
-            return null;
-        }
-
-        return route('payments.screenshot', ['payment' => $this->record]);
+        return $this->record->screenshotUrl();
     }
 }

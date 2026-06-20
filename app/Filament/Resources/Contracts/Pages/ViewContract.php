@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Support\ImageUpload;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\Payment;
@@ -12,7 +13,6 @@ use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
@@ -151,14 +151,9 @@ class ViewContract extends ViewRecord
                         ->maxDate(now())
                         ->default(now()),
 
-                    FileUpload::make('screenshot')
+                    ImageUpload::make(Payment::SCREENSHOT_DIR, 'screenshot')
                         ->label(__('app.label.screenshot'))
-                        ->required()
-                        ->image()
-                        ->disk('local')
-                        ->visibility('private')
-                        ->directory(Payment::SCREENSHOT_DIR)
-                        ->maxSize(5120),
+                        ->required(),
                 ])
                 ->action(function (array $data): void {
                     if (! $this->record->canAcceptPayment()) {
@@ -289,17 +284,10 @@ class ViewContract extends ViewRecord
         ];
     }
 
-    /**
-     * Private-disk screenshot URL — uses the contracts.editor route style so
-     * the file is served behind the panel auth.
-     */
+    /** Public URL of a payment's uploaded proof screenshot. */
     public function paymentScreenshotUrl(Payment $payment): ?string
     {
-        if (! $payment->screenshot) {
-            return null;
-        }
-
-        return route('payments.screenshot', ['payment' => $payment]);
+        return $payment->screenshotUrl();
     }
 
     public function approverAvatar(ContractApprover $approver): string

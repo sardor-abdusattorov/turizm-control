@@ -14,7 +14,7 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    Storage::fake('local');
+    Storage::fake('public');
 });
 
 it('lists payments for users who can view any payment', function () {

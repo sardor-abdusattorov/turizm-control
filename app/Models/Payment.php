@@ -30,7 +30,7 @@ class Payment extends Model
         'paid_at' => 'date',
     ];
 
-    /** Private disk path where payment proof screenshots live. */
+    /** Folder (on the public disk) the payment proof screenshots upload into. */
     public const SCREENSHOT_DIR = 'payments';
 
     protected static function booted(): void
@@ -42,10 +42,18 @@ class Payment extends Model
         });
 
         static::deleting(function (self $payment): void {
-            if ($payment->screenshot && Storage::disk('local')->exists($payment->screenshot)) {
-                Storage::disk('local')->delete($payment->screenshot);
+            if ($payment->screenshot && Storage::disk('public')->exists($payment->screenshot)) {
+                Storage::disk('public')->delete($payment->screenshot);
             }
         });
+    }
+
+    /** Public URL of the uploaded proof screenshot, or null when absent. */
+    public function screenshotUrl(): ?string
+    {
+        return $this->screenshot
+            ? Storage::disk('public')->url($this->screenshot)
+            : null;
     }
 
     public function contract(): BelongsTo

@@ -65,8 +65,7 @@ class PaymentsTable
 
                 ImageColumn::make('screenshot')
                     ->label(__('app.label.screenshot'))
-                    ->disk('local')
-                    ->visibility('private')
+                    ->disk('public')
                     ->height(40)
                     ->square(),
 
