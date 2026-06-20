@@ -13,6 +13,10 @@ class DashboardHeaderWidget extends Widget
 
     protected static ?int $sort = -20;
 
+    // Never lazy — the greeting is the "what should I care about" line and must
+    // be in the very first paint, not pop in after a deferred load.
+    protected static bool $isLazy = false;
+
     /**
      * One personalised line that answers "what should I care about right now",
      * picked by what is actually demanding the user's attention.

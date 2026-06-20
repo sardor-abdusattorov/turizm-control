@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LatestPaymentsWidget extends TableWidget
 {
-    protected int|string|array $columnSpan = ['default' => 'full', 'md' => 1];
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?int $sort = 4;
 

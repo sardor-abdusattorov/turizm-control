@@ -26,6 +26,10 @@ class OverdueAlertBanner extends Widget
 
     protected static ?int $sort = -10;
 
+    // Render immediately — an overdue alert that pops in a second late defeats
+    // the point of being the loudest thing on the page.
+    protected static bool $isLazy = false;
+
     public static function canView(): bool
     {
         return self::resolveItems()->isNotEmpty();

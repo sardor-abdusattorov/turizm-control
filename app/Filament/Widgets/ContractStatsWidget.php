@@ -22,9 +22,10 @@ class ContractStatsWidget extends StatsOverviewWidget
 
     public static function canView(): bool
     {
-        // Only people who own contracts have a personal pipeline. Pure
-        // approvers (director / legal / accountant) work from the queue table.
-        return app(DashboardContext::class)->isManager();
+        // Strictly the manager role — they're the only ones who actually own a
+        // draft/in-review pipeline. super_admin isn't a contract owner, so for
+        // them this was just two "0" cards; they get oversight widgets instead.
+        return auth()->user()?->hasRole('manager') ?? false;
     }
 
     protected function getStats(): array

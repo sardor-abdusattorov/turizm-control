@@ -11,13 +11,13 @@ class ContractsTrendChartWidget extends ChartWidget
 {
     protected ?string $pollingInterval = null;
 
-    protected int|string|array $columnSpan = ['default' => 'full', 'md' => 1];
+    protected int|string|array $columnSpan = 'full';
 
     // Pushed to the very bottom — the trend chart is a weekly-glance analytic,
     // not part of the daily action loop, so it sits under everything else.
     protected static ?int $sort = 20;
 
-    protected ?string $maxHeight = '260px';
+    protected ?string $maxHeight = '240px';
 
     public function getHeading(): ?string
     {

@@ -6,8 +6,6 @@ use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Payments\PaymentResource;
 use App\Models\Contract;
-use App\Models\Payment;
-use Carbon\CarbonImmutable;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
@@ -42,13 +40,11 @@ class PaymentStatsWidget extends StatsOverviewWidget
     protected function getStats(): array
     {
         $totals = $this->financialTotals();
-
-        // Sparkline (payment momentum) lives on the Collected card only — the
-        // same 14-day series behind all three cards would be noise, not signal.
-        $sparkline = $this->dailyPaymentsSparkline(14);
         $contractsUrl = ContractResource::getUrl('index');
         $paymentsUrl = PaymentResource::getUrl('index');
 
+        // No per-card sparkline — a chart on one card made it taller than its
+        // neighbours and broke the row's alignment. Three clean, equal cards.
         return [
             Stat::make(__('app.stats.approved_value'), self::formatUzs($totals['approved']))
                 ->description(__('app.stats.approved_value_description'))
@@ -62,7 +58,6 @@ class PaymentStatsWidget extends StatsOverviewWidget
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success')
                 ->icon('heroicon-o-banknotes')
-                ->chart($sparkline)
                 ->url($paymentsUrl),
 
             Stat::make(__('app.stats.outstanding'), self::formatUzs($totals['outstanding']))
@@ -114,30 +109,6 @@ class PaymentStatsWidget extends StatsOverviewWidget
 
             return ['approved' => $approved, 'collected' => $collected, 'outstanding' => $outstanding];
         });
-    }
-
-    /**
-     * 14-day sparkline of the daily number of payments — gives the money
-     * cards a sense of momentum next to the static totals.
-     *
-     * @return list<int>
-     */
-    private function dailyPaymentsSparkline(int $days): array
-    {
-        $start = CarbonImmutable::now()->startOfDay()->subDays($days - 1);
-
-        $byDay = Payment::query()
-            ->where('paid_at', '>=', $start->toDateString())
-            ->get(['paid_at'])
-            ->countBy(fn ($p) => $p->paid_at->format('Y-m-d'));
-
-        $series = [];
-        for ($i = 0; $i < $days; $i++) {
-            $key = $start->addDays($i)->format('Y-m-d');
-            $series[] = (int) ($byDay[$key] ?? 0);
-        }
-
-        return $series;
     }
 
     /** Render a UZS amount short (123 456 789 → "123.5M UZS") so it fits the card. */
