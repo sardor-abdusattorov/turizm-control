@@ -81,12 +81,6 @@ class ContractsTable
                     ->view('filament.resources.contracts.tables.payment-column')
                     ->sortable(),
 
-                TextColumn::make('paid_percent')
-                    ->label(__('app.label.paid_percent'))
-                    ->formatStateUsing(fn ($state): string => rtrim(rtrim(number_format((float) $state, 2, '.', ''), '0'), '.').'%')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
                 TextColumn::make('created_at')
                     ->label(__('app.label.created_at'))
                     ->dateTime('d.m.Y H:i')
