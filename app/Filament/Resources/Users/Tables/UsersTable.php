@@ -29,6 +29,7 @@ class UsersTable
                 TextColumn::make('name')
                     ->label(__('app.label.name'))
                     ->searchable()
+                    ->wrap()
                     ->sortable(),
 
                 TextColumn::make('email')
