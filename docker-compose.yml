@@ -30,6 +30,28 @@ services:
       - app
     restart: unless-stopped
 
+  # Daemon that runs `schedule:run` once a minute — drives every task
+  # registered in routes/console.php (CBU rate refresh, approval-reminder
+  # mailer, …). Uses the same PHP image as the web container; no cron
+  # needed on the host.
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: turizm-scheduler
+    command: ["php", "artisan", "schedule:work"]
+    volumes:
+      - ./:/var/www
+      - vendor:/var/www/vendor
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app
+    restart: unless-stopped
+
   mysql:
     image: mysql:8.0
     container_name: turizm-mysql
