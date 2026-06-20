@@ -22,7 +22,7 @@ class UsersTable
             ->columns([
                 ImageColumn::make('avatar_url')
                     ->label(__('app.label.profile_image'))
-                    ->disk('public')
+                    ->disk('local')
                     ->circular()
                     ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name='.urlencode($record->name).'&color=7F9CF5&background=EBF4FF'),
 

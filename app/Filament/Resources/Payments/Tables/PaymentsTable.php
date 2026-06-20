@@ -13,6 +13,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,18 +24,17 @@ class PaymentsTable
     {
         return $table
             ->defaultSort('paid_at', 'desc')
-            // Payments naturally belong to a contract, and the same contract
-            // recurs across rows — grouping clusters them and the per-group
-            // percent sum shows how much of each contract is settled at a glance.
+            // Grouping by contract is offered as an opt-in (via the "Group by"
+            // control) rather than forced on: the per-group percent sum then
+            // shows how much of each contract is settled. The page/grand totals
+            // are hidden since summing percentages across contracts is
+            // meaningless — only the per-group summary makes sense.
             ->groups([
                 Group::make('contract.number')
                     ->label(__('app.label.contract'))
                     ->titlePrefixedWithLabel(false)
                     ->collapsible(),
             ])
-            ->defaultGroup('contract.number')
-            // The page/grand totals would sum percentages across different
-            // contracts (meaningless), so only the per-group summary is shown.
             ->summaries(pageCondition: false, allTableCondition: false)
             ->columns([
                 TextColumn::make('contract.number')
@@ -65,7 +65,7 @@ class PaymentsTable
 
                 ImageColumn::make('screenshot')
                     ->label(__('app.label.screenshot'))
-                    ->disk('public')
+                    ->disk('local')
                     ->height(40)
                     ->square(),
 
@@ -80,6 +80,14 @@ class PaymentsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                // Focus the list on a single contract — the right tool when you
+                // want one contract's instalments rather than every contract.
+                SelectFilter::make('contract_id')
+                    ->label(__('app.label.contract'))
+                    ->relationship('contract', 'number')
+                    ->searchable()
+                    ->preload(),
+
                 Filter::make('paid_at')
                     ->schema([
                         DatePicker::make('from')->label(__('app.label.from')),
