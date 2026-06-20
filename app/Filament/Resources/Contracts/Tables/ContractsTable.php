@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Contracts\Tables;
 
 use App\Enums\PaymentStatus;
-use App\Filament\Exports\ContractExporter;
+use App\Exports\ContractsExport;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Contracts\Pages\ViewContract;
 use App\Models\Contract;
@@ -17,14 +17,13 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ContractsTable
 {
@@ -193,21 +192,23 @@ class ContractsTable
                     ->color('gray'),
             ])
             ->headerActions([
-                ExportAction::make()
+                Action::make('exportXlsx')
                     ->label(__('app.action.export_xlsx'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
-                    ->exporter(ContractExporter::class)
-                    ->fileName(fn (): string => 'contracts-'.now()->format('Y-m-d'))
-                    ->visible(fn (): bool => ViewContract::userCanExportContract()),
+                    ->visible(fn (): bool => ViewContract::userCanExportContract())
+                    ->action(function ($livewire) {
+                        // getFilteredTableQuery() respects every tab, filter and
+                        // sort the user has applied — so the file only contains
+                        // what they're seeing on screen.
+                        return Excel::download(
+                            new ContractsExport($livewire->getFilteredTableQuery()),
+                            'contracts-'.now()->format('Y-m-d').'.xlsx',
+                        );
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    ExportBulkAction::make()
-                        ->label(__('app.action.export_xlsx'))
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->exporter(ContractExporter::class)
-                        ->fileName(fn (): string => 'contracts-selected-'.now()->format('Y-m-d')),
                     DeleteBulkAction::make(),
                 ]),
             ]);

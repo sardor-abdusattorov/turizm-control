@@ -2,21 +2,21 @@
 
 namespace App\Filament\Resources\Contacts\Tables;
 
-use App\Filament\Exports\ContactExporter;
+use App\Exports\ContactsExport;
 use App\Filament\Resources\Contacts\ContactResource;
 use App\Models\Contact;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ContactsTable
 {
@@ -93,18 +93,17 @@ class ContactsTable
                     ->color('gray'),
             ])
             ->headerActions([
-                ExportAction::make()
+                Action::make('exportXlsx')
                     ->label(__('app.action.export_xlsx'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
-                    ->exporter(ContactExporter::class),
+                    ->action(fn ($livewire) => Excel::download(
+                        new ContactsExport($livewire->getFilteredTableQuery()),
+                        'contacts-'.now()->format('Y-m-d').'.xlsx',
+                    )),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    ExportBulkAction::make()
-                        ->label(__('app.action.export_xlsx'))
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->exporter(ContactExporter::class),
                     DeleteBulkAction::make(),
                 ]),
             ]);

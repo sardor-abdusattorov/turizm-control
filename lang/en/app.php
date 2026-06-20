@@ -301,6 +301,10 @@ return [
     'export' => [
         'completed_body' => 'Your export is ready: :count rows exported.',
         'failed_rows' => ':count rows failed to export.',
+        'contracts_title' => 'Contracts registry :year',
+        'contracts_sheet_title' => 'Contracts',
+        'contacts_title' => 'Contacts registry :year',
+        'contacts_sheet_title' => 'Contacts',
     ],
     'notification' => [
         'approval_requested' => [
