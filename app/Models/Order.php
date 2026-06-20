@@ -24,7 +24,6 @@ class Order extends Model
         'file_path',
         'document_key',
         'issued_at',
-        'deadline_at',
         'status',
         'created_by',
     ];
@@ -32,7 +31,6 @@ class Order extends Model
     protected $casts = [
         'status' => 'boolean',
         'issued_at' => 'date',
-        'deadline_at' => 'date',
     ];
 
     /** Prefix used by generateNumber() — matches the existing КОНТ-… contract style. */

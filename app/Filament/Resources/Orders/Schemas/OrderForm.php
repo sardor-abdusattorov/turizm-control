@@ -44,12 +44,6 @@ class OrderForm
                                     ->displayFormat('d.m.Y')
                                     ->default(now())
                                     ->required(),
-
-                                DatePicker::make('deadline_at')
-                                    ->label(__('app.label.deadline'))
-                                    ->native(false)
-                                    ->displayFormat('d.m.Y')
-                                    ->helperText(__('app.helper.deadline_optional')),
                             ]),
 
                         TextInput::make('title')

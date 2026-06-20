@@ -1,28 +1,10 @@
 @php
     /** @var \App\Models\Order $record */
-    use Carbon\CarbonInterface;
-    use Illuminate\Support\Carbon;
-
     $record = $this->record;
 
-    $deadline = $record->deadline_at;
     $isActive = (bool) $record->status;
-    $overdue = $isActive && $deadline && $deadline->isPast();
-    $dueSoon = $isActive && $deadline && ! $overdue && $deadline->diffInDays(now()) <= 3;
-
-    $heroVariant = match (true) {
-        ! $isActive => 'gray',
-        $overdue => 'danger',
-        $dueSoon => 'warning',
-        default => 'success',
-    };
-
-    $statusLabel = match (true) {
-        ! $isActive => __('app.label.inactive'),
-        $overdue => __('app.label.overdue'),
-        $dueSoon => __('app.label.due'),
-        default => __('app.label.active'),
-    };
+    $heroVariant = $isActive ? 'success' : 'gray';
+    $statusLabel = $isActive ? __('app.label.active') : __('app.label.inactive');
 
     $ext = strtoupper((string) $record->extension());
     $fileName = $record->file_path ? basename($record->file_path) : null;
@@ -32,15 +14,18 @@
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
+    // Every field that used to be scattered across Hero / File card / Sidebar
+    // now lives in a single Information table — including the description
+    // (rendered as a wrap row so paragraphs survive intact).
     $details = [
         ['heroicon-o-hashtag',                __('app.label.order_number'),       $record->number],
         ['heroicon-o-bolt',                   __('app.label.status'),             $statusLabel, 'status'],
         ['heroicon-o-tag',                    __('app.label.order_type_single'),  $record->orderType?->title],
         ['heroicon-o-calendar',               __('app.label.issued_at'),          $record->issued_at?->format('d.m.Y')],
         ['heroicon-o-calendar-days',          __('app.label.year'),               $record->registerYear()],
-        ['heroicon-o-clock',                  __('app.label.deadline'),           $deadline?->format('d.m.Y')],
+        ['heroicon-o-bars-3-bottom-left',     __('app.label.description'),        $record->description, 'wrap'],
         ['heroicon-o-user',                   __('app.label.created_by'),         $record->creator?->name],
-        ['heroicon-o-arrow-down-tray',        __('app.label.created_at'),         $record->created_at?->format('d.m.Y H:i'), null, true],
+        ['heroicon-o-clock',                  __('app.label.created_at'),         $record->created_at?->format('d.m.Y H:i'), null, true],
         ['heroicon-o-pencil',                 __('app.label.updated_at'),         $record->updated_at?->format('d.m.Y H:i'), null, true],
     ];
 @endphp
@@ -60,133 +45,108 @@
                 @endif
             </div>
             <h2 class="ow-hero__title">{{ $record->title }}</h2>
-            <div class="ow-hero__dates">
-                @if ($record->issued_at)
+            @if ($record->issued_at)
+                <div class="ow-hero__dates">
                     <span class="ow-hero__date">
                         {!! $ic('heroicon-o-calendar', 14) !!}
                         {{ __('app.label.issued_at') }}: <b>{{ $record->issued_at->translatedFormat('d M Y') }}</b>
                     </span>
-                @endif
-                @if ($deadline)
-                    <span class="ow-hero__date">
-                        {!! $ic('heroicon-o-clock', 14) !!}
-                        {{ __('app.label.deadline') }}: <b>{{ $deadline->translatedFormat('d M Y') }}</b>
-                        @if ($overdue)
-                            <span class="ow-tag ow-tag--over">{{ __('app.label.overdue') }}</span>
-                        @elseif ($dueSoon)
-                            <span class="ow-tag ow-tag--soon">{{ $deadline->diffForHumans(now(), ['parts' => 1, 'syntax' => CarbonInterface::DIFF_ABSOLUTE]) }}</span>
-                        @endif
-                    </span>
-                @endif
-            </div>
+                </div>
+            @endif
         </div>
         <span class="ow-pill ow-pill--{{ $heroVariant }}">{{ $statusLabel }}</span>
     </section>
 
-    {{-- ============ TWO COLUMNS ============ --}}
-    <div class="ow-cols">
-        {{-- LEFT: file + description --}}
-        <div class="ow-main">
-            @if ($record->fileExists())
-                <section class="ow-card">
-                    <div class="ow-hd">
-                        <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text') !!}</span>
-                        <h2 class="ow-hd__t">{{ __('app.label.document') }}</h2>
-                    </div>
+    {{-- ============ FILE CARD — FULL WIDTH ============ --}}
+    @if ($record->fileExists())
+        <section class="ow-card">
+            <div class="ow-hd">
+                <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text') !!}</span>
+                <h2 class="ow-hd__t">{{ __('app.label.document') }}</h2>
+            </div>
 
-                    <div class="ow-file">
-                        <div class="ow-file__thumb" aria-hidden="true">
-                            <svg viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 4 h36 l12 12 v60 H8 Z" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
-                                <path d="M44 4 v12 h12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
-                                <rect x="14" y="30" width="34" height="2" rx="1" fill="#e2e8f0"/>
-                                <rect x="14" y="36" width="28" height="2" rx="1" fill="#e2e8f0"/>
-                                <rect x="14" y="42" width="34" height="2" rx="1" fill="#e2e8f0"/>
-                                <rect x="14" y="48" width="22" height="2" rx="1" fill="#e2e8f0"/>
-                            </svg>
-                            <span class="ow-file__ext">{{ $ext ?: '—' }}</span>
-                        </div>
-                        <div class="ow-file__body">
-                            <div class="ow-file__field">
-                                <div class="ow-file__lb">{{ __('app.label.file_name') }}</div>
-                                <div class="ow-file__vl" title="{{ $fileName }}">{{ $fileName }}</div>
-                            </div>
-                            <div class="ow-file__field">
-                                <div class="ow-file__lb">{{ __('app.label.size') }}</div>
-                                <div class="ow-file__vl">{{ $fileSize ?? '—' }}</div>
-                            </div>
-                            <div class="ow-file__field">
-                                <div class="ow-file__lb">{{ __('app.label.created_at') }}</div>
-                                <div class="ow-file__vl">{{ $record->created_at?->translatedFormat('d M Y H:i') ?? '—' }}</div>
-                            </div>
-                        </div>
+            <div class="ow-file">
+                <div class="ow-file__thumb" aria-hidden="true">
+                    <svg viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 4 h36 l12 12 v60 H8 Z" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+                        <path d="M44 4 v12 h12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+                        <rect x="14" y="30" width="34" height="2" rx="1" fill="#e2e8f0"/>
+                        <rect x="14" y="36" width="28" height="2" rx="1" fill="#e2e8f0"/>
+                        <rect x="14" y="42" width="34" height="2" rx="1" fill="#e2e8f0"/>
+                        <rect x="14" y="48" width="22" height="2" rx="1" fill="#e2e8f0"/>
+                    </svg>
+                    <span class="ow-file__ext">{{ $ext ?: '—' }}</span>
+                </div>
+                <div class="ow-file__body">
+                    <div class="ow-file__field">
+                        <div class="ow-file__lb">{{ __('app.label.file_name') }}</div>
+                        <div class="ow-file__vl" title="{{ $fileName }}">{{ $fileName }}</div>
                     </div>
-                    <div class="ow-file__act">
-                        @if ($fileEditUrl)
-                            <a href="{{ $fileEditUrl }}" class="ow-btn ow-btn--primary">
-                                {!! $ic('heroicon-o-pencil-square', 14) !!}
-                                <span>{{ __('app.action.open_editor') }}</span>
-                            </a>
-                        @endif
-                        @if ($fileViewUrl)
-                            <a href="{{ $fileViewUrl }}" target="_blank" rel="noopener" class="ow-btn ow-btn--ghost">
-                                {!! $ic('heroicon-o-arrow-top-right-on-square', 14) !!}
-                                <span>{{ __('app.action.open_in_new_tab') }}</span>
-                            </a>
-                        @endif
+                    <div class="ow-file__field">
+                        <div class="ow-file__lb">{{ __('app.label.size') }}</div>
+                        <div class="ow-file__vl">{{ $fileSize ?? '—' }}</div>
                     </div>
-                </section>
-            @endif
+                    <div class="ow-file__field">
+                        <div class="ow-file__lb">{{ __('app.label.created_at') }}</div>
+                        <div class="ow-file__vl">{{ $record->created_at?->translatedFormat('d M Y H:i') ?? '—' }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="ow-file__act">
+                @if ($fileEditUrl)
+                    <a href="{{ $fileEditUrl }}" class="ow-btn ow-btn--primary">
+                        {!! $ic('heroicon-o-pencil-square', 14) !!}
+                        <span>{{ __('app.action.open_editor') }}</span>
+                    </a>
+                @endif
+                @if ($fileViewUrl)
+                    <a href="{{ $fileViewUrl }}" target="_blank" rel="noopener" class="ow-btn ow-btn--ghost">
+                        {!! $ic('heroicon-o-arrow-top-right-on-square', 14) !!}
+                        <span>{{ __('app.action.open_in_new_tab') }}</span>
+                    </a>
+                @endif
+            </div>
+        </section>
+    @endif
 
-            @if (filled($record->description))
-                <section class="ow-card">
-                    <div class="ow-hd">
-                        <span class="ow-hd__ic">{!! $ic('heroicon-o-bars-3-bottom-left') !!}</span>
-                        <h2 class="ow-hd__t">{{ __('app.label.description') }}</h2>
-                    </div>
-                    <div class="ow-desc">{!! nl2br(e($record->description)) !!}</div>
-                </section>
-            @endif
+    {{-- ============ INFORMATION — FULL WIDTH TABLE ============ --}}
+    <section class="ow-card">
+        <div class="ow-hd">
+            <span class="ow-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span>
+            <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
         </div>
 
-        {{-- RIGHT: basic info table --}}
-        <div class="ow-side">
-            <section class="ow-card">
-                <div class="ow-hd">
-                    <span class="ow-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span>
-                    <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
+        <div class="ow-dets">
+            @foreach ($details as $row)
+                @php
+                    [$icon, $label, $value, $type, $extra] = array_pad($row, 5, null);
+                    $hasValue = filled($value);
+                @endphp
+                <div class="ow-row {{ $type === 'wrap' ? 'ow-row--wrap' : '' }}"
+                     @if ($extra) x-show="basicExpanded" x-cloak @endif>
+                    <span class="ow-row__k">
+                        <span class="ow-row__ic">{!! $ic($icon, 14) !!}</span>
+                        <span class="ow-row__lb">{{ $label }}</span>
+                    </span>
+                    <span class="ow-row__v">
+                        @if ($type === 'status' && $hasValue)
+                            <span class="ow-pill ow-pill--{{ $heroVariant }}" style="padding:.2rem .55rem;font-size:.72rem;">{{ $value }}</span>
+                        @elseif ($type === 'wrap' && $hasValue)
+                            <span class="ow-row__vl ow-row__vl--wrap">{!! nl2br(e($value)) !!}</span>
+                        @elseif ($hasValue)
+                            <span class="ow-row__vl">{{ $value }}</span>
+                        @else
+                            <span class="ow-row__vl ow-row__vl--muted">{{ __('app.label.not_set') }}</span>
+                        @endif
+                    </span>
                 </div>
-
-                <div class="ow-dets">
-                    @foreach ($details as $row)
-                        @php
-                            [$icon, $label, $value, $type, $extra] = array_pad($row, 5, null);
-                            $hasValue = filled($value);
-                        @endphp
-                        <div class="ow-row" @if ($extra) x-show="basicExpanded" x-cloak @endif>
-                            <span class="ow-row__k">
-                                <span class="ow-row__ic">{!! $ic($icon, 14) !!}</span>
-                                <span class="ow-row__lb">{{ $label }}</span>
-                            </span>
-                            <span class="ow-row__v">
-                                @if ($type === 'status' && $hasValue)
-                                    <span class="ow-pill ow-pill--{{ $heroVariant }}" style="padding:.2rem .55rem;font-size:.72rem;">{{ $value }}</span>
-                                @elseif ($hasValue)
-                                    <span class="ow-row__vl">{{ $value }}</span>
-                                @else
-                                    <span class="ow-row__vl ow-row__vl--muted">{{ __('app.label.not_set') }}</span>
-                                @endif
-                            </span>
-                        </div>
-                    @endforeach
-                </div>
-                <button type="button" class="ow-show-more" @click="basicExpanded = ! basicExpanded">
-                    <span x-show="! basicExpanded">{!! $ic('heroicon-m-chevron-down', 13) !!} {{ __('app.label.show_more') }}</span>
-                    <span x-show="basicExpanded" x-cloak>{!! $ic('heroicon-m-chevron-up', 13) !!} {{ __('app.label.show_less') }}</span>
-                </button>
-            </section>
+            @endforeach
         </div>
-    </div>
+        <button type="button" class="ow-show-more" @click="basicExpanded = ! basicExpanded">
+            <span x-show="! basicExpanded">{!! $ic('heroicon-m-chevron-down', 13) !!} {{ __('app.label.show_more') }}</span>
+            <span x-show="basicExpanded" x-cloak>{!! $ic('heroicon-m-chevron-up', 13) !!} {{ __('app.label.show_less') }}</span>
+        </button>
+    </section>
 </div>
 
 <style>
@@ -197,8 +157,7 @@
         --accent-ring: rgba(99, 102, 241, .18);
         --accent-strong: #4338ca; --accent-on: #fff;
         --track: #e5e7eb;
-        font-size: 0.875rem;
-        color: var(--t);
+        font-size: 0.875rem; color: var(--t);
         display: flex; flex-direction: column; gap: 1rem;
     }
     .dark .ow {
@@ -216,8 +175,6 @@
     }
     .ow-hero::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; }
     .ow-hero--success::before { background: #10b981; }
-    .ow-hero--warning::before { background: #f59e0b; }
-    .ow-hero--danger::before  { background: #ef4444; }
     .ow-hero--gray::before    { background: #94a3b8; }
     .ow-hero__l { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .55rem; }
     .ow-hero__meta { display: inline-flex; align-items: center; gap: .55rem; flex-wrap: wrap; }
@@ -254,31 +211,9 @@
     }
     .ow-pill::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; background: currentColor; }
     .ow-pill--success { background: #d1fae5; color: #047857; }
-    .ow-pill--warning { background: #ffedd5; color: #c2410c; }
-    .ow-pill--danger  { background: #fee2e2; color: #b91c1c; }
     .ow-pill--gray    { background: #f1f5f9; color: #64748b; }
     .dark .ow-pill--success { background: rgba(16, 185, 129, .16); color: #6ee7b7; }
-    .dark .ow-pill--warning { background: rgba(251, 146, 60, .16); color: #fdba74; }
-    .dark .ow-pill--danger  { background: rgba(239, 68, 68, .16); color: #fca5a5; }
     .dark .ow-pill--gray    { background: rgba(255, 255, 255, .07); color: #cbd5e1; }
-
-    .ow-tag {
-        display: inline-flex; align-items: center;
-        font-size: .66rem; font-weight: 700; padding: .12rem .45rem;
-        border-radius: 999px; text-transform: uppercase; letter-spacing: .04em;
-        margin-left: .25rem;
-    }
-    .ow-tag--over { background: #fee2e2; color: #b91c1c; }
-    .ow-tag--soon { background: #ffedd5; color: #c2410c; }
-    .dark .ow-tag--over { background: rgba(239, 68, 68, .18); color: #fca5a5; }
-    .dark .ow-tag--soon { background: rgba(251, 146, 60, .18); color: #fdba74; }
-
-    /* TWO COLUMNS */
-    .ow-cols { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-    @media (min-width: 1024px) {
-        .ow-cols { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
-    }
-    .ow-main, .ow-side { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
 
     /* CARD */
     .ow-card { background: var(--s); border: 1px solid var(--d); border-radius: 1rem; overflow: hidden; }
@@ -329,34 +264,31 @@
     .ow-btn--ghost { background: transparent; color: var(--t); box-shadow: inset 0 0 0 1px var(--d); }
     .ow-btn--ghost:hover { background: var(--soft); }
 
-    /* DESCRIPTION */
-    .ow-desc {
-        padding: 1.1rem 1.5rem 1.3rem; font-size: .875rem; color: var(--t);
-        line-height: 1.55; white-space: normal;
-    }
-
-    /* DETAILS TABLE (key/value grid) — same look as the contract page */
+    /* DETAILS TABLE (key/value grid) — full width version like contracts */
     .ow-dets { display: flex; flex-direction: column; }
     .ow-row {
         display: grid;
-        grid-template-columns: minmax(8rem, 11rem) 1fr;
+        grid-template-columns: minmax(11rem, 16rem) 1fr;
         align-items: stretch; border-bottom: 1px solid var(--d);
     }
     .ow-row:last-child { border-bottom: 0; }
     .ow-row__k {
         display: flex; align-items: center; gap: .55rem;
-        padding: .7rem 1.1rem; background: var(--soft);
+        padding: .8rem 1.25rem; background: var(--soft);
         border-right: 1px solid var(--d);
     }
+    .ow-row--wrap .ow-row__k { align-items: flex-start; padding-top: 1rem; }
     .ow-row__ic { color: var(--m2); display: inline-flex; flex-shrink: 0; }
     .ow-row__lb { font-size: .8125rem; font-weight: 600; color: var(--m); }
     .ow-row__v {
-        display: flex; align-items: center; padding: .7rem 1.1rem; min-width: 0;
+        display: flex; align-items: center; padding: .8rem 1.25rem; min-width: 0;
     }
+    .ow-row--wrap .ow-row__v { align-items: flex-start; padding-top: 1rem; padding-bottom: 1rem; }
     .ow-row__vl {
         font-size: .8125rem; font-weight: 600; color: var(--t);
         min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
+    .ow-row__vl--wrap { white-space: normal; line-height: 1.55; overflow: visible; }
     .ow-row__vl--muted { color: var(--m2); font-weight: 500; font-style: italic; }
     .ow-show-more {
         display: flex; align-items: center; justify-content: center; gap: .4rem;

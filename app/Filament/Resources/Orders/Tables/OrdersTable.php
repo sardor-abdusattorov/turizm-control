@@ -12,7 +12,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -60,18 +59,6 @@ class OrdersTable
                     ->date('d.m.Y')
                     ->sortable(),
 
-                TextColumn::make('deadline_at')
-                    ->label(__('app.label.deadline'))
-                    ->date('d.m.Y')
-                    ->sortable()
-                    ->placeholder('—')
-                    ->color(fn (?Order $record): ?string => match (true) {
-                        $record?->deadline_at?->isPast() => 'danger',
-                        $record?->deadline_at?->diffInDays(now(), false) >= -3 => 'warning',
-                        default => null,
-                    })
-                    ->toggleable(),
-
                 TextColumn::make('creator.name')
                     ->label(__('app.label.created_by'))
                     ->sortable()
@@ -116,10 +103,6 @@ class OrdersTable
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
                     ->options(Order::getStatuses()),
-
-                Filter::make('overdue')
-                    ->label(__('app.label.overdue'))
-                    ->query(fn (Builder $query) => $query->whereDate('deadline_at', '<', now())),
             ])
             ->recordUrl(fn (Order $record) => OrderResource::getUrl('view', ['record' => $record]))
             ->recordActions([

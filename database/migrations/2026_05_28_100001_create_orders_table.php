@@ -20,17 +20,14 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('document_key')->nullable();
             // Issued_at — the day the order was actually signed; the source of
-            // truth for which yearly register the order belongs to. deadline_at
-            // stays around for orders that imply a follow-up task.
+            // truth for which yearly register the order belongs to.
             $table->date('issued_at')->nullable();
-            $table->date('deadline_at')->nullable();
             $table->boolean('status')->default(true);
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
 
             $table->index('status');
             $table->index('issued_at');
-            $table->index('deadline_at');
         });
     }
 

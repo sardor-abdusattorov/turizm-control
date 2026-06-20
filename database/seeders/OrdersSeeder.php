@@ -106,6 +106,11 @@ class OrdersSeeder extends Seeder
         ];
 
         foreach ($orders as $data) {
+            // The seed dataset still carries a `deadline` per row from the old
+            // schema — reuse it as a rough "issued at" anchor (the order would
+            // have been signed shortly before the work needed doing).
+            $issued = $data['deadline']->copy()->subDays(rand(7, 60));
+
             Order::firstOrCreate(
                 [
                     'order_type_id' => $data['type']->id,
@@ -114,8 +119,7 @@ class OrdersSeeder extends Seeder
                 [
                     'description' => $data['description'],
                     'file_path' => 'uploads/files/orders/'.now()->format('Y/m').'/sample.pdf',
-                    'issued_at' => $data['deadline']->copy()->subDays(rand(7, 60)),
-                    'deadline_at' => $data['deadline'],
+                    'issued_at' => $issued,
                     'status' => $data['status'],
                     'created_by' => $creatorFor($data['creator']),
                 ]
