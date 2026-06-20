@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PaymentStatus;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\Currency;
@@ -25,6 +26,8 @@ class ContractFactory extends Factory
             'title' => fake()->sentence(),
             'amount' => fake()->randomFloat(2, 100, 1_000_000),
             'status' => Contract::STATUS_DRAFT,
+            'payment_status' => PaymentStatus::NotPaid->value,
+            'paid_percent' => 0,
         ];
     }
 

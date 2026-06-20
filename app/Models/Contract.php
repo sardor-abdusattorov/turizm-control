@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ContractStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Concerns\HasDocumentKey;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
@@ -29,6 +30,8 @@ class Contract extends Model
         'title',
         'amount',
         'status',
+        'payment_status',
+        'paid_percent',
         'signed_at',
         'document_file',
         'document_key',
@@ -37,8 +40,10 @@ class Contract extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'paid_percent' => 'decimal:2',
         'signed_at' => 'date',
         'status' => ContractStatus::class,
+        'payment_status' => PaymentStatus::class,
     ];
 
     // Constants alias the enum cases so the existing `Contract::STATUS_*` call
@@ -618,6 +623,48 @@ class Contract extends Model
             'approvers',
             fn (Builder $q) => $q->where('user_id', $user->id),
         );
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class)->orderByDesc('paid_at');
+    }
+
+    /**
+     * Sum of percent across all payments on this contract. Reads the cached
+     * `paid_percent` column maintained by PaymentObserver, falling back to a
+     * fresh sum() when the column isn't loaded (e.g. inside the observer).
+     */
+    public function paidPercent(): float
+    {
+        if (array_key_exists('paid_percent', $this->attributes)) {
+            return (float) $this->paid_percent;
+        }
+
+        return (float) $this->payments()->sum('percent');
+    }
+
+    /**
+     * Percent that may still be paid before the contract is fully settled.
+     * Never negative, even if the totals briefly overshoot 100%.
+     */
+    public function remainingPercent(): float
+    {
+        return max(0.0, round(100 - $this->paidPercent(), 2));
+    }
+
+    public function isFullyPaid(): bool
+    {
+        return $this->payment_status === PaymentStatus::FullyPaid;
+    }
+
+    /**
+     * Whether a new payment may be recorded against this contract: it must
+     * be approved (signed by the director) and not already fully paid.
+     */
+    public function canAcceptPayment(): bool
+    {
+        return $this->status === self::STATUS_APPROVED && ! $this->isFullyPaid();
     }
 
     /** The role whose single holder is the final (director) approver. */

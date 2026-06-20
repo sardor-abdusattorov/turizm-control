@@ -204,6 +204,22 @@ return [
         'load_more' => 'Show more',
         'all' => 'All',
 
+        // Payments
+        'payment_single' => 'Payment',
+        'payment_plural' => 'Payments',
+        'percent' => 'Percent',
+        'paid_at' => 'Paid on',
+        'screenshot' => 'Screenshot',
+        'payment_status' => 'Payment status',
+        'paid_percent' => 'Paid',
+        'remaining_percent' => 'Remaining',
+        'add_payment' => 'Add payment',
+        'no_payments_yet' => 'No payments recorded yet.',
+        'payment_progress' => 'Payment progress',
+        'remaining_to_pay' => 'Remaining: :percent%',
+        'open_screenshot' => 'Open screenshot',
+        'contract' => 'Contract',
+
         // Currencies
         'currency_single' => 'Currency',
         'currency_plural' => 'Currencies',
@@ -272,6 +288,8 @@ return [
         'download_pdf' => 'Download PDF',
         'preview_pdf' => 'Preview PDF',
         'open_contract' => 'Open contract',
+        'add_payment' => 'Add payment',
+        'record_payment' => 'Record payment',
     ],
     'notification' => [
         'approval_requested' => [
@@ -335,6 +353,10 @@ return [
         'select_order_type_first' => 'Pick an order type on the previous step to load its document template here.',
         'template_has_no_fields' => 'This template has no fields defined. Add some under Resources → Contract Templates → this template → Form Fields.',
         'preview_empty_hint' => 'Fill in the fields on the left — the rendered document will appear here.',
+        'payment_recorded' => 'Payment recorded.',
+        'payment_contract_not_approved' => 'Payments can only be recorded against approved contracts.',
+        'payment_already_full' => 'This contract is already fully paid.',
+        'payment_exceeds_remaining' => 'The payment percent cannot exceed the remaining :percent%.',
     ],
     'helper' => [
         'inn' => '9 digits for legal entities',
@@ -416,6 +438,11 @@ return [
             'approved' => 'Approved',
             'rejected' => 'Rejected',
         ],
+    ],
+    'payment_status' => [
+        'not_paid' => 'Not paid',
+        'partially_paid' => 'Partially paid',
+        'fully_paid' => 'Fully paid',
     ],
     'telegram' => [
         'link_missing_token' => 'Open the “Connect Telegram” link from the app to link your account.',

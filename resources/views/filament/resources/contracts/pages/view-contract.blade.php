@@ -527,6 +527,65 @@
                         </div>
                     @endif
                 </section>
+
+                @php
+                    $paymentSummary = $this->paymentSummary();
+                    $payments = $paymentSummary['payments'];
+                    $paidPercent = $paymentSummary['paid_percent'];
+                    $remainingPercent = $paymentSummary['remaining_percent'];
+                    $paymentStatus = $paymentSummary['status'];
+                    $paymentBar = (int) min(100, max(0, round($paidPercent)));
+                @endphp
+
+                <section class="cw-card" style="margin-top:1rem;">
+                    <div class="cw-hd">
+                        <span class="cw-hd__ic">{!! $ic('heroicon-o-banknotes') !!}</span>
+                        <h2 class="cw-hd__t">{{ __('app.label.payment_progress') }}</h2>
+                        <span class="cw-pill cw-pill--{{ $paymentStatus->color() }}" style="margin-left:auto;padding:.32rem .7rem;font-size:.78rem;">{{ $paymentStatus->label() }}</span>
+                    </div>
+
+                    <div class="cw-prog" style="padding-top:.6rem;">
+                        <div class="cw-prog__top">
+                            <div class="cw-prog__l">
+                                <span class="cw-prog__count"><b>{{ rtrim(rtrim(number_format($paidPercent, 2, '.', ''), '0'), '.') }}%</b> / 100%</span>
+                                @if ($remainingPercent > 0)
+                                    <span class="cw-prog__sub">{{ __('app.label.remaining_to_pay', ['percent' => rtrim(rtrim(number_format($remainingPercent, 2, '.', ''), '0'), '.')]) }}</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="cw-prog__bar" style="background:rgba(148,163,184,.18);border-radius:9999px;overflow:hidden;height:.55rem;margin-top:.45rem;">
+                            <span style="display:block;height:100%;width:{{ $paymentBar }}%;background:linear-gradient(90deg,#22c55e,#16a34a);transition:width .25s ease;"></span>
+                        </div>
+                    </div>
+
+                    @if ($payments->isEmpty())
+                        <div class="cw-bd"><p style="font-size:.854rem;color:var(--m)">{{ __('app.label.no_payments_yet') }}</p></div>
+                    @else
+                        <div class="cw-chain" style="gap:.55rem;">
+                            @foreach ($payments as $payment)
+                                @php $screenshotUrl = $this->paymentScreenshotUrl($payment); @endphp
+                                <div class="cw-step" style="align-items:center;">
+                                    <div class="cw-node" style="background:rgba(34,197,94,.12);">
+                                        <span class="cw-badge cw-badge--approved">{!! $ic('heroicon-s-check-circle', 13) !!}</span>
+                                    </div>
+                                    <div class="cw-step__bd">
+                                        <div class="cw-step__nm">
+                                            {{ rtrim(rtrim(number_format((float) $payment->percent, 2, '.', ''), '0'), '.') }}%
+                                            <span class="cw-ord">{{ $payment->paid_at?->format('d.m.Y') }}</span>
+                                        </div>
+                                        <div class="cw-step__dp">
+                                            {{ __('app.label.created_by') }}: {{ $payment->creator?->name ?? __('app.label.system') }}
+                                            · {{ $payment->created_at?->format('d.m.Y H:i') }}
+                                        </div>
+                                    </div>
+                                    @if ($screenshotUrl)
+                                        <a href="{{ $screenshotUrl }}" target="_blank" rel="noopener" class="cw-eye" title="{{ __('app.label.open_screenshot') }}">{!! $ic('heroicon-o-photo', 16) !!}</a>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </section>
             </div>
 
             {{-- SIDEBAR: combined Document + Basic Information card --}}

@@ -47,6 +47,8 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('position', ['view_any', 'view']),
             ...$this->resourcePermissions('order_type', ['view_any', 'view']),
             ...$this->resourcePermissions('activity', ['view_any', 'view']),
+            // Payments: oversight-only — read every payment, no editing.
+            ...$this->resourcePermissions('payment', ['view_any', 'view']),
         ]);
 
         // 3) manager — creates and edits their own contracts, no oversight,
@@ -60,6 +62,8 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('department', ['view_any']),
             ...$this->resourcePermissions('position', ['view_any']),
             ...$this->resourcePermissions('order_type', ['view_any']),
+            // Payments: read-only on their own contracts (scope handles ownership).
+            ...$this->resourcePermissions('payment', ['view_any', 'view']),
         ]);
 
         // 4) legal_officer — approves contracts. They see only contracts where
@@ -70,11 +74,13 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('contact', ['view_any', 'view']),
         ]);
 
-        // 5) accountant — same shape as legal_officer (approver scope only).
+        // 5) accountant — books payments. Sees every contract they need to bill
+        //    against and every payment they (or anyone else) have recorded.
         $this->syncRole('accountant', [
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),
+            ...$this->resourcePermissions('payment', ['view_any', 'view', 'create']),
         ]);
     }
 

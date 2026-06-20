@@ -8,6 +8,7 @@ use App\Http\Controllers\OnlyOfficeOrderController;
 use App\Http\Controllers\OnlyOfficeTemplateController;
 use App\Http\Controllers\OrderEditorController;
 use App\Http\Controllers\OrderFileController;
+use App\Http\Controllers\PaymentScreenshotController;
 use App\Http\Controllers\TelegramConnectController;
 use App\Http\Controllers\TelegramWebhookController;
 use Illuminate\Support\Facades\Route;
@@ -54,4 +55,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     Route::get('/orders/{order}/file', [OrderFileController::class, 'inline'])
         ->name('orders.file.inline');
+
+    Route::get('/payments/{payment}/screenshot', PaymentScreenshotController::class)
+        ->name('payments.screenshot');
 });

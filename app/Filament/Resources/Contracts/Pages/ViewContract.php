@@ -2,13 +2,18 @@
 
 namespace App\Filament\Resources\Contracts\Pages;
 
+use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Models\ContractApprover;
+use App\Models\Payment;
 use App\Services\Contracts\ContractWorkflow;
 use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Carbon;
@@ -119,6 +124,73 @@ class ViewContract extends ViewRecord
 
             ...EditContract::approvalActions($this->record),
 
+            Action::make('addPayment')
+                ->label(__('app.action.add_payment'))
+                ->icon('heroicon-o-banknotes')
+                ->color('success')
+                ->visible(fn (): bool => $this->record?->canAcceptPayment()
+                    && auth()->user()?->can('create_payment'))
+                ->modalHeading(__('app.action.record_payment'))
+                ->schema([
+                    TextInput::make('percent')
+                        ->label(__('app.label.percent'))
+                        ->numeric()
+                        ->required()
+                        ->minValue(0.01)
+                        ->maxValue(fn (): float => max(0.01, $this->record->remainingPercent()))
+                        ->step('0.01')
+                        ->suffix('%')
+                        ->helperText(fn (): string => __('app.label.remaining_to_pay', [
+                            'percent' => rtrim(rtrim(number_format($this->record->remainingPercent(), 2, '.', ''), '0'), '.'),
+                        ])),
+
+                    DatePicker::make('paid_at')
+                        ->label(__('app.label.paid_at'))
+                        ->required()
+                        ->native(false)
+                        ->maxDate(now())
+                        ->default(now()),
+
+                    FileUpload::make('screenshot')
+                        ->label(__('app.label.screenshot'))
+                        ->required()
+                        ->image()
+                        ->disk('local')
+                        ->visibility('private')
+                        ->directory(Payment::SCREENSHOT_DIR)
+                        ->maxSize(5120),
+                ])
+                ->action(function (array $data): void {
+                    if (! $this->record->canAcceptPayment()) {
+                        Notification::make()->title(__('app.message.action_not_allowed'))->danger()->send();
+
+                        return;
+                    }
+
+                    $remaining = $this->record->remainingPercent();
+
+                    if ((float) $data['percent'] > $remaining + 0.001) {
+                        Notification::make()
+                            ->title(__('app.message.payment_exceeds_remaining', [
+                                'percent' => rtrim(rtrim(number_format($remaining, 2, '.', ''), '0'), '.'),
+                            ]))
+                            ->danger()
+                            ->send();
+
+                        return;
+                    }
+
+                    Payment::create([
+                        'contract_id' => $this->record->id,
+                        'percent' => $data['percent'],
+                        'paid_at' => $data['paid_at'],
+                        'screenshot' => $data['screenshot'],
+                    ]);
+
+                    Notification::make()->title(__('app.message.payment_recorded'))->success()->send();
+                    $this->record->refresh();
+                }),
+
             Action::make('downloadPdf')
                 ->label(__('app.action.download_pdf'))
                 ->icon('heroicon-o-document-arrow-down')
@@ -189,6 +261,45 @@ class ViewContract extends ViewRecord
     public function editorUrl(string $mode = 'view'): string
     {
         return route('contracts.editor', ['contract' => $this->record, 'mode' => $mode]);
+    }
+
+    /**
+     * Payment progress summary for the View page — used by the Payments
+     * section in the blade view.
+     *
+     * @return array{
+     *     payments: Collection<int, Payment>,
+     *     paid_percent: float,
+     *     remaining_percent: float,
+     *     status: PaymentStatus,
+     *     can_add: bool,
+     * }
+     */
+    public function paymentSummary(): array
+    {
+        $paid = (float) $this->record->paid_percent;
+
+        return [
+            'payments' => $this->record->payments,
+            'paid_percent' => $paid,
+            'remaining_percent' => $this->record->remainingPercent(),
+            'status' => $this->record->payment_status ?? PaymentStatus::NotPaid,
+            'can_add' => $this->record->canAcceptPayment()
+                && (bool) auth()->user()?->can('create_payment'),
+        ];
+    }
+
+    /**
+     * Private-disk screenshot URL — uses the contracts.editor route style so
+     * the file is served behind the panel auth.
+     */
+    public function paymentScreenshotUrl(Payment $payment): ?string
+    {
+        if (! $payment->screenshot) {
+            return null;
+        }
+
+        return route('payments.screenshot', ['payment' => $payment]);
     }
 
     public function approverAvatar(ContractApprover $approver): string

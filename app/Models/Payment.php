@@ -1,0 +1,84 @@
+<?php
+
+namespace App\Models;
+
+use App\Observers\PaymentObserver;
+use Database\Factories\PaymentFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
+
+#[ObservedBy(PaymentObserver::class)]
+class Payment extends Model
+{
+    /** @use HasFactory<PaymentFactory> */
+    use HasFactory;
+
+    protected $fillable = [
+        'contract_id',
+        'created_by',
+        'percent',
+        'paid_at',
+        'screenshot',
+    ];
+
+    protected $casts = [
+        'percent' => 'decimal:2',
+        'paid_at' => 'date',
+    ];
+
+    /** Private disk path where payment proof screenshots live. */
+    public const SCREENSHOT_DIR = 'payments';
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $payment): void {
+            if (! $payment->created_by && auth()->check()) {
+                $payment->created_by = (int) auth()->id();
+            }
+        });
+
+        static::deleting(function (self $payment): void {
+            if ($payment->screenshot && Storage::disk('local')->exists($payment->screenshot)) {
+                Storage::disk('local')->delete($payment->screenshot);
+            }
+        });
+    }
+
+    public function contract(): BelongsTo
+    {
+        return $this->belongsTo(Contract::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Limit the query to payments the given user is allowed to see. Mirrors
+     * the contract-level scope: oversight roles see everything, the manager
+     * who owns the contract sees their own, everyone else sees nothing.
+     */
+    public function scopeVisibleTo(Builder $query, ?User $user = null): Builder
+    {
+        $user ??= auth()->user();
+
+        if (! $user) {
+            return $query->whereRaw('0 = 1');
+        }
+
+        if ($user->hasAnyRole(Contract::OVERSIGHT_ROLES) || $user->can('view_all_contracts')) {
+            return $query;
+        }
+
+        if ($user->hasRole('accountant')) {
+            return $query;
+        }
+
+        return $query->whereHas('contract', fn (Builder $q) => $q->where('responsible_id', $user->id));
+    }
+}

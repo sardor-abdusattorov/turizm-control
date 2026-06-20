@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Contracts\Tables;
 
+use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Contracts\Pages\ViewContract;
 use App\Models\Contract;
@@ -55,6 +56,19 @@ class ContractsTable
                     ->view('filament.resources.contracts.tables.status-column')
                     ->sortable(),
 
+                TextColumn::make('payment_status')
+                    ->label(__('app.label.payment_status'))
+                    ->badge()
+                    ->formatStateUsing(fn (?PaymentStatus $state): string => $state?->label() ?? PaymentStatus::NotPaid->label())
+                    ->color(fn (?PaymentStatus $state): string => ($state ?? PaymentStatus::NotPaid)->color())
+                    ->sortable(),
+
+                TextColumn::make('paid_percent')
+                    ->label(__('app.label.paid_percent'))
+                    ->formatStateUsing(fn ($state): string => rtrim(rtrim(number_format((float) $state, 2, '.', ''), '0'), '.').'%')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 ViewColumn::make('approvers_chain')
                     ->label(__('app.label.approvers'))
                     ->view('filament.resources.contracts.tables.approvers-column')
@@ -90,6 +104,10 @@ class ContractsTable
                     ->label(__('app.label.order_type_single'))
                     ->options(fn () => OrderType::getActive())
                     ->searchable(),
+
+                SelectFilter::make('payment_status')
+                    ->label(__('app.label.payment_status'))
+                    ->options(PaymentStatus::options()),
             ])
             ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))
             ->recordActions([
