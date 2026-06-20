@@ -10,8 +10,10 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -21,6 +23,19 @@ class PaymentsTable
     {
         return $table
             ->defaultSort('paid_at', 'desc')
+            // Payments naturally belong to a contract, and the same contract
+            // recurs across rows — grouping clusters them and the per-group
+            // percent sum shows how much of each contract is settled at a glance.
+            ->groups([
+                Group::make('contract.number')
+                    ->label(__('app.label.contract'))
+                    ->titlePrefixedWithLabel(false)
+                    ->collapsible(),
+            ])
+            ->defaultGroup('contract.number')
+            // The page/grand totals would sum percentages across different
+            // contracts (meaningless), so only the per-group summary is shown.
+            ->summaries(pageCondition: false, allTableCondition: false)
             ->columns([
                 TextColumn::make('contract.number')
                     ->label(__('app.label.contract_number'))
@@ -36,6 +51,11 @@ class PaymentsTable
                 TextColumn::make('percent')
                     ->label(__('app.label.percent'))
                     ->formatStateUsing(fn ($state): string => number_format((float) $state, 2, '.', ' ').'%')
+                    ->summarize(
+                        Sum::make()
+                            ->label(__('app.label.total_paid'))
+                            ->formatStateUsing(fn ($state): string => number_format((float) $state, 2, '.', ' ').'%'),
+                    )
                     ->sortable(),
 
                 TextColumn::make('paid_at')

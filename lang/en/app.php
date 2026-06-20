@@ -217,6 +217,7 @@ return [
         'screenshot' => 'Screenshot',
         'payment_status' => 'Payment status',
         'paid_percent' => 'Paid',
+        'total_paid' => 'Total paid',
         'remaining_percent' => 'Remaining',
         'add_payment' => 'Add payment',
         'no_payments_yet' => 'No payments recorded yet.',
