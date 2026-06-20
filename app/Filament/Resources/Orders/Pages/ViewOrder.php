@@ -3,19 +3,24 @@
 namespace App\Filament\Resources\Orders\Pages;
 
 use App\Filament\Resources\Orders\OrderResource;
-use App\Filament\Resources\Orders\Schemas\OrderInfolist;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 
 class ViewOrder extends ViewRecord
 {
     protected static string $resource = OrderResource::class;
 
-    public function infolist(Schema $schema): Schema
+    protected string $view = 'filament.resources.orders.pages.view-order';
+
+    public function getHeading(): string
     {
-        return OrderInfolist::configure($schema);
+        return $this->record->number ?: (string) $this->record->title;
+    }
+
+    public function getSubheading(): ?string
+    {
+        return null;
     }
 
     protected function getHeaderActions(): array
@@ -37,5 +42,40 @@ class ViewOrder extends ViewRecord
 
             EditAction::make(),
         ];
+    }
+
+    public function fileSizeLabel(): ?string
+    {
+        if (! $this->record->fileExists()) {
+            return null;
+        }
+
+        $bytes = filesize($this->record->fileAbsolutePath());
+
+        if ($bytes === false) {
+            return null;
+        }
+
+        return $bytes >= 1024 * 1024
+            ? number_format($bytes / 1024 / 1024, 2, ',', ' ').' MB'
+            : number_format($bytes / 1024, 0, ',', ' ').' KB';
+    }
+
+    public function fileInlineUrl(): ?string
+    {
+        if (! $this->record->fileExists()) {
+            return null;
+        }
+
+        return $this->record->isOpenableInOnlyOffice()
+            ? route('orders.editor', ['order' => $this->record, 'mode' => 'view'])
+            : route('orders.file.inline', ['order' => $this->record]);
+    }
+
+    public function fileEditorUrl(): ?string
+    {
+        return $this->record->isOpenableInOnlyOffice()
+            ? route('orders.editor', ['order' => $this->record, 'mode' => 'edit'])
+            : null;
     }
 }

@@ -114,6 +114,7 @@ class OrdersSeeder extends Seeder
                 [
                     'description' => $data['description'],
                     'file_path' => 'uploads/files/orders/'.now()->format('Y/m').'/sample.pdf',
+                    'issued_at' => $data['deadline']->copy()->subDays(rand(7, 60)),
                     'deadline_at' => $data['deadline'],
                     'status' => $data['status'],
                     'created_by' => $creatorFor($data['creator']),

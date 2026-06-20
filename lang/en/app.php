@@ -62,6 +62,10 @@ return [
         // Orders
         'order_single' => 'Order',
         'order_plural' => 'Orders',
+        'order_number' => 'Order No.',
+        'order_number_auto' => '(will be generated)',
+        'issued_at' => 'Issued on',
+        'year' => 'Year',
         'order_type_single' => 'Order Type',
         'no_category' => 'No category',
         'select_order_type_first' => 'Select an order type first',
@@ -404,6 +408,7 @@ return [
         'user_field_placeholders' => 'Plus any field key you defined in "Document fields" above — e.g. {{employee_name}} for a field with key employee_name.',
         'contract_template_name_example' => 'e.g. Lease agreement (UZ) — HR',
         'placeholders_click_to_copy' => 'Click any tag to copy it to the clipboard, then paste into the document.',
+        'deadline_optional' => 'Optional — only when the order implies a follow-up task.',
     ],
     'validation' => [
         'approver_chain_required_departments' => 'The approval chain must include at least one Legal approver and one Accounting approver.',

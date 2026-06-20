@@ -22,8 +22,14 @@ class OrdersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort('issued_at', 'desc')
             ->columns([
+                TextColumn::make('number')
+                    ->label(__('app.label.order_number'))
+                    ->searchable()
+                    ->sortable()
+                    ->weight('semibold'),
+
                 TextColumn::make('title')
                     ->label(__('app.label.title'))
                     ->searchable()
@@ -49,15 +55,22 @@ class OrdersTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('issued_at')
+                    ->label(__('app.label.issued_at'))
+                    ->date('d.m.Y')
+                    ->sortable(),
+
                 TextColumn::make('deadline_at')
                     ->label(__('app.label.deadline'))
                     ->date('d.m.Y')
                     ->sortable()
+                    ->placeholder('—')
                     ->color(fn (?Order $record): ?string => match (true) {
                         $record?->deadline_at?->isPast() => 'danger',
                         $record?->deadline_at?->diffInDays(now(), false) >= -3 => 'warning',
                         default => null,
-                    }),
+                    })
+                    ->toggleable(),
 
                 TextColumn::make('creator.name')
                     ->label(__('app.label.created_by'))
@@ -84,6 +97,21 @@ class OrdersTable
                     ->relationship('orderType', 'title')
                     ->searchable()
                     ->preload(),
+
+                SelectFilter::make('issued_year')
+                    ->label(__('app.label.year'))
+                    ->options(fn (): array => Order::query()
+                        ->whereNotNull('issued_at')
+                        ->pluck('issued_at')
+                        ->map(fn ($d) => $d?->year)
+                        ->filter()
+                        ->unique()
+                        ->sortDesc()
+                        ->mapWithKeys(fn ($y) => [$y => $y])
+                        ->all())
+                    ->query(fn (Builder $query, array $data) => $data['value']
+                        ? $query->whereYear('issued_at', $data['value'])
+                        : $query),
 
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))

@@ -24,6 +24,13 @@ class OrderForm
                     ->schema([
                         Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
+                                TextInput::make('number')
+                                    ->label(__('app.label.order_number'))
+                                    ->placeholder(__('app.label.order_number_auto'))
+                                    ->disabled()
+                                    ->dehydrated(false)
+                                    ->visibleOn('view'),
+
                                 Select::make('order_type_id')
                                     ->label(__('app.label.order_type_single'))
                                     ->options(OrderType::getActive())
@@ -31,12 +38,18 @@ class OrderForm
                                     ->searchable()
                                     ->preload(),
 
+                                DatePicker::make('issued_at')
+                                    ->label(__('app.label.issued_at'))
+                                    ->native(false)
+                                    ->displayFormat('d.m.Y')
+                                    ->default(now())
+                                    ->required(),
+
                                 DatePicker::make('deadline_at')
                                     ->label(__('app.label.deadline'))
                                     ->native(false)
                                     ->displayFormat('d.m.Y')
-                                    ->minDate(now()->startOfDay())
-                                    ->maxDate(now()->endOfYear()),
+                                    ->helperText(__('app.helper.deadline_optional')),
                             ]),
 
                         TextInput::make('title')
