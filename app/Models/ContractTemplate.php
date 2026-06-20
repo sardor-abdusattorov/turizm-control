@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActiveStatus;
 use App\Models\Concerns\HasDocumentKey;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,9 @@ use Illuminate\Support\Facades\Storage;
 
 class ContractTemplate extends Model
 {
-    use HasDocumentKey, HasFactory;
+    use HasActiveStatus;
+    use HasDocumentKey;
+    use HasFactory;
 
     protected $fillable = [
         'order_type_id',
@@ -27,10 +30,6 @@ class ContractTemplate extends Model
         'status' => 'boolean',
         'sort' => 'integer',
     ];
-
-    public const STATUS_INACTIVE = 0;
-
-    public const STATUS_ACTIVE = 1;
 
     protected static function booted(): void
     {
@@ -69,19 +68,6 @@ class ContractTemplate extends Model
             'uz' => __('app.label.uz'),
             'en' => __('app.label.en'),
         ];
-    }
-
-    public static function getStatuses(): array
-    {
-        return [
-            self::STATUS_ACTIVE => __('app.status.active'),
-            self::STATUS_INACTIVE => __('app.status.inactive'),
-        ];
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', self::STATUS_ACTIVE);
     }
 
     public function orderType(): BelongsTo

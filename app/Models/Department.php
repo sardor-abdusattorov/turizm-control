@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActiveStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
 class Department extends Model
 {
+    use HasActiveStatus;
     use HasFactory;
     use HasTranslations;
 
@@ -25,10 +27,6 @@ class Department extends Model
         'status' => 'boolean',
     ];
 
-    const STATUS_INACTIVE = 0;
-
-    const STATUS_ACTIVE = 1;
-
     /**
      * Department codes that participate in the approval workflow.
      *
@@ -43,17 +41,6 @@ class Department extends Model
      * @var array<int, string>
      */
     public const REQUIRED_APPROVER_CODES = ['legal', 'accounting'];
-
-    /**
-     * Get available statuses
-     */
-    public static function getStatuses(): array
-    {
-        return [
-            self::STATUS_ACTIVE => __('app.status.active'),
-            self::STATUS_INACTIVE => __('app.status.inactive'),
-        ];
-    }
 
     /**
      * Relationship with User (head of department)
@@ -86,14 +73,6 @@ class Department extends Model
             ->where('status', User::STATUS_ACTIVE)
             ->orderBy('id')
             ->first();
-    }
-
-    /**
-     * Scope for active departments
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('status', self::STATUS_ACTIVE);
     }
 
     /**

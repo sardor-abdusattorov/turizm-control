@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActiveStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,7 @@ use Spatie\Translatable\HasTranslations;
 
 class OrderType extends Model
 {
+    use HasActiveStatus;
     use HasFactory;
     use HasTranslations;
 
@@ -24,23 +26,6 @@ class OrderType extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
-
-    public const STATUS_INACTIVE = 0;
-
-    public const STATUS_ACTIVE = 1;
-
-    public static function getStatuses(): array
-    {
-        return [
-            self::STATUS_ACTIVE => __('app.status.active'),
-            self::STATUS_INACTIVE => __('app.status.inactive'),
-        ];
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', self::STATUS_ACTIVE);
-    }
 
     /**
      * Active order types as id => localized title pairs (for Select::options).

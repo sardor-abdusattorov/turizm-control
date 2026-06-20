@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActiveStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,7 @@ use Spatie\Translatable\HasTranslations;
 
 class Contact extends Model
 {
+    use HasActiveStatus;
     use HasFactory;
     use HasTranslations;
 
@@ -36,21 +38,9 @@ class Contact extends Model
         'status' => 'boolean',
     ];
 
-    public const STATUS_INACTIVE = 0;
-
-    public const STATUS_ACTIVE = 1;
-
     public const TYPE_LEGAL = 'legal';
 
     public const TYPE_INDIVIDUAL = 'individual';
-
-    public static function getStatuses(): array
-    {
-        return [
-            self::STATUS_ACTIVE => __('app.status.active'),
-            self::STATUS_INACTIVE => __('app.status.inactive'),
-        ];
-    }
 
     public static function getTypes(): array
     {
@@ -66,11 +56,6 @@ class Contact extends Model
             self::TYPE_LEGAL => 'info',
             self::TYPE_INDIVIDUAL => 'warning',
         ];
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', self::STATUS_ACTIVE);
     }
 
     /**

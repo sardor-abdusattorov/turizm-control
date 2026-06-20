@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActiveStatus;
 use App\Models\Concerns\HasDocumentKey;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,9 @@ use Illuminate\Support\Facades\Storage;
 
 class Order extends Model
 {
-    use HasDocumentKey, HasFactory;
+    use HasActiveStatus;
+    use HasDocumentKey;
+    use HasFactory;
 
     protected $fillable = [
         'order_type_id',
@@ -27,10 +30,6 @@ class Order extends Model
         'status' => 'boolean',
         'deadline_at' => 'date',
     ];
-
-    public const STATUS_INACTIVE = 0;
-
-    public const STATUS_ACTIVE = 1;
 
     protected static function booted(): void
     {
