@@ -1,7 +1,8 @@
 FROM php:8.4-fpm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        default-mysql-client \
+        postgresql-client \
+        libpq-dev \
         libzip-dev \
         libpng-dev \
         libjpeg-dev \
@@ -9,14 +10,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libfreetype6-dev \
         libicu-dev \
         libonig-dev \
+        libsqlite3-dev \
         git \
         unzip \
     && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype \
     && docker-php-ext-install -j$(nproc) \
-        pdo_mysql \
-        mysqli \
+        pdo_pgsql \
+        pgsql \
+        pdo_sqlite \
         mbstring \
         bcmath \
         gd \
