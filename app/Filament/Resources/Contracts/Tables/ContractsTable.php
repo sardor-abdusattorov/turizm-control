@@ -56,19 +56,6 @@ class ContractsTable
                     ->view('filament.resources.contracts.tables.status-column')
                     ->sortable(),
 
-                TextColumn::make('payment_status')
-                    ->label(__('app.label.payment_status'))
-                    ->badge()
-                    ->formatStateUsing(fn (?PaymentStatus $state): string => $state?->label() ?? PaymentStatus::NotPaid->label())
-                    ->color(fn (?PaymentStatus $state): string => ($state ?? PaymentStatus::NotPaid)->color())
-                    ->sortable(),
-
-                TextColumn::make('paid_percent')
-                    ->label(__('app.label.paid_percent'))
-                    ->formatStateUsing(fn ($state): string => rtrim(rtrim(number_format((float) $state, 2, '.', ''), '0'), '.').'%')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
                 ViewColumn::make('approvers_chain')
                     ->label(__('app.label.approvers'))
                     ->view('filament.resources.contracts.tables.approvers-column')
@@ -79,6 +66,20 @@ class ContractsTable
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))
                     ->toggleable(),
+
+                TextColumn::make('payment_status')
+                    ->label(__('app.label.payment_status'))
+                    ->badge()
+                    ->formatStateUsing(fn (?PaymentStatus $state): string => $state?->label() ?? PaymentStatus::NotPaid->label())
+                    ->color(fn (?PaymentStatus $state): string => ($state ?? PaymentStatus::NotPaid)->color())
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('paid_percent')
+                    ->label(__('app.label.paid_percent'))
+                    ->formatStateUsing(fn ($state): string => rtrim(rtrim(number_format((float) $state, 2, '.', ''), '0'), '.').'%')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
                     ->label(__('app.label.created_at'))
