@@ -46,14 +46,16 @@
 
 @once
     <style>
-        .ca { display:flex; flex-direction:column; gap:.45rem; align-items:stretch;
-            background:transparent; border:0; cursor:pointer; padding:.4rem .55rem;
-            border-radius:.6rem; min-width:13rem; max-width:18rem; transition:background .12s ease; text-align:left; }
-        .ca:hover { background:rgba(127,127,127,.07); }
-        .ca__hd { display:flex; align-items:center; gap:.55rem; }
-        .ca__seg { display:flex; gap:3px; flex:1; min-width:4rem; }
-        .ca__seg > span { flex:1; height:.45rem; border-radius:99px; }
-        .ca__count { font-size:.78rem; font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
+        .ca { display:flex; flex-direction:column; gap:.55rem; align-items:stretch;
+            background:transparent; border:0; cursor:pointer; padding:.7rem .8rem; margin:.15rem 0;
+            border-radius:.7rem; min-width:13rem; max-width:18rem; transition:background .12s ease, box-shadow .12s ease; text-align:left; }
+        .ca:hover { background:rgba(127,127,127,.06); box-shadow:inset 0 0 0 1px rgba(127,127,127,.12); }
+        .ca__hd { display:flex; align-items:center; gap:.6rem; }
+        /* Single continuous track — green fill = approved fraction. Clearer
+           than one ambiguous segment per approver. */
+        .ca__bar { flex:1; min-width:4rem; height:.4rem; border-radius:99px; background:rgba(148,163,184,.22); overflow:hidden; }
+        .ca__bar > span { display:block; height:100%; border-radius:99px; transition:width .25s ease; }
+        .ca__count { font-size:.76rem; font-weight:650; white-space:nowrap; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
         .ca__list { display:flex; flex-direction:column; gap:.25rem; }
         .ca__row { display:flex; align-items:center; gap:.5rem; font-size:.8rem; line-height:1.2; }
         .ca__av { width:1.5rem; height:1.5rem; border-radius:50%; flex-shrink:0;
@@ -82,12 +84,14 @@
         title="{{ __('app.label.approval_chain') }}"
         class="ca"
     >
-        {{-- Header: progress bar + summary --}}
+        {{-- Header: one continuous fill bar + summary --}}
+        @php
+            $fillPct = $total > 0 ? round($approved / $total * 100) : 0;
+            $fillColor = $hasRejected ? '#dc2626' : ($approved === $total && $total > 0 ? '#059669' : '#6366f1');
+        @endphp
         <div class="ca__hd">
-            <div class="ca__seg">
-                @foreach ($active as $a)
-                    <span style="background:{{ $colorFor($a->status)['solid'] }};"></span>
-                @endforeach
+            <div class="ca__bar">
+                <span style="width:{{ $isDraft ? 0 : $fillPct }}%;background:{{ $fillColor }};"></span>
             </div>
             <span class="ca__count" style="color:{{ $summaryColor }};">{{ $summary }}</span>
         </div>

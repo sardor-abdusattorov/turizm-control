@@ -53,9 +53,11 @@ it('renders the file card with an OnlyOffice viewer link for docx orders', funct
 
     $html = Livewire::test(ViewOrder::class, ['record' => $order->id])->html();
 
+    // The file card now carries a single primary action — for an editable
+    // docx that's the OnlyOffice editor (mode=edit).
     expect($html)->toContain('sample.docx')
         ->toContain('DOCX')
-        ->toContain(route('orders.editor', ['order' => $order, 'mode' => 'view']))
+        ->toContain(route('orders.editor', ['order' => $order, 'mode' => 'edit']))
         ->not->toContain('<iframe');
 });
 

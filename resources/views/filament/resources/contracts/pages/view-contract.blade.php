@@ -197,27 +197,21 @@
         .cw-prog{ display:flex; flex-direction:column; gap:.8rem; padding:1.05rem 1.5rem 1.2rem; border-bottom:1px solid var(--d); }
         .cw-prog__top{ display:flex; align-items:center; justify-content:space-between; gap:.65rem 1.25rem; flex-wrap:wrap; }
         .cw-prog__l{ display:flex; align-items:center; gap:.3rem .7rem; flex-wrap:wrap; min-width:0; }
-        .cw-prog__count{ font-size:.85rem; color:var(--m); font-weight:550; white-space:nowrap; }
-        .cw-prog__count b{ color:var(--t); font-weight:750; font-size:.95rem; }
+        .cw-prog__count{ font-size:.85rem; color:var(--m); font-weight:500; white-space:nowrap; }
+        .cw-prog__count b{ color:var(--t); font-weight:700; font-size:.95rem; }
         .cw-prog__sub{ font-size:.745rem; color:var(--m2); display:inline-flex; align-items:center; gap:.3rem; white-space:nowrap; }
         .cw-prog__await{ display:inline-flex; align-items:center; gap:.5rem; padding:.28rem .65rem .28rem .42rem;
             border-radius:999px; background:var(--accent-softer); box-shadow:inset 0 0 0 1px var(--accent-ring); }
         .cw-prog__await-lb{ font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-strong); }
         .cw-prog__await img{ width:1.5rem; height:1.5rem; border-radius:50%; object-fit:cover; box-shadow:0 0 0 1.5px var(--accent); }
-        .cw-prog__await-nm{ font-size:.8rem; font-weight:650; color:var(--t); white-space:nowrap; }
-        .cw-prog__bar{ display:flex; gap:4px; height:.5rem; }
-        .cw-seg{ flex:1 1 0; min-width:0; border-radius:999px; background:var(--track); position:relative; overflow:hidden; transition:background .2s ease; }
-        .cw-seg--approved{ background:#10b981; }
-        .cw-seg--rejected{ background:#ef4444; }
-        .cw-seg--returned{ background:#3b82f6; }
-        /* Current step reads as "in progress", not "done": a track with a
-           narrow accent bar sliding across it, so only finished steps are
-           solid-filled and the filled count matches "N / M approved". */
-        .cw-seg--current{ background:var(--track); }
-        .cw-seg--current::after{ content:''; position:absolute; top:0; bottom:0; left:0; width:45%;
-            border-radius:999px; background:var(--accent); }
-        @media (prefers-reduced-motion: no-preference){ .cw-seg--current::after{ animation:cwSeg 1.5s ease-in-out infinite; } }
-        @keyframes cwSeg{ 0%{ left:-45%; } 100%{ left:100%; } }
+        .cw-prog__await-nm{ font-size:.8rem; font-weight:600; color:var(--t); white-space:nowrap; }
+        /* Single continuous track + green fill — readable at a glance, no
+           ambiguous per-step segments. */
+        .cw-prog__track{ height:.5rem; border-radius:999px; background:var(--track); overflow:hidden; }
+        .cw-prog__fill{ display:block; height:100%; border-radius:999px; transition:width .3s ease; }
+        .cw-prog__legend{ display:flex; flex-wrap:wrap; gap:.35rem .9rem; }
+        .cw-lg{ display:inline-flex; align-items:center; gap:.35rem; font-size:.74rem; color:var(--m); }
+        .cw-lg i{ width:.5rem; height:.5rem; border-radius:50%; flex-shrink:0; }
 
         /* approval chain — vertical timeline */
         .cw-chain{ padding:.9rem 1.25rem 1.1rem; }
@@ -241,7 +235,7 @@
         .cw-badge--approved{ background:#10b981; } .cw-badge--rejected{ background:#ef4444; } .cw-badge--returned{ background:#3b82f6; }
         .cw-badge--current{ background:var(--accent); color:var(--accent-on); } .cw-badge--queued{ background:#cbd5e1; color:#64748b; } .dark .cw-badge--queued{ background:#3f3f46; color:#a1a1aa; }
         .cw-step__bd{ min-width:0; flex:1; padding-top:.15rem; }
-        .cw-step__nm{ font-size:0.9rem; font-weight:650; color:var(--t); display:flex; align-items:center; gap:.4rem; }
+        .cw-step__nm{ font-size:0.9rem; font-weight:600; color:var(--t); display:flex; align-items:center; gap:.4rem; }
         .cw-ord{ font-size:0.664rem; font-weight:700; color:var(--m2); background:var(--soft); border-radius:999px; padding:.05rem .42rem; }
         .cw-director{ display:inline-flex; align-items:center; gap:.22rem; font-size:.6rem; font-weight:700;
             text-transform:uppercase; letter-spacing:.04em; color:#b45309; background:rgba(245,158,11,.15);
@@ -265,7 +259,7 @@
         .cw-doc{ display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
         .cw-doc__ic{ width:3.25rem; height:3.25rem; border-radius:.85rem; background:linear-gradient(135deg, var(--accent-ring), var(--accent-softer)); color:var(--accent-strong); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
         .dark .cw-doc__ic{ color:var(--accent); }
-        .cw-doc__nm{ font-weight:650; color:var(--t); font-size:0.926rem; }
+        .cw-doc__nm{ font-weight:600; color:var(--t); font-size:0.926rem; }
         .cw-doc__mt{ font-size:0.784rem; color:var(--m); margin-top:.15rem; }
         .cw-doc__act{ margin-left:auto; display:flex; gap:.5rem; flex-wrap:wrap; }
         .cw-pdf{ margin-top:1.1rem; border:1px solid var(--d); border-radius:.85rem; overflow:hidden; }
@@ -307,7 +301,7 @@
         .cw-file__body{ display:flex; flex-direction:column; gap:.6rem; min-width:0; flex:1; padding-top:.15rem; }
         .cw-file__field{ display:flex; flex-direction:column; gap:.15rem; min-width:0; }
         .cw-file__lb{ font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--m2); }
-        .cw-file__vl{ font-size:.86rem; font-weight:650; color:var(--t);
+        .cw-file__vl{ font-size:.86rem; font-weight:500; color:var(--t);
             white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .cw-file__act{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; padding:.75rem 1.5rem 1.2rem; }
         .cw-btn{ display:inline-flex; align-items:center; gap:.4rem; padding:.5rem .85rem; border-radius:.5rem;
@@ -437,15 +431,23 @@
                         <h2 class="cw-hd__t">{{ __('app.label.approval_chain') }}</h2>
                     </div>
 
-                    {{-- Progress band — segmented bar (one cell per approver,
-                         tinted by state, live shimmer on the current step),
-                         the approved counter, when it was submitted, and a
-                         compact "Awaiting X" tile while in-review. --}}
+                    {{-- Progress band — one clean continuous fill (green =
+                         approved fraction), a plain "N of M approved" counter
+                         plus a status breakdown, and the "Awaiting X" tile while
+                         in review. The per-step detail lives in the timeline
+                         below, so the band stays a single legible bar. --}}
                     @if ($totalCount > 0)
+                        @php
+                            $rejectedCount = $active->where('status', ContractApprover::STATUS_REJECTED)->count();
+                            $reviewingCount = $active->where('status', ContractApprover::STATUS_PENDING)->count();
+                            $queuedCount = max(0, $totalCount - $approvedCount - $rejectedCount - $reviewingCount);
+                            $fillPct = round($approvedCount / $totalCount * 100);
+                            $barColor = $rejectedCount > 0 ? '#ef4444' : ($approvedCount === $totalCount ? '#10b981' : '#10b981');
+                        @endphp
                         <div class="cw-prog">
                             <div class="cw-prog__top">
                                 <div class="cw-prog__l">
-                                    <span class="cw-prog__count"><b>{{ $approvedCount }}</b> / {{ $totalCount }} {{ __('app.label.approved_lower') }}</span>
+                                    <span class="cw-prog__count"><b>{{ $approvedCount }}</b> {{ __('app.label.of') }} {{ $totalCount }} {{ __('app.label.approved_lower') }}</span>
                                     @if ($submittedAt)
                                         <span class="cw-prog__sub">{!! $ic('heroicon-m-paper-airplane', 12) !!} {{ __('app.label.submitted') }} {{ $submittedAt->diffForHumans() }}</span>
                                     @endif
@@ -458,10 +460,14 @@
                                     </span>
                                 @endif
                             </div>
-                            <div class="cw-prog__bar">
-                                @foreach ($active as $ap)
-                                    <span class="cw-seg cw-seg--{{ $this->approverState($ap) }}" title="{{ $ap->user?->name }} · {{ $statusName($ap->status) }}"></span>
-                                @endforeach
+                            <div class="cw-prog__track">
+                                <span class="cw-prog__fill" style="width:{{ $fillPct }}%;background:{{ $barColor }};"></span>
+                            </div>
+                            <div class="cw-prog__legend">
+                                @if ($approvedCount > 0)<span class="cw-lg"><i style="background:#10b981;"></i>{{ $approvedCount }} {{ __('app.contract_approver.status.approved') }}</span>@endif
+                                @if ($reviewingCount > 0)<span class="cw-lg"><i style="background:#6366f1;"></i>{{ $reviewingCount }} {{ __('app.contract_approver.status.pending') }}</span>@endif
+                                @if ($queuedCount > 0)<span class="cw-lg"><i style="background:#cbd5e1;"></i>{{ $queuedCount }} {{ __('app.contract_approver.status.queued') }}</span>@endif
+                                @if ($rejectedCount > 0)<span class="cw-lg"><i style="background:#ef4444;"></i>{{ $rejectedCount }} {{ __('app.contract_approver.status.rejected') }}</span>@endif
                             </div>
                         </div>
                     @endif
@@ -632,23 +638,14 @@
                                 @endif
                             </div>
                         </div>
+                        {{-- One primary action only. Preview / PDF download
+                             already live in the page header actions, so they're
+                             not duplicated here. --}}
                         <div class="cw-file__act">
                             <a href="{{ $editUrl }}" class="cw-btn cw-btn--primary">
                                 {!! $ic('heroicon-o-pencil-square', 16) !!}
-                                <span>{{ __('app.action.open_editor') }}</span>
+                                <span>{{ $record->canBeEditedBy() ? __('app.action.open_editor') : __('app.action.open_file') }}</span>
                             </a>
-                            @if ($previewUrl)
-                                <a href="{{ $previewUrl }}" target="_blank" rel="noopener" class="cw-btn cw-btn--ghost">
-                                    {!! $ic('heroicon-o-arrow-top-right-on-square', 16) !!}
-                                    <span>{{ __('app.action.open_in_new_tab') }}</span>
-                                </a>
-                            @endif
-                            @if ($record->status === Contract::STATUS_APPROVED)
-                                <a href="{{ route('contracts.pdf.download', ['contract' => $record]) }}" class="cw-btn cw-btn--ghost">
-                                    {!! $ic('heroicon-o-document-arrow-down', 16) !!}
-                                    <span>PDF</span>
-                                </a>
-                            @endif
                         </div>
                     @endif
 

@@ -92,17 +92,18 @@
                     </div>
                 </div>
             </div>
+            {{-- Single primary action — editable docs open in the editor,
+                 everything else opens inline. The header keeps the rest. --}}
             <div class="ow-file__act">
                 @if ($fileEditUrl)
                     <a href="{{ $fileEditUrl }}" class="ow-btn ow-btn--primary">
                         {!! $ic('heroicon-o-pencil-square', 14) !!}
                         <span>{{ __('app.action.open_editor') }}</span>
                     </a>
-                @endif
-                @if ($fileViewUrl)
-                    <a href="{{ $fileViewUrl }}" target="_blank" rel="noopener" class="ow-btn ow-btn--ghost">
+                @elseif ($fileViewUrl)
+                    <a href="{{ $fileViewUrl }}" target="_blank" rel="noopener" class="ow-btn ow-btn--primary">
                         {!! $ic('heroicon-o-arrow-top-right-on-square', 14) !!}
-                        <span>{{ __('app.action.open_in_new_tab') }}</span>
+                        <span>{{ __('app.action.open_file') }}</span>
                     </a>
                 @endif
             </div>
@@ -186,7 +187,7 @@
     }
     .ow-num {
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: .78rem; font-weight: 700; color: #475569;
+        font-size: .78rem; font-weight: 600; color: #475569;
         background: #f1f5f9; padding: .22rem .55rem; border-radius: .35rem;
         letter-spacing: .03em;
     }
@@ -199,7 +200,7 @@
         display: inline-flex; align-items: center; gap: .55rem 1.25rem; flex-wrap: wrap;
         font-size: .8125rem; color: var(--m);
     }
-    .ow-hero__dates b { color: var(--t); font-weight: 650; }
+    .ow-hero__dates b { color: var(--t); font-weight: 600; }
     .ow-hero__date { display: inline-flex; align-items: center; gap: .4rem; }
 
     /* PILL */
@@ -227,7 +228,7 @@
         background: var(--accent-softer); color: var(--accent-strong);
     }
     .dark .ow-hd__ic { color: var(--accent); }
-    .ow-hd__t { font-size: 0.9375rem; font-weight: 650; margin: 0; color: var(--t); }
+    .ow-hd__t { font-size: 0.9375rem; font-weight: 600; margin: 0; color: var(--t); }
 
     /* FILE BLOCK */
     .ow-file { display: flex; align-items: flex-start; gap: 1.1rem; padding: 1.25rem 1.5rem .5rem; }
@@ -246,11 +247,11 @@
     .ow-file__body { display: flex; flex-direction: column; gap: .55rem; min-width: 0; flex: 1; }
     .ow-file__field { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
     .ow-file__lb {
-        font-size: .62rem; font-weight: 700; text-transform: uppercase;
+        font-size: .62rem; font-weight: 600; text-transform: uppercase;
         letter-spacing: .06em; color: var(--m2);
     }
     .ow-file__vl {
-        font-size: .8125rem; font-weight: 650; color: var(--t);
+        font-size: .8125rem; font-weight: 500; color: var(--t);
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .ow-file__act { display: flex; gap: .5rem; flex-wrap: wrap; padding: .75rem 1.5rem 1.2rem; }

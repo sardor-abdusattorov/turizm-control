@@ -141,6 +141,12 @@ class ContractSeeder extends Seeder
             ]);
             $contract->refresh();
 
+            // buildDocumentFromTemplate's invalidation cascade may have left a
+            // fresh QUEUED chain behind (rebuilt from the global flow). Wipe it
+            // so seedApprovers is the single author of the chain — otherwise
+            // each approver shows up twice (queued + approved).
+            $contract->approvers()->delete();
+
             $this->seedApprovers($contract, $manager, $legal, $accountant, $director, $data['status']);
             $this->seedPayments($contract, $accountant ?? $manager, $data['payments']);
         }
@@ -167,6 +173,14 @@ class ContractSeeder extends Seeder
             return;
         }
 
+        // Realistic per-step comments so the approver detail modal has
+        // something to show in the seeded demo, not just a status + date.
+        $approvedComments = [
+            'Согласовано с юридической стороны, замечаний нет.',
+            'Финансовых возражений нет, сумма подтверждена.',
+            'Утверждаю. Можно подписывать.',
+        ];
+
         $order = 1;
 
         foreach ($chain as $index => $user) {
@@ -181,6 +195,12 @@ class ContractSeeder extends Seeder
                 default => ContractApprover::STATUS_QUEUED,
             };
 
+            $comment = match ($approverStatus) {
+                ContractApprover::STATUS_REJECTED => 'Уточните, пожалуйста, сумму НДС в п. 3.2.',
+                ContractApprover::STATUS_APPROVED => $approvedComments[$index] ?? $approvedComments[0],
+                default => null,
+            };
+
             ContractApprover::create([
                 'contract_id' => $contract->id,
                 'user_id' => $user->id,
@@ -191,9 +211,10 @@ class ContractSeeder extends Seeder
                     [ContractApprover::STATUS_APPROVED, ContractApprover::STATUS_REJECTED],
                     true,
                 ) ? now()->subDays(rand(1, 10)) : null,
-                'comment' => $approverStatus === ContractApprover::STATUS_REJECTED
-                    ? 'Уточните, пожалуйста, сумму НДС.'
+                'due_at' => $approverStatus === ContractApprover::STATUS_PENDING
+                    ? now()->subDays(2)
                     : null,
+                'comment' => $comment,
             ]);
         }
     }

@@ -93,11 +93,10 @@ it('keeps a cancelled approval verdict and comment in the per-approver modal', f
         ->and($html)->not->toContain('cw-history-btn');
 });
 
-it('shows a preview button on the document card instead of an embedded pdf iframe', function () {
+it('shows a single open action on the document card instead of an embedded pdf iframe', function () {
     Storage::fake('local');
 
     $user = viewerWithAccess();
-    // PDF preview unlocks only once approved (after the director signs off).
     $contract = Contract::factory()->create([
         'responsible_id' => $user->id,
         'status' => Contract::STATUS_APPROVED,
@@ -108,7 +107,9 @@ it('shows a preview button on the document card instead of an embedded pdf ifram
 
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
-    expect($html)->toContain(route('contracts.pdf.inline', ['contract' => $contract]))
+    // The card carries one primary action into the editor; PDF download lives
+    // in the page header now, not as a second card button. No embedded iframe.
+    expect($html)->toContain(route('contracts.editor', ['contract' => $contract, 'mode' => 'view']))
         ->and($html)->not->toContain('<iframe');
 });
 
@@ -188,10 +189,11 @@ it('shows a per-approver detail modal trigger and renders queued steps distinctl
         // Status pill now rides on the tab bar instead of a separate strip.
         ->and($html)->toContain('cw-tabs__status')
         ->and($html)->not->toContain('cw-meta')
-        // Progress band: segmented bar tinted per state + the "Awaiting" tile.
-        ->and($html)->toContain('cw-prog__bar')
-        ->and($html)->toContain('cw-seg cw-seg--current')
-        ->and($html)->toContain('cw-seg cw-seg--queued')
+        // Progress band: a single continuous fill track + status legend + the
+        // "Awaiting" tile (the old per-step segmented bar was replaced).
+        ->and($html)->toContain('cw-prog__track')
+        ->and($html)->toContain('cw-prog__fill')
+        ->and($html)->toContain('cw-prog__legend')
         ->and($html)->toContain('cw-prog__await')
         // Modals are keyed by user_id so one opener covers all of a person's records.
         ->and($html)->toContain('approver = '.$contract->approvers()->where('order', 1)->first()->user_id)

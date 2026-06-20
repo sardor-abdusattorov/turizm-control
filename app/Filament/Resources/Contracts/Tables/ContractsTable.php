@@ -32,9 +32,17 @@ class ContractsTable
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
+                // Identity first (number), then state right after so the eye
+                // catches "what is it / what shape is it in" before the details.
                 TextColumn::make('number')
                     ->label(__('app.label.contract_number'))
+                    ->weight('semibold')
                     ->searchable()
+                    ->sortable(),
+
+                ViewColumn::make('status')
+                    ->label(__('app.label.status'))
+                    ->view('filament.resources.contracts.tables.status-column')
                     ->sortable(),
 
                 TextColumn::make('title')
@@ -46,16 +54,12 @@ class ContractsTable
                 TextColumn::make('contact.name')
                     ->label(__('app.label.contact_single'))
                     ->searchable()
-                    ->limit(40),
+                    ->limit(40)
+                    ->toggleable(),
 
                 TextColumn::make('amount')
                     ->label(__('app.label.amount'))
                     ->formatStateUsing(fn (?string $state, Contract $record): string => number_format((float) $state, 2, ',', ' ').' '.($record->currency?->short_name ?? ''))
-                    ->sortable(),
-
-                ViewColumn::make('status')
-                    ->label(__('app.label.status'))
-                    ->view('filament.resources.contracts.tables.status-column')
                     ->sortable(),
 
                 ViewColumn::make('approvers_chain')
