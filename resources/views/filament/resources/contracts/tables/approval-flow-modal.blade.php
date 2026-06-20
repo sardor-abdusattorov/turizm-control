@@ -33,33 +33,159 @@
 @endphp
 
 <style>
-    .fl { display:flex; flex-direction:column; }
-    .fl__step { display:grid; grid-template-columns:2.5rem 1fr; gap:.9rem; position:relative; padding-bottom:1.15rem; }
-    .fl__step:last-child { padding-bottom:0; }
-    .fl__rail { position:relative; display:flex; justify-content:center; }
-    .fl__line { position:absolute; top:2.6rem; bottom:-1.15rem; left:50%; transform:translateX(-50%); width:2px; background:rgba(127,127,127,.2); border-radius:2px; }
-    .fl__av { width:2.5rem; height:2.5rem; border-radius:50%; object-fit:cover; position:relative; z-index:1;
-        --gap:#fff; box-shadow:0 0 0 2px var(--gap), 0 0 0 4px var(--ring,#cbd5e1); }
-    .dark .fl__av { --gap:#1b1b1f; }
-    .fl__body { min-width:0; padding-top:.1rem; }
-    .fl__top { display:flex; align-items:center; justify-content:space-between; gap:.6rem; flex-wrap:wrap; }
-    .fl__nm { font-size:.95rem; font-weight:700; color:currentColor; }
-    .fl__dp { font-size:.8rem; color:currentColor; opacity:.6; margin-top:.05rem; }
-    .fl__badge { display:inline-flex; align-items:center; gap:.35rem; padding:.18rem .55rem; border-radius:999px;
-        font-size:.74rem; font-weight:650; white-space:nowrap; }
-    .fl__badge > i { width:.45rem; height:.45rem; border-radius:50%; display:block; }
-    .fl__when { font-size:.74rem; color:currentColor; opacity:.55; margin-top:.4rem; }
-    .fl__cmt { margin-top:.5rem; font-size:.85rem; color:currentColor; line-height:1.45; }
-    .fl__sys { margin-top:.45rem; padding:.45rem .6rem; border-radius:.5rem; background:rgba(251,146,60,.09);
-        border:1px solid rgba(251,146,60,.25); font-size:.8rem; color:#c2410c; line-height:1.4; }
-    .fl__cap { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:currentColor; opacity:.55; }
-    .fl__hist { margin-top:1.2rem; border-top:1px solid rgba(127,127,127,.15); padding-top:1rem; }
-    .fl__hist summary { cursor:pointer; font-size:.82rem; font-weight:600; color:currentColor; opacity:.75; list-style:none; display:flex; align-items:center; gap:.4rem; }
-    .fl__hist summary::-webkit-details-marker { display:none; }
-    .fl__hrow { display:flex; align-items:flex-start; gap:.6rem; padding:.55rem 0; border-top:1px solid rgba(127,127,127,.1); }
-    .fl__hrow:first-of-type { border-top:0; }
-    .fl__hav { width:1.7rem; height:1.7rem; border-radius:50%; object-fit:cover; flex-shrink:0; opacity:.85; }
-    .fl__empty { font-size:.85rem; color:currentColor; opacity:.55; padding:.5rem 0; }
+    .fl {
+        display: flex;
+        flex-direction: column;
+    }
+    .fl__step {
+        display: grid;
+        grid-template-columns: 2.5rem 1fr;
+        gap: .9rem;
+        position: relative;
+        padding-bottom: 1.15rem;
+    }
+    .fl__step:last-child {
+        padding-bottom: 0;
+    }
+    .fl__rail {
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+    .fl__line {
+        position: absolute;
+        top: 2.6rem;
+        bottom: -1.15rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        background: rgba(127,127,127,.2);
+        border-radius: 2px;
+    }
+    .fl__av {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        object-fit: cover;
+        position: relative;
+        z-index: 1;
+        --gap: #fff;
+        box-shadow: 0 0 0 2px var(--gap), 0 0 0 4px var(--ring,#cbd5e1);
+    }
+    .dark .fl__av {
+        --gap: #1b1b1f;
+    }
+    .fl__body {
+        min-width: 0;
+        padding-top: .1rem;
+    }
+    .fl__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .6rem;
+        flex-wrap: wrap;
+    }
+    .fl__nm {
+        font-size: .95rem;
+        font-weight: 700;
+        color: currentColor;
+    }
+    .fl__dp {
+        font-size: .8rem;
+        color: currentColor;
+        opacity: .6;
+        margin-top: .05rem;
+    }
+    .fl__badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .18rem .55rem;
+        border-radius: 999px;
+        font-size: .74rem;
+        font-weight: 650;
+        white-space: nowrap;
+    }
+    .fl__badge > i {
+        width: .45rem;
+        height: .45rem;
+        border-radius: 50%;
+        display: block;
+    }
+    .fl__when {
+        font-size: .74rem;
+        color: currentColor;
+        opacity: .55;
+        margin-top: .4rem;
+    }
+    .fl__cmt {
+        margin-top: .5rem;
+        font-size: .85rem;
+        color: currentColor;
+        line-height: 1.45;
+    }
+    .fl__sys {
+        margin-top: .45rem;
+        padding: .45rem .6rem;
+        border-radius: .5rem;
+        background: rgba(251,146,60,.09);
+        border: 1px solid rgba(251,146,60,.25);
+        font-size: .8rem;
+        color: #c2410c;
+        line-height: 1.4;
+    }
+    .fl__cap {
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: currentColor;
+        opacity: .55;
+    }
+    .fl__hist {
+        margin-top: 1.2rem;
+        border-top: 1px solid rgba(127,127,127,.15);
+        padding-top: 1rem;
+    }
+    .fl__hist summary {
+        cursor: pointer;
+        font-size: .82rem;
+        font-weight: 600;
+        color: currentColor;
+        opacity: .75;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+    }
+    .fl__hist summary::-webkit-details-marker {
+        display: none;
+    }
+    .fl__hrow {
+        display: flex;
+        align-items: flex-start;
+        gap: .6rem;
+        padding: .55rem 0;
+        border-top: 1px solid rgba(127,127,127,.1);
+    }
+    .fl__hrow:first-of-type {
+        border-top: 0;
+    }
+    .fl__hav {
+        width: 1.7rem;
+        height: 1.7rem;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        opacity: .85;
+    }
+    .fl__empty {
+        font-size: .85rem;
+        color: currentColor;
+        opacity: .55;
+        padding: .5rem 0;
+    }
 </style>
 
 @if ($active->isEmpty())

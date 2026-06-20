@@ -51,7 +51,11 @@
 </div>
 
 <style>
-    .ph-wrap { display: flex; flex-direction: column; gap: 1rem; }
+    .ph-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
     .ph-title {
         font-size: .72rem;
         font-weight: 600;
@@ -60,7 +64,11 @@
         color: rgba(100, 116, 139, 1);
         margin-bottom: .45rem;
     }
-    .ph-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .ph-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .4rem;
+    }
     .ph-chip {
         display: inline-flex;
         align-items: center;
@@ -80,14 +88,27 @@
         background: rgba(127, 127, 127, .18);
         border-color: rgba(127, 127, 127, .28);
     }
-    .ph-chip:active { transform: translateY(1px); }
+    .ph-chip:active {
+        transform: translateY(1px);
+    }
     .ph-chip--copied {
         background: rgba(34, 197, 94, .14);
         border-color: rgba(34, 197, 94, .42);
         color: rgb(21, 128, 61);
     }
-    .ph-ic { width: 13px; height: 13px; opacity: .55; }
-    .ph-ic--ok { opacity: 1; color: rgb(34, 197, 94); }
-    .dark .ph-title { color: rgba(148, 163, 184, 1); }
-    .dark .ph-chip--copied { color: rgb(134, 239, 172); }
+    .ph-ic {
+        width: 13px;
+        height: 13px;
+        opacity: .55;
+    }
+    .ph-ic--ok {
+        opacity: 1;
+        color: rgb(34, 197, 94);
+    }
+    .dark .ph-title {
+        color: rgba(148, 163, 184, 1);
+    }
+    .dark .ph-chip--copied {
+        color: rgb(134, 239, 172);
+    }
 </style>
