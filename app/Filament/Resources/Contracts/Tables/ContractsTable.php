@@ -18,11 +18,14 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ContractsTable
@@ -109,6 +112,18 @@ class ContractsTable
                 SelectFilter::make('payment_status')
                     ->label(__('app.label.payment_status'))
                     ->options(PaymentStatus::options()),
+
+                // Period filter — answers "what was created this quarter" for
+                // the finance / exec view without scrolling through pages.
+                Filter::make('created_at')
+                    ->label(__('app.label.created_at'))
+                    ->schema([
+                        DatePicker::make('from')->label(__('app.label.from')),
+                        DatePicker::make('until')->label(__('app.label.until')),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when($data['from'] ?? null, fn (Builder $q, $date) => $q->whereDate('created_at', '>=', $date))
+                        ->when($data['until'] ?? null, fn (Builder $q, $date) => $q->whereDate('created_at', '<=', $date))),
             ])
             ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))
             ->recordActions([

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Orders\Tables;
 
 use App\Filament\Resources\Orders\OrderResource;
 use App\Models\Order;
+use App\Models\User;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -103,6 +104,15 @@ class OrdersTable
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
                     ->options(Order::getStatuses()),
+
+                // Accountability filter — who issued each order.
+                SelectFilter::make('created_by')
+                    ->label(__('app.label.created_by'))
+                    ->options(fn () => User::query()
+                        ->where('status', User::STATUS_ACTIVE)
+                        ->orderBy('name')
+                        ->pluck('name', 'id'))
+                    ->searchable(),
             ])
             ->recordUrl(fn (Order $record) => OrderResource::getUrl('view', ['record' => $record]))
             ->recordActions([

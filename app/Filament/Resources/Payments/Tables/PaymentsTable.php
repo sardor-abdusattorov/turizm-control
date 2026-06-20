@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Payments\Tables;
 
+use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Payments\PaymentResource;
 use App\Models\Payment;
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
@@ -87,6 +89,29 @@ class PaymentsTable
                     ->relationship('contract', 'number')
                     ->searchable()
                     ->preload(),
+
+                // Filter by the parent contract's payment progress — useful for
+                // audits ("which payments belong to still-open contracts?").
+                SelectFilter::make('contract_payment_status')
+                    ->label(__('app.label.payment_status'))
+                    ->options(PaymentStatus::options())
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['value'] ?? null,
+                            fn (Builder $q, $value) => $q->whereHas(
+                                'contract',
+                                fn (Builder $c) => $c->where('payment_status', $value),
+                            ),
+                        )),
+
+                // Accountability filter — who recorded each payment.
+                SelectFilter::make('created_by')
+                    ->label(__('app.label.created_by'))
+                    ->options(fn () => User::query()
+                        ->where('status', User::STATUS_ACTIVE)
+                        ->orderBy('name')
+                        ->pluck('name', 'id'))
+                    ->searchable(),
 
                 Filter::make('paid_at')
                     ->schema([

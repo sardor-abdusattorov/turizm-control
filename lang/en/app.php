@@ -260,6 +260,7 @@ return [
         'telegram_chat_id_help' => 'Used to send approval notifications via Telegram',
         'default_recipients' => 'Default Approvers',
         'default_recipients_help' => 'These users will be suggested by default when you submit a contract for approval',
+        'role' => 'Role',
         'roles' => 'Roles',
         'active' => 'Active',
         'inactive' => 'Inactive',

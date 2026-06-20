@@ -13,6 +13,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Spatie\Permission\Models\Role;
 
 class UsersTable
 {
@@ -77,6 +78,14 @@ class UsersTable
                 SelectFilter::make('position_id')
                     ->label(__('app.label.position'))
                     ->relationship('position', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                // Big admin filter — find all managers, accountants, etc.
+                SelectFilter::make('roles')
+                    ->label(__('app.label.role'))
+                    ->relationship('roles', 'name')
+                    ->options(fn () => Role::query()->orderBy('name')->pluck('name', 'id'))
                     ->searchable()
                     ->preload(),
 
