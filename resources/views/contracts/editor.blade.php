@@ -24,7 +24,7 @@
             text-decoration: none; flex-shrink: 0;
             transition: background 120ms ease, color 120ms ease;
         }
-        .editor-topbar .close-btn:hover { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+        .editor-topbar .close-btn:hover { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
         .editor-topbar .doc-meta { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 10px; }
         .editor-topbar .doc-number { font-weight: 700; font-size: 14px; color: #111827; flex-shrink: 0; }
         .editor-topbar .doc-title { font-size: 14px; color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
