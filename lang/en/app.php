@@ -497,6 +497,22 @@ return [
         'my_in_review' => 'My contracts in review',
         'my_approved' => 'My approved contracts',
         'my_drafts' => 'My drafts',
+
+        // PaymentStatsWidget
+        'approved_value' => 'Approved value',
+        'approved_value_description' => 'Total value of signed contracts',
+        'collected' => 'Collected',
+        'collected_description' => 'Booked payments',
+        'outstanding' => 'Outstanding',
+        'outstanding_description' => 'Still expected to be paid',
+        'fully_paid_count' => 'Fully paid contracts',
+        'fully_paid_count_description' => 'Reached 100% payments',
+
+        // ContractsTrendChartWidget
+        'contracts_trend_heading' => 'Contracts over the last 6 months',
+        'contracts_trend_description' => 'Comparing new contracts vs. signed contracts month-over-month.',
+        'contracts_created' => 'Created',
+        'contracts_signed' => 'Signed',
     ],
     'filter' => [
         'awaiting_my_approval' => 'Awaiting my approval',

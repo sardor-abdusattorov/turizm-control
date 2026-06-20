@@ -4,6 +4,8 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\ContractStatsWidget;
+use App\Filament\Widgets\ContractsTrendChartWidget;
+use App\Filament\Widgets\PaymentStatsWidget;
 use App\Services\Telegram\TelegramService;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
@@ -91,6 +93,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->widgets([
                 ContractStatsWidget::class,
+                PaymentStatsWidget::class,
+                ContractsTrendChartWidget::class,
             ])
             ->resources([
 
