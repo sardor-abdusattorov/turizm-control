@@ -124,13 +124,26 @@ class ViewContract extends ViewRecord
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('success')
                 ->url(fn () => route('contracts.pdf.download', ['contract' => $this->record]))
-                ->visible(fn () => $this->record?->status === Contract::STATUS_APPROVED
-                    && (auth()->user()?->can('export_contract') ?? false)),
+                ->visible(fn (): bool => $this->record?->status === Contract::STATUS_APPROVED
+                    && self::userCanExportContract()),
 
             EditAction::make()
                 ->icon('heroicon-o-pencil-square')
                 ->visible(fn () => $this->record?->canBeEditedBy()),
         ];
+    }
+
+    /**
+     * Whether the current user may export contract PDFs. super_admin is
+     * matched by role directly so the action stays available before the
+     * permission seeder has been run.
+     */
+    public static function userCanExportContract(): bool
+    {
+        $user = auth()->user();
+
+        return $user !== null
+            && ($user->hasRole('super_admin') || $user->can('export_contract'));
     }
 
     /**

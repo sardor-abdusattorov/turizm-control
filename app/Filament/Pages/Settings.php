@@ -53,11 +53,20 @@ class Settings extends Page implements HasForms
 
     /**
      * Gate the whole page on a single Shield permission so non-admins can
-     * neither see it in the sidebar nor reach it by URL.
+     * neither see it in the sidebar nor reach it by URL. super_admin is
+     * checked by role directly so the page stays reachable even before the
+     * RolesAndPermissionsSeeder has actually created the permission, or
+     * if the permission cache hasn't been refreshed yet.
      */
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('manage_settings') ?? false;
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasRole('super_admin') || $user->can('manage_settings');
     }
 
     public static function shouldRegisterNavigation(): bool

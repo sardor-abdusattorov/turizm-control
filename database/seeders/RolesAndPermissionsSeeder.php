@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -11,25 +10,20 @@ use Spatie\Permission\PermissionRegistrar;
 
 /**
  * Single source of truth for application roles + their permission sets.
- * Run after Shield has generated the per-resource permissions
- * (view_any_x, update_x, ...) via `php artisan shield:generate`; the
- * project:update command already wires that for you. Re-running this
- * seeder is safe: it only assigns existing permissions and never
- * destroys data.
+ *
+ * Assumes Shield has already generated the per-resource permissions
+ * (view_any_x, update_x, ...) — `project:update init` does that for you
+ * by running `shield:generate` before the seeders. We do NOT call
+ * `shield:generate` from here: that command is interactive and would
+ * hang on `db:seed`. The seeder is idempotent — re-running it only
+ * assigns existing permissions and never destroys data.
  */
 class RolesAndPermissionsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Make sure Shield-derived permissions are present before we wire roles to them.
-        // --all picks up every resource/page/widget + the custom_permissions list.
-        Artisan::call('shield:generate', [
-            '--all' => true,
-            '--ignore-existing-policies' => true,
-        ]);
-
         // Reset Spatie's in-memory permission cache so the role -> permission
-        // sync below sees everything Shield just created.
+        // sync below sees every permission that's currently in the DB.
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         // 1) super_admin — sees and does everything.

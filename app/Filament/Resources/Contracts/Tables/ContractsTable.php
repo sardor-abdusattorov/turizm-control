@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Contracts\Tables;
 
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Resources\Contracts\Pages\ViewContract;
 use App\Models\Contract;
 use App\Models\Currency;
 use App\Models\OrderType;
@@ -125,8 +126,8 @@ class ContractsTable
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('gray')
                         ->url(fn (Contract $record) => route('contracts.pdf.download', ['contract' => $record]))
-                        ->visible(fn (Contract $record) => $record->status === Contract::STATUS_APPROVED
-                            && (auth()->user()?->can('export_contract') ?? false)),
+                        ->visible(fn (Contract $record): bool => $record->status === Contract::STATUS_APPROVED
+                            && ViewContract::userCanExportContract()),
 
                     Action::make('openEditor')
                         ->label(__('app.action.open_editor'))
