@@ -16,7 +16,6 @@ return [
         'main_settings' => 'Main Settings',
         'status' => 'Status',
         'empty' => 'Empty',
-        'all' => 'All',
         'ru' => 'Russian',
         'uz' => 'Uzbek',
         'en' => 'English',
@@ -38,9 +37,6 @@ return [
         'items_amount' => 'Total amount',
         'items_counterparty' => 'Counterparty',
         'items_agreement_ref' => 'Agreement no. / date',
-        'overdue' => 'Overdue',
-        'responsible' => 'Responsible manager',
-        'contract_number' => 'Contract no.',
         'approval_flow' => 'Approval Flow',
         'approval_sla_days' => 'Review deadline (days)',
         'due_at' => 'Due',
@@ -55,7 +51,6 @@ return [
         'documents' => 'Documents',
         'created_by' => 'Created by',
         'deadline' => 'Deadline',
-        'overdue' => 'Overdue',
         'from' => 'From',
         'until' => 'Until',
 
@@ -99,7 +94,6 @@ return [
         'signing_place' => 'Place of signing',
         'amount' => 'Amount',
         'responsible' => 'Responsible',
-        'currency_single' => 'Currency',
 
         // Contract editor
         'contract_editor' => 'Contract Editor',
@@ -151,7 +145,6 @@ return [
         'position' => 'Position',
         'position_single' => 'Position',
         'full_name' => 'Full name',
-        'acted_at' => 'Acted at',
         'position_plural' => 'Positions',
         'position_name' => 'Position Name',
         'general_information' => 'General Information',
