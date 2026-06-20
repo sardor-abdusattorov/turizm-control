@@ -21,6 +21,10 @@ class DatabaseSeeder extends Seeder
             TestUsersSeeder::class,
             SettingsSeeder::class,
             OrdersSeeder::class,
+            // Contracts depend on templates, contacts, currencies, and test users —
+            // everything they need is seeded above.
+            ContractTemplateSeeder::class,
+            ContractSeeder::class,
         ]);
     }
 }
