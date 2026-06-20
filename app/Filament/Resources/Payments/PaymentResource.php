@@ -6,7 +6,6 @@ use App\Filament\Resources\Payments\Pages\CreatePayment;
 use App\Filament\Resources\Payments\Pages\ListPayments;
 use App\Filament\Resources\Payments\Pages\ViewPayment;
 use App\Filament\Resources\Payments\Schemas\PaymentForm;
-use App\Filament\Resources\Payments\Schemas\PaymentInfolist;
 use App\Filament\Resources\Payments\Tables\PaymentsTable;
 use App\Models\Payment;
 use BackedEnum;
@@ -52,11 +51,6 @@ class PaymentResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return PaymentForm::configure($schema);
-    }
-
-    public static function infolist(Schema $schema): Schema
-    {
-        return PaymentInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table

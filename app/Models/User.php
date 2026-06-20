@@ -22,8 +22,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     use HasPanelShield;
     use HasRoles;
-
-    //    use HasUiSettings;
     use Notifiable;
 
     public const STATUS_ACTIVE = 1;
