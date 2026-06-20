@@ -220,6 +220,12 @@ return [
         'open_screenshot' => 'Open screenshot',
         'contract' => 'Contract',
 
+        // Placeholder groups (contract template form)
+        'placeholder_group_contract' => 'Contract',
+        'placeholder_group_date' => 'Date',
+        'placeholder_group_contact' => 'Counterparty',
+        'placeholder_group_bank' => 'Bank details',
+
         // Currencies
         'currency_single' => 'Currency',
         'currency_plural' => 'Currencies',
@@ -357,6 +363,8 @@ return [
         'payment_contract_not_approved' => 'Payments can only be recorded against approved contracts.',
         'payment_already_full' => 'This contract is already fully paid.',
         'payment_exceeds_remaining' => 'The payment percent cannot exceed the remaining :percent%.',
+        'copied' => 'Copied',
+        'click_to_copy' => 'Click to copy',
     ],
     'helper' => [
         'inn' => '9 digits for legal entities',
@@ -366,7 +374,7 @@ return [
         'bank_account' => '20 digits',
         'template_file' => 'Upload the contract as a .docx with {{placeholders}} where values should be inserted. Max 10 MB.',
         'template_editor_independent' => 'Document content is edited in OnlyOffice — changes save automatically there. The "Save changes" button below only stores the metadata above (name, order type, sort, status).',
-        'contract_template_choice' => 'Pick a template — its language is shown in brackets and sets the contract language.',
+        'contract_template_choice' => 'Pick a contract template. Templates are listed by name.',
         'contract_order_type' => 'Pick the order type first — it filters the templates available below.',
         'approval_chain_form' => 'Pre-filled from your profile. Add or remove approvers for this contract — the order below is the order they approve in.',
         'approval_chain_pick' => 'Pick approvers in the order they should approve. Search by name or department.',
@@ -385,6 +393,8 @@ return [
         'organization_logo' => 'Recommended: PNG or SVG with a transparent background, max ~200px tall. Used in the document header via {{logo}}.',
         'available_placeholders' => 'Available placeholders (click to expand)',
         'user_field_placeholders' => 'Plus any field key you defined in "Document fields" above — e.g. {{employee_name}} for a field with key employee_name.',
+        'contract_template_name_example' => 'e.g. Lease agreement (UZ) — HR',
+        'placeholders_click_to_copy' => 'Click any tag to copy it to the clipboard, then paste into the document.',
     ],
     'validation' => [
         'approver_chain_required_departments' => 'The approval chain must include at least one Legal approver and one Accounting approver.',

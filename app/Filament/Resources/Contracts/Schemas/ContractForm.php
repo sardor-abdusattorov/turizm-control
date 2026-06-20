@@ -196,7 +196,7 @@ class ContractForm
             ->orderBy('sort')
             ->get()
             ->mapWithKeys(fn (ContractTemplate $t): array => [
-                $t->id => $t->name.' ('.strtoupper($t->language).')',
+                $t->id => $t->name,
             ])
             ->toArray();
     }

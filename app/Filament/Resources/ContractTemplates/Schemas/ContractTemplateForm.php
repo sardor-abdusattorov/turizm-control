@@ -9,10 +9,11 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 
 class ContractTemplateForm
@@ -29,35 +30,29 @@ class ContractTemplateForm
                             ->label(__('app.label.contract_template_name'))
                             ->required()
                             ->maxLength(255)
+                            ->placeholder(__('app.helper.contract_template_name_example'))
                             ->columnSpanFull(),
 
-                        Select::make('order_type_id')
-                            ->label(__('app.label.order_type_single'))
-                            ->options(OrderType::getActive())
-                            ->searchable()
-                            ->preload()
-                            ->placeholder(__('app.label.no_category'))
-                            ->columnSpanFull(),
+                        Grid::make(3)->schema([
+                            Select::make('order_type_id')
+                                ->label(__('app.label.order_type_single'))
+                                ->options(OrderType::getActive())
+                                ->searchable()
+                                ->preload()
+                                ->placeholder(__('app.label.no_category'))
+                                ->columnSpan(2),
 
-                        Select::make('language')
-                            ->label(__('app.label.language'))
-                            ->options(ContractTemplate::getLanguages())
-                            ->default('ru')
-                            ->required()
-                            ->native(false)
-                            ->columnSpanFull(),
-
-                        TextInput::make('sort')
-                            ->label(__('app.label.sort'))
-                            ->numeric()
-                            ->default(0)
-                            ->columnSpanFull(),
+                            TextInput::make('sort')
+                                ->label(__('app.label.sort'))
+                                ->numeric()
+                                ->default(0)
+                                ->columnSpan(1),
+                        ]),
 
                         Toggle::make('status')
                             ->label(__('app.label.status'))
                             ->default(true)
-                            ->inline(false)
-                            ->columnSpanFull(),
+                            ->inline(false),
                     ]),
 
                 Section::make(__('app.label.contract_template_file'))
@@ -88,43 +83,17 @@ class ContractTemplateForm
                                     ]);
                                 })
                                 ->visible(fn (?ContractTemplate $record) => $record?->templateExists() ?? false),
-                        ])->columnSpanFull(),
+                        ]),
+                    ]),
 
-                        TextEntry::make('editor_hint')
-                            ->hiddenLabel()
-                            ->state(__('app.helper.template_editor_independent')),
-
-                        TextEntry::make('placeholders_hint')
-                            ->label(__('app.label.available_placeholders'))
-                            ->state(self::placeholderHint())
-                            ->html(),
+                Section::make(__('app.label.available_placeholders'))
+                    ->collapsible()
+                    ->collapsed()
+                    ->description(__('app.helper.placeholders_click_to_copy'))
+                    ->schema([
+                        View::make('filament.resources.contract-templates.partials.placeholders')
+                            ->columnSpanFull(),
                     ]),
             ]);
-    }
-
-    protected static function placeholderHint(): string
-    {
-        $items = [
-            '{{number}}', '{{title}}',
-            '{{date.day}}', '{{date.month}}', '{{date.year}}', '{{date.full}}',
-            '{{amount}}', '{{currency}}',
-            '{{contact.name}}', '{{contact.legal_form}}', '{{contact.director}}',
-            '{{contact.inn}}', '{{contact.pinfl}}', '{{contact.oked}}',
-            '{{contact.address}}', '{{contact.phone}}', '{{contact.email}}',
-            '{{contact.bank_account}}', '{{contact.bank_name}}', '{{contact.mfo}}',
-        ];
-
-        // Inline styles only — Filament strips <style> from TextEntry HTML state.
-        // Use a semi-transparent neutral that reads on both light and dark themes.
-        $chipStyle = 'font-size:.82rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;'
-            .'padding:.18rem .5rem;border-radius:.35rem;'
-            .'background:rgba(127,127,127,.14);color:currentColor;';
-
-        $tags = array_map(
-            fn (string $item): string => '<code style="'.$chipStyle.'">'.e($item).'</code>',
-            $items,
-        );
-
-        return '<div style="display:flex;flex-wrap:wrap;gap:.4rem;">'.implode('', $tags).'</div>';
     }
 }
