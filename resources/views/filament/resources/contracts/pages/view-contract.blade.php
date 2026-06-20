@@ -283,7 +283,7 @@
         .cw-row__lb{ font-size:0.8125rem; font-weight:600; color:#1f2937; }
         .dark .cw-row__lb{ color:#e5e7eb; }
         .cw-row__v{ display:flex; align-items:center; padding:.85rem 1.25rem; min-width:0; transition:background .12s ease; }
-        .cw-row__vl{ font-size:0.8125rem; font-weight:450; color:var(--t); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .cw-row__vl{ font-size:0.8125rem; font-weight:500; color:var(--t); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .cw-row__vl--muted{ color:var(--m2); font-weight:500; font-style:italic; }
         button.cw-row{ width:100%; background:transparent; border:0; border-bottom:1px solid var(--d); cursor:pointer; text-align:left; font:inherit; padding:0; }
         .cw-row--link:hover .cw-row__v{ background:var(--accent-softer); }

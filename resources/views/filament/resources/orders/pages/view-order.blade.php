@@ -289,10 +289,13 @@
     }
     .ow-row--wrap .ow-row__v { align-items: flex-start; padding-top: 1rem; padding-bottom: 1rem; }
     .ow-row__vl {
-        font-size: .8125rem; font-weight: 450; color: var(--t);
+        font-size: .8125rem; font-weight: 500; color: var(--t);
         min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .ow-row__vl--wrap { white-space: normal; line-height: 1.55; overflow: visible; }
+    .ow-row__vl--wrap {
+        white-space: normal; line-height: 1.55; overflow: visible;
+        text-overflow: clip; font-weight: 500;
+    }
     .ow-row__vl--muted { color: var(--m2); font-weight: 500; font-style: italic; }
     .ow-show-more {
         display: flex; align-items: center; justify-content: center; gap: .4rem;
