@@ -296,6 +296,11 @@ return [
         'open_contract' => 'Open contract',
         'add_payment' => 'Add payment',
         'record_payment' => 'Record payment',
+        'export_xlsx' => 'Export to Excel',
+    ],
+    'export' => [
+        'completed_body' => 'Your export is ready: :count rows exported.',
+        'failed_rows' => ':count rows failed to export.',
     ],
     'notification' => [
         'approval_requested' => [

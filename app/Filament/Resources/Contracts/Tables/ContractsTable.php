@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Contracts\Tables;
 
 use App\Enums\PaymentStatus;
+use App\Filament\Exports\ContractExporter;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Contracts\Pages\ViewContract;
 use App\Models\Contract;
@@ -16,6 +17,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
@@ -189,8 +192,22 @@ class ContractsTable
                     ->icon('heroicon-m-ellipsis-vertical')
                     ->color('gray'),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('app.action.export_xlsx'))
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('gray')
+                    ->exporter(ContractExporter::class)
+                    ->fileName(fn (): string => 'contracts-'.now()->format('Y-m-d'))
+                    ->visible(fn (): bool => ViewContract::userCanExportContract()),
+            ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make()
+                        ->label(__('app.action.export_xlsx'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->exporter(ContractExporter::class)
+                        ->fileName(fn (): string => 'contracts-selected-'.now()->format('Y-m-d')),
                     DeleteBulkAction::make(),
                 ]),
             ]);
