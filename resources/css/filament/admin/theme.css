@@ -114,3 +114,38 @@
     height: auto;
     max-height: none;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   ActionGroup ("…" dropdown trigger) hover affordance.
+
+   Every row/toolbar ActionGroup renders its trigger as
+   `.fi-icon-btn.fi-ac-btn-group`. By default it only changes the icon tint on
+   hover, which is easy to miss. Give it a clear, primary-tinted rounded
+   surface + a 1px ring + a tiny lift so it reads as an interactive control
+   across every table at once — no per-table configuration needed.
+   ────────────────────────────────────────────────────────────────────────── */
+.fi-icon-btn.fi-ac-btn-group {
+    border-radius: 0.5rem;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.12s ease;
+}
+
+.fi-icon-btn.fi-ac-btn-group:hover {
+    background-color: rgb(var(--primary-50));
+    color: rgb(var(--primary-600));
+    box-shadow: inset 0 0 0 1px rgb(var(--primary-200));
+    transform: translateY(-1px);
+}
+
+.fi-icon-btn.fi-ac-btn-group:active {
+    transform: translateY(0);
+}
+
+.dark .fi-icon-btn.fi-ac-btn-group:hover {
+    background-color: rgb(var(--primary-400) / 0.14);
+    color: rgb(var(--primary-300));
+    box-shadow: inset 0 0 0 1px rgb(var(--primary-400) / 0.28);
+}
