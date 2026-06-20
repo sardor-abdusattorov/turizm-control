@@ -278,14 +278,18 @@
         border-right: 1px solid var(--d);
     }
     .ow-row--wrap .ow-row__k { align-items: flex-start; padding-top: 1rem; }
-    .ow-row__ic { color: var(--m2); display: inline-flex; flex-shrink: 0; }
-    .ow-row__lb { font-size: .8125rem; font-weight: 600; color: var(--m); }
+    .ow-row__ic { color: #94a3b8; display: inline-flex; flex-shrink: 0; }
+    .dark .ow-row__ic { color: #6e7681; }
+    .ow-row__lb {
+        font-size: .8125rem; font-weight: 600; color: #1f2937;
+    }
+    .dark .ow-row__lb { color: #e5e7eb; }
     .ow-row__v {
         display: flex; align-items: center; padding: .8rem 1.25rem; min-width: 0;
     }
     .ow-row--wrap .ow-row__v { align-items: flex-start; padding-top: 1rem; padding-bottom: 1rem; }
     .ow-row__vl {
-        font-size: .8125rem; font-weight: 600; color: var(--t);
+        font-size: .8125rem; font-weight: 450; color: var(--t);
         min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .ow-row__vl--wrap { white-space: normal; line-height: 1.55; overflow: visible; }
