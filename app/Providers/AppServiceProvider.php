@@ -122,11 +122,15 @@ class AppServiceProvider extends ServiceProvider
             ->paginationPageOptions([10, 25, 50])
         );
 
-        // Every "…" group trigger gets an "Actions" tooltip so the bare
-        // three-dots icon says what it does on hover — paired with the hover
-        // surface defined in the panel theme. Closure keeps it locale-aware.
+        // Every group trigger renders as a labelled "Actions" button (not a
+        // bare "…" icon) and keeps the tooltip. Closures keep both label and
+        // tooltip locale-aware; the hover surface is defined in the panel theme.
         ActionGroup::configureUsing(
-            fn (ActionGroup $group) => $group->tooltip(fn (): string => __('app.label.actions')),
+            fn (ActionGroup $group) => $group
+                ->label(fn (): string => __('app.label.actions'))
+                ->button()
+                ->color('gray')
+                ->tooltip(fn (): string => __('app.label.actions')),
         );
     }
 
