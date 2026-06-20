@@ -13,7 +13,9 @@ class ContractsTrendChartWidget extends ChartWidget
 
     protected int|string|array $columnSpan = ['default' => 'full', 'md' => 1];
 
-    protected static ?int $sort = 3;
+    // Pushed to the very bottom — the trend chart is a weekly-glance analytic,
+    // not part of the daily action loop, so it sits under everything else.
+    protected static ?int $sort = 20;
 
     protected ?string $maxHeight = '260px';
 

@@ -5,6 +5,10 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\ContractStatsWidget;
 use App\Filament\Widgets\ContractsTrendChartWidget;
+use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
+use App\Filament\Widgets\Dashboard\MyApprovalQueueWidget;
+use App\Filament\Widgets\Dashboard\OverdueAlertBanner;
+use App\Filament\Widgets\Dashboard\RecentActivityWidget;
 use App\Filament\Widgets\LatestPaymentsWidget;
 use App\Filament\Widgets\PaymentStatsWidget;
 use App\Services\Telegram\TelegramService;
@@ -93,10 +97,18 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
+                // Order on screen is driven by each widget's $sort; this list is
+                // just registration. Greeting (-20) and overdue banner (-10) lead,
+                // then the approval queue (1), personal stats (2), money (3),
+                // latest payments (4), recent activity (5), trend chart (20).
+                DashboardHeaderWidget::class,
+                OverdueAlertBanner::class,
+                MyApprovalQueueWidget::class,
                 ContractStatsWidget::class,
                 PaymentStatsWidget::class,
-                ContractsTrendChartWidget::class,
                 LatestPaymentsWidget::class,
+                RecentActivityWidget::class,
+                ContractsTrendChartWidget::class,
             ])
             ->resources([
 

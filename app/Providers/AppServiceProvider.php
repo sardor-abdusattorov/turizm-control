@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
 use App\Policies\ActivityPolicy;
+use App\Services\Dashboard\DashboardContext;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Filament\Facades\Filament;
@@ -27,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         Gate::policy(Activity::class, ActivityPolicy::class);
+
+        // Per-request singleton so every dashboard widget shares one resolved
+        // context (and its memoised "awaiting me" / counts queries) instead of
+        // each widget re-running them.
+        $this->app->scoped(DashboardContext::class);
 
         $this->configureRenderHooks();
     }

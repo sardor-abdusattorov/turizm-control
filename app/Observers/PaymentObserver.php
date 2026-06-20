@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Enums\PaymentStatus;
+use App\Filament\Widgets\PaymentStatsWidget;
 use App\Models\Contract;
 use App\Models\Payment;
 
@@ -11,6 +12,7 @@ class PaymentObserver
     public function created(Payment $payment): void
     {
         $this->syncContractPaymentStatus($payment->contract_id);
+        PaymentStatsWidget::bustCache();
     }
 
     public function updated(Payment $payment): void
@@ -24,11 +26,14 @@ class PaymentObserver
         if ($original && $original !== (int) $payment->contract_id) {
             $this->syncContractPaymentStatus($original);
         }
+
+        PaymentStatsWidget::bustCache();
     }
 
     public function deleted(Payment $payment): void
     {
         $this->syncContractPaymentStatus($payment->contract_id);
+        PaymentStatsWidget::bustCache();
     }
 
     /**

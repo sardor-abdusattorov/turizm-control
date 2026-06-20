@@ -10,12 +10,23 @@ use App\Models\Payment;
 use Carbon\CarbonImmutable;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class PaymentStatsWidget extends StatsOverviewWidget
 {
     protected ?string $pollingInterval = null;
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
+
+    /** Bumped by Payment/Contract observers to invalidate the cached totals. */
+    public const CACHE_VERSION_KEY = 'dashboard.financial_version';
+
+    public static function bustCache(): void
+    {
+        // forever()+1 rather than increment() so it works on file/database
+        // cache drivers where increment() on a missing key is a no-op.
+        Cache::forever(self::CACHE_VERSION_KEY, ((int) Cache::get(self::CACHE_VERSION_KEY, 1)) + 1);
+    }
 
     public static function canView(): bool
     {
@@ -30,47 +41,23 @@ class PaymentStatsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        // Convert every contract's amount to UZS using the snapshot rate that
-        // lives on the currency record so the totals are comparable across
-        // currencies (UZS rate is 1, so the math is a no-op for UZS rows).
-        $approvedQuery = Contract::query()
-            ->visibleTo()
-            ->where('status', Contract::STATUS_APPROVED)
-            ->with('currency');
+        $totals = $this->financialTotals();
 
-        $approvedTotal = 0.0;
-        $collectedTotal = 0.0;
-        $outstandingTotal = 0.0;
-        $fullyPaidCount = 0;
-
-        foreach ($approvedQuery->get() as $contract) {
-            $rate = (float) ($contract->currency?->value ?? 1);
-            $valueUzs = (float) $contract->amount * $rate;
-            $paidPercent = (float) $contract->paid_percent;
-
-            $approvedTotal += $valueUzs;
-            $collectedTotal += $valueUzs * $paidPercent / 100;
-            $outstandingTotal += $valueUzs * (100 - min(100, $paidPercent)) / 100;
-
-            if ($contract->payment_status === PaymentStatus::FullyPaid) {
-                $fullyPaidCount++;
-            }
-        }
-
+        // Sparkline (payment momentum) lives on the Collected card only — the
+        // same 14-day series behind all three cards would be noise, not signal.
         $sparkline = $this->dailyPaymentsSparkline(14);
         $contractsUrl = ContractResource::getUrl('index');
         $paymentsUrl = PaymentResource::getUrl('index');
 
         return [
-            Stat::make(__('app.stats.approved_value'), self::formatUzs($approvedTotal))
+            Stat::make(__('app.stats.approved_value'), self::formatUzs($totals['approved']))
                 ->description(__('app.stats.approved_value_description'))
                 ->descriptionIcon('heroicon-m-document-check')
-                ->color('primary')
+                ->color('gray')
                 ->icon('heroicon-o-document-check')
-                ->chart($sparkline)
                 ->url($contractsUrl.'?tableFilters[status][value]='.Contract::STATUS_APPROVED->value),
 
-            Stat::make(__('app.stats.collected'), self::formatUzs($collectedTotal))
+            Stat::make(__('app.stats.collected'), self::formatUzs($totals['collected']))
                 ->description(__('app.stats.collected_description'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success')
@@ -78,22 +65,55 @@ class PaymentStatsWidget extends StatsOverviewWidget
                 ->chart($sparkline)
                 ->url($paymentsUrl),
 
-            Stat::make(__('app.stats.outstanding'), self::formatUzs($outstandingTotal))
+            Stat::make(__('app.stats.outstanding'), self::formatUzs($totals['outstanding']))
                 ->description(__('app.stats.outstanding_description'))
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
-                ->color($outstandingTotal > 0 ? 'warning' : 'success')
+                ->color($totals['outstanding'] > 0 ? 'warning' : 'gray')
                 ->icon('heroicon-o-clock')
-                ->chart($sparkline)
                 ->url($contractsUrl.'?tableFilters[payment_status][value]='.PaymentStatus::PartiallyPaid->value),
-
-            Stat::make(__('app.stats.fully_paid_count'), $fullyPaidCount)
-                ->description(__('app.stats.fully_paid_count_description'))
-                ->descriptionIcon('heroicon-m-check-badge')
-                ->color($fullyPaidCount > 0 ? 'success' : 'gray')
-                ->icon('heroicon-o-check-badge')
-                ->chart($sparkline)
-                ->url($contractsUrl.'?tableFilters[payment_status][value]='.PaymentStatus::FullyPaid->value),
         ];
+    }
+
+    /**
+     * Approved value / collected / outstanding across every visible approved
+     * contract, in UZS. Cached for 5 minutes — it sums over all approved
+     * contracts and only changes when a payment is booked or a contract is
+     * signed, neither of which is second-by-second.
+     *
+     * @return array{approved: float, collected: float, outstanding: float}
+     */
+    private function financialTotals(): array
+    {
+        $userId = (int) (auth()->id() ?? 0);
+        // Version segment so a booked payment / signed contract can bust every
+        // per-user key at once (see Payment + Contract observers).
+        $version = Cache::get(self::CACHE_VERSION_KEY, 1);
+
+        return Cache::remember("dashboard.financial_totals.{$userId}.v{$version}", 300, function (): array {
+            $approved = 0.0;
+            $collected = 0.0;
+            $outstanding = 0.0;
+
+            // Convert each amount to UZS via the snapshot rate on the currency
+            // record so cross-currency totals are comparable (UZS rate = 1).
+            $contracts = Contract::query()
+                ->visibleTo()
+                ->where('status', Contract::STATUS_APPROVED)
+                ->with('currency')
+                ->get();
+
+            foreach ($contracts as $contract) {
+                $rate = (float) ($contract->currency?->value ?? 1);
+                $valueUzs = (float) $contract->amount * $rate;
+                $paidPercent = (float) $contract->paid_percent;
+
+                $approved += $valueUzs;
+                $collected += $valueUzs * $paidPercent / 100;
+                $outstanding += $valueUzs * (100 - min(100, $paidPercent)) / 100;
+            }
+
+            return ['approved' => $approved, 'collected' => $collected, 'outstanding' => $outstanding];
+        });
     }
 
     /**
