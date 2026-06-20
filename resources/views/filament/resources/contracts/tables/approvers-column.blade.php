@@ -47,7 +47,7 @@
 @once
     <style>
         .ca { display:flex; flex-direction:column; gap:.55rem; align-items:stretch;
-            background:transparent; border:0; cursor:pointer; padding:.7rem .8rem; margin:.15rem 0;
+            background:transparent; border:0; cursor:pointer; padding:.7rem .8rem; margin:.25rem 0;
             border-radius:.7rem; min-width:13rem; max-width:18rem; transition:background .12s ease, box-shadow .12s ease; text-align:left; }
         .ca:hover { background:rgba(127,127,127,.06); box-shadow:inset 0 0 0 1px rgba(127,127,127,.12); }
         .ca__hd { display:flex; align-items:center; gap:.6rem; }
