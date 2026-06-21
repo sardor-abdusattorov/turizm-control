@@ -112,7 +112,6 @@ class ContractSeeder extends Seeder
                     'contact_id' => $data['contact']->id,
                     'currency_id' => $data['currency']->id,
                     'responsible_id' => $manager->id,
-                    'language' => $data['template']->language ?? 'ru',
                     'amount' => $data['amount'],
                     'status' => $data['status'],
                     'signed_at' => $data['signed_at'] ?? null,

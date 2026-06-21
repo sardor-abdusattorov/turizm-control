@@ -19,7 +19,6 @@ class ContractTemplate extends Model
     protected $fillable = [
         'order_type_id',
         'name',
-        'language',
         'template_file',
         'document_key',
         'sort',
@@ -59,15 +58,6 @@ class ContractTemplate extends Model
     {
         return $this->template_file
             && Storage::disk('local')->exists($this->template_file);
-    }
-
-    public static function getLanguages(): array
-    {
-        return [
-            'ru' => __('app.label.ru'),
-            'uz' => __('app.label.uz'),
-            'en' => __('app.label.en'),
-        ];
     }
 
     public function orderType(): BelongsTo

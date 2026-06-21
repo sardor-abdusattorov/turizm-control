@@ -26,7 +26,6 @@ class Contract extends Model
         'contact_id',
         'currency_id',
         'responsible_id',
-        'language',
         'title',
         'amount',
         'status',
@@ -112,7 +111,6 @@ class Contract extends Model
         'order_type_id',
         'contract_template_id',
         'document_file',
-        'language',
     ];
 
     private bool $preserveApprovedStatus = false;

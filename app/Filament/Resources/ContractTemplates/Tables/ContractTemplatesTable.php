@@ -45,12 +45,6 @@ class ContractTemplatesTable
                     ->badge()
                     ->placeholder('—'),
 
-                TextColumn::make('language')
-                    ->label(__('app.label.language'))
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => ContractTemplate::getLanguages()[$state] ?? $state)
-                    ->sortable(),
-
                 TextColumn::make('sort')
                     ->label(__('app.label.sort'))
                     ->sortable(),
@@ -69,10 +63,6 @@ class ContractTemplatesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('language')
-                    ->label(__('app.label.language'))
-                    ->options(ContractTemplate::getLanguages()),
-
                 SelectFilter::make('order_type_id')
                     ->label(__('app.label.order_type_single'))
                     ->relationship('orderType', 'title')

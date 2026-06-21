@@ -74,7 +74,6 @@ it('creates approvers in the order they were picked', function () {
     $template = ContractTemplate::factory()->create([
         'order_type_id' => $orderType->id,
         'status' => true,
-        'language' => 'ru',
     ]);
     Storage::disk('local')->put($template->template_file, file_get_contents(fillableDocx()));
 
@@ -116,7 +115,7 @@ it('rejects creating a contract whose chain has no accounting approver', functio
 
     $orderType = OrderType::factory()->create();
     $template = ContractTemplate::factory()->create([
-        'order_type_id' => $orderType->id, 'status' => true, 'language' => 'ru',
+        'order_type_id' => $orderType->id, 'status' => true,
     ]);
     Storage::disk('local')->put($template->template_file, file_get_contents(fillableDocx()));
     $contact = Contact::factory()->create(['status' => true]);

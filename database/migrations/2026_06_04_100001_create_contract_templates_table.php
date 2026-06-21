@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_type_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
-            $table->string('language', 2)->default('ru');
             $table->string('template_file');
             $table->string('document_key')->nullable();
             $table->unsignedInteger('sort')->default(0);
@@ -20,7 +19,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('order_type_id');
-            $table->index('language');
             $table->index('status');
         });
     }

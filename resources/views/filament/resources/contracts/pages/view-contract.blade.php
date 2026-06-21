@@ -76,15 +76,6 @@
         return $c->translatedFormat('d F Y');
     };
 
-    // Friendly language label — fall back to the short code if the title is
-    // missing from the lang file.
-    $languageLabel = null;
-    if ($record->language) {
-        $key = 'app.label.'.strtolower($record->language);
-        $resolved = __($key);
-        $languageLabel = $resolved === $key ? strtoupper($record->language) : $resolved;
-    }
-
     // Core info visible by default; everything else lives behind "Show more".
     $details = [
         ['heroicon-o-bolt', __('app.label.status'), $statusLabel, 'status', false],
@@ -96,7 +87,6 @@
         ['heroicon-o-banknotes', __('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? ''), null, false],
 
         // Extra rows — collapsed by default.
-        ['heroicon-o-language', __('app.label.language'), $languageLabel, null, true],
         ['heroicon-o-paper-airplane', __('app.label.submitted'), $this->submittedAt()?->format('d.m.Y H:i'), null, true],
         ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y'), null, true],
         ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i'), null, true],

@@ -45,9 +45,18 @@ class OnlyOfficeService
             callbackUrl: $this->internalRouteUrl('contract', $contract->id, 'callback', $contract->document_key),
             permissions: $permissions,
             mode: $mode,
-            lang: $contract->language ?: 'ru',
+            lang: self::editorLocale(),
             user: $user,
         );
+    }
+
+    /**
+     * UI language for the editor — follows the panel's active locale, but
+     * falls back to Russian because OnlyOffice has no Uzbek interface.
+     */
+    private static function editorLocale(): string
+    {
+        return app()->getLocale() === 'uz' ? 'ru' : app()->getLocale();
     }
 
     public function templateEditorConfig(ContractTemplate $template, User $user, ?string $forceMode = null): array
@@ -62,7 +71,7 @@ class OnlyOfficeService
             callbackUrl: $this->internalRouteUrl('template', $template->id, 'callback', $template->document_key),
             permissions: $permissions,
             mode: $mode,
-            lang: $template->language ?: 'ru',
+            lang: self::editorLocale(),
             user: $user,
         );
     }

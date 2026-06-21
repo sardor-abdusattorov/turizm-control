@@ -16,7 +16,6 @@ class ContractTemplateFactory extends Factory
     {
         return [
             'name' => fake()->words(3, true),
-            'language' => 'ru',
             'template_file' => 'contract-templates/template-'.fake()->uuid().'.docx',
             'sort' => 0,
             'status' => true,

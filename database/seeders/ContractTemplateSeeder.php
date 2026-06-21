@@ -44,7 +44,6 @@ class ContractTemplateSeeder extends Seeder
                     'order_type_id' => $data['order_type']->id,
                     'sort' => $data['sort'],
                     'status' => true,
-                    'language' => 'ru',
                     'template_file' => 'contract-templates/pending/stub.docx',
                 ]
             );

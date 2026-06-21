@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('contact_id')->constrained()->restrictOnDelete();
             $table->foreignId('currency_id')->constrained()->restrictOnDelete();
             $table->foreignId('responsible_id')->constrained('users')->cascadeOnDelete();
-            $table->string('language', 2)->default('ru');
             $table->string('title');
             $table->decimal('amount', 15, 2)->default(0);
             $table->string('status', 30)->default('draft');

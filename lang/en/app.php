@@ -6,7 +6,6 @@ return [
         'title' => 'Title',
         'email' => 'Email',
         'address' => 'Address',
-        'language' => 'Language',
         'settings' => 'Settings',
         'users_single' => 'User',
         'users_plural' => 'Users',

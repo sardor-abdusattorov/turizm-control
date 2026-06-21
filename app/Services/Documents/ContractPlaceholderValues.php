@@ -14,7 +14,9 @@ class ContractPlaceholderValues
         $currency = $contract->currency;
         $signed = $contract->signed_at;
         $created = $contract->created_at ?? now();
-        $locale = $contract->language ?: 'ru';
+        // Generated documents are Russian, so pull the Russian translation of
+        // the counterparty's name/address regardless of the panel locale.
+        $locale = 'ru';
 
         $contactName = $contact?->getTranslation('name', $locale, false)
             ?: ($contact?->name ?? '');
