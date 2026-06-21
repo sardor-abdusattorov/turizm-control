@@ -1480,21 +1480,21 @@
         .cw-rt {
             width: 100%;
             border-collapse: collapse;
-            font-size: .8rem;
+            font-size: .86rem;
         }
         .cw-rt thead th {
             text-align: left;
-            font-size: .66rem;
-            font-weight: 700;
+            font-size: .72rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: .04em;
             color: var(--m2);
-            padding: .4rem .5rem;
+            padding: .5rem .6rem;
             border-bottom: 1px solid var(--d);
             white-space: nowrap;
         }
         .cw-rt tbody td {
-            padding: .6rem .5rem;
+            padding: .7rem .6rem;
             border-bottom: 1px solid var(--d);
             vertical-align: top;
         }
@@ -1506,6 +1506,9 @@
         }
         .cw-rt__st {
             white-space: nowrap;
+        }
+        .cw-rt__st .cw-pill {
+            font-size: .78rem;
         }
         .cw-rt__ord {
             display: block;
@@ -1537,6 +1540,7 @@
         }
         .cw-rt__cmt {
             line-height: 1.42;
+            font-size: .84rem;
             color: var(--t);
         }
         .cw-rt__cmt--muted {
@@ -1558,7 +1562,7 @@
             margin-right: .3rem;
         }
         .cw-rt__date {
-            font-size: .74rem;
+            font-size: .8rem;
             color: var(--m);
             white-space: nowrap;
             font-variant-numeric: tabular-nums;
@@ -1566,8 +1570,8 @@
         .cw-rt__date small {
             display: block;
             opacity: .6;
-            font-size: .68rem;
-            margin-top: .08rem;
+            font-size: .72rem;
+            margin-top: .1rem;
         }
         .cw-rt__date--muted {
             opacity: .4;
@@ -1601,26 +1605,26 @@
             background: var(--s);
         }
         .cw-stat__lb {
-            font-size: .65rem;
+            font-size: .72rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: .05em;
             color: var(--m2);
             display: inline-flex;
             align-items: center;
-            gap: .3rem;
+            gap: .35rem;
         }
         .cw-stat__vl {
-            margin-top: .28rem;
-            font-size: .85rem;
+            margin-top: .3rem;
+            font-size: 1.02rem;
             font-weight: 600;
             color: var(--t);
             line-height: 1.2;
             font-variant-numeric: tabular-nums;
         }
         .cw-stat__sub {
-            margin-top: .18rem;
-            font-size: .7rem;
+            margin-top: .2rem;
+            font-size: .78rem;
             font-weight: 500;
             color: var(--m);
         }
