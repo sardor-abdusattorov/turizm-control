@@ -147,7 +147,13 @@ class ContractSeeder extends Seeder
         ?User $director,
         ContractStatus $status,
     ): void {
-        $chain = collect([$legal, $accountant, $director])->filter()->values();
+        // The director joins only as the final manual sign-off, so they appear
+        // in the chain solely on contracts that reached full approval — never
+        // in a draft / in-review / rejected chain.
+        $chain = collect([$legal, $accountant])
+            ->when($status === ContractStatus::Approved, fn ($c) => $c->push($director))
+            ->filter()
+            ->values();
 
         if ($chain->isEmpty()) {
             return;

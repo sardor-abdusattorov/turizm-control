@@ -31,7 +31,7 @@ class SettingsSeeder extends Seeder
             'metrics.yandex' => '',
             'metrics.google' => '',
 
-            'approval.flow' => ['legal', 'accounting', 'direction'],
+            'approval.flow' => ['legal', 'accounting'],
             'approval.sla_days' => 2,
         ];
 

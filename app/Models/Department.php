@@ -42,6 +42,15 @@ class Department extends Model
      */
     public const REQUIRED_APPROVER_CODES = ['legal', 'accounting'];
 
+    /**
+     * Department codes that form the auto-built sequential approval chain.
+     * The director is intentionally excluded — they join later as a separate,
+     * manually-triggered final sign-off (see Contract::appendDirectorApprover()).
+     *
+     * @var array<int, string>
+     */
+    public const FLOW_CODES = ['legal', 'accounting'];
+
     public function head()
     {
         return $this->belongsTo(User::class, 'head_of_department');
@@ -103,8 +112,9 @@ class Department extends Model
 
     /**
      * Canonical approval flow order: takes the admin-configured order
-     * from settings.approval.flow and falls back to APPROVER_CODES when
-     * none is set or the saved one is empty.
+     * from settings.approval.flow and falls back to FLOW_CODES when
+     * none is set or the saved one is empty. The director is never part of
+     * this chain — they are handed the contract manually as a final stage.
      *
      * @return array<int, string>
      */
@@ -113,12 +123,12 @@ class Department extends Model
         $flow = settings('approval.flow');
 
         if (! is_array($flow) || empty($flow)) {
-            return self::APPROVER_CODES;
+            return self::FLOW_CODES;
         }
 
         return array_values(array_intersect(
             array_filter($flow, 'is_string'),
-            self::APPROVER_CODES
+            self::FLOW_CODES
         ));
     }
 }

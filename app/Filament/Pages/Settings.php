@@ -91,7 +91,7 @@ class Settings extends Page implements HasForms
     protected function getApproverDepartmentOptions(): array
     {
         $names = Department::query()
-            ->whereIn('code', Department::APPROVER_CODES)
+            ->whereIn('code', Department::FLOW_CODES)
             ->get()
             ->mapWithKeys(fn (Department $d) => [
                 $d->code => $d->getTranslation('name', app()->getLocale()),
@@ -102,12 +102,11 @@ class Settings extends Page implements HasForms
             'legal' => __('app.label.department_legal'),
             'financial' => __('app.label.department_financial'),
             'accounting' => __('app.label.department_accounting'),
-            'direction' => __('app.label.department_direction'),
         ];
 
         $options = [];
 
-        foreach (Department::APPROVER_CODES as $code) {
+        foreach (Department::FLOW_CODES as $code) {
             $options[$code] = $names[$code] ?? $fallbackLabels[$code] ?? $code;
         }
 

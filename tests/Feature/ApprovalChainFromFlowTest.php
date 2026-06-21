@@ -2,6 +2,7 @@
 
 use App\Models\Contract;
 use App\Models\Department;
+use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -29,28 +30,29 @@ beforeEach(function () {
     departmentWithHead('accounting', 'Accountant One');
     departmentWithHead('direction', 'Director One');
 
-    \App\Models\Settings::set('approval.flow', ['legal', 'accounting', 'direction']);
+    Settings::set('approval.flow', ['legal', 'accounting', 'direction']);
     clear_settings_cache();
 });
 
-it('builds the chain from the settings queue in order, using department heads', function () {
+it('builds the chain from the settings queue in order, excluding the director', function () {
     $contract = Contract::factory()->create();
 
     $created = $contract->buildApprovalChainFromFlow();
 
-    expect($created)->toBe(3);
+    // The director is a separate manual final stage and is never auto-added,
+    // even though the seeded flow still lists "direction".
+    expect($created)->toBe(2);
 
     $chain = $contract->approvers()->with('user')->orderBy('order')->get();
 
     expect($chain->pluck('user.name')->all())->toBe([
         'Lawyer One',
         'Accountant One',
-        'Director One',
     ]);
 });
 
 it('respects a reordered approval flow', function () {
-    \App\Models\Settings::set('approval.flow', ['accounting', 'legal', 'direction']);
+    Settings::set('approval.flow', ['accounting', 'legal', 'direction']);
     clear_settings_cache();
 
     $contract = Contract::factory()->create();
@@ -74,10 +76,11 @@ it('falls back to the first active member when a department has no head', functi
         ->toBe('Legal Member');
 });
 
-it('exposes a readable preview of the global chain', function () {
+it('exposes a readable preview of the global chain without the director', function () {
     $preview = Contract::approvalChainPreview();
 
-    expect($preview)->toHaveCount(3)
+    expect($preview)->toHaveCount(2)
         ->and($preview[0])->toContain('Lawyer One')
-        ->and($preview[2])->toContain('Director One');
+        ->and($preview[1])->toContain('Accountant One')
+        ->and(implode(' ', $preview))->not->toContain('Director One');
 });

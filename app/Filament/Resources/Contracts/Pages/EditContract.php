@@ -183,11 +183,14 @@ class EditContract extends EditRecord
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
                 ->requiresConfirmation()
+                ->modalIcon('heroicon-o-check-circle')
                 ->modalHeading(__('app.action.approve'))
+                ->modalSubmitActionLabel(__('app.action.approve'))
+                ->modalWidth('xl')
                 ->schema([
                     Textarea::make('comment')
                         ->label(__('app.label.comment'))
-                        ->rows(3),
+                        ->rows(4),
                 ])
                 ->visible(fn () => $record?->canBeApprovedBy())
                 ->action(function (array $data, ContractWorkflow $workflow) use ($record): void {
@@ -204,12 +207,16 @@ class EditContract extends EditRecord
                 ->label(__('app.action.reject'))
                 ->icon('heroicon-o-x-circle')
                 ->color('danger')
+                ->requiresConfirmation()
+                ->modalIcon('heroicon-o-x-circle')
                 ->modalHeading(__('app.action.reject'))
+                ->modalSubmitActionLabel(__('app.action.reject'))
+                ->modalWidth('xl')
                 ->schema([
                     Textarea::make('comment')
                         ->label(__('app.label.rejection_reason'))
                         ->required()
-                        ->rows(3),
+                        ->rows(4),
                 ])
                 ->visible(fn () => $record?->canBeApprovedBy())
                 ->action(function (array $data, ContractWorkflow $workflow) use ($record): void {
