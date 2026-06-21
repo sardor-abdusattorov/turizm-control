@@ -5,17 +5,22 @@ use App\Models\ContractApprover;
 use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    Storage::fake('local');
+});
 
 it('skips inactive approvers when the contract is submitted', function () {
     $responsible = User::factory()->create();
     $inactiveLawyer = User::factory()->create(['status' => false]);
     $activeAccountant = User::factory()->create(['status' => true]);
 
-    $contract = Contract::factory()->create([
+    $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);

@@ -5,17 +5,22 @@ use App\Models\ContractApprover;
 use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    Storage::fake('local');
+});
 
 function createContractWithChain(int $approverCount = 3): array
 {
     $responsible = User::factory()->create();
     $approvers = User::factory()->count($approverCount)->create();
 
-    $contract = Contract::factory()->create([
+    $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);
@@ -125,7 +130,7 @@ it('refuses to approve when the acting user is not the current approver', functi
 
 it('refuses to submit when there are no approvers', function () {
     $responsible = User::factory()->create();
-    $contract = Contract::factory()->create([
+    $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);
@@ -135,5 +140,25 @@ it('refuses to submit when there are no approvers', function () {
     $result = app(ContractWorkflow::class)->submit($contract);
 
     expect($result)->toBeFalse()
+        ->and($contract->fresh()->status)->toBe(Contract::STATUS_DRAFT);
+});
+
+it('refuses to submit when the contract has no document on disk', function () {
+    $responsible = User::factory()->create();
+    $approver = User::factory()->create();
+
+    // Note: no ->withDocument() — there is no docx on disk.
+    $contract = Contract::factory()->create([
+        'responsible_id' => $responsible->id,
+        'status' => Contract::STATUS_DRAFT,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $approver->id, 'order' => 1,
+    ]);
+
+    actingAs($responsible);
+
+    expect($contract->canBeSubmittedBy($responsible))->toBeFalse()
+        ->and(app(ContractWorkflow::class)->submit($contract))->toBeFalse()
         ->and($contract->fresh()->status)->toBe(Contract::STATUS_DRAFT);
 });

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
 
 use function Pest\Laravel\actingAs;
@@ -15,6 +16,7 @@ use function Pest\Laravel\artisan;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    Storage::fake('local');
     config(['settings.cache' => false]);
     Settings::set('approval.sla_days', 2);
     clear_settings_cache();
@@ -25,7 +27,7 @@ function slaChain(int $count = 2): array
     $responsible = User::factory()->create();
     $approvers = User::factory()->count($count)->create();
 
-    $contract = Contract::factory()->create([
+    $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);

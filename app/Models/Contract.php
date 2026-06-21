@@ -454,6 +454,7 @@ class Contract extends Model
         return $user
             && $this->status === self::STATUS_DRAFT
             && ($this->responsible_id === $user->id || $user->hasRole('super_admin'))
+            && $this->documentExists()
             && ($this->activeApprovers()->exists() || $this->canRebuildChainOnSubmit());
     }
 

@@ -72,7 +72,7 @@ it('database-notifies the first approver when a contract is submitted', function
     $responsible = User::factory()->create();
     $approver = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
-    $contract = Contract::factory()->create([
+    $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);

@@ -6,17 +6,22 @@ use App\Models\Department;
 use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    Storage::fake('local');
+});
 
 function chainForSubmit(int $approverCount = 2): array
 {
     $responsible = User::factory()->create();
     $approvers = User::factory()->count($approverCount)->create();
 
-    $contract = Contract::factory()->create([
+    $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);

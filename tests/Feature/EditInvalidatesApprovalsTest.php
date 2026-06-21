@@ -7,10 +7,15 @@ use App\Models\Settings;
 use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    Storage::fake('local');
+});
 
 function settingsFlowAvailable(): void
 {
@@ -34,7 +39,7 @@ function inReviewContractWithChain(): array
     $responsible = User::factory()->create();
     $approvers = User::factory()->count(3)->create();
 
-    $contract = Contract::factory()->create([
+    $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_IN_REVIEW,
     ]);
