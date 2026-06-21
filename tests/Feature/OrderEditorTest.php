@@ -76,7 +76,7 @@ it('returns 404 when the order file is not a docx', function () {
 it('downloads the order docx via OnlyOffice with a valid shared_key', function () {
     $order = makeOrderWithDocx();
 
-    get(route('onlyoffice.order.document', [
+    get(route('orders.document', [
         'order' => $order,
         'shared_key' => $order->document_key,
     ]))->assertOk();
@@ -85,7 +85,7 @@ it('downloads the order docx via OnlyOffice with a valid shared_key', function (
 it('rejects OnlyOffice document requests with a wrong shared_key', function () {
     $order = makeOrderWithDocx();
 
-    get(route('onlyoffice.order.document', [
+    get(route('orders.document', [
         'order' => $order,
         'shared_key' => 'wrong',
     ]))->assertForbidden();
@@ -99,7 +99,7 @@ it('persists the edited order docx on OnlyOffice callback', function () {
     $order = makeOrderWithDocx();
     $originalKey = $order->document_key;
 
-    post(route('onlyoffice.order.callback', [
+    post(route('orders.save-callback', [
         'order' => $order,
         'shared_key' => $order->document_key,
     ]), [
@@ -119,7 +119,7 @@ it('keeps the key on order forcesave callback (status 6)', function () {
     $order = makeOrderWithDocx();
     $originalKey = $order->document_key;
 
-    post(route('onlyoffice.order.callback', [
+    post(route('orders.save-callback', [
         'order' => $order,
         'shared_key' => $order->document_key,
     ]), [

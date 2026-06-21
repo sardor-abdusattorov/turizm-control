@@ -98,7 +98,7 @@ it('writes a Document activity log entry on OnlyOffice contract save', function 
     Storage::disk('local')->put($contract->documentPath(), 'fake');
 
     post(
-        route('onlyoffice.contract.callback', [
+        route('contracts.save-callback', [
             'contract' => $contract,
             'shared_key' => $contract->document_key,
         ]),
@@ -124,7 +124,7 @@ it('writes a Document activity log entry on OnlyOffice template save', function 
     Storage::disk('local')->put($template->template_file, 'fake');
 
     post(
-        route('onlyoffice.template.callback', [
+        route('contract-templates.save-callback', [
             'template' => $template,
             'shared_key' => $template->document_key,
         ]),
@@ -150,7 +150,7 @@ it('uses Template Forcesave event for status 6 callbacks', function () {
     Storage::disk('local')->put($template->template_file, 'fake');
 
     post(
-        route('onlyoffice.template.callback', [
+        route('contract-templates.save-callback', [
             'template' => $template,
             'shared_key' => $template->document_key,
         ]),

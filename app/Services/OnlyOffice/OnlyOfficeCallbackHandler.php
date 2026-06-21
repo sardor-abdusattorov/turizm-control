@@ -16,7 +16,7 @@ class OnlyOfficeCallbackHandler
     public function __construct(public OnlyOfficeService $service) {}
 
     /**
-     * Handle a /onlyoffice/{subject}/callback request.
+     * Handle a /{subject}s/{id}/save-callback request from the editor server.
      *
      * @param  Closure(string $body): void  $persist  Writes the docx bytes
      * @param  Closure(): void  $onFinalSave  Runs after status=2 (rotate key, refresh model, etc.)

@@ -77,7 +77,7 @@ it('returns 404 from the editor when the template file is missing', function () 
 it('downloads the template docx via OnlyOffice with a valid shared_key', function () {
     $template = makeTemplateWithFile();
 
-    $response = get(route('onlyoffice.template.document', [
+    $response = get(route('contract-templates.document', [
         'template' => $template,
         'shared_key' => $template->document_key,
     ]));
@@ -88,7 +88,7 @@ it('downloads the template docx via OnlyOffice with a valid shared_key', functio
 it('rejects OnlyOffice document requests without a matching shared_key', function () {
     $template = makeTemplateWithFile();
 
-    get(route('onlyoffice.template.document', [
+    get(route('contract-templates.document', [
         'template' => $template,
         'shared_key' => 'wrong',
     ]))->assertForbidden();
@@ -103,7 +103,7 @@ it('persists the edited template back to storage on OnlyOffice callback', functi
     $originalKey = $template->document_key;
 
     post(
-        route('onlyoffice.template.callback', [
+        route('contract-templates.save-callback', [
             'template' => $template,
             'shared_key' => $template->document_key,
         ]),
@@ -126,7 +126,7 @@ it('keeps the document_key intact on forcesave callbacks during editing', functi
     $originalKey = $template->document_key;
 
     post(
-        route('onlyoffice.template.callback', [
+        route('contract-templates.save-callback', [
             'template' => $template,
             'shared_key' => $template->document_key,
         ]),
@@ -144,7 +144,7 @@ it('rejects OnlyOffice callbacks without a matching shared_key', function () {
     $template = makeTemplateWithFile();
 
     post(
-        route('onlyoffice.template.callback', [
+        route('contract-templates.save-callback', [
             'template' => $template,
             'shared_key' => 'wrong',
         ]),

@@ -303,10 +303,13 @@ class OnlyOfficeService
 
     private function internalRouteUrl(string $subject, int $id, string $action, ?string $sharedKey): string
     {
+        // 'document' fetches the docx, 'callback' (alias for save-callback) is
+        // the post-save webhook OnlyOffice hits when the user finishes editing.
+        $path = $action === 'callback' ? 'save-callback' : $action;
         $prefix = match ($subject) {
-            'template' => "/onlyoffice/template/{$id}/{$action}",
-            'order' => "/onlyoffice/order/{$id}/{$action}",
-            default => "/onlyoffice/{$id}/{$action}",
+            'template' => "/contract-templates/{$id}/{$path}",
+            'order' => "/orders/{$id}/{$path}",
+            default => "/contracts/{$id}/{$path}",
         };
 
         return $this->callbackHost().$prefix.'?shared_key='.$sharedKey;

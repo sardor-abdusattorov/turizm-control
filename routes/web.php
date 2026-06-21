@@ -12,23 +12,23 @@ use App\Http\Controllers\TelegramConnectController;
 use App\Http\Controllers\TelegramWebhookController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/onlyoffice/{contract}/document', [OnlyOfficeContractController::class, 'document'])
-    ->name('onlyoffice.contract.document');
+Route::get('/contracts/{contract}/document', [OnlyOfficeContractController::class, 'document'])
+    ->name('contracts.document');
 
-Route::post('/onlyoffice/{contract}/callback', [OnlyOfficeContractController::class, 'callback'])
-    ->name('onlyoffice.contract.callback');
+Route::post('/contracts/{contract}/save-callback', [OnlyOfficeContractController::class, 'callback'])
+    ->name('contracts.save-callback');
 
-Route::get('/onlyoffice/template/{template}/document', [OnlyOfficeTemplateController::class, 'document'])
-    ->name('onlyoffice.template.document');
+Route::get('/contract-templates/{template}/document', [OnlyOfficeTemplateController::class, 'document'])
+    ->name('contract-templates.document');
 
-Route::post('/onlyoffice/template/{template}/callback', [OnlyOfficeTemplateController::class, 'callback'])
-    ->name('onlyoffice.template.callback');
+Route::post('/contract-templates/{template}/save-callback', [OnlyOfficeTemplateController::class, 'callback'])
+    ->name('contract-templates.save-callback');
 
-Route::get('/onlyoffice/order/{order}/document', [OnlyOfficeOrderController::class, 'document'])
-    ->name('onlyoffice.order.document');
+Route::get('/orders/{order}/document', [OnlyOfficeOrderController::class, 'document'])
+    ->name('orders.document');
 
-Route::post('/onlyoffice/order/{order}/callback', [OnlyOfficeOrderController::class, 'callback'])
-    ->name('onlyoffice.order.callback');
+Route::post('/orders/{order}/save-callback', [OnlyOfficeOrderController::class, 'callback'])
+    ->name('orders.save-callback');
 
 Route::post('/telegram/webhook/{secret}', [TelegramWebhookController::class, 'handle'])
     ->name('telegram.webhook');
