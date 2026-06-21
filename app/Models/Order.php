@@ -134,11 +134,6 @@ class Order extends Model
         ];
     }
 
-    public function scopeActive($query)
-    {
-        return $query->where('status', self::STATUS_ACTIVE);
-    }
-
     public function orderType(): BelongsTo
     {
         return $this->belongsTo(OrderType::class);
