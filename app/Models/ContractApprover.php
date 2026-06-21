@@ -41,8 +41,6 @@ class ContractApprover extends Model
 
     public const STATUS_REJECTED = ContractApproverStatus::Rejected;
 
-    public const STATUS_RETURNED = ContractApproverStatus::Returned;
-
     public const STATUS_SKIPPED = ContractApproverStatus::Skipped;
 
     public const STATUS_INVALIDATED = ContractApproverStatus::Invalidated;
@@ -75,15 +73,6 @@ class ContractApprover extends Model
     {
         $this->update([
             'status' => self::STATUS_REJECTED,
-            'comment' => $comment,
-            'acted_at' => now(),
-        ]);
-    }
-
-    public function markReturned(?string $comment = null): void
-    {
-        $this->update([
-            'status' => self::STATUS_RETURNED,
             'comment' => $comment,
             'acted_at' => now(),
         ]);

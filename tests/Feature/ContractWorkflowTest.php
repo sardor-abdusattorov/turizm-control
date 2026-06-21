@@ -110,32 +110,6 @@ it('rejects a contract and notifies the responsible', function () {
     ]);
 });
 
-it('returns a contract for revision, resets other approvers and notifies the responsible', function () {
-    [$contract, $responsible, $approvers] = createContractWithChain(3);
-    $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
-    $contract->approvers()->where('order', 1)->first()->markApproved();
-
-    $secondApprover = $approvers->get(1);
-    actingAs($secondApprover);
-
-    $result = app(ContractWorkflow::class)->returnForRevision($contract, $secondApprover, 'add appendix');
-
-    expect($result)->toBeTrue()
-        ->and($contract->fresh()->status)->toBe(Contract::STATUS_DRAFT);
-
-    $approvers = $contract->fresh()->approvers;
-
-    expect($approvers->firstWhere('order', 2)->status)->toBe(ContractApprover::STATUS_RETURNED)
-        ->and($approvers->firstWhere('order', 2)->comment)->toBe('add appendix')
-        ->and($approvers->firstWhere('order', 1)->status)->toBe(ContractApprover::STATUS_QUEUED)
-        ->and($approvers->firstWhere('order', 3)->status)->toBe(ContractApprover::STATUS_QUEUED);
-
-    $this->assertDatabaseHas('notifications', [
-        'notifiable_id' => $responsible->id,
-        'notifiable_type' => User::class,
-    ]);
-});
-
 it('refuses to approve when the acting user is not the current approver', function () {
     [$contract, , $approvers] = createContractWithChain();
     $contract->update(['status' => Contract::STATUS_IN_REVIEW]);

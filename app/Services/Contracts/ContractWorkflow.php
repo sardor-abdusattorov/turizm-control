@@ -199,43 +199,6 @@ class ContractWorkflow
         return true;
     }
 
-    public function returnForRevision(Contract $contract, User $user, ?string $comment = null): bool
-    {
-        if (! $contract->canBeApprovedBy($user)) {
-            return false;
-        }
-
-        $current = $contract->currentApprover();
-
-        if (! $current) {
-            return false;
-        }
-
-        DB::transaction(function () use ($contract, $current, $comment, $user): void {
-            $current->markReturned($comment);
-
-            $contract->approvers()
-                ->where('id', '!=', $current->id)
-                ->update([
-                    'status' => ContractApprover::STATUS_QUEUED,
-                    'comment' => null,
-                    'acted_at' => null,
-                ]);
-
-            $contract->update(['status' => Contract::STATUS_DRAFT]);
-            $this->notifier->notifyReturned($contract, $comment);
-
-            $this->logWorkflowEvent(
-                event: 'Contract Returned',
-                contract: $contract,
-                user: $user,
-                properties: ['comment' => $comment],
-            );
-        });
-
-        return true;
-    }
-
     private function slaDays(): int
     {
         $days = (int) settings('approval.sla_days', 2);

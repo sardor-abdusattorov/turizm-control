@@ -343,7 +343,6 @@ class Contract extends Model
         $decided = [
             ContractApprover::STATUS_APPROVED,
             ContractApprover::STATUS_REJECTED,
-            ContractApprover::STATUS_RETURNED,
         ];
 
         $count = 0;
@@ -491,12 +490,20 @@ class Contract extends Model
             return true;
         }
 
-        return $this->responsible_id === $user->id
+        // The responsible manager owns the document while it is a draft, in
+        // review, or has come back rejected.
+        if ($this->responsible_id === $user->id
             && in_array($this->status, [
                 self::STATUS_DRAFT,
                 self::STATUS_IN_REVIEW,
                 self::STATUS_REJECTED,
-            ], true);
+            ], true)) {
+            return true;
+        }
+
+        // The approver whose turn it is may tweak the document before
+        // approving it.
+        return $this->currentApprover()?->user_id === $user->id;
     }
 
     public function canBeDeletedBy(?User $user = null): bool

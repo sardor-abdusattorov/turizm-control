@@ -132,7 +132,6 @@ return [
         'comment' => 'Comment',
         'system_note' => 'System note',
         'rejection_reason' => 'Reason for rejection',
-        'return_reason' => 'What needs to be revised',
 
         'department' => 'Department',
         'department_single' => 'Department',
@@ -288,7 +287,6 @@ return [
         'send_to_director' => 'Send to director',
         'approve' => 'Approve',
         'reject' => 'Reject',
-        'return_for_revision' => 'Return for revision',
         'archive' => 'Archive',
         'back_to_contract' => 'Back to contract',
         'close' => 'Close',
@@ -328,10 +326,6 @@ return [
             'title' => 'Contract rejected',
             'body' => 'Contract :number was rejected — reason: :reason',
         ],
-        'contract_returned' => [
-            'title' => 'Contract returned for revision',
-            'body' => 'Contract :number was sent back to draft — note: :reason',
-        ],
         'approval_due_soon' => [
             'title' => 'Approval deadline approaching',
             'body' => 'Contract :number is waiting for your approval and the deadline is near.',
@@ -369,7 +363,6 @@ return [
         'contract_submitted' => 'Contract sent for approval',
         'contract_approved' => 'Contract approved',
         'contract_rejected' => 'Contract rejected',
-        'contract_returned' => 'Contract returned for revision',
         'contract_archived' => 'Contract archived',
         'approval_state_reset' => 'Editing reset the approval chain — please submit the contract for approval again',
         'contract_data_saved' => 'Contract data saved',
@@ -492,7 +485,6 @@ return [
             'pending' => 'Reviewing',
             'approved' => 'Approved',
             'rejected' => 'Rejected',
-            'returned' => 'Returned',
             'skipped' => 'Skipped',
             'invalidated' => 'Cancelled (after edit)',
             'not_submitted' => 'Not submitted for approval',

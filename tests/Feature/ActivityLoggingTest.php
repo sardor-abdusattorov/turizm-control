@@ -82,20 +82,13 @@ it('writes step-approved and final approved entries through the chain', function
         ->and($final->properties->get('final'))->toBeTrue();
 });
 
-it('writes reject and return activity entries', function () {
+it('writes a reject activity entry', function () {
     [$contract, , $approvers] = chainOf(2);
     $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
     actingAs($approvers->first());
 
     app(ContractWorkflow::class)->reject($contract, $approvers->first(), 'amount mismatch');
     expect(Activity::where('event', 'Contract Rejected')->exists())->toBeTrue();
-
-    [$contract2, , $approvers2] = chainOf(2);
-    $contract2->update(['status' => Contract::STATUS_IN_REVIEW]);
-    actingAs($approvers2->first());
-
-    app(ContractWorkflow::class)->returnForRevision($contract2, $approvers2->first(), 'add appendix');
-    expect(Activity::where('event', 'Contract Returned')->exists())->toBeTrue();
 });
 
 it('writes a Document activity log entry on OnlyOffice contract save', function () {

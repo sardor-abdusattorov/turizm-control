@@ -2114,7 +2114,7 @@
 
                 // Timing tile, shaped by where this person currently stands.
                 $timing = null;
-                if ($ap->acted_at && in_array($ap->status, [ContractApprover::STATUS_APPROVED, ContractApprover::STATUS_REJECTED, ContractApprover::STATUS_RETURNED], true)) {
+                if ($ap->acted_at && in_array($ap->status, [ContractApprover::STATUS_APPROVED, ContractApprover::STATUS_REJECTED], true)) {
                     $onTime = $ap->due_at ? $ap->acted_at->lessThanOrEqualTo($ap->due_at) : null;
                     $startedAt = $ap->due_at?->copy()->subDays($slaDays);
                     $timing = [

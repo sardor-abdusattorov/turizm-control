@@ -91,33 +91,6 @@ class ContractNotifier
         );
     }
 
-    public function notifyReturned(Contract $contract, ?string $reason = null): void
-    {
-        $recipient = $contract->responsible;
-
-        if (! $recipient) {
-            return;
-        }
-
-        Notification::make()
-            ->title(__('app.notification.contract_returned.title'))
-            ->body(__('app.notification.contract_returned.body', [
-                'number' => $contract->number,
-                'reason' => $reason ?? '—',
-            ]))
-            ->icon('heroicon-o-arrow-uturn-left')
-            ->info()
-            ->actions([
-                $this->openContractAction($contract),
-            ])
-            ->sendToDatabase($recipient);
-
-        $this->sendTelegram($recipient, $contract,
-            '↩️ '.__('app.notification.contract_returned.title'),
-            __('app.notification.contract_returned.body', ['number' => $contract->number, 'reason' => $reason ?? '—']),
-        );
-    }
-
     public function notifyReminder(ContractApprover $approver): void
     {
         $contract = $approver->contract;

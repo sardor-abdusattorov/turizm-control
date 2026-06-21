@@ -170,7 +170,7 @@ class EditContract extends EditRecord
     }
 
     /**
-     * Approve / Reject / Return — visible only to the current approver.
+     * Approve / Reject — visible only to the current approver.
      * Reused by ViewContract so approvers can act without entering edit mode.
      *
      * @return array<int, Action>
@@ -220,28 +220,6 @@ class EditContract extends EditRecord
                     }
 
                     Notification::make()->title(__('app.message.contract_rejected'))->danger()->send();
-                }),
-
-            Action::make('returnForRevision')
-                ->label(__('app.action.return_for_revision'))
-                ->icon('heroicon-o-arrow-uturn-left')
-                ->color('gray')
-                ->modalHeading(__('app.action.return_for_revision'))
-                ->schema([
-                    Textarea::make('comment')
-                        ->label(__('app.label.return_reason'))
-                        ->required()
-                        ->rows(3),
-                ])
-                ->visible(fn () => $record?->canBeApprovedBy())
-                ->action(function (array $data, ContractWorkflow $workflow) use ($record): void {
-                    if (! $workflow->returnForRevision($record, auth()->user(), $data['comment'])) {
-                        Notification::make()->title(__('app.message.action_not_allowed'))->danger()->send();
-
-                        return;
-                    }
-
-                    Notification::make()->title(__('app.message.contract_returned'))->warning()->send();
                 }),
         ];
     }

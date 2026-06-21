@@ -8,7 +8,6 @@ enum ContractApproverStatus: string
     case Pending = 'pending';
     case Approved = 'approved';
     case Rejected = 'rejected';
-    case Returned = 'returned';
     case Skipped = 'skipped';
     case Invalidated = 'invalidated';
 
@@ -24,7 +23,6 @@ enum ContractApproverStatus: string
             self::Pending => 'primary',
             self::Approved => 'success',
             self::Rejected => 'danger',
-            self::Returned => 'info',
         };
     }
 }

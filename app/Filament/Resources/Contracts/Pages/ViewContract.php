@@ -293,10 +293,6 @@ class ViewContract extends ViewRecord
             return ['icon' => 'heroicon-s-x-circle', 'color' => 'danger'];
         }
 
-        if ($approver->status === ContractApprover::STATUS_RETURNED) {
-            return ['icon' => 'heroicon-s-arrow-uturn-left', 'color' => 'info'];
-        }
-
         if ($this->isCurrentApprover($approver)) {
             return ['icon' => 'heroicon-s-clock', 'color' => 'primary'];
         }
@@ -359,7 +355,6 @@ class ViewContract extends ViewRecord
         return match (true) {
             $approver->status === ContractApprover::STATUS_APPROVED => 'approved',
             $approver->status === ContractApprover::STATUS_REJECTED => 'rejected',
-            $approver->status === ContractApprover::STATUS_RETURNED => 'returned',
             $this->isCurrentApprover($approver) => 'current',
             default => 'queued',
         };
@@ -375,7 +370,6 @@ class ViewContract extends ViewRecord
             'Contract Sent To Director' => ['icon' => 'heroicon-o-arrow-up-circle', 'color' => 'primary'],
             'Contract Step Approved', 'Contract Approved' => ['icon' => 'heroicon-o-check-circle', 'color' => 'success'],
             'Contract Rejected' => ['icon' => 'heroicon-o-x-circle', 'color' => 'danger'],
-            'Contract Returned' => ['icon' => 'heroicon-o-arrow-uturn-left', 'color' => 'warning'],
             'Contract Document Saved', 'Contract Document Forcesave' => ['icon' => 'heroicon-o-document-text', 'color' => 'info'],
             'Contract Edit Invalidated' => ['icon' => 'heroicon-o-no-symbol', 'color' => 'warning'],
             'created' => ['icon' => 'heroicon-o-sparkles', 'color' => 'info'],
@@ -389,7 +383,7 @@ class ViewContract extends ViewRecord
     {
         return match ($event) {
             'Contract Submitted', 'Contract Sent To Director', 'Contract Step Approved',
-            'Contract Approved', 'Contract Rejected', 'Contract Returned' => 'workflow',
+            'Contract Approved', 'Contract Rejected' => 'workflow',
             default => 'edit',
         };
     }

@@ -83,22 +83,3 @@ it('promotes the next QUEUED approver to PENDING when the current one approves',
     expect($second->status)->toBe(ContractApprover::STATUS_PENDING)
         ->and($second->due_at)->not->toBeNull();
 });
-
-it('returns other approvers to QUEUED (not PENDING) when one returns the contract for revision', function () {
-    [$contract, , $approvers] = chainForSubmit(3);
-    $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
-
-    // First already approved; second is reviewing now.
-    $contract->approvers()->where('order', 1)->first()->markApproved();
-    $contract->approvers()->where('order', 2)->first()->startReview(2);
-
-    $second = $approvers->get(1);
-    actingAs($second);
-
-    app(ContractWorkflow::class)->returnForRevision($contract, $second, 'fix it');
-
-    $rows = $contract->fresh()->approvers;
-    expect($rows->firstWhere('order', 1)->status)->toBe(ContractApprover::STATUS_QUEUED)
-        ->and($rows->firstWhere('order', 2)->status)->toBe(ContractApprover::STATUS_RETURNED)
-        ->and($rows->firstWhere('order', 3)->status)->toBe(ContractApprover::STATUS_QUEUED);
-});
