@@ -13,7 +13,10 @@
     $active = $record->activeApprovers;
     $historical = $record->approvers->whereIn('status', [ContractApprover::STATUS_INVALIDATED, ContractApprover::STATUS_SKIPPED]);
     $approvedCount = $active->where('status', ContractApprover::STATUS_APPROVED)->count();
-    $totalCount = $active->count();
+    // Use the highest `order` in the chain so a "Step 3 / X" tile reads
+    // correctly even when an earlier slot was invalidated and removed from
+    // the active rows.
+    $totalCount = (int) max($active->max('order') ?? 0, $active->count());
     $progress = $totalCount ? round($approvedCount / $totalCount * 100) : 0;
 
     // People who only appear in cancelled/skipped rows — e.g. an approver who
@@ -1598,26 +1601,27 @@
             background: var(--s);
         }
         .cw-stat__lb {
-            font-size: .64rem;
-            font-weight: 700;
+            font-size: .65rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: .04em;
+            letter-spacing: .05em;
             color: var(--m2);
             display: inline-flex;
             align-items: center;
             gap: .3rem;
         }
         .cw-stat__vl {
-            margin-top: .3rem;
-            font-size: .95rem;
-            font-weight: 750;
+            margin-top: .28rem;
+            font-size: .85rem;
+            font-weight: 600;
             color: var(--t);
-            line-height: 1.15;
+            line-height: 1.2;
             font-variant-numeric: tabular-nums;
         }
         .cw-stat__sub {
-            margin-top: .15rem;
+            margin-top: .18rem;
             font-size: .7rem;
+            font-weight: 500;
             color: var(--m);
         }
         .cw-stat--success {
@@ -2137,7 +2141,9 @@
                         <div class="cw-stat">
                             <span class="cw-stat__lb">{!! $ic('heroicon-m-queue-list', 12) !!} {{ __('app.label.step') }}</span>
                             <div class="cw-stat__vl">{{ $ap->order }} / {{ $totalCount }}</div>
-                            <div class="cw-stat__sub">{{ trans_choice('app.label.attempts_count', $allRecords->count(), ['count' => $allRecords->count()]) }}</div>
+                            @if ($allRecords->count() > 1)
+                                <div class="cw-stat__sub">{{ trans_choice('app.label.attempts_count', $allRecords->count(), ['count' => $allRecords->count()]) }}</div>
+                            @endif
                         </div>
                         @if ($timing)
                             <div class="cw-stat cw-stat--{{ $timing['tone'] }}">
@@ -2178,7 +2184,6 @@
                                     <tr @class(['is-past' => $past]) style="--row-accent:{{ $rowAccent }};">
                                         <td class="cw-rt__st">
                                             <span class="cw-pill cw-pill--{{ $pillFor($shown) }}">{{ $statusName($shown) }}</span>
-                                            <span class="cw-rt__ord">#{{ $rec->order }}</span>
                                             @if ($rec->wasCancelledAfterVerdict())
                                                 <span class="cw-rt__tag">{!! $ic('heroicon-m-x-circle', 11) !!} {{ __('app.label.cancelled') }}</span>
                                             @endif
