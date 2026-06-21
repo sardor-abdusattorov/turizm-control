@@ -44,6 +44,7 @@
     .af-wrap {
         max-height: 65vh;
         overflow-y: auto;
+        overflow-x: auto;
         margin: -.25rem;
         padding: .25rem;
     }
@@ -72,7 +73,7 @@
         background: #18181b;
     }
     .af tbody td {
-        padding: .75rem .6rem;
+        padding: .75rem .9rem .75rem .6rem;
         border-bottom: 1px solid rgba(127,127,127,.12);
         vertical-align: top;
     }
@@ -163,6 +164,25 @@
         font-weight: 650;
         color: #dc2626;
     }
+    /* SLA hint under the Status pill — clearly belongs to Status, not to the
+       Acted-on column next to it. */
+    .af-due {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        margin-top: .35rem;
+        padding: .15rem .45rem;
+        border-radius: .35rem;
+        background: rgba(127,127,127,.07);
+        border: 1px dashed rgba(127,127,127,.28);
+        font-size: .68rem;
+        font-weight: 600;
+        color: currentColor;
+        opacity: .75;
+    }
+    .af-due > svg {
+        opacity: .7;
+    }
 
     .af-date {
         font-size: .78rem;
@@ -180,19 +200,12 @@
         opacity: .35;
     }
 
+    /* Mobile: keep the table as a table and let the wrapper scroll sideways
+       (the index data tables behave the same way) instead of stacking rows. */
     @media (max-width: 720px) {
-        .af thead { display: none; }
-        .af tbody td {
-            display: block;
-            padding: .35rem .6rem;
-            border-bottom: 0;
+        .af {
+            min-width: 44rem;
         }
-        .af tbody tr {
-            display: block;
-            padding: .8rem .2rem;
-            border-bottom: 1px solid rgba(127,127,127,.18);
-        }
-        .af-date { white-space: normal; }
     }
 </style>
 
@@ -252,9 +265,10 @@
                                 {{ __('app.label.overdue') }}
                             </div>
                         @elseif ($a->status === ContractApprover::STATUS_PENDING && $a->due_at)
-                            <div class="af-date" style="margin-top:.3rem;">
-                                <small>{{ __('app.label.due') }} {{ $a->due_at->translatedFormat('d.m.Y') }}</small>
-                            </div>
+                            <span class="af-due">
+                                {!! svg('heroicon-m-clock', '', ['width' => 11, 'height' => 11])->toHtml() !!}
+                                {{ __('app.label.due') }} {{ $a->due_at->translatedFormat('d.m.Y') }}
+                            </span>
                         @endif
                     </td>
                     <td>
