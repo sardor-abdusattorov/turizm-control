@@ -45,7 +45,7 @@ it('locks download and print while a draft contract is still in progress', funct
         ->and($permissions['print'])->toBeFalse();
 });
 
-it('locks export while the contract is in review for the current approver', function () {
+it('lets the current approver edit directly but still locks export while in review', function () {
     $approver = User::factory()->create();
     $contract = Contract::factory()->create([
         'responsible_id' => User::factory()->create()->id,
@@ -61,10 +61,44 @@ it('locks export while the contract is in review for the current approver', func
 
     $permissions = editorPermissions($contract->refresh(), $approver);
 
-    expect($permissions['review'])->toBeTrue()
-        ->and($permissions['edit'])->toBeFalse()
+    expect($permissions['edit'])->toBeTrue()
+        ->and($permissions['review'])->toBeFalse()
         ->and($permissions['download'])->toBeFalse()
         ->and($permissions['print'])->toBeFalse();
+});
+
+it('lets the responsible manager edit a contract that is in review', function () {
+    $responsible = User::factory()->create();
+    $contract = Contract::factory()->create([
+        'responsible_id' => $responsible->id,
+        'status' => Contract::STATUS_IN_REVIEW,
+    ]);
+
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => User::factory()->create()->id,
+        'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+
+    $permissions = editorPermissions($contract->refresh(), $responsible);
+
+    expect($permissions['edit'])->toBeTrue()
+        ->and($permissions['review'])->toBeFalse();
+});
+
+it('keeps track changes disabled in the editor', function () {
+    $responsible = User::factory()->create();
+    $contract = Contract::factory()->create([
+        'responsible_id' => $responsible->id,
+        'status' => Contract::STATUS_DRAFT,
+    ]);
+
+    $review = app(OnlyOfficeService::class)
+        ->editorConfig($contract, $responsible)['editorConfig']['customization']['review'];
+
+    expect($review['trackChanges'])->toBeFalse()
+        ->and($review['showReviewChanges'])->toBeFalse();
 });
 
 it('unlocks download and print once the contract is approved', function () {

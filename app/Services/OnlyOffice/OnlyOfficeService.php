@@ -35,7 +35,7 @@ class OnlyOfficeService
     public function editorConfig(Contract $contract, User $user, ?string $forceMode = null): array
     {
         $permissions = $this->resolvePermissions($contract, $user);
-        $defaultMode = ($permissions['edit'] || $permissions['review']) ? 'edit' : 'view';
+        $defaultMode = $permissions['edit'] ? 'edit' : 'view';
         $mode = $this->resolveMode($forceMode, $defaultMode, $permissions);
 
         return $this->buildConfig(
@@ -61,7 +61,7 @@ class OnlyOfficeService
 
     public function templateEditorConfig(ContractTemplate $template, User $user, ?string $forceMode = null): array
     {
-        $permissions = $this->permissionSet(edit: true, review: true, comment: true, download: false, print: false);
+        $permissions = $this->permissionSet(edit: true, review: false, comment: true, download: false, print: false);
         $mode = $this->resolveMode($forceMode, 'edit', $permissions);
 
         return $this->buildConfig(
@@ -78,7 +78,7 @@ class OnlyOfficeService
 
     public function orderEditorConfig(Order $order, User $user, ?string $forceMode = null): array
     {
-        $permissions = $this->permissionSet(edit: true, review: true, comment: true, download: true, print: true);
+        $permissions = $this->permissionSet(edit: true, review: false, comment: true, download: true, print: true);
         $mode = $this->resolveMode($forceMode, 'edit', $permissions);
         $extension = $order->extension() ?: 'docx';
 
@@ -144,12 +144,11 @@ class OnlyOfficeService
     {
         $canExport = $this->canExportContract($contract, $user);
 
-        if ($contract->status === Contract::STATUS_DRAFT && $contract->canBeEditedBy($user)) {
-            return $this->permissionSet(edit: true, review: true, comment: true, download: $canExport, print: $canExport);
-        }
-
-        if ($contract->status === Contract::STATUS_IN_REVIEW && $contract->isCurrentApprover($user)) {
-            return $this->permissionSet(edit: false, review: true, comment: true, download: $canExport, print: $canExport);
+        // Anyone allowed to edit the contract — the author while it is a
+        // draft / in review / rejected, plus the current approver — edits the
+        // document directly. Track changes / review mode is never used.
+        if ($contract->canBeEditedBy($user)) {
+            return $this->permissionSet(edit: true, review: false, comment: true, download: $canExport, print: $canExport);
         }
 
         return $this->permissionSet(edit: false, review: false, comment: false, download: $canExport, print: $canExport);
@@ -199,7 +198,7 @@ class OnlyOfficeService
                     'id' => (string) $user->id,
                     'name' => $user->name,
                 ],
-                'customization' => $this->customization($mode),
+                'customization' => $this->customization(),
             ],
         ];
 
@@ -242,30 +241,28 @@ class OnlyOfficeService
      */
     private function resolveMode(?string $forceMode, string $default, array $permissions): string
     {
-        $mode = in_array($forceMode, ['edit', 'view', 'review'], true)
+        $mode = in_array($forceMode, ['edit', 'view'], true)
             ? $forceMode
             : $default;
 
         if ($mode === 'edit' && ! ($permissions['edit'] ?? false)) {
-            return ($permissions['review'] ?? false) ? 'review' : 'view';
+            return 'view';
         }
 
         return $mode;
     }
 
     /**
-     * Customization block. trackChanges is set explicitly per mode so
-     * OnlyOffice doesn't fall back to the user's saved preference (which
-     * stuck ON from earlier sessions and forced the editor into the
-     * Reviewing badge even when we opened in mode=edit).
+     * Customization block. Track changes / review markup is force-disabled —
+     * the document is always edited directly, never via suggestions — and set
+     * explicitly so OnlyOffice can't fall back to a per-user preference that
+     * stuck ON from an earlier session.
      *
      * @return array<string, mixed>
      */
-    private function customization(string $mode): array
+    private function customization(): array
     {
-        $isReview = $mode === 'review';
-
-        $customization = [
+        return [
             'forcesave' => true,
             'autosave' => true,
             'compactHeader' => false,
@@ -274,14 +271,12 @@ class OnlyOfficeService
             'about' => false,
             'feedback' => ['visible' => false],
             'review' => [
-                'trackChanges' => $isReview,
-                'showReviewChanges' => $isReview,
+                'trackChanges' => false,
+                'showReviewChanges' => false,
                 'reviewDisplay' => 'markup',
                 'hoverMode' => true,
             ],
         ];
-
-        return $customization;
     }
 
     private function permissionSet(
