@@ -122,35 +122,26 @@
         [x-cloak] {
             display: none !important;
         }
+        /* Base palette tokens (--s/--t/--m/--accent/...) live in theme.css.
+           The cw page tunes a few values for tighter contrast against the
+           chain/progress bars and keeps its page-specific extras (--r,
+           --track, --accent-ring, --accent-on). */
         .cw {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
-            --s: #fff;
             --r: rgba(15,20,25,.08);
-            --t: #0f1419;
-            --m: #57606a;
-            --m2: #8b949e;
             --d: rgba(15,20,25,.07);
-            --soft: #f8fafc;
             --track: #e6ebf1;
-            --accent: #6366f1;
-            --accent-strong: #4338ca;
             --accent-soft: rgba(99,102,241,.12);
             --accent-softer: rgba(99,102,241,.05);
             --accent-ring: rgba(99,102,241,.18);
             --accent-on: #fff;
         }
         .dark .cw {
-            --s: #18181b;
             --r: rgba(255,255,255,.08);
-            --t: #f0f6fc;
-            --m: #9aa4b2;
-            --m2: #6e7681;
             --d: rgba(255,255,255,.07);
-            --soft: rgba(255,255,255,.03);
             --track: rgba(255,255,255,.10);
-            --accent: #818cf8;
             --accent-strong: #a5b4fc;
             --accent-soft: rgba(129,140,248,.16);
             --accent-softer: rgba(129,140,248,.08);

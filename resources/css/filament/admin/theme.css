@@ -4,6 +4,41 @@
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../resources/views/livewire/**/*';
 
+/* Custom view-page palette: cw (contracts), ow (orders), pv (payments).
+   Each page used to redeclare these same tokens in its own <style> block —
+   pulled into the theme so the palette + its dark-mode mirror live in one
+   place. A page can still override any individual token locally if it
+   needs a different accent. */
+.cw,
+.ow,
+.pv {
+    --s: #fff;
+    --t: #0f1419;
+    --m: #57606a;
+    --m2: #8b949e;
+    --d: rgba(15, 20, 25, .08);
+    --soft: #f8fafc;
+    --accent: #6366f1;
+    --accent-soft: #eef2ff;
+    --accent-softer: #f5f7ff;
+    --accent-strong: #4338ca;
+}
+
+.dark .cw,
+.dark .ow,
+.dark .pv {
+    --s: #18181b;
+    --t: #f0f6fc;
+    --m: #9aa4b2;
+    --m2: #6e7681;
+    --d: rgba(255, 255, 255, .08);
+    --soft: rgba(255, 255, 255, .03);
+    --accent: #818cf8;
+    --accent-soft: rgba(99, 102, 241, .12);
+    --accent-softer: rgba(99, 102, 241, .07);
+    --accent-strong: #c7d2fe;
+}
+
 /* Thin accent scrollbars via the STANDARD properties only. We intentionally
    do NOT use ::-webkit-scrollbar: a webkit custom scrollbar is painted off the
    compositor, which forces main-thread scrolling — that's what made the page

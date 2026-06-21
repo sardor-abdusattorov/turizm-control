@@ -80,34 +80,13 @@
 </div>
 
 <style>
+    /* Palette tokens (--s/--t/--m/--accent/...) live in theme.css. */
     .pv {
-        --s: #fff;
-        --t: #0f1419;
-        --m: #57606a;
-        --m2: #8b949e;
-        --d: rgba(15,20,25,.08);
-        --soft: #f8fafc;
-        --accent: #6366f1;
-        --accent-soft: #eef2ff;
-        --accent-softer: #f5f7ff;
-        --accent-strong: #4338ca;
         font-size: .875rem;
         color: var(--t);
         display: flex;
         flex-direction: column;
         gap: 1rem;
-    }
-    .dark .pv {
-        --s: #18181b;
-        --t: #f0f6fc;
-        --m: #9aa4b2;
-        --m2: #6e7681;
-        --d: rgba(255,255,255,.08);
-        --soft: rgba(255,255,255,.03);
-        --accent: #818cf8;
-        --accent-soft: rgba(99,102,241,.12);
-        --accent-softer: rgba(99,102,241,.07);
-        --accent-strong: #c7d2fe;
     }
 
     /* HERO */
