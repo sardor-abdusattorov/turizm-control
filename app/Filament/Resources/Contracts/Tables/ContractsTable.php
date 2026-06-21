@@ -70,6 +70,12 @@ class ContractsTable
                     ->extraHeaderAttributes(['style' => 'min-width:14rem;'])
                     ->extraAttributes(['style' => 'min-width:14rem;vertical-align:middle;']),
 
+                ViewColumn::make('sla')
+                    ->label(__('app.label.due'))
+                    ->view('filament.components.sla-countdown')
+                    ->state(fn (Contract $record) => $record->currentApprover()?->due_at)
+                    ->disableClick(),
+
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))
                     ->toggleable(),

@@ -6,9 +6,9 @@ use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Services\Dashboard\DashboardContext;
-use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
@@ -60,11 +60,11 @@ class MyApprovalQueueWidget extends TableWidget
                     ->formatStateUsing(fn ($state, Contract $record): string => number_format((float) $state, 0, '.', ' ').' '.($record->currency?->short_name ?? ''))
                     ->sortable(false),
 
-                TextColumn::make('due')
+                ViewColumn::make('due')
                     ->label(__('app.label.due'))
-                    ->state(fn (Contract $record): string => $this->dueLabel($record))
-                    ->badge()
-                    ->color(fn (Contract $record): string => $this->myRow($record)?->isOverdue() ? 'danger' : 'warning'),
+                    ->view('filament.components.sla-countdown')
+                    ->state(fn (Contract $record) => $this->myRow($record)?->due_at)
+                    ->disableClick(),
             ])
             ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))
             ->recordActions([
@@ -81,18 +81,5 @@ class MyApprovalQueueWidget extends TableWidget
     private function myRow(Contract $contract): ?ContractApprover
     {
         return app(DashboardContext::class)->myApproverRow($contract);
-    }
-
-    private function dueLabel(Contract $contract): string
-    {
-        $due = $this->myRow($contract)?->due_at;
-
-        if (! $due) {
-            return __('app.label.not_set');
-        }
-
-        return $due->isPast()
-            ? __('app.dashboard.overdue_by', ['time' => $due->diffForHumans(now(), ['parts' => 1, 'syntax' => CarbonInterface::DIFF_ABSOLUTE])])
-            : __('app.dashboard.due_in', ['time' => $due->diffForHumans(now(), ['parts' => 1, 'syntax' => CarbonInterface::DIFF_ABSOLUTE])]);
     }
 }

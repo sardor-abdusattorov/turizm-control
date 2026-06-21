@@ -25,8 +25,15 @@
                             {{ __('app.dashboard.held_by', ['name' => $item['who']]) }}
                         @endif
                     </span>
-                    @if ($item['days'] > 0)
-                        <span class="oab__days">{{ $this->daysLabel($item['days']) }}</span>
+                    @php
+                        $due = $item['role'] === 'mine'
+                            ? app(\App\Services\Dashboard\DashboardContext::class)->myApproverRow($contract)?->due_at
+                            : $contract->currentApprover()?->due_at;
+                    @endphp
+                    @if ($due)
+                        <span class="oab__cd">
+                            @include('filament.components.sla-countdown', ['due' => $due])
+                        </span>
                     @endif
                     <span class="oab__go">
                         {{ __('app.action.open_contract') }}
