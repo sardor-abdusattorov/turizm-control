@@ -17,7 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $middleware->validateCsrfTokens(except: [
-            'onlyoffice/*',
+            'contracts/*/save-callback',
+            'contract-templates/*/save-callback',
+            'orders/*/save-callback',
             'telegram/webhook/*',
         ]);
     })
