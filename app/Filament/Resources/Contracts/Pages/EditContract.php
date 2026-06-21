@@ -33,6 +33,13 @@ class EditContract extends EditRecord
 
     protected ?ContractStatus $originalStatus = null;
 
+    public function mount(int|string $record): void
+    {
+        parent::mount($record);
+
+        abort_unless($this->record->canBeEditedBy(), 403);
+    }
+
     protected function getRedirectUrl(): string
     {
         return ContractResource::getUrl('view', ['record' => $this->record]);

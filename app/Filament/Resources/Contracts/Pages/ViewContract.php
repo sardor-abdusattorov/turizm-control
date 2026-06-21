@@ -181,14 +181,6 @@ class ViewContract extends ViewRecord
                     $this->record->refresh();
                 }),
 
-            Action::make('downloadPdf')
-                ->label(__('app.action.download_pdf'))
-                ->icon('heroicon-o-document-arrow-down')
-                ->color('success')
-                ->url(fn () => route('contracts.pdf.download', ['contract' => $this->record]))
-                ->visible(fn (): bool => $this->record?->status === Contract::STATUS_APPROVED
-                    && self::userCanExportContract()),
-
             EditAction::make()
                 ->icon('heroicon-o-pencil-square')
                 ->visible(fn () => $this->record?->canBeEditedBy()),

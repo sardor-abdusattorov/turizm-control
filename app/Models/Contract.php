@@ -484,6 +484,12 @@ class Contract extends Model
             return false;
         }
 
+        // A finalized contract is immutable — once it is fully approved the
+        // signed document is locked for everyone, administrators included.
+        if ($this->status === self::STATUS_APPROVED) {
+            return false;
+        }
+
         if ($user->hasRole('super_admin')) {
             return true;
         }
