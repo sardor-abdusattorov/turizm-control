@@ -333,6 +333,14 @@ return [
             'title' => 'Approval overdue',
             'body' => 'Contract :number is past its approval deadline and still waiting for you.',
         ],
+        'payment_recorded' => [
+            'title' => 'Payment recorded',
+            'body' => 'A payment of :percent% was recorded on contract :number.',
+        ],
+        'payment_completed' => [
+            'title' => 'Contract fully paid',
+            'body' => 'Contract :number has now been paid in full.',
+        ],
     ],
     'message' => [
         'loading_editor' => 'Loading editor…',

@@ -2,16 +2,16 @@
 
 namespace App\Services\Contracts;
 
-use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Models\ContractApprover;
-use App\Models\User;
+use App\Services\Notifications\InteractsWithContractNotifications;
 use App\Services\Telegram\TelegramService;
-use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 
 class ContractNotifier
 {
+    use InteractsWithContractNotifications;
+
     public function __construct(public TelegramService $telegram) {}
 
     public function notifyApprovalRequested(ContractApprover $approver): void
@@ -116,39 +116,6 @@ class ContractNotifier
         $this->sendTelegram($recipient, $contract,
             ($overdue ? '⚠️ ' : '⏰ ').__("app.notification.{$key}.title"),
             __("app.notification.{$key}.body", ['number' => $contract->number]),
-        );
-    }
-
-    protected function openContractAction(Contract $contract): Action
-    {
-        return Action::make('open')
-            ->label(__('app.action.open_contract'))
-            ->url(ContractResource::getUrl('view', ['record' => $contract->id]))
-            ->markAsRead();
-    }
-
-    protected function sendTelegram(User $recipient, Contract $contract, string $title, string $body, bool $withApprove = false): void
-    {
-        $url = ContractResource::getUrl('view', ['record' => $contract->id]);
-
-        $keyboard = [];
-
-        if ($withApprove) {
-            $keyboard[] = [[
-                'text' => '✅ '.__('app.action.approve'),
-                'callback_data' => "approve:{$contract->id}",
-            ]];
-        }
-
-        $keyboard[] = [[
-            'text' => __('app.action.open_contract'),
-            'url' => $url,
-        ]];
-
-        $this->telegram->send(
-            $recipient->telegram_chat_id,
-            "<b>{$title}</b>\n{$body}",
-            $keyboard,
         );
     }
 }
