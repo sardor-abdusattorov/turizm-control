@@ -33,6 +33,15 @@
 
     $pillFor = fn (ContractApproverStatus $status): string => $status->color();
     $statusName = fn (ContractApproverStatus $status): string => $status->label();
+
+    // Before a contract is submitted the approvers are technically "queued",
+    // but the review hasn't started — so show "Not submitted" instead of
+    // "In queue" while the contract is still a draft.
+    $isDraft = $record->status === Contract::STATUS_DRAFT;
+    $approverLabel = fn (ContractApproverStatus $status): string => $isDraft && $status === ContractApproverStatus::Queued
+        ? __('app.label.not_submitted')
+        : $status->label();
+
     $ic = fn (string $name, int $size = 18) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
     // SLA window (days an approver gets once it's their turn) and the saturated
@@ -1785,7 +1794,7 @@
                                         <div class="cw-step__nm">{{ $ap->user?->name }} <span class="cw-ord">#{{ $ap->order }}</span>@if ($isDirector)<span class="cw-director">{!! $ic('heroicon-s-shield-check', 11) !!} {{ __('app.label.final_sign_off') }}</span>@endif</div>
                                         <div class="cw-step__dp">{{ $ap->user?->department?->name }}{{ $ap->user?->position?->name ? ' · '.$ap->user->position->name : '' }}</div>
                                         <div class="cw-step__meta">
-                                            <span class="cw-pill cw-pill--{{ $pillFor($ap->status) }}">{{ $statusName($ap->status) }}</span>
+                                            <span class="cw-pill cw-pill--{{ $pillFor($ap->status) }}">{{ $approverLabel($ap->status) }}</span>
                                             @if ($ap->acted_at)
                                                 <span class="cw-when">{!! $ic('heroicon-m-check', 13) !!} {{ $ap->acted_at->format('d.m.Y H:i') }}</span>
                                             @elseif ($state === 'current' && $ap->due_at)
@@ -2148,7 +2157,7 @@
                             <div class="cw-modal__dp">{{ $ap->user?->department?->name }}{{ $ap->user?->position?->name ? ' · '.$ap->user->position->name : '' }}</div>
                         </div>
                         <div class="cw-modal__hd-pill">
-                            <span class="cw-pill cw-pill--lg cw-pill--{{ $apTone }}">{{ $statusName($apShown) }}</span>
+                            <span class="cw-pill cw-pill--lg cw-pill--{{ $apTone }}">{{ $approverLabel($apShown) }}</span>
                             <button type="button" class="cw-modal__x" @click="approver = null">{!! $ic('heroicon-o-x-mark', 16) !!}</button>
                         </div>
                     </div>
@@ -2199,7 +2208,7 @@
                                     @endphp
                                     <tr @class(['is-past' => $past]) style="--row-accent:{{ $rowAccent }};">
                                         <td class="cw-rt__st">
-                                            <span class="cw-pill cw-pill--{{ $pillFor($shown) }}">{{ $statusName($shown) }}</span>
+                                            <span class="cw-pill cw-pill--{{ $pillFor($shown) }}">{{ $approverLabel($shown) }}</span>
                                             @if ($rec->wasCancelledAfterVerdict())
                                                 <span class="cw-rt__tag">{!! $ic('heroicon-m-x-circle', 11) !!} {{ __('app.label.cancelled') }}</span>
                                             @endif
