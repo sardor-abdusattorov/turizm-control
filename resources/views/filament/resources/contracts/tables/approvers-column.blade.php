@@ -87,6 +87,17 @@
             height: 100%;
             border-radius: 99px;
             transition: width .25s ease;
+            animation: ca-grow .65s ease-out both;
+        }
+        @keyframes ca-grow {
+            from {
+                width: 0 !important;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .ca__bar > span {
+                animation: none;
+            }
         }
         .ca__count {
             font-size: .76rem;

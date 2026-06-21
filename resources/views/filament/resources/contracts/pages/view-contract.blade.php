@@ -563,6 +563,17 @@
             height: 100%;
             border-radius: 999px;
             transition: width .3s ease;
+            animation: cw-prog-grow .8s ease-out both;
+        }
+        @keyframes cw-prog-grow {
+            from {
+                width: 0 !important;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .cw-prog__fill {
+                animation: none;
+            }
         }
         .cw-prog__legend {
             display: flex;
