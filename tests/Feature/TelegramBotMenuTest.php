@@ -9,6 +9,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
+use function Pest\Laravel\actingAs;
+
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
@@ -177,6 +179,51 @@ it('renders the awaiting list paginated', function () {
 
         return $kb->contains(fn ($btn) => ($btn['callback_data'] ?? null) === 'aw:2');
     });
+});
+
+it('confirms then deletes the telegram link on /unlink', function () {
+    $user = User::factory()->withTelegram('888')->create();
+
+    // /unlink — bot replies with the confirmation card
+    app(TelegramBot::class)->handleUpdate([
+        'message' => [
+            'chat' => ['id' => 888],
+            'text' => '/unlink',
+        ],
+    ]);
+
+    // user taps the confirm button
+    app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb',
+            'from' => ['id' => 888],
+            'message' => ['message_id' => 1],
+            'data' => 'unlink',
+        ],
+    ]);
+
+    expect($user->fresh()->telegram)->toBeNull();
+});
+
+it('renders the unlink banner on a panel page for users who have not linked', function () {
+    $user = User::factory()->create();
+
+    actingAs($user);
+
+    $html = view('filament.partials.telegram-nag')->render();
+
+    expect($html)->toContain(__('app.label.telegram_nag_title'))
+        ->and($html)->toContain(route('telegram.connect'));
+});
+
+it('does not render the unlink banner for users who have already linked', function () {
+    $user = User::factory()->withTelegram('999')->create();
+
+    actingAs($user);
+
+    $html = view('filament.partials.telegram-nag')->render();
+
+    expect(trim($html))->toBe('');
 });
 
 afterEach(function () {

@@ -54,6 +54,11 @@ class AppServiceProvider extends ServiceProvider
             'panels::body.end',
             fn (): string => '<script>window.addEventListener("pageshow",function(e){if(e.persisted){window.location.reload();}});</script>'
         );
+
+        FilamentView::registerRenderHook(
+            'panels::page.start',
+            fn (): string => view('filament.partials.telegram-nag')->render()
+        );
     }
 
     public function boot(): void

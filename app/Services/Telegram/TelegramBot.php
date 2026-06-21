@@ -83,6 +83,12 @@ class TelegramBot
             return;
         }
 
+        if ($text === '/unlink') {
+            $this->sendUnlinkConfirm($chatId);
+
+            return;
+        }
+
         if ($text === '/help') {
             $this->withUserLocale($chatId, function () use ($chatId): void {
                 $this->telegram->send($chatId, __('app.telegram.help'));
@@ -210,6 +216,11 @@ class TelegramBot
                 $this->state->clear($chatId);
                 $this->telegram->answerCallbackQuery($callbackId, __('app.telegram.cancelled'));
                 $this->editToMainMenu($chatId, $messageId, $user);
+
+                return;
+
+            case 'unlink':
+                $this->finishUnlink($callbackId, $chatId, $messageId, $user);
 
                 return;
 
@@ -365,6 +376,45 @@ class TelegramBot
     {
         $screen = $this->menu->localePicker();
         $this->telegram->send($chatId, $screen['text'], $screen['keyboard']);
+    }
+
+    private function sendUnlinkConfirm(string $chatId): void
+    {
+        $this->withUserLocale($chatId, function () use ($chatId): void {
+            $user = $this->resolveUser($chatId);
+
+            if (! $user) {
+                $this->telegram->send($chatId, __('app.telegram.not_linked'));
+
+                return;
+            }
+
+            $this->telegram->send(
+                $chatId,
+                '<b>'.__('app.telegram.unlink_confirm_title')."</b>\n\n".__('app.telegram.unlink_confirm_body'),
+                [
+                    [
+                        ['text' => '🔓 '.__('app.telegram.unlink_confirm_yes'), 'callback_data' => 'unlink'],
+                        ['text' => '✖ '.__('app.action.cancel'), 'callback_data' => 'menu'],
+                    ],
+                ],
+            );
+        });
+    }
+
+    private function finishUnlink(string $callbackId, string $chatId, ?int $messageId, User $user): void
+    {
+        // Drop the row so the backend stops sending notifications. The user
+        // can always reconnect from the profile page in the web panel.
+        $user->telegram()->delete();
+        $this->state->clear($chatId);
+
+        $this->telegram->editMessage(
+            $chatId,
+            $messageId,
+            '<b>'.__('app.telegram.unlinked_title').'</b>'."\n\n".__('app.telegram.unlinked_body'),
+        );
+        $this->telegram->answerCallbackQuery($callbackId, __('app.telegram.unlinked_title'));
     }
 
     private function editToLocalePicker(string $chatId, ?int $messageId): void
