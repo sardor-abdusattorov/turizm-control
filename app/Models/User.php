@@ -104,13 +104,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
                 $avatar = $user->getFilamentAvatarUrl()
                     ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF';
 
-                $position = $user->position?->name ? ' · '.e($user->position->name) : '';
-
+                // Compact label: a small avatar + name only. Filament reuses this
+                // markup for the selected chips, so keeping it slim stops them
+                // from rendering as big two-line cards. Department is the group
+                // header and the position lives in the preview list below.
                 $grouped[$department][$user->id] = sprintf(
-                    '<div class="flex items-center gap-2"><img src="%s" class="w-6 h-6 rounded-full object-cover" alt=""><span>%s%s</span></div>',
+                    '<span class="flex items-center gap-1.5 text-sm"><img src="%s" class="w-5 h-5 rounded-full object-cover shrink-0" alt="">%s</span>',
                     e($avatar),
                     e($user->name),
-                    $position,
                 );
 
                 return $grouped;
