@@ -361,23 +361,34 @@ class Contract extends Model
             ContractApprover::STATUS_APPROVED,
             ContractApprover::STATUS_REJECTED,
         ];
+        $invalidated = ContractApprover::STATUS_INVALIDATED;
 
-        $count = 0;
-
-        foreach ($this->approvers()->get() as $approver) {
-            $hadVerdict = in_array($approver->status, $decided, true);
-
+        // Rows that already had a verdict need their `original_status`
+        // preserved (the audit trail still shows the original outcome).
+        // Iterate them per-row — they're typically 0-2 per contract and
+        // need to round-trip acted_at through the Eloquent date cast.
+        $verdictCount = 0;
+        foreach ($this->approvers()->whereIn('status', $decided)->get() as $approver) {
             $approver->update([
-                'original_status' => $hadVerdict ? $approver->status : $approver->original_status,
-                'status' => ContractApprover::STATUS_INVALIDATED,
+                'original_status' => $approver->status,
+                'status' => $invalidated,
                 'system_comment' => $note,
-                'acted_at' => $hadVerdict ? $approver->acted_at : now(),
+                'acted_at' => $approver->acted_at,
             ]);
-
-            $count++;
+            $verdictCount++;
         }
 
-        return $count;
+        // Everything else can flip in a single batch UPDATE — no per-row
+        // state to preserve.
+        $pending = $this->approvers()
+            ->whereNotIn('status', array_merge($decided, [$invalidated]))
+            ->update([
+                'status' => $invalidated,
+                'system_comment' => $note,
+                'acted_at' => now(),
+            ]);
+
+        return $verdictCount + $pending;
     }
 
     public function isCurrentApprover(User $user): bool

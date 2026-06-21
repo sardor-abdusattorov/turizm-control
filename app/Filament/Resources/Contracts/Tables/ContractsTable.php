@@ -33,6 +33,16 @@ class ContractsTable
     public static function configure(Table $table): Table
     {
         return $table
+            // Every visible column reads from a relation (status, chain,
+            // contact, currency, responsible, payments). Without eager
+            // loading the listing fires hundreds of queries per page; this
+            // keeps it to a flat handful.
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
+                'contact',
+                'currency',
+                'responsible',
+                'activeApprovers.user.department',
+            ]))
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('number')
