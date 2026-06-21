@@ -33,6 +33,33 @@ class TelegramService
         return $this->call('sendMessage', $payload);
     }
 
+    /**
+     * Replace the text + keyboard of an existing message. Used to mutate the
+     * notification bubble in place after an action (e.g. "→ ✅ Approved").
+     *
+     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
+     */
+    public function editMessage(?string $chatId, ?int $messageId, string $message, ?array $inlineKeyboard = null): bool
+    {
+        if (! $this->token() || ! $chatId || ! $messageId) {
+            return false;
+        }
+
+        $payload = [
+            'chat_id' => $chatId,
+            'message_id' => $messageId,
+            'text' => $message,
+            'parse_mode' => 'HTML',
+            'disable_web_page_preview' => true,
+        ];
+
+        if ($inlineKeyboard !== null) {
+            $payload['reply_markup'] = ['inline_keyboard' => $inlineKeyboard];
+        }
+
+        return $this->call('editMessageText', $payload);
+    }
+
     public function answerCallbackQuery(string $callbackQueryId, ?string $text = null): bool
     {
         if (! $this->token()) {
