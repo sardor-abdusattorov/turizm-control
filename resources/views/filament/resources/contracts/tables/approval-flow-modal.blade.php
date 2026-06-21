@@ -4,252 +4,268 @@
     use App\Models\ContractApprover;
 
     /** @var \App\Models\Contract $contract */
-    $active = $contract->activeApprovers->sortBy('order')->values();
-    $historical = $contract->approvers
-        ->whereIn('status', [ContractApprover::STATUS_INVALIDATED, ContractApprover::STATUS_SKIPPED])
-        ->sortByDesc('id')
-        ->values();
+    // Chronological audit log: every row (queue, pending, approved, returned,
+    // rejected, invalidated, skipped) in the order it was created. The table
+    // tells the full story without hiding anything in a collapsible.
+    $rows = $contract->approvers->sortBy('id')->values();
     $isDraft = $contract->status === Contract::STATUS_DRAFT;
 
     $colorFor = function (ContractApproverStatus $status): array {
         return match ($status) {
-            ContractApprover::STATUS_APPROVED => ['bg' => 'rgba(16,185,129,.12)', 'fg' => '#047857', 'ring' => '#10b981'],
-            ContractApprover::STATUS_REJECTED => ['bg' => 'rgba(239,68,68,.12)', 'fg' => '#b91c1c', 'ring' => '#ef4444'],
-            ContractApprover::STATUS_RETURNED => ['bg' => 'rgba(59,130,246,.12)', 'fg' => '#1d4ed8', 'ring' => '#3b82f6'],
-            ContractApprover::STATUS_PENDING => ['bg' => 'rgba(251,146,60,.14)', 'fg' => '#c2410c', 'ring' => '#fb923c'],
-            ContractApprover::STATUS_QUEUED => ['bg' => 'rgba(99,102,241,.10)', 'fg' => '#4f46e5', 'ring' => '#a5b4fc'],
-            default => ['bg' => 'rgba(127,127,127,.10)', 'fg' => 'currentColor', 'ring' => '#cbd5e1'],
+            ContractApprover::STATUS_APPROVED => ['bg' => 'rgba(16,185,129,.12)', 'fg' => '#047857', 'dot' => '#10b981'],
+            ContractApprover::STATUS_REJECTED => ['bg' => 'rgba(239,68,68,.12)', 'fg' => '#b91c1c', 'dot' => '#ef4444'],
+            ContractApprover::STATUS_RETURNED => ['bg' => 'rgba(59,130,246,.12)', 'fg' => '#1d4ed8', 'dot' => '#3b82f6'],
+            ContractApprover::STATUS_PENDING => ['bg' => 'rgba(251,146,60,.14)', 'fg' => '#c2410c', 'dot' => '#fb923c'],
+            ContractApprover::STATUS_QUEUED => ['bg' => 'rgba(99,102,241,.10)', 'fg' => '#4f46e5', 'dot' => '#a5b4fc'],
+            ContractApprover::STATUS_INVALIDATED => ['bg' => 'rgba(127,127,127,.10)', 'fg' => '#6b7280', 'dot' => '#9ca3af'],
+            ContractApprover::STATUS_SKIPPED => ['bg' => 'rgba(127,127,127,.10)', 'fg' => '#6b7280', 'dot' => '#9ca3af'],
+            default => ['bg' => 'rgba(127,127,127,.10)', 'fg' => 'currentColor', 'dot' => '#cbd5e1'],
         };
     };
 
-    // When the contract is still a draft no one is actually reviewing yet —
-    // show a "Not submitted" label instead of "In queue" / "Reviewing".
-    $labelFor = fn (ContractApproverStatus $status): string => $isDraft
+    // While the contract is still a draft no one is actually reviewing yet —
+    // show "Not submitted" for queued rows so the user understands nothing has
+    // started. Other statuses keep their real label.
+    $labelFor = fn (ContractApprover $a): string => $isDraft && $a->status === ContractApprover::STATUS_QUEUED
         ? __('app.contract_approver.status.not_submitted')
-        : $status->label();
+        : $a->status->label();
 
-    $avatarOf = fn ($a) => $a->user?->getFilamentAvatarUrl()
+    $avatarOf = fn (ContractApprover $a): string => $a->user?->getFilamentAvatarUrl()
         ?? 'https://ui-avatars.com/api/?name='.urlencode($a->user?->name ?? '?').'&color=7F9CF5&background=EBF4FF';
 @endphp
 
 <style>
-    .fl {
-        display: flex;
-        flex-direction: column;
-    }
-    .fl__step {
-        display: grid;
-        grid-template-columns: 2.5rem 1fr;
-        gap: .9rem;
-        position: relative;
-        padding-bottom: 1.15rem;
-    }
-    .fl__step:last-child {
-        padding-bottom: 0;
-    }
-    .fl__rail {
-        position: relative;
-        display: flex;
-        justify-content: center;
-    }
-    .fl__line {
-        position: absolute;
-        top: 2.6rem;
-        bottom: -1.15rem;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 2px;
-        background: rgba(127,127,127,.2);
-        border-radius: 2px;
-    }
-    .fl__av {
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: 50%;
-        object-fit: cover;
-        position: relative;
-        z-index: 1;
-        --gap: #fff;
-        box-shadow: 0 0 0 2px var(--gap), 0 0 0 4px var(--ring,#cbd5e1);
-    }
-    .dark .fl__av {
-        --gap: #1b1b1f;
-    }
-    .fl__body {
-        min-width: 0;
-        padding-top: .1rem;
-    }
-    .fl__top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: .6rem;
-        flex-wrap: wrap;
-    }
-    .fl__nm {
-        font-size: .95rem;
-        font-weight: 700;
-        color: currentColor;
-    }
-    .fl__dp {
-        font-size: .8rem;
-        color: currentColor;
-        opacity: .6;
-        margin-top: .05rem;
-    }
-    .fl__badge {
-        display: inline-flex;
-        align-items: center;
-        gap: .35rem;
-        padding: .18rem .55rem;
-        border-radius: 999px;
-        font-size: .74rem;
-        font-weight: 650;
-        white-space: nowrap;
-    }
-    .fl__badge > i {
-        width: .45rem;
-        height: .45rem;
-        border-radius: 50%;
-        display: block;
-    }
-    .fl__when {
-        font-size: .74rem;
-        color: currentColor;
-        opacity: .55;
-        margin-top: .4rem;
-    }
-    .fl__cmt {
-        margin-top: .5rem;
+    .af-empty {
         font-size: .85rem;
         color: currentColor;
-        line-height: 1.45;
+        opacity: .55;
+        padding: 1rem 0;
+        text-align: center;
     }
-    .fl__sys {
-        margin-top: .45rem;
-        padding: .45rem .6rem;
-        border-radius: .5rem;
-        background: rgba(251,146,60,.09);
-        border: 1px solid rgba(251,146,60,.25);
-        font-size: .8rem;
-        color: #c2410c;
-        line-height: 1.4;
+    .af {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .82rem;
     }
-    .fl__cap {
-        font-size: .72rem;
-        font-weight: 700;
+    .af thead th {
+        text-align: left;
+        font-size: .7rem;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: .05em;
+        letter-spacing: .04em;
         color: currentColor;
         opacity: .55;
+        padding: .6rem .6rem;
+        border-bottom: 1px solid rgba(127,127,127,.2);
+        white-space: nowrap;
     }
-    .fl__hist {
-        margin-top: 1.2rem;
-        border-top: 1px solid rgba(127,127,127,.15);
-        padding-top: 1rem;
+    .af tbody td {
+        padding: .75rem .6rem;
+        border-bottom: 1px solid rgba(127,127,127,.12);
+        vertical-align: top;
     }
-    .fl__hist summary {
-        cursor: pointer;
-        font-size: .82rem;
-        font-weight: 600;
-        color: currentColor;
-        opacity: .75;
-        list-style: none;
+    .af tbody tr:last-child td {
+        border-bottom: 0;
+    }
+    .af tbody tr.is-inactive td {
+        opacity: .72;
+    }
+
+    .af-user {
         display: flex;
         align-items: center;
-        gap: .4rem;
+        gap: .55rem;
+        min-width: 11rem;
     }
-    .fl__hist summary::-webkit-details-marker {
-        display: none;
-    }
-    .fl__hrow {
-        display: flex;
-        align-items: flex-start;
-        gap: .6rem;
-        padding: .55rem 0;
-        border-top: 1px solid rgba(127,127,127,.1);
-    }
-    .fl__hrow:first-of-type {
-        border-top: 0;
-    }
-    .fl__hav {
-        width: 1.7rem;
-        height: 1.7rem;
+    .af-user__av {
+        width: 2rem;
+        height: 2rem;
         border-radius: 50%;
         object-fit: cover;
         flex-shrink: 0;
-        opacity: .85;
     }
-    .fl__empty {
+    .af-user__nm {
+        font-weight: 650;
+        line-height: 1.2;
         font-size: .85rem;
+    }
+    .af-user__nm small {
+        font-weight: 500;
+        opacity: .5;
+        margin-left: .15rem;
+        font-size: .75rem;
+    }
+    .af-user__dp {
+        font-size: .72rem;
+        opacity: .6;
+        margin-top: .15rem;
+        line-height: 1.25;
+    }
+
+    .af-cmt {
+        line-height: 1.45;
+        font-size: .82rem;
         color: currentColor;
+    }
+    .af-cmt--muted {
+        opacity: .35;
+        font-style: italic;
+    }
+    .af-sys {
+        margin-top: .35rem;
+        padding: .35rem .5rem;
+        border-radius: .4rem;
+        background: rgba(251,146,60,.09);
+        border: 1px solid rgba(251,146,60,.25);
+        font-size: .76rem;
+        color: #c2410c;
+        line-height: 1.4;
+    }
+    .dark .af-sys {
+        color: #fdba74;
+    }
+
+    .af-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .2rem .55rem;
+        border-radius: 999px;
+        font-size: .72rem;
+        font-weight: 650;
+        white-space: nowrap;
+    }
+    .af-badge > i {
+        width: .42rem;
+        height: .42rem;
+        border-radius: 50%;
+        display: block;
+        flex-shrink: 0;
+    }
+    .af-overdue {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        margin-top: .3rem;
+        font-size: .7rem;
+        font-weight: 650;
+        color: #dc2626;
+    }
+
+    .af-date {
+        font-size: .78rem;
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+    .af-date small {
+        display: block;
         opacity: .55;
-        padding: .5rem 0;
+        font-size: .7rem;
+        margin-top: .1rem;
+    }
+    .af-date--muted {
+        opacity: .35;
+    }
+
+    @media (max-width: 720px) {
+        .af thead { display: none; }
+        .af tbody td {
+            display: block;
+            padding: .35rem .6rem;
+            border-bottom: 0;
+        }
+        .af tbody tr {
+            display: block;
+            padding: .8rem .2rem;
+            border-bottom: 1px solid rgba(127,127,127,.18);
+        }
+        .af-date { white-space: normal; }
     }
 </style>
 
-@if ($active->isEmpty())
-    <div class="fl__empty">{{ __('app.helper.approval_chain_empty') }}</div>
+@if ($rows->isEmpty())
+    <div class="af-empty">{{ __('app.helper.approval_chain_empty') }}</div>
 @else
-    <div class="fl">
-        @foreach ($active as $a)
-            @php $c = $colorFor($a->status); @endphp
-            <div class="fl__step">
-                <div class="fl__rail">
-                    @unless ($loop->last)<span class="fl__line"></span>@endunless
-                    <img class="fl__av" src="{{ $avatarOf($a) }}" alt="" style="--ring:{{ $c['ring'] }};">
-                </div>
-                <div class="fl__body">
-                    <div class="fl__top">
-                        <div style="min-width:0;">
-                            <div class="fl__nm">{{ $a->user?->name ?? '—' }} <span style="font-weight:500;opacity:.5;font-size:.82rem;">#{{ $a->order }}</span></div>
-                            <div class="fl__dp">{{ $a->user?->department?->name }}{{ $a->user?->position?->name ? ' · '.$a->user->position->name : '' }}</div>
+    <table class="af">
+        <thead>
+            <tr>
+                <th>{{ __('app.label.approver') }}</th>
+                <th>{{ __('app.label.comment') }}</th>
+                <th>{{ __('app.label.status') }}</th>
+                <th>{{ __('app.label.acted_at') }}</th>
+                <th>{{ __('app.label.updated_at') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($rows as $a)
+                @php
+                    $c = $colorFor($a->status);
+                    $inactive = in_array($a->status, [
+                        ContractApprover::STATUS_INVALIDATED,
+                        ContractApprover::STATUS_SKIPPED,
+                    ], true);
+                @endphp
+                <tr @class(['is-inactive' => $inactive])>
+                    <td>
+                        <div class="af-user">
+                            <img class="af-user__av" src="{{ $avatarOf($a) }}" alt="">
+                            <div style="min-width:0;">
+                                <div class="af-user__nm">{{ $a->user?->name ?? '—' }}<small>#{{ $a->order }}</small></div>
+                                @if ($a->user?->department?->name || $a->user?->position?->name)
+                                    <div class="af-user__dp">{{ $a->user?->department?->name }}{{ $a->user?->position?->name ? ' · '.$a->user->position->name : '' }}</div>
+                                @endif
+                            </div>
                         </div>
-                        <span class="fl__badge" style="background:{{ $c['bg'] }};color:{{ $c['fg'] }};">
-                            <i style="background:{{ $c['ring'] }};"></i>
-                            {{ $labelFor($a->status) }}
+                    </td>
+                    <td>
+                        @if ($a->comment)
+                            <div class="af-cmt">{{ $a->comment }}</div>
+                        @else
+                            <div class="af-cmt af-cmt--muted">—</div>
+                        @endif
+                        @if ($a->system_comment)
+                            <div class="af-sys"><b>{{ __('app.label.system_note') }}:</b> {{ $a->system_comment }}</div>
+                        @endif
+                    </td>
+                    <td>
+                        <span class="af-badge" style="background:{{ $c['bg'] }};color:{{ $c['fg'] }};">
+                            <i style="background:{{ $c['dot'] }};"></i>
+                            {{ $labelFor($a) }}
                         </span>
-                    </div>
-
-                    @if ($a->acted_at)
-                        <div class="fl__when">{{ $a->acted_at->translatedFormat('d M Y · H:i') }}</div>
-                    @elseif ($a->due_at)
-                        <div class="fl__when" @if ($a->isOverdue()) style="color:#dc2626;opacity:1;font-weight:600;" @endif>{{ __('app.label.due') }} {{ $a->due_at->translatedFormat('d M Y') }}</div>
-                    @endif
-
-                    @if ($a->comment)<div class="fl__cmt">{{ $a->comment }}</div>@endif
-                    @if ($a->system_comment)<div class="fl__sys"><b>{{ __('app.label.system_note') }}:</b> {{ $a->system_comment }}</div>@endif
-                </div>
-            </div>
-        @endforeach
-    </div>
-@endif
-
-@if ($historical->isNotEmpty())
-    <details class="fl__hist">
-        <summary>
-            {!! svg('heroicon-m-clock', '', ['width' => 15, 'height' => 15])->toHtml() !!}
-            {{ __('app.label.previous_attempts') }} ({{ $historical->count() }})
-        </summary>
-        <div style="margin-top:.7rem;">
-            @foreach ($historical as $h)
-                @php $hc = $colorFor($h->status); @endphp
-                <div class="fl__hrow">
-                    <img class="fl__hav" src="{{ $avatarOf($h) }}" alt="">
-                    <div style="min-width:0;flex:1;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;">
-                            <span style="font-size:.85rem;font-weight:600;">{{ $h->user?->name }} <span style="font-weight:400;opacity:.5;">#{{ $h->order }}</span></span>
-                            <span class="fl__badge" style="background:{{ $hc['bg'] }};color:{{ $hc['fg'] }};">
-                                <i style="background:{{ $hc['ring'] }};"></i>
-                                {{ $h->status->label() }}
-                            </span>
-                        </div>
-                        @if ($h->comment)<div style="margin-top:.3rem;font-size:.82rem;line-height:1.4;">{{ $h->comment }}</div>@endif
-                        @if ($h->system_comment)<div style="margin-top:.3rem;font-size:.78rem;color:#c2410c;line-height:1.35;">{{ $h->system_comment }}</div>@endif
-                        @if ($h->acted_at)<div style="margin-top:.25rem;font-size:.72rem;opacity:.5;">{{ $h->acted_at->translatedFormat('d M Y · H:i') }}</div>@endif
-                    </div>
-                </div>
+                        @if ($a->isOverdue())
+                            <div class="af-overdue">
+                                {!! svg('heroicon-m-exclamation-triangle', '', ['width' => 12, 'height' => 12])->toHtml() !!}
+                                {{ __('app.label.overdue') }}
+                            </div>
+                        @elseif ($a->status === ContractApprover::STATUS_PENDING && $a->due_at)
+                            <div class="af-date" style="margin-top:.3rem;">
+                                <small>{{ __('app.label.due') }} {{ $a->due_at->translatedFormat('d.m.Y') }}</small>
+                            </div>
+                        @endif
+                    </td>
+                    <td>
+                        @if ($a->acted_at)
+                            <div class="af-date">
+                                {{ $a->acted_at->translatedFormat('d.m.Y') }}
+                                <small>{{ $a->acted_at->format('H:i') }}</small>
+                            </div>
+                        @else
+                            <div class="af-date af-date--muted">—</div>
+                        @endif
+                    </td>
+                    <td>
+                        @if ($a->updated_at)
+                            <div class="af-date">
+                                {{ $a->updated_at->translatedFormat('d.m.Y') }}
+                                <small>{{ $a->updated_at->format('H:i') }}</small>
+                            </div>
+                        @else
+                            <div class="af-date af-date--muted">—</div>
+                        @endif
+                    </td>
+                </tr>
             @endforeach
-        </div>
-    </details>
+        </tbody>
+    </table>
 @endif

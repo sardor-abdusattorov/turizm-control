@@ -109,7 +109,8 @@ it('lists invalidated attempts under previous attempts with comments preserved',
 
     expect($html)
         ->toContain('Olim Repeated')
-        ->toContain('Approved on first pass')            // historical comment kept
-        ->toContain('Cancelled — contract was edited.')  // system note kept
-        ->toContain(__('app.label.previous_attempts').' (1)'); // collapsible history
+        ->toContain('Approved on first pass')
+        ->toContain('Cancelled — contract was edited.')
+        ->toContain('is-inactive')
+        ->toContain(__('app.contract_approver.status.invalidated'));
 });

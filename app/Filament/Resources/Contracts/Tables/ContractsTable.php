@@ -124,7 +124,7 @@ class ContractsTable
                     ->hiddenLabel()
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('app.action.close'))
-                    ->modalWidth('lg')
+                    ->modalWidth('4xl')
                     ->modalHeading(fn (Contract $record): string => trim(($record->number ? $record->number.' · ' : '').($record->title ?? '')) ?: __('app.label.approval_chain'))
                     ->modalContent(fn (Contract $record) => view(
                         'filament.resources.contracts.tables.approval-flow-modal',
