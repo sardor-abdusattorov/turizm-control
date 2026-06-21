@@ -123,7 +123,7 @@ class ContractsTable
                 Action::make('contractFlow')
                     ->hiddenLabel()
                     ->modalSubmitAction(false)
-                    ->modalCancelActionLabel(__('app.action.close'))
+                    ->modalCancelAction(false)
                     ->modalWidth('4xl')
                     ->modalHeading(fn (Contract $record): string => trim(($record->number ? $record->number.' · ' : '').($record->title ?? '')) ?: __('app.label.approval_chain'))
                     ->modalContent(fn (Contract $record) => view(
