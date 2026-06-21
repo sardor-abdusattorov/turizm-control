@@ -7,7 +7,6 @@ use App\Policies\ActivityPolicy;
 use App\Services\Dashboard\DashboardContext;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
-use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
 use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Columns\Column;
@@ -106,14 +105,6 @@ class AppServiceProvider extends ServiceProvider
             ->deferColumnManager(false)
             ->deferFilters(false)
             ->paginationPageOptions([10, 25, 50])
-        );
-
-        ActionGroup::configureUsing(
-            fn (ActionGroup $group) => $group
-                ->label(fn (): string => __('app.label.actions'))
-                ->button()
-                ->color('gray')
-                ->tooltip(fn (): string => __('app.label.actions')),
         );
     }
 

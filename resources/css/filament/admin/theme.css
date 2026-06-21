@@ -285,33 +285,6 @@
     max-height: none;
 }
 
-/* ──────────────────────────────────────────────────────────────────────────
-   ActionGroup ("Actions") trigger hover affordance.
-
-   The group trigger now renders as a labelled button (`.fi-ac-btn-group`,
-   whether icon-only or with text). On hover it gets a primary 1px ring and a
-   tiny lift on top of the button's own styling, so it reads clearly as an
-   interactive control across every table at once — no per-table config.
-   ────────────────────────────────────────────────────────────────────────── */
-.fi-ac-btn-group {
-    transition:
-        box-shadow 0.15s ease,
-        transform 0.12s ease;
-}
-
-.fi-ac-btn-group:hover {
-    box-shadow: inset 0 0 0 1px rgb(var(--primary-300));
-    transform: translateY(-1px);
-}
-
-.fi-ac-btn-group:active {
-    transform: translateY(0);
-}
-
-.dark .fi-ac-btn-group:hover {
-    box-shadow: inset 0 0 0 1px rgb(var(--primary-400) / 0.4);
-}
-
 /* ─── Mobile: scroll the key/value detail table sideways ────────────────────
    On a phone the value column gets squeezed to an ellipsis. Instead of
    stacking, the detail table keeps its two columns and scrolls horizontally
