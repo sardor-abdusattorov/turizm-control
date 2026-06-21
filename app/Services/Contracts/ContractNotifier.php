@@ -5,6 +5,7 @@ namespace App\Services\Contracts;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Services\Notifications\InteractsWithContractNotifications;
+use App\Services\Telegram\BotMenuBuilder;
 use App\Services\Telegram\TelegramService;
 use Filament\Notifications\Notification;
 
@@ -12,7 +13,10 @@ class ContractNotifier
 {
     use InteractsWithContractNotifications;
 
-    public function __construct(public TelegramService $telegram) {}
+    public function __construct(
+        public TelegramService $telegram,
+        public BotMenuBuilder $botMenu,
+    ) {}
 
     public function notifyApprovalRequested(ContractApprover $approver): void
     {
@@ -33,10 +37,15 @@ class ContractNotifier
             ])
             ->sendToDatabase($recipient);
 
-        $this->sendTelegram($recipient, $contract,
-            '📨 '.__('app.notification.approval_requested.title'),
-            __('app.notification.approval_requested.body', ['number' => $contract->number]),
-            withApprove: true,
+        // Rich Telegram card (amount + responsible + Approve/Reject/Open),
+        // built by the bot menu builder so the format stays in sync with
+        // what the bot itself renders.
+        $screen = $this->botMenu->notificationApprovalRequested($contract);
+
+        $this->telegram->send(
+            $recipient->telegram?->chat_id,
+            $screen['text'],
+            $screen['keyboard'],
         );
     }
 
