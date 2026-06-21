@@ -1911,6 +1911,9 @@
                     @endif
                 </section>
 
+                {{-- Payments only exist once the contract is fully approved by
+                     the director, so the progress block is hidden until then. --}}
+                @if ($record->status === Contract::STATUS_APPROVED)
                 @php
                     $paymentSummary = $this->paymentSummary();
                     $payments = $paymentSummary['payments'];
@@ -1969,6 +1972,7 @@
                         </div>
                     @endif
                 </section>
+                @endif
             </div>
 
             {{-- SIDEBAR: combined Document + Basic Information card --}}
