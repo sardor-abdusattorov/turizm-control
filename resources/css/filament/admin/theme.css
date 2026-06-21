@@ -303,3 +303,21 @@
         grid-template-columns: 12rem 1fr;
     }
 }
+
+/* ─── Keyboard-navigation focus ring ────────────────────────────────
+   Custom buttons / links in our cw-/ow-/pv-/tg- partials were
+   invisible to anyone tabbing through. Filament's own controls keep
+   their built-in ring; this adds one for ours. */
+.cw-btn:focus-visible,
+.cw-tab:focus-visible,
+.cw-eye:focus-visible,
+.cw-row--link:focus-visible,
+.cw-modal__x:focus-visible,
+.cf-btn:focus-visible,
+.ow-btn:focus-visible,
+.pv-btn:focus-visible,
+.tg-link__btn:focus-visible,
+.tg-nag__btn:focus-visible {
+    outline: 2px solid var(--accent, #6366f1);
+    outline-offset: 2px;
+}

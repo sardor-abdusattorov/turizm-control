@@ -1820,7 +1820,7 @@
                                 @if ($current && $record->status === Contract::STATUS_IN_REVIEW)
                                     <span class="cw-prog__await">
                                         <span class="cw-prog__await-lb">{{ __('app.label.awaiting') }}</span>
-                                        <img src="{{ $this->approverAvatar($current) }}" alt="">
+                                        <img src="{{ $this->approverAvatar($current) }}" alt="{{ $current->user?->name }}">
                                         <span class="cw-prog__await-nm">{{ $current->user?->name }}</span>
                                     </span>
                                 @endif
@@ -1849,7 +1849,7 @@
                                 @endphp
                                 <div class="cw-step cw-step--{{ $state }}{{ $isDirector ? ' cw-step--director' : '' }}">
                                     <div class="cw-node">
-                                        <img src="{{ $this->approverAvatar($ap) }}" alt="">
+                                        <img src="{{ $this->approverAvatar($ap) }}" alt="{{ $ap->user?->name }}">
                                         <span class="cw-badge cw-badge--{{ $state }}">{!! $ic($v['icon'], 13) !!}</span>
                                     </div>
                                     <div class="cw-step__bd">
@@ -1884,7 +1884,7 @@
                             @foreach ($historicalOnly as $h)
                                 <div class="cw-step cw-step--ghost">
                                     <div class="cw-node">
-                                        <img src="{{ $this->approverAvatar($h) }}" alt="">
+                                        <img src="{{ $this->approverAvatar($h) }}" alt="{{ $h->user?->name }}">
                                         <span class="cw-badge cw-badge--queued">{!! $ic('heroicon-m-minus', 13) !!}</span>
                                     </div>
                                     <div class="cw-step__bd">
@@ -2127,7 +2127,7 @@
 
         {{-- Contact detail modal --}}
         @if ($contact)
-            <div class="cw-modal" x-show="contactOpen" x-cloak style="display:none;">
+            <div class="cw-modal" x-show="contactOpen" x-cloak style="display:none;" role="dialog" aria-modal="true" @keydown.escape.window="contactOpen = false">
                 <div class="cw-modal__bg" @click="contactOpen = false"></div>
                 <div class="cw-modal__card" style="max-width:34rem;"
                     x-transition:enter="transition ease-out duration-200"
@@ -2143,7 +2143,7 @@
                                 <div class="cw-modal__dp">{{ $contact->legal_form }}</div>
                             @endif
                         </div>
-                        <button type="button" class="cw-modal__x" @click="contactOpen = false">{!! $ic('heroicon-m-x-mark', 16) !!}</button>
+                        <button type="button" class="cw-modal__x" @click="contactOpen = false" aria-label="{{ __('app.action.cancel') }}">{!! $ic('heroicon-m-x-mark', 16) !!}</button>
                     </div>
                     <div class="cw-modal__bd">
                         @foreach ($contactGroups as [$groupLabel, $rows])
@@ -2208,7 +2208,7 @@
                     ];
                 }
             @endphp
-            <div class="cw-modal" x-show="approver === {{ $ap->user_id }}" x-cloak style="display:none;">
+            <div class="cw-modal" x-show="approver === {{ $ap->user_id }}" x-cloak style="display:none;" role="dialog" aria-modal="true" @keydown.escape.window="approver = null">
                 <div class="cw-modal__bg" @click="approver = null"
                      x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                      x-transition:leave="transition ease-in duration-120" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
@@ -2217,14 +2217,14 @@
                      x-transition:leave="transition ease-in duration-120" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
                     <div class="cw-modal__bar" style="background:{{ $apRing }};"></div>
                     <div class="cw-modal__hd">
-                        <img src="{{ $this->approverAvatar($ap) }}" alt="" style="box-shadow:0 0 0 3px var(--s),0 0 0 5px {{ $apRing }};">
+                        <img src="{{ $this->approverAvatar($ap) }}" alt="{{ $ap->user?->name }}" style="box-shadow:0 0 0 3px var(--s),0 0 0 5px {{ $apRing }};">
                         <div style="min-width:0;flex:1;">
                             <div class="cw-modal__nm">{{ $ap->user?->name }}</div>
                             <div class="cw-modal__dp">{{ $ap->user?->department?->name }}{{ $ap->user?->position?->name ? ' · '.$ap->user->position->name : '' }}</div>
                         </div>
                         <div class="cw-modal__hd-pill">
                             <span class="cw-pill cw-pill--lg cw-pill--{{ $apTone }}">{{ $approverLabel($apShown) }}</span>
-                            <button type="button" class="cw-modal__x" @click="approver = null">{!! $ic('heroicon-o-x-mark', 16) !!}</button>
+                            <button type="button" class="cw-modal__x" @click="approver = null" aria-label="{{ __('app.action.cancel') }}">{!! $ic('heroicon-o-x-mark', 16) !!}</button>
                         </div>
                     </div>
 
