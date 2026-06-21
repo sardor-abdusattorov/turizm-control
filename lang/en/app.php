@@ -123,7 +123,6 @@ return [
         'contract_step_approvers' => 'Approval chain',
         'contract_step_editor' => 'Document',
         'contract_data' => 'Document fields',
-        'contract_number_auto' => '(will be generated)',
         'approval_chain' => 'Approval chain',
         'approver' => 'Approver',
         'actions' => 'Actions',

@@ -22,6 +22,7 @@ class ContractFactory extends Factory
             'contact_id' => Contact::factory(),
             'currency_id' => Currency::factory(),
             'responsible_id' => User::factory(),
+            'number' => 'F-'.fake()->unique()->numberBetween(10000, 99999),
             'title' => fake()->sentence(),
             'amount' => fake()->randomFloat(2, 100, 1_000_000),
             'status' => Contract::STATUS_DRAFT,

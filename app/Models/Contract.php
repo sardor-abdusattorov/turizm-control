@@ -66,10 +66,6 @@ class Contract extends Model
     protected static function booted(): void
     {
         static::creating(function (self $contract): void {
-            if (! $contract->number) {
-                $contract->number = static::generateNumber();
-            }
-
             if (! $contract->document_key) {
                 $contract->document_key = static::generateDocumentKey();
             }
@@ -211,23 +207,6 @@ class Contract extends Model
                 'status' => ContractApprover::STATUS_QUEUED,
             ]);
         }
-    }
-
-    public static function generateNumber(): string
-    {
-        $year = now()->year;
-        $prefix = 'КОНТ';
-
-        $lastSeq = static::query()
-            ->where('number', 'like', "{$prefix}-{$year}-%")
-            ->orderByDesc('id')
-            ->value('number');
-
-        $next = $lastSeq
-            ? ((int) substr($lastSeq, strrpos($lastSeq, '-') + 1)) + 1
-            : 1;
-
-        return sprintf('%s-%d-%03d', $prefix, $year, $next);
     }
 
     public function documentPath(): string

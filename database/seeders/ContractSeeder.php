@@ -99,7 +99,7 @@ class ContractSeeder extends Seeder
             ],
         ];
 
-        foreach ($contracts as $data) {
+        foreach ($contracts as $index => $data) {
             if (! $data['currency'] || ! $data['template'] || ! $data['contact']) {
                 continue;
             }
@@ -107,6 +107,7 @@ class ContractSeeder extends Seeder
             $contract = Contract::firstOrCreate(
                 ['title' => $data['title']],
                 [
+                    'number' => 'DEMO-'.now()->year.'-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
                     'contract_template_id' => $data['template']->id,
                     'order_type_id' => $data['template']->order_type_id,
                     'contact_id' => $data['contact']->id,
