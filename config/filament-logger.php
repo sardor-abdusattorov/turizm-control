@@ -281,6 +281,13 @@ return [
         ],
         'ignore_for' => [
             User::class => ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'],
+            // Bookkeeping columns that change as a side effect of an action
+            // that is already logged elsewhere — the document build after
+            // create (document_file/key), the workflow transitions which log
+            // their own "Submitted/Approved/…" entries (status, signed_at),
+            // and PDF generation (pdf_file). Ignoring them stops a duplicate
+            // "Contract Updated" landing next to the real entry.
+            Contract::class => ['document_file', 'document_key', 'pdf_file', 'signed_at', 'status'],
         ],
         'register' => [
             Contract::class,
