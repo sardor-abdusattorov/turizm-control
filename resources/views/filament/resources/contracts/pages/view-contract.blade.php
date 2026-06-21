@@ -1703,6 +1703,71 @@
         .cw-rt tbody td:first-child {
             border-left: 3px solid var(--row-accent, transparent);
         }
+
+        /* ─── Mobile (< 640px) ─────────────────────────────────────────── */
+        @media (max-width: 640px) {
+            /* Basic-information rows stack: label on top, value full width. */
+            .cw-row {
+                grid-template-columns: 1fr;
+            }
+            .cw-row__k {
+                border-right: 0;
+                border-bottom: 1px solid var(--d);
+            }
+
+            /* Approval-chain step: let the name/role/pill wrap instead of
+               overflowing, and pull the eye button up to the top. */
+            .cw-step {
+                gap: .7rem;
+            }
+            .cw-step__nm {
+                flex-wrap: wrap;
+            }
+
+            /* Per-approver modal: give it the screen, stack the metric tiles,
+               wrap the header, and turn the record table into stacked blocks. */
+            .cw-modal {
+                padding: .5rem;
+            }
+            .cw-modal__card {
+                max-height: 92vh;
+            }
+            .cw-modal__hd {
+                flex-wrap: wrap;
+                padding: 1rem;
+            }
+            .cw-modal__hd-pill {
+                margin-left: 0;
+                width: 100%;
+                justify-content: space-between;
+            }
+            .cw-stats {
+                grid-template-columns: 1fr;
+                padding: .85rem 1rem;
+            }
+            .cw-modal__bd {
+                padding: .9rem 1rem 1.2rem;
+            }
+            .cw-rt thead {
+                display: none;
+            }
+            .cw-rt tbody tr {
+                display: block;
+                padding: .35rem 0;
+                border-bottom: 1px solid var(--d);
+            }
+            .cw-rt tbody tr:last-child {
+                border-bottom: 0;
+            }
+            .cw-rt tbody td {
+                display: block;
+                border-bottom: 0;
+                padding: .2rem .6rem;
+            }
+            .cw-rt tbody td:first-child {
+                padding-top: .6rem;
+            }
+        }
     </style>
 
     <div class="cw"
