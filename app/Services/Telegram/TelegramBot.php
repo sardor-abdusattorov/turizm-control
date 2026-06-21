@@ -77,7 +77,11 @@ class TelegramBot
             return;
         }
 
-        $user->update(['telegram_chat_id' => $chatId]);
+        $user->telegram()->updateOrCreate(
+            [],
+            ['chat_id' => $chatId, 'linked_at' => now()],
+        );
+
         $this->telegram->send($chatId, __('app.telegram.link_success', ['name' => $user->name]));
     }
 
@@ -98,7 +102,7 @@ class TelegramBot
             return;
         }
 
-        $user = User::where('telegram_chat_id', $chatId)->first();
+        $user = User::whereHas('telegram', fn ($q) => $q->where('chat_id', $chatId))->first();
         $contract = Contract::find((int) $contractId);
 
         if (! $user || ! $contract) {

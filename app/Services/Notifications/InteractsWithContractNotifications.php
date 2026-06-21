@@ -41,7 +41,7 @@ trait InteractsWithContractNotifications
         ]];
 
         $this->telegram->send(
-            $recipient->telegram_chat_id,
+            $recipient->telegram?->chat_id,
             "<b>{$title}</b>\n{$body}",
             $keyboard,
         );

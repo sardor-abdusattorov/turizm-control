@@ -10,6 +10,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
@@ -33,7 +34,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         'avatar_url',
         'email',
         'password',
-        'telegram_chat_id',
         'department_id',
         'position_id',
         'status',
@@ -76,6 +76,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     {
         return $this->belongsToMany(User::class, 'recipients', 'user_id', 'recipient_id')
             ->withTimestamps();
+    }
+
+    public function telegram(): HasOne
+    {
+        return $this->hasOne(TelegramUser::class);
+    }
+
+    public function isTelegramLinked(): bool
+    {
+        return $this->telegram()->exists();
     }
 
     public function getDefaultRecipientIds(): array

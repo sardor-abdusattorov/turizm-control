@@ -19,6 +19,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Exceptions\Halt;
@@ -69,7 +70,6 @@ class ProfileSettings extends Page implements HasActions, HasForms
             'name' => $user->name,
             'email' => $user->email,
             'avatar_url' => $user->avatar_url,
-            'telegram_chat_id' => $user->telegram_chat_id,
             'department_id' => $user->department_id,
             'position_id' => $user->position_id,
             'default_recipients' => $user->getDefaultRecipientIds(),
@@ -108,10 +108,11 @@ class ProfileSettings extends Page implements HasActions, HasForms
                                     ->maxLength(255),
                             ]),
 
-                        TextInput::make('telegram_chat_id')
-                            ->label(__('app.label.telegram_chat_id'))
-                            ->helperText(__('app.label.telegram_chat_id_help'))
-                            ->maxLength(255),
+                        View::make('filament.pages.partials.telegram-connect')
+                            ->viewData([
+                                'connected' => (bool) Auth::user()?->isTelegramLinked(),
+                                'username' => Auth::user()?->telegram?->username,
+                            ]),
 
                         Grid::make(['default' => 1, 'sm' => 2])
                             ->schema([
@@ -218,7 +219,6 @@ class ProfileSettings extends Page implements HasActions, HasForms
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'avatar_url' => $data['avatar_url'] ?? null,
-                'telegram_chat_id' => $data['telegram_chat_id'] ?? null,
             ];
 
             if (array_key_exists('department_id', $data)) {
@@ -262,6 +262,35 @@ class ProfileSettings extends Page implements HasActions, HasForms
         } catch (Halt $exception) {
             return;
         }
+    }
+
+    public function connectTelegramAction(): Action
+    {
+        return Action::make('connectTelegram')
+            ->label(__('app.action.connect_telegram'))
+            ->color('primary')
+            ->icon('heroicon-o-paper-airplane')
+            ->url(fn (): string => route('telegram.connect'))
+            ->openUrlInNewTab();
+    }
+
+    public function disconnectTelegramAction(): Action
+    {
+        return Action::make('disconnectTelegram')
+            ->label(__('app.action.disconnect_telegram'))
+            ->color('danger')
+            ->icon('heroicon-o-x-circle')
+            ->requiresConfirmation()
+            ->modalHeading(__('app.action.disconnect_telegram'))
+            ->modalDescription(__('app.message.confirm_disconnect_telegram'))
+            ->action(function (): void {
+                Auth::user()?->telegram()?->delete();
+
+                Notification::make()
+                    ->title(__('app.message.telegram_disconnected'))
+                    ->success()
+                    ->send();
+            });
     }
 
     public function logoutOtherSessionsAction(): Action

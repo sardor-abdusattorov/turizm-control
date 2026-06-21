@@ -34,7 +34,7 @@ it('generates a connect deep link that maps a token to the user', function () {
 });
 
 it('links the chat id to the user when /start arrives with a valid token', function () {
-    $user = User::factory()->create(['telegram_chat_id' => null]);
+    $user = User::factory()->create();
     $url = app(TelegramBot::class)->connectUrl($user);
     $token = str($url)->after('start=')->value();
 
@@ -45,7 +45,7 @@ it('links the chat id to the user when /start arrives with a valid token', funct
         ],
     ]);
 
-    expect($user->fresh()->telegram_chat_id)->toBe('987654');
+    expect($user->fresh()->telegram?->chat_id)->toBe('987654');
 });
 
 it('rejects the webhook with a wrong secret and accepts the right one', function () {
@@ -57,7 +57,7 @@ it('rejects the webhook with a wrong secret and accepts the right one', function
 });
 
 it('approves the contract from an inline callback by the current approver', function () {
-    $approver = User::factory()->create(['telegram_chat_id' => '555']);
+    $approver = User::factory()->withTelegram('555')->create();
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
     ContractApprover::factory()->create([
         'contract_id' => $contract->id,
@@ -79,7 +79,7 @@ it('approves the contract from an inline callback by the current approver', func
 });
 
 it('does not approve when the caller is not the current approver', function () {
-    $outsider = User::factory()->create(['telegram_chat_id' => '777']);
+    $outsider = User::factory()->withTelegram('777')->create();
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
     ContractApprover::factory()->create([
         'contract_id' => $contract->id,

@@ -3,10 +3,10 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use App\Filament\Support\ImageUpload;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
 
@@ -29,10 +29,6 @@ class UserForm
                             ->email()
                             ->required()
                             ->unique(ignoreRecord: true)
-                            ->maxLength(255),
-
-                        TextInput::make('telegram_chat_id')
-                            ->label(__('app.label.telegram_chat_id'))
                             ->maxLength(255),
 
                         ImageUpload::make('users', 'avatar_url')

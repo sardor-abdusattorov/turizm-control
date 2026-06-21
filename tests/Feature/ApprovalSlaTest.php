@@ -108,7 +108,7 @@ it('pushes a telegram message when a bot token and chat id are present', functio
     Http::fake(['*/sendMessage' => Http::response(['ok' => true])]);
 
     [$contract, $responsible, $approvers] = slaChain(1);
-    $approvers->first()->update(['telegram_chat_id' => '123456']);
+    $approvers->first()->telegram()->create(['chat_id' => '123456', 'linked_at' => now()]);
     actingAs($responsible);
 
     app(ContractWorkflow::class)->submit($contract);

@@ -34,4 +34,16 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    public function withTelegram(string $chatId, ?string $locale = null, ?string $username = null): static
+    {
+        return $this->afterCreating(function (User $user) use ($chatId, $locale, $username) {
+            $user->telegram()->create([
+                'chat_id' => $chatId,
+                'username' => $username,
+                'locale' => $locale,
+                'linked_at' => now(),
+            ]);
+        });
+    }
 }
