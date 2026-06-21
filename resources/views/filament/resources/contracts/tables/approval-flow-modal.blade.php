@@ -42,12 +42,22 @@
         padding: 1rem 0;
         text-align: center;
     }
+    .af-wrap {
+        max-height: 65vh;
+        overflow-y: auto;
+        margin: -.25rem;
+        padding: .25rem;
+    }
     .af {
         width: 100%;
         border-collapse: collapse;
         font-size: .82rem;
     }
     .af thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #fff;
         text-align: left;
         font-size: .7rem;
         font-weight: 600;
@@ -58,6 +68,9 @@
         padding: .6rem .6rem;
         border-bottom: 1px solid rgba(127,127,127,.2);
         white-space: nowrap;
+    }
+    .dark .af thead th {
+        background: #18181b;
     }
     .af tbody td {
         padding: .75rem .6rem;
@@ -187,6 +200,7 @@
 @if ($rows->isEmpty())
     <div class="af-empty">{{ __('app.helper.approval_chain_empty') }}</div>
 @else
+<div class="af-wrap">
     <table class="af">
         <thead>
             <tr>
@@ -268,4 +282,5 @@
             @endforeach
         </tbody>
     </table>
+</div>
 @endif
