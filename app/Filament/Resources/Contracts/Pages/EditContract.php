@@ -99,12 +99,33 @@ class EditContract extends EditRecord
 
     protected function afterSave(): void
     {
-        if (! $this->syncChain || $this->approverChain === $this->originalChain) {
+        $startedMidFlow = $this->originalStatus !== null
+            && $this->originalStatus !== Contract::STATUS_DRAFT;
+
+        $chainChanged = $this->syncChain
+            && $this->approverChain !== $this->originalChain;
+
+        if (! $chainChanged && ! $startedMidFlow) {
             return;
         }
 
-        if ($this->originalStatus !== Contract::STATUS_DRAFT
-            && $this->record->status !== Contract::STATUS_DRAFT) {
+        // The model observer (Contract::maybeInvalidateOnEdit) already did
+        // the reset + chain rebuild whenever a REAPPROVAL_TRIGGER_FIELD
+        // changed — the give-away is that status flipped to Draft on its
+        // own. If the picker wasn't touched, the observer's work is the
+        // final word; bail before re-cancelling its rebuilt queue.
+        $observerHandledReset = $startedMidFlow
+            && $this->record->status === Contract::STATUS_DRAFT;
+
+        if (! $chainChanged && $observerHandledReset) {
+            return;
+        }
+
+        // Going through the save modal on a mid-flow contract is an explicit
+        // promise to cancel the existing approval chain — honour it even
+        // when no visible field actually changed (the OnlyOffice document on
+        // disk may have changed between load and save).
+        if ($startedMidFlow && ! $observerHandledReset) {
             $this->record->forceFill([
                 'status' => Contract::STATUS_DRAFT,
                 'signed_at' => null,
@@ -119,6 +140,10 @@ class EditContract extends EditRecord
                 'system_comment' => __('app.message.invalidated_on_edit'),
                 'acted_at' => now(),
             ]);
+
+        $this->approverChain = $chainChanged
+            ? $this->approverChain
+            : $this->originalChain;
 
         $this->rebuildQueuedChain();
     }

@@ -35,7 +35,10 @@ class OnlyOfficeContractController extends Controller
             forcesaveEvent: 'Contract Document Forcesave',
             logDescription: 'Contract '.$contract->number.' saved via OnlyOffice',
             persist: $this->callback->persistToDisk('local', $contract->documentPath()),
-            onFinalSave: fn () => $contract->refreshDocumentKey(),
+            onFinalSave: function () use ($contract): void {
+                $contract->refreshDocumentKey();
+                $contract->reinvalidateAfterDocumentEdit();
+            },
             logProperties: ['contract_number' => $contract->number],
         );
 

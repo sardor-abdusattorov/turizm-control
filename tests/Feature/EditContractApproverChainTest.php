@@ -125,7 +125,11 @@ it('reassigns the chain on an in-review contract: resets to draft, keeps the old
         ->and($contract->activeApprovers()->pluck('user_id')->map(fn ($id): int => (int) $id)->all())->toBe([$newLegal->id, $newAccounting->id]);
 });
 
-it('leaves a running approval untouched when the chain is saved unchanged', function () {
+it('cancels approvals and queues the same chain when save is invoked mid-flow, even with no form changes', function () {
+    // Going through the Save modal on an in-review contract is an explicit
+    // promise to cancel approvals (the modal says so). Honour it even when
+    // the author hasn't touched any field — the OnlyOffice doc on disk may
+    // have changed since the page was opened.
     $author = editorWithPerms();
     $legal = chainApprover('legal');
     $accounting = chainApprover('accounting');
@@ -140,16 +144,16 @@ it('leaves a running approval untouched when the chain is saved unchanged', func
         'status' => ContractApprover::STATUS_QUEUED,
     ]);
 
-    // Open and save without changing the chain or any business field.
     Livewire::test(EditContract::class, ['record' => $contract->getKey()])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $contract->refresh();
 
-    expect($contract->status)->toBe(Contract::STATUS_IN_REVIEW)
-        ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(0)
-        ->and($contract->activeApprovers()->pluck('user_id')->map(fn ($id): int => (int) $id)->all())->toBe([$legal->id, $accounting->id]);
+    expect($contract->status)->toBe(Contract::STATUS_DRAFT)
+        ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(2)
+        ->and($contract->activeApprovers()->orderBy('order')->pluck('user_id')->map(fn ($id): int => (int) $id)->all())
+        ->toBe([$legal->id, $accounting->id]);
 });
 
 it('preserves the invalidated audit trail when the resulting draft chain is re-saved', function () {

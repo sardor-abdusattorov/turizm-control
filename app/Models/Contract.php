@@ -173,6 +173,46 @@ class Contract extends Model
         }
     }
 
+    /**
+     * Called from the OnlyOffice save-callback after the editor finalises a
+     * save (status 2 / 6). When the contract was already mid-flow, the doc
+     * we just received on disk is different from what previous approvers
+     * signed off on — so we reset the contract to Draft and cancel every
+     * approval (preserving the active chain in the queue so the manager can
+     * resubmit to the same people).
+     */
+    public function reinvalidateAfterDocumentEdit(): void
+    {
+        $this->refresh();
+
+        if ($this->status === self::STATUS_DRAFT) {
+            return;
+        }
+
+        $previousUserIds = $this->activeApprovers()
+            ->orderBy('order')
+            ->pluck('user_id')
+            ->all();
+
+        $this->forceFill([
+            'status' => self::STATUS_DRAFT,
+            'signed_at' => null,
+        ])->saveQuietly();
+
+        $this->invalidateAllApprovers(__('app.message.invalidated_on_document_save'));
+
+        $order = 1;
+
+        foreach ($previousUserIds as $userId) {
+            ContractApprover::create([
+                'contract_id' => $this->id,
+                'user_id' => $userId,
+                'order' => $order++,
+                'status' => ContractApprover::STATUS_QUEUED,
+            ]);
+        }
+    }
+
     public static function generateNumber(): string
     {
         $year = now()->year;
