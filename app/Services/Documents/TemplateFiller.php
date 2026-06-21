@@ -19,15 +19,18 @@ class TemplateFiller
 
         $destinationDir = dirname($destinationPath);
 
-        if (! is_dir($destinationDir)) {
-            mkdir($destinationDir, 0775, true);
+        // Race-safe directory creation: another request may create it between
+        // the check and mkdir, so re-check after a failed attempt before
+        // giving up with an actionable message (usually a storage permission).
+        if (! is_dir($destinationDir) && ! @mkdir($destinationDir, 0775, true) && ! is_dir($destinationDir)) {
+            throw new RuntimeException("Cannot create document directory (check storage/ write permissions): {$destinationDir}");
         }
 
         if (! copy($sourcePath, $destinationPath)) {
             throw new RuntimeException("Failed to copy template to: {$destinationPath}");
         }
 
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
 
         if ($zip->open($destinationPath) !== true) {
             throw new RuntimeException("Failed to open docx as zip: {$destinationPath}");
@@ -68,7 +71,7 @@ class TemplateFiller
 
     private function processXml(string $xml, array $values): ?string
     {
-        $dom = new DOMDocument();
+        $dom = new DOMDocument;
         $dom->preserveWhiteSpace = true;
         $dom->formatOutput = false;
 
