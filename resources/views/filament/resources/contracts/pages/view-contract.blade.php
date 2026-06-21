@@ -1734,12 +1734,18 @@
             }
             .cw-modal__hd {
                 flex-wrap: wrap;
-                padding: 1rem;
+                padding: 1rem 3rem 1rem 1rem;
             }
             .cw-modal__hd-pill {
                 margin-left: 0;
-                width: 100%;
-                justify-content: space-between;
+            }
+            /* keep the close button pinned to the top-right corner instead of
+               dropping it onto its own row */
+            .cw-modal__x {
+                position: absolute;
+                top: .9rem;
+                right: .9rem;
+                margin-left: 0;
             }
             .cw-stats {
                 grid-template-columns: 1fr;
