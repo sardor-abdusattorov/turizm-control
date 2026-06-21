@@ -87,7 +87,7 @@ it('keeps a cancelled approval verdict and comment in the per-approver modal', f
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
     expect($html)->toContain('Looks good, ship it.')           // their own comment
-        ->and($html)->toContain('Earlier attempts')             // the past-attempts caption
+        ->and($html)->toContain('is-past')                      // cancelled row, dimmed in the table
         ->and($html)->toContain(__('app.message.invalidated_on_edit'))
         // The standalone history button/modal is gone — history lives in the eye.
         ->and($html)->not->toContain('cw-history-btn');

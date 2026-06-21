@@ -182,7 +182,6 @@ return [
         'not_submitted' => 'Not submitted',
         'approval_records' => 'Approval records',
         'attempts_count' => ':count record|:count records',
-        'earlier_attempts' => 'Earlier attempts',
         'no_longer_in_chain' => 'No longer in the chain',
         'cancelled' => 'Cancelled',
         'no_comment' => 'No comment left',

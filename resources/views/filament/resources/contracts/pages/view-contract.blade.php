@@ -1459,102 +1459,103 @@
             padding: .4rem 0;
         }
 
-        /* Per-record cards inside the eye-modal (all rows of this user). */
-        .cw-recs {
-            display: flex;
-            flex-direction: column;
-            gap: .55rem;
+        /* Per-record table inside the eye-modal — every row this user has on
+           the contract (current + cancelled attempts), newest first. Mirrors
+           the chain modal's table, scoped to one person. */
+        .cw-rt {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .8rem;
         }
-        .cw-recs__cap {
-            display: inline-flex;
-            align-items: center;
-            gap: .35rem;
-            margin-top: .4rem;
-            font-size: .68rem;
+        .cw-rt thead th {
+            text-align: left;
+            font-size: .66rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: .05em;
+            letter-spacing: .04em;
             color: var(--m2);
+            padding: .4rem .5rem;
+            border-bottom: 1px solid var(--d);
+            white-space: nowrap;
         }
-        .cw-rec {
-            position: relative;
-            border: 1px solid var(--d);
-            border-radius: .7rem;
-            padding: .7rem .85rem;
-            background: var(--s);
+        .cw-rt tbody td {
+            padding: .6rem .5rem;
+            border-bottom: 1px solid var(--d);
+            vertical-align: top;
         }
-        .cw-rec--focus {
-            box-shadow: inset 0 0 0 1.5px var(--accent);
+        .cw-rt tbody tr:last-child td {
+            border-bottom: 0;
         }
-        .cw-rec--past {
-            background: var(--soft);
-            border-style: dashed;
+        .cw-rt tbody tr.is-past td {
+            opacity: .62;
         }
-        .cw-rec__top {
-            display: flex;
-            align-items: center;
-            gap: .45rem;
-            flex-wrap: wrap;
+        .cw-rt__st {
+            white-space: nowrap;
         }
-        .cw-rec__tag {
+        .cw-rt__ord {
+            display: block;
+            margin-top: .3rem;
+            font-size: .68rem;
+            font-weight: 600;
+            color: var(--m2);
+            font-variant-numeric: tabular-nums;
+        }
+        .cw-rt__tag {
             display: inline-flex;
             align-items: center;
             gap: .2rem;
-            font-size: .66rem;
+            margin-top: .3rem;
+            font-size: .64rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: .03em;
             color: #c2410c;
         }
-        .cw-rec__ord {
-            font-size: .72rem;
-            font-weight: 600;
-            color: var(--m2);
-            font-variant-numeric: tabular-nums;
-        }
-        .cw-rec__when {
+        .cw-rt__overdue {
             display: inline-flex;
             align-items: center;
-            gap: .3rem;
-            font-size: .73rem;
-            color: var(--m);
-            margin-left: auto;
-            white-space: nowrap;
-        }
-        .cw-rec__cmt {
-            display: flex;
-            align-items: flex-start;
-            gap: .4rem;
-            margin-top: .55rem;
-            padding: .5rem .65rem;
-            border-radius: .5rem;
-            background: var(--soft);
-            border: 1px solid var(--d);
-            font-size: .82rem;
-            color: var(--t);
-            line-height: 1.45;
-        }
-        .cw-rec--past .cw-rec__cmt {
-            background: var(--s);
-        }
-        .cw-rec__cmt > svg {
-            color: var(--m2);
-            flex-shrink: 0;
-            margin-top: .12rem;
-        }
-        .cw-rec__sys {
-            margin-top: .45rem;
-            padding: .45rem .6rem;
-            border-radius: .45rem;
-            background: rgba(251,146,60,.10);
-            border: 1px solid rgba(251,146,60,.32);
-            font-size: .78rem;
-            color: #c2410c;
-            line-height: 1.4;
-        }
-        .cw-rec__sys-lb {
+            gap: .2rem;
+            margin-top: .3rem;
+            font-size: .66rem;
             font-weight: 700;
-            margin-right: .35rem;
+            color: #dc2626;
+        }
+        .cw-rt__cmt {
+            line-height: 1.42;
+            color: var(--t);
+        }
+        .cw-rt__cmt--muted {
+            color: var(--m2);
+            font-style: italic;
+        }
+        .cw-rt__sys {
+            margin-top: .35rem;
+            padding: .35rem .5rem;
+            border-radius: .4rem;
+            background: rgba(251,146,60,.10);
+            border: 1px solid rgba(251,146,60,.30);
+            font-size: .74rem;
+            color: #c2410c;
+            line-height: 1.38;
+        }
+        .cw-rt__sys-lb {
+            font-weight: 700;
+            margin-right: .3rem;
+        }
+        .cw-rt__date {
+            font-size: .74rem;
+            color: var(--m);
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+        .cw-rt__date small {
+            display: block;
+            opacity: .6;
+            font-size: .68rem;
+            margin-top: .08rem;
+        }
+        .cw-rt__date--muted {
+            opacity: .4;
         }
     </style>
 
@@ -1965,7 +1966,7 @@
                 <div class="cw-modal__bg" @click="approver = null"
                      x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                      x-transition:leave="transition ease-in duration-120" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
-                <div class="cw-modal__card" style="max-width:36rem;" @click.stop
+                <div class="cw-modal__card" style="max-width:44rem;" @click.stop
                      x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95 translate-y-2" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-120" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
                     <div class="cw-modal__hd">
@@ -1982,57 +1983,65 @@
                         <button type="button" class="cw-modal__x" @click="approver = null">{!! $ic('heroicon-o-x-mark', 16) !!}</button>
                     </div>
                     <div class="cw-modal__bd">
-                        {{-- One card per record. The live row keeps an accent
-                             ring; cancelled rows are muted but still show the
+                        {{-- One row per record. The live attempt reads normally;
+                             cancelled / skipped rows are dimmed but still show the
                              verdict the approver reached and their own comment. --}}
-                        <div class="cw-recs">
-                            @php $pastShown = false; @endphp
-                            @foreach ($allRecords as $rec)
-                                @php
-                                    $past = $isHistorical($rec);
-                                    $shown = $rec->displayStatus();
-                                    $whenIcon = match ($shown) {
-                                        ContractApprover::STATUS_APPROVED => 'heroicon-m-check',
-                                        ContractApprover::STATUS_REJECTED => 'heroicon-m-x-mark',
-                                        ContractApprover::STATUS_RETURNED => 'heroicon-m-arrow-uturn-left',
-                                        default => 'heroicon-m-clock',
-                                    };
-                                @endphp
-
-                                @if ($past && ! $pastShown)
-                                    @php $pastShown = true; @endphp
-                                    <div class="cw-recs__cap">{!! $ic('heroicon-m-clock', 12) !!} {{ __('app.label.earlier_attempts') }}</div>
-                                @endif
-
-                                <div class="cw-rec {{ $past ? 'cw-rec--past' : 'cw-rec--focus' }}">
-                                    <div class="cw-rec__top">
-                                        <span class="cw-pill cw-pill--{{ $pillFor($shown) }}">{{ $statusName($shown) }}</span>
-                                        @if ($rec->wasCancelledAfterVerdict())
-                                            <span class="cw-rec__tag">{!! $ic('heroicon-m-x-circle', 11) !!} {{ __('app.label.cancelled') }}</span>
-                                        @endif
-                                        <span class="cw-rec__ord">#{{ $rec->order }}</span>
-                                        <span class="cw-rec__when">
-                                            @if ($rec->acted_at)
-                                                {!! $ic($whenIcon, 12) !!} {{ $rec->acted_at->format('d.m.Y H:i') }}
-                                            @elseif ($rec->due_at)
-                                                {!! $ic('heroicon-m-clock', 12) !!} {{ __('app.label.due') }} {{ $rec->due_at->format('d.m.Y H:i') }}
-                                            @else
-                                                {!! $ic('heroicon-m-clock', 12) !!} {{ $rec->created_at?->format('d.m.Y H:i') }}
+                        <table class="cw-rt">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('app.label.status') }}</th>
+                                    <th>{{ __('app.label.comment') }}</th>
+                                    <th>{{ __('app.label.acted_at') }}</th>
+                                    <th>{{ __('app.label.updated_at') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($allRecords as $rec)
+                                    @php
+                                        $past = $isHistorical($rec);
+                                        $shown = $rec->displayStatus();
+                                    @endphp
+                                    <tr @class(['is-past' => $past])>
+                                        <td class="cw-rt__st">
+                                            <span class="cw-pill cw-pill--{{ $pillFor($shown) }}">{{ $statusName($shown) }}</span>
+                                            <span class="cw-rt__ord">#{{ $rec->order }}</span>
+                                            @if ($rec->wasCancelledAfterVerdict())
+                                                <span class="cw-rt__tag">{!! $ic('heroicon-m-x-circle', 11) !!} {{ __('app.label.cancelled') }}</span>
                                             @endif
-                                        </span>
-                                    </div>
-                                    @if ($rec->comment)
-                                        <div class="cw-rec__cmt">{!! $ic('heroicon-m-chat-bubble-bottom-center-text', 13) !!} <span>{{ $rec->comment }}</span></div>
-                                    @endif
-                                    @if ($rec->system_comment)
-                                        <div class="cw-rec__sys">
-                                            <span class="cw-rec__sys-lb">{{ __('app.label.system_note') }}</span>
-                                            <span>{{ $rec->system_comment }}</span>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
+                                            @if ($rec->isOverdue())
+                                                <span class="cw-rt__overdue">{!! $ic('heroicon-m-exclamation-triangle', 11) !!} {{ __('app.label.overdue') }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($rec->comment)
+                                                <div class="cw-rt__cmt">{{ $rec->comment }}</div>
+                                            @else
+                                                <div class="cw-rt__cmt cw-rt__cmt--muted">—</div>
+                                            @endif
+                                            @if ($rec->system_comment)
+                                                <div class="cw-rt__sys"><span class="cw-rt__sys-lb">{{ __('app.label.system_note') }}:</span>{{ $rec->system_comment }}</div>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($rec->acted_at)
+                                                <div class="cw-rt__date">{{ $rec->acted_at->format('d.m.Y') }}<small>{{ $rec->acted_at->format('H:i') }}</small></div>
+                                            @elseif ($rec->due_at && $rec->status === ContractApprover::STATUS_PENDING)
+                                                <div class="cw-rt__date"><small>{{ __('app.label.due') }} {{ $rec->due_at->format('d.m.Y') }}</small></div>
+                                            @else
+                                                <div class="cw-rt__date cw-rt__date--muted">—</div>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($rec->updated_at)
+                                                <div class="cw-rt__date">{{ $rec->updated_at->format('d.m.Y') }}<small>{{ $rec->updated_at->format('H:i') }}</small></div>
+                                            @else
+                                                <div class="cw-rt__date cw-rt__date--muted">—</div>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
 
                         @if ($apActs->isNotEmpty())
                             <div class="cw-sub">
