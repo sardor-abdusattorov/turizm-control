@@ -171,7 +171,7 @@ class ContractsTable
 
                     Action::make('submitForApproval')
                         ->label(__('app.action.submit_for_approval'))
-                        ->icon('heroicon-o-arrow-up-tray')
+                        ->icon('heroicon-o-paper-airplane')
                         ->color('gray')
                         ->requiresConfirmation()
                         ->modalHeading(__('app.action.submit_for_approval'))
