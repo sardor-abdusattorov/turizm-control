@@ -294,39 +294,7 @@
         color: #cbd5e1;
     }
 
-    /* CARD */
-    .ow-card {
-        background: var(--s);
-        border: 1px solid var(--d);
-        border-radius: 1rem;
-        overflow: hidden;
-    }
-    .ow-hd {
-        display: flex;
-        align-items: center;
-        gap: .65rem;
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid var(--d);
-    }
-    .ow-hd__ic {
-        width: 1.85rem;
-        height: 1.85rem;
-        border-radius: .55rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--accent-softer);
-        color: var(--accent-strong);
-    }
-    .dark .ow-hd__ic {
-        color: var(--accent);
-    }
-    .ow-hd__t {
-        font-size: 0.9375rem;
-        font-weight: 600;
-        margin: 0;
-        color: var(--t);
-    }
+    /* card / hd primitives live in theme.css. */
 
     /* FILE BLOCK */
     .ow-file {
@@ -425,67 +393,16 @@
         background: var(--soft);
     }
 
-    /* DETAILS TABLE (key/value grid) — full width version like contracts */
-    .ow-dets {
-        display: flex;
-        flex-direction: column;
-    }
-    .ow-row {
-        display: grid;
-        grid-template-columns: minmax(11rem, 16rem) 1fr;
-        align-items: stretch;
-        border-bottom: 1px solid var(--d);
-    }
-    .ow-row:last-child {
-        border-bottom: 0;
-    }
-    .ow-row__k {
-        display: flex;
-        align-items: center;
-        gap: .55rem;
-        padding: .8rem 1.25rem;
-        background: var(--soft);
-        border-right: 1px solid var(--d);
-    }
+    /* dets / row primitives (k/ic/lb/v/vl/vl--muted) live in theme.css.
+       Page-specific extensions (--wrap modifier) stay here. */
     .ow-row--wrap .ow-row__k {
         align-items: flex-start;
         padding-top: 1rem;
-    }
-    .ow-row__ic {
-        color: #94a3b8;
-        display: inline-flex;
-        flex-shrink: 0;
-    }
-    .dark .ow-row__ic {
-        color: #6e7681;
-    }
-    .ow-row__lb {
-        font-size: .8125rem;
-        font-weight: 600;
-        color: #1f2937;
-    }
-    .dark .ow-row__lb {
-        color: #e5e7eb;
-    }
-    .ow-row__v {
-        display: flex;
-        align-items: center;
-        padding: .8rem 1.25rem;
-        min-width: 0;
     }
     .ow-row--wrap .ow-row__v {
         align-items: flex-start;
         padding-top: 1rem;
         padding-bottom: 1rem;
-    }
-    .ow-row__vl {
-        font-size: .8125rem;
-        font-weight: 500;
-        color: var(--t);
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
     }
     .ow-row__vl--wrap {
         white-space: normal;
@@ -493,11 +410,6 @@
         overflow: visible;
         text-overflow: clip;
         font-weight: 500;
-    }
-    .ow-row__vl--muted {
-        color: var(--m2);
-        font-weight: 500;
-        font-style: italic;
     }
     .ow-show-more {
         display: flex;

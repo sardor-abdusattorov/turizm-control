@@ -39,6 +39,141 @@
     --accent-strong: #c7d2fe;
 }
 
+/* ────────────── Shared primitives for the view-page family ──────────────
+   The card / section-header / details-table structure is identical across
+   the order (.ow) and payment (.pv) pages, so it lives here. The contract
+   (.cw) page uses a slightly tighter variant of card/hd/row and keeps that
+   inline. The row-cell atoms (icon, label, value, muted) are 100% identical
+   in all three pages, so .cw is included on those selectors too. */
+
+.ow-card,
+.pv-card {
+    background: var(--s);
+    border: 1px solid var(--d);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.ow-hd,
+.pv-hd {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--d);
+}
+
+.ow-hd__ic,
+.pv-hd__ic {
+    width: 1.85rem;
+    height: 1.85rem;
+    border-radius: .55rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-softer);
+    color: var(--accent-strong);
+}
+
+.dark .ow-hd__ic,
+.dark .pv-hd__ic {
+    color: var(--accent);
+}
+
+.ow-hd__t,
+.pv-hd__t {
+    font-size: .9375rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--t);
+}
+
+.ow-dets,
+.pv-dets {
+    display: flex;
+    flex-direction: column;
+}
+
+.ow-row,
+.pv-row {
+    display: grid;
+    grid-template-columns: minmax(11rem, 16rem) 1fr;
+    align-items: stretch;
+    border-bottom: 1px solid var(--d);
+}
+
+.cw-row:last-child,
+.ow-row:last-child,
+.pv-row:last-child {
+    border-bottom: 0;
+}
+
+.ow-row__k,
+.pv-row__k {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .8rem 1.25rem;
+    background: var(--soft);
+    border-right: 1px solid var(--d);
+}
+
+.ow-row__v,
+.pv-row__v {
+    display: flex;
+    align-items: center;
+    padding: .8rem 1.25rem;
+    min-width: 0;
+}
+
+.cw-row__ic,
+.ow-row__ic,
+.pv-row__ic {
+    color: #94a3b8;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.dark .cw-row__ic,
+.dark .ow-row__ic,
+.dark .pv-row__ic {
+    color: #6e7681;
+}
+
+.cw-row__lb,
+.ow-row__lb,
+.pv-row__lb {
+    font-size: .8125rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.dark .cw-row__lb,
+.dark .ow-row__lb,
+.dark .pv-row__lb {
+    color: #e5e7eb;
+}
+
+.cw-row__vl,
+.ow-row__vl,
+.pv-row__vl {
+    font-size: .8125rem;
+    font-weight: 500;
+    color: var(--t);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cw-row__vl--muted,
+.ow-row__vl--muted,
+.pv-row__vl--muted {
+    color: var(--m2);
+    font-weight: 500;
+    font-style: italic;
+}
+
 /* Thin accent scrollbars via the STANDARD properties only. We intentionally
    do NOT use ::-webkit-scrollbar: a webkit custom scrollbar is painted off the
    compositor, which forces main-thread scrolling — that's what made the page

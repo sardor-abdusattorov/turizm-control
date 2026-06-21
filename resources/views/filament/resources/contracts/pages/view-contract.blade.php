@@ -863,9 +863,8 @@
             align-items: stretch;
             border-bottom: 1px solid var(--d);
         }
-        .cw-row:last-child {
-            border-bottom: 0;
-        }
+        /* Row atoms (icon, label, value, muted, :last-child) live in
+           theme.css. cw keeps its tighter k/v padding + value transition. */
         .cw-row__k {
             display: flex;
             align-items: center;
@@ -874,42 +873,12 @@
             background: var(--soft);
             border-right: 1px solid var(--d);
         }
-        .cw-row__ic {
-            color: #94a3b8;
-            display: inline-flex;
-            flex-shrink: 0;
-        }
-        .dark .cw-row__ic {
-            color: #6e7681;
-        }
-        .cw-row__lb {
-            font-size: 0.8125rem;
-            font-weight: 600;
-            color: #1f2937;
-        }
-        .dark .cw-row__lb {
-            color: #e5e7eb;
-        }
         .cw-row__v {
             display: flex;
             align-items: center;
             padding: .85rem 1.25rem;
             min-width: 0;
             transition: background .12s ease;
-        }
-        .cw-row__vl {
-            font-size: 0.8125rem;
-            font-weight: 500;
-            color: var(--t);
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .cw-row__vl--muted {
-            color: var(--m2);
-            font-weight: 500;
-            font-style: italic;
         }
         button.cw-row {
             width: 100%;
