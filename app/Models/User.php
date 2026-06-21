@@ -106,8 +106,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
                 $position = $user->position?->name ? ' · '.e($user->position->name) : '';
 
+                // Compact label (small avatar + name · position on one line).
+                // Inline styles, not Tailwind classes: this markup is built in a
+                // model, which Tailwind's JIT does not scan, so utility classes
+                // would not be compiled and the avatar would render unsized.
                 $grouped[$department][$user->id] = sprintf(
-                    '<div class="flex items-center gap-2"><img src="%s" class="w-6 h-6 rounded-full object-cover" alt=""><span>%s%s</span></div>',
+                    '<span style="display:inline-flex;align-items:center;gap:.4rem;font-size:.8125rem;">'
+                    .'<img src="%s" alt="" style="width:1.25rem;height:1.25rem;border-radius:9999px;object-fit:cover;flex-shrink:0;">'
+                    .'<span>%s%s</span></span>',
                     e($avatar),
                     e($user->name),
                     $position,
