@@ -1706,13 +1706,14 @@
 
         /* ─── Mobile (< 640px) ─────────────────────────────────────────── */
         @media (max-width: 640px) {
-            /* Basic-information rows stack: label on top, value full width. */
-            .cw-row {
-                grid-template-columns: 1fr;
+            /* Basic-information table keeps its two columns and scrolls
+               sideways (like the index tables) instead of squeezing values. */
+            .cw-dets {
+                overflow-x: auto;
             }
-            .cw-row__k {
-                border-right: 0;
-                border-bottom: 1px solid var(--d);
+            .cw-row {
+                min-width: 34rem;
+                grid-template-columns: 12rem 1fr;
             }
 
             /* Approval-chain step: let the name/role/pill wrap instead of

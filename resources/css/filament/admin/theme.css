@@ -312,29 +312,21 @@
     box-shadow: inset 0 0 0 1px rgb(var(--primary-400) / 0.4);
 }
 
-/* ─── Mobile: stack the key/value detail rows ───────────────────────────────
-   On a phone the two-column grid (label | value) squeezes the value column so
-   hard that everything truncates with an ellipsis. Below 640px the rows stack
-   — label on top, value full-width and wrapping — so the value is readable.
-   The .ow-/.pv- grids live here; the contract page's tighter .cw-row grid is
-   handled inline in its own view. */
+/* ─── Mobile: scroll the key/value detail table sideways ────────────────────
+   On a phone the value column gets squeezed to an ellipsis. Instead of
+   stacking, the detail table keeps its two columns and scrolls horizontally
+   (like the index data tables): the rows hold a min-width wider than the
+   screen and the container scrolls. The .ow-/.pv- grids live here; the
+   contract page's .cw- grid is handled inline in its own view. */
 @media (max-width: 640px) {
+    .ow-dets,
+    .pv-dets {
+        overflow-x: auto;
+    }
+
     .ow-row,
     .pv-row {
-        grid-template-columns: 1fr;
-    }
-
-    .ow-row__k,
-    .pv-row__k {
-        border-right: 0;
-        border-bottom: 1px solid var(--d);
-    }
-
-    .cw-row__vl,
-    .ow-row__vl,
-    .pv-row__vl {
-        white-space: normal;
-        overflow: visible;
-        text-overflow: clip;
+        min-width: 34rem;
+        grid-template-columns: 12rem 1fr;
     }
 }
