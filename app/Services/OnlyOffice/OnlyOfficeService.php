@@ -140,6 +140,22 @@ class OnlyOfficeService
         return $decoded['payload'] ?? $decoded;
     }
 
+    /**
+     * Whether JWT validation is configured. When the secret is empty (only
+     * happens in local dev / tests with no editor wired up) the callback
+     * handler runs in degraded mode and trusts the raw body. In production
+     * the secret MUST be set so every callback is signed and verified.
+     */
+    public function isJwtConfigured(): bool
+    {
+        return $this->jwtSecret() !== '';
+    }
+
+    public function jwtSecret(): string
+    {
+        return (string) config('onlyoffice.jwt_secret');
+    }
+
     public function resolvePermissions(Contract $contract, User $user): array
     {
         $canExport = $this->canExportContract($contract, $user);

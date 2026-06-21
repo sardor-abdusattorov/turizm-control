@@ -102,10 +102,10 @@ it('writes a Document activity log entry on OnlyOffice contract save', function 
             'contract' => $contract,
             'shared_key' => $contract->document_key,
         ]),
-        [
+        signOnlyOfficeCallback([
             'status' => 2,
             'url' => 'http://onlyoffice/cache/files/saved-contract.docx',
-        ],
+        ]),
     )->assertOk();
 
     $activity = Activity::where('log_name', 'Document')
@@ -128,10 +128,10 @@ it('writes a Document activity log entry on OnlyOffice template save', function 
             'template' => $template,
             'shared_key' => $template->document_key,
         ]),
-        [
+        signOnlyOfficeCallback([
             'status' => 2,
             'url' => 'http://onlyoffice/cache/files/saved-template.docx',
-        ],
+        ]),
     )->assertOk();
 
     $activity = Activity::where('log_name', 'Document')
@@ -154,10 +154,10 @@ it('uses Template Forcesave event for status 6 callbacks', function () {
             'template' => $template,
             'shared_key' => $template->document_key,
         ]),
-        [
+        signOnlyOfficeCallback([
             'status' => 6,
             'url' => 'http://onlyoffice/cache/files/saved-template.docx',
-        ],
+        ]),
     )->assertOk();
 
     expect(Activity::where('event', 'Template Forcesave')->exists())->toBeTrue();

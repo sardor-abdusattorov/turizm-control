@@ -35,6 +35,16 @@ class Payment extends Model
     protected static function booted(): void
     {
         static::creating(function (self $payment): void {
+            // In HTTP context the creator is always the authenticated user —
+            // overriding (not just defaulting) so a mass-assigned
+            // `created_by` from the request body cannot spoof attribution.
+            // CLI / seeders / factories keep whatever they passed in.
+            if (! app()->runningInConsole() && auth()->check()) {
+                $payment->created_by = (int) auth()->id();
+
+                return;
+            }
+
             if (! $payment->created_by && auth()->check()) {
                 $payment->created_by = (int) auth()->id();
             }

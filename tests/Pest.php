@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Services\OnlyOffice\JwtSigner;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
@@ -59,4 +60,20 @@ function userWithPermission(string ...$permissions): User
     }
 
     return $user->fresh();
+}
+
+/**
+ * Sign an OnlyOffice save-callback payload with the configured JWT secret.
+ * After enabling JWT verification in the handler, raw bodies are rejected —
+ * tests that POST to save-callback routes need to wrap the data with a
+ * valid token using this helper.
+ *
+ * @param  array<string, mixed>  $data
+ * @return array<string, mixed>
+ */
+function signOnlyOfficeCallback(array $data): array
+{
+    $signer = new JwtSigner((string) config('onlyoffice.jwt_secret'));
+
+    return $data + ['token' => $signer->encode($data)];
 }

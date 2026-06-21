@@ -107,10 +107,10 @@ it('persists the edited template back to storage on OnlyOffice callback', functi
             'template' => $template,
             'shared_key' => $template->document_key,
         ]),
-        [
+        signOnlyOfficeCallback([
             'status' => 2,
             'url' => 'http://onlyoffice/cache/files/edited-template.docx',
-        ],
+        ]),
     )->assertOk()->assertExactJson(['error' => 0]);
 
     expect(Storage::disk('local')->get($template->template_file))->toBe('%edited-binary')
@@ -130,10 +130,10 @@ it('keeps the document_key intact on forcesave callbacks during editing', functi
             'template' => $template,
             'shared_key' => $template->document_key,
         ]),
-        [
+        signOnlyOfficeCallback([
             'status' => 6,
             'url' => 'http://onlyoffice/cache/files/edited-template.docx',
-        ],
+        ]),
     )->assertOk()->assertExactJson(['error' => 0]);
 
     expect(Storage::disk('local')->get($template->template_file))->toBe('%mid-edit-binary')
@@ -148,6 +148,6 @@ it('rejects OnlyOffice callbacks without a matching shared_key', function () {
             'template' => $template,
             'shared_key' => 'wrong',
         ]),
-        ['status' => 2, 'url' => 'http://onlyoffice/x.docx'],
+        signOnlyOfficeCallback(['status' => 2, 'url' => 'http://onlyoffice/x.docx']),
     )->assertForbidden();
 });

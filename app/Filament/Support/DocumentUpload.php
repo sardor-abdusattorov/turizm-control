@@ -20,6 +20,7 @@ class DocumentUpload
                 'application/vnd.ms-excel',
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ])
+            ->maxSize(20 * 1024)     // 20 MB — generous for contracts, but bounded.
             ->downloadable()
             ->previewable(false)
             ->nullable();

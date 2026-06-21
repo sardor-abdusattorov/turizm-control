@@ -102,10 +102,10 @@ it('persists the edited order docx on OnlyOffice callback', function () {
     post(route('orders.save-callback', [
         'order' => $order,
         'shared_key' => $order->document_key,
-    ]), [
+    ]), signOnlyOfficeCallback([
         'status' => 2,
         'url' => 'http://onlyoffice/cache/files/order-edited.docx',
-    ])->assertOk()->assertExactJson(['error' => 0]);
+    ]))->assertOk()->assertExactJson(['error' => 0]);
 
     expect(Storage::disk('local')->get($order->file_path))->toBe('%edited')
         ->and($order->fresh()->document_key)->not->toBe($originalKey);
@@ -122,10 +122,10 @@ it('keeps the key on order forcesave callback (status 6)', function () {
     post(route('orders.save-callback', [
         'order' => $order,
         'shared_key' => $order->document_key,
-    ]), [
+    ]), signOnlyOfficeCallback([
         'status' => 6,
         'url' => 'http://onlyoffice/cache/files/order-edited.docx',
-    ])->assertOk();
+    ]))->assertOk();
 
     expect($order->fresh()->document_key)->toBe($originalKey);
 });

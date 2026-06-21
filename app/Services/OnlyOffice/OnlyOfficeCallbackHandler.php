@@ -33,8 +33,9 @@ class OnlyOfficeCallbackHandler
         array $logProperties = [],
     ): array {
         $logEvent = $savedEvent;
-        $status = (int) $request->input('status', 0);
-        $url = $request->input('url');
+        $payload = $this->verifiedPayload($request);
+        $status = (int) ($payload['status'] ?? 0);
+        $url = $payload['url'] ?? null;
 
         if (! in_array($status, [2, 6], true) || ! is_string($url)) {
             return ['error' => 0];
@@ -64,7 +65,7 @@ class OnlyOfficeCallbackHandler
                 options: [
                     'logName' => 'Document',
                     'subject' => $subject,
-                    'causer' => $this->resolveCauser($request),
+                    'causer' => $this->resolveCauser($payload),
                     'properties' => array_merge(
                         ['status' => $status, 'bytes' => strlen($body)],
                         $logProperties,
@@ -84,6 +85,31 @@ class OnlyOfficeCallbackHandler
         }
     }
 
+    /**
+     * Verify the OnlyOffice JWT and return the trusted payload (status / url
+     * / users come from there, not from the raw body — the raw body is
+     * untrusted). When the JWT secret is not configured we run in degraded
+     * mode and fall back to the raw body so local dev without the editor
+     * still works; production must set ONLYOFFICE_JWT_SECRET.
+     *
+     * @return array<string, mixed>
+     */
+    private function verifiedPayload(Request $request): array
+    {
+        if (! $this->service->isJwtConfigured()) {
+            return $request->all();
+        }
+
+        $payload = $this->service->verifyCallback(
+            $request->all(),
+            $request->header('Authorization'),
+        );
+
+        abort_if($payload === null, 403, 'OnlyOffice callback rejected: missing or invalid JWT.');
+
+        return $payload;
+    }
+
     public function ensureSharedKey(Request $request, ?string $expected): void
     {
         $provided = (string) $request->query('shared_key', '');
@@ -99,9 +125,12 @@ class OnlyOfficeCallbackHandler
         return fn (string $body) => Storage::disk($disk)->put($path, $body);
     }
 
-    private function resolveCauser(Request $request): ?User
+    /**
+     * @param  array<string, mixed>  $payload  verified JWT payload (trusted)
+     */
+    private function resolveCauser(array $payload): ?User
     {
-        $userIds = $request->input('users', []);
+        $userIds = $payload['users'] ?? [];
 
         if (! is_array($userIds) || $userIds === []) {
             return null;

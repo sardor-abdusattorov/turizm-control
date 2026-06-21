@@ -66,10 +66,10 @@ it('cancels approvals when OnlyOffice saves the document on an in-review contrac
             'contract' => $contract,
             'shared_key' => $contract->document_key,
         ]),
-        [
+        signOnlyOfficeCallback([
             'status' => 2,
             'url' => 'http://onlyoffice/cache/files/edited.docx',
-        ],
+        ]),
     )->assertOk();
 
     $contract->refresh();
@@ -93,10 +93,10 @@ it('leaves a draft contract untouched when OnlyOffice saves the document', funct
             'contract' => $contract,
             'shared_key' => $contract->document_key,
         ]),
-        [
+        signOnlyOfficeCallback([
             'status' => 2,
             'url' => 'http://onlyoffice/cache/files/edited.docx',
-        ],
+        ]),
     )->assertOk();
 
     expect($contract->fresh()->status)->toBe(Contract::STATUS_DRAFT)
@@ -116,10 +116,10 @@ it('does not invalidate approvals on an OnlyOffice forcesave status that did not
             'contract' => $contract,
             'shared_key' => $contract->document_key,
         ]),
-        [
+        signOnlyOfficeCallback([
             'status' => 6,
             'url' => 'http://onlyoffice/cache/files/edited.docx',
-        ],
+        ]),
     )->assertOk();
 
     $contract->refresh();
