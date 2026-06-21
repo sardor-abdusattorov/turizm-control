@@ -16,7 +16,15 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
+        // host / HMR / polling are driven by env vars so the same config
+        // works both natively (defaults: localhost, no polling) and inside
+        // the Docker `node` container, which sets VITE_HOST=0.0.0.0 etc.
+        host: process.env.VITE_HOST || 'localhost',
+        hmr: {
+            host: process.env.VITE_HMR_HOST || 'localhost',
+        },
         watch: {
+            usePolling: process.env.VITE_USE_POLLING === 'true',
             ignored: ['**/storage/framework/views/**'],
         },
     },

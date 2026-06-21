@@ -88,18 +88,28 @@ services:
       - app
     restart: unless-stopped
 
+  # Vite dev server for the Filament theme + app assets. Installs deps into
+  # the named node_modules volume on first run (so Linux binaries never clash
+  # with a host node_modules built on Windows/macOS), then runs `npm run dev`.
+  # For production assets run `npm run build` instead.
   node:
     image: node:24-alpine
     container_name: turizm-node
     working_dir: /var/www
+    command: sh -c "[ -d node_modules/vite ] || npm install --no-audit --no-fund; npm run dev"
+    ports:
+      - "5173:5173"
     volumes:
       - ./:/var/www
-      - vendor:/var/www/vendor
       - node_modules:/var/www/node_modules
+    environment:
+      VITE_HOST: 0.0.0.0
+      VITE_HMR_HOST: localhost
+      VITE_USE_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
     networks:
       - app
-    profiles:
-      - tools
+    restart: unless-stopped
 
   onlyoffice:
     image: onlyoffice/documentserver:8.2
