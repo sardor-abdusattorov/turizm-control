@@ -10,21 +10,21 @@ class SettingsSeeder extends Seeder
     public function run(): void
     {
         $values = [
-            'organization.name.ru' => 'Национальный PR-центр',
-            'organization.name.uz' => 'Milliy PR-markazi',
-            'organization.name.en' => 'National PR Center',
+            'organization.name.ru' => 'PR-Контроль',
+            'organization.name.uz' => 'PR-Kontrol',
+            'organization.name.en' => 'PR-Kontrol',
 
-            'seo.title.ru' => 'Национальный PR-центр Узбекистана',
-            'seo.title.uz' => "O'zbekiston Milliy PR-markazi",
-            'seo.title.en' => 'National PR Center of Uzbekistan',
+            'seo.title.ru' => 'PR-Контроль — система согласования договоров',
+            'seo.title.uz' => 'PR-Kontrol — shartnomalarni kelishish tizimi',
+            'seo.title.en' => 'PR-Kontrol — Contract Approval System',
 
-            'seo.description.ru' => 'Национальный PR-центр презентует туристический потенциал Узбекистана на мировой арене: международные мероприятия, медиа-проекты и продвижение туризма.',
-            'seo.description.uz' => "Milliy PR-markazi O'zbekiston turizm salohiyatini jahon miqyosida namoyish etadi: xalqaro tadbirlar, media-loyihalar va turizmni rivojlantirish.",
-            'seo.description.en' => "The National PR Center presents Uzbekistan's tourism potential on the global stage: international events, media projects and tourism promotion.",
+            'seo.description.ru' => 'PR-Контроль — внутренняя система управления договорами Национального PR-центра Узбекистана: согласование, подписание, контроль оплат.',
+            'seo.description.uz' => 'PR-Kontrol — Oʻzbekiston Milliy PR-markazining shartnomalarni boshqarish ichki tizimi: kelishuv, imzolash, toʻlovlar nazorati.',
+            'seo.description.en' => 'PR-Kontrol — internal contract management system of the National PR Center of Uzbekistan: approval, signing, payment tracking.',
 
-            'seo.keywords.ru' => 'туризм Узбекистан, PR-центр, продвижение туризма, медиа-проекты',
-            'seo.keywords.uz' => "O'zbekiston turizmi, PR-markaz, turizmni rivojlantirish",
-            'seo.keywords.en' => 'Uzbekistan tourism, PR center, tourism promotion',
+            'seo.keywords.ru' => 'PR-Контроль, согласование договоров, контроль договоров, PR-центр Узбекистан',
+            'seo.keywords.uz' => 'PR-Kontrol, shartnoma kelishish, shartnoma nazorati, Milliy PR-markaz',
+            'seo.keywords.en' => 'PR-Kontrol, contract approval, contract management, National PR Center',
 
             'seo.indexing_enabled' => true,
 
