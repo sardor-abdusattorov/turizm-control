@@ -43,10 +43,12 @@
     }
     .af-wrap {
         max-height: 65vh;
-        overflow-y: auto;
-        overflow-x: auto;
-        margin: -.25rem;
-        padding: .25rem;
+        overflow: auto;
+        /* width:100% + min-width:0 keep the wrapper at the modal's width so the
+           wide table scrolls INSIDE it, instead of the wrapper growing to the
+           table width and pushing the whole modal off-screen. */
+        width: 100%;
+        min-width: 0;
     }
     .af {
         width: 100%;
