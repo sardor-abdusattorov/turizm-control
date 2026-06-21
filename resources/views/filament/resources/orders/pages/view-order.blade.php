@@ -435,5 +435,44 @@
         align-items: center;
         gap: .35rem;
     }
+
+    /* ───── Mobile (< 640px) ─────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+        /* Hero: stack the columns, let dates wrap, dim chip-meta gap. */
+        .ow-hero {
+            flex-direction: column;
+            gap: .9rem;
+            padding: 1rem 1.1rem;
+        }
+        .ow-hero__meta {
+            flex-wrap: wrap;
+            gap: .4rem;
+        }
+        .ow-hero__title {
+            font-size: 1.1rem;
+        }
+        .ow-hero__dates {
+            flex-direction: column;
+            gap: .35rem;
+            align-items: flex-start;
+        }
+        .ow-num {
+            white-space: normal;
+            word-break: break-all;
+        }
+
+        /* File-card row: stack thumb + body, drop the fixed thumb width. */
+        .ow-file {
+            flex-direction: column;
+            gap: .75rem;
+        }
+        .ow-file__thumb {
+            width: 100%;
+            height: 4rem;
+        }
+        .ow-file__field {
+            flex-wrap: wrap;
+        }
+    }
 </style>
 </x-filament-panels::page>

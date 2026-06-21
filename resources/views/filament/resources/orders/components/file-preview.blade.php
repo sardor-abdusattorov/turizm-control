@@ -166,4 +166,18 @@
         flex-wrap: wrap;
         margin-top: .5rem;
     }
+
+    /* Mobile (< 640px): shrink the thumb and drop fixed widths */
+    @media (max-width: 640px) {
+        .of-thumb {
+            width: 5.5rem;
+            height: 7rem;
+        }
+        .of-thumb svg {
+            width: 3.5rem;
+        }
+        .of-meta {
+            min-width: 0;
+        }
+    }
 </style>

@@ -180,5 +180,21 @@
         .cf-btn--ghost:hover {
             background: rgba(127,127,127,.08);
         }
+
+        /* Mobile (< 640px): stack the file card vertically + tighter thumb */
+        @media (max-width: 640px) {
+            .cf-file__row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: .8rem;
+            }
+            .cf-file__thumb {
+                width: 100%;
+                height: 4.5rem;
+            }
+            .cf-file__act {
+                flex-wrap: wrap;
+            }
+        }
     </style>
 @endonce
