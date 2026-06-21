@@ -24,12 +24,16 @@ services:
     env_file:
       - .env
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - app
     restart: unless-stopped
 
+  # Daemon that runs `schedule:run` once a minute — drives every task
+  # registered in routes/console.php (CBU rate refresh, approval-reminder
+  # mailer, …). Uses the same PHP image as the web container; no cron
+  # needed on the host.
   scheduler:
     build:
       context: .
@@ -42,25 +46,26 @@ services:
     env_file:
       - .env
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - app
     restart: unless-stopped
 
-  postgres:
-    image: postgres:16-alpine
-    container_name: turizm-postgres
+  mysql:
+    image: mysql:8.0
+    container_name: turizm-mysql
     environment:
-      POSTGRES_DB: ${DB_DATABASE:-turizm}
-      POSTGRES_USER: ${DB_USERNAME:-turizm}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_DATABASE: ${DB_DATABASE:-turizm}
+      MYSQL_USER: ${DB_USERNAME:-turizm}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-secret}
     ports:
-      - "54321:5432"
+      - "33061:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-turizm} -d ${DB_DATABASE:-turizm}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD:-secret}"]
       interval: 5s
       timeout: 5s
       retries: 12
@@ -68,18 +73,17 @@ services:
       - app
     restart: unless-stopped
 
-  pgadmin:
-    image: dpage/pgadmin4:8
-    container_name: turizm-pgadmin
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: turizm-pma
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@turizm.local}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-secret}
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 128M
     ports:
       - "8081:80"
     depends_on:
-      - postgres
+      - mysql
     networks:
       - app
     restart: unless-stopped
@@ -125,7 +129,7 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
+  mysql_data:
   vendor:
   node_modules:
   onlyoffice_data:
