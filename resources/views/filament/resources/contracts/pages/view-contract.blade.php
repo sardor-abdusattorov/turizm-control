@@ -32,6 +32,18 @@
     $statusName = fn (ContractApproverStatus $status): string => $status->label();
     $ic = fn (string $name, int $size = 18) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
+    // SLA window (days an approver gets once it's their turn) and the saturated
+    // dot colour per Filament status token — used to tint the per-approver modal.
+    $slaDays = (int) settings('approval.sla_days', 2);
+    $ringFor = [
+        'success' => '#10b981',
+        'danger' => '#ef4444',
+        'info' => '#3b82f6',
+        'warning' => '#fb923c',
+        'primary' => '#818cf8',
+        'gray' => '#cbd5e1',
+    ];
+
     $activities = $this->getActivities()
         ->unique(fn ($a) => ($a->description ?? '').'|'.$a->created_at?->format('YmdHi'))
         ->values();
@@ -1557,6 +1569,111 @@
         .cw-rt__date--muted {
             opacity: .4;
         }
+        /* status colour bar at the very top of the eye-modal card */
+        .cw-modal__bar {
+            height: .3rem;
+            width: 100%;
+            flex-shrink: 0;
+        }
+        .cw-modal__hd-pill {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        /* metric tiles strip (step / timing / reminders) */
+        .cw-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+            gap: .6rem;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--d);
+            background: var(--soft);
+        }
+        .cw-stat {
+            border: 1px solid var(--d);
+            border-radius: .65rem;
+            padding: .6rem .7rem;
+            background: var(--s);
+        }
+        .cw-stat__lb {
+            font-size: .64rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: var(--m2);
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+        }
+        .cw-stat__vl {
+            margin-top: .3rem;
+            font-size: .95rem;
+            font-weight: 750;
+            color: var(--t);
+            line-height: 1.15;
+            font-variant-numeric: tabular-nums;
+        }
+        .cw-stat__sub {
+            margin-top: .15rem;
+            font-size: .7rem;
+            color: var(--m);
+        }
+        .cw-stat--success {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+        }
+        .cw-stat--success .cw-stat__vl {
+            color: #047857;
+        }
+        .dark .cw-stat--success {
+            background: rgba(16,185,129,.10);
+            border-color: rgba(16,185,129,.30);
+        }
+        .dark .cw-stat--success .cw-stat__vl {
+            color: #6ee7b7;
+        }
+        .cw-stat--warning {
+            background: #fff7ed;
+            border-color: #fed7aa;
+        }
+        .cw-stat--warning .cw-stat__vl {
+            color: #c2410c;
+        }
+        .dark .cw-stat--warning {
+            background: rgba(251,146,60,.10);
+            border-color: rgba(251,146,60,.30);
+        }
+        .dark .cw-stat--warning .cw-stat__vl {
+            color: #fdba74;
+        }
+        .cw-stat--danger {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+        .cw-stat--danger .cw-stat__vl {
+            color: #b91c1c;
+        }
+        .dark .cw-stat--danger {
+            background: rgba(239,68,68,.10);
+            border-color: rgba(239,68,68,.30);
+        }
+        .dark .cw-stat--danger .cw-stat__vl {
+            color: #fca5a5;
+        }
+        .cw-stat--primary {
+            background: var(--accent-softer);
+            border-color: var(--accent-ring);
+        }
+        .cw-stat--primary .cw-stat__vl {
+            color: var(--accent-strong);
+        }
+
+        /* coloured left accent per record row, set inline by status */
+        .cw-rt tbody td:first-child {
+            border-left: 3px solid var(--row-accent, transparent);
+        }
     </style>
 
     <div class="cw"
@@ -1961,27 +2078,83 @@
                 // Every record this user has on the contract, newest first.
                 $allRecords = $record->approvers->where('user_id', $ap->user_id)->sortByDesc('id')->values();
                 $isHistorical = fn ($r) => in_array($r->status, [ContractApprover::STATUS_INVALIDATED, ContractApprover::STATUS_SKIPPED], true);
+
+                $apShown = $ap->displayStatus();
+                $apTone = $pillFor($apShown);
+                $apRing = $ringFor[$apTone] ?? '#cbd5e1';
+
+                // Timing tile, shaped by where this person currently stands.
+                $timing = null;
+                if ($ap->acted_at && in_array($ap->status, [ContractApprover::STATUS_APPROVED, ContractApprover::STATUS_REJECTED, ContractApprover::STATUS_RETURNED], true)) {
+                    $onTime = $ap->due_at ? $ap->acted_at->lessThanOrEqualTo($ap->due_at) : null;
+                    $startedAt = $ap->due_at?->copy()->subDays($slaDays);
+                    $timing = [
+                        'lb' => __('app.label.responded_in'),
+                        'vl' => $startedAt ? $startedAt->diffForHumans($ap->acted_at, ['parts' => 2, 'syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE]) : $ap->acted_at->format('d.m.Y'),
+                        'sub' => $onTime === null ? null : ($onTime ? __('app.label.on_time') : __('app.label.is_late')),
+                        'tone' => $onTime === false ? 'danger' : 'success',
+                    ];
+                } elseif ($ap->status === ContractApprover::STATUS_PENDING && $ap->due_at) {
+                    $overdue = $ap->isOverdue();
+                    $timing = [
+                        'lb' => __('app.label.due'),
+                        'vl' => $ap->due_at->format('d.m.Y'),
+                        'sub' => $overdue
+                            ? __('app.label.overdue')
+                            : __('app.label.time_left', ['time' => $ap->due_at->diffForHumans(now(), ['parts' => 2, 'syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE])]),
+                        'tone' => $overdue ? 'danger' : 'warning',
+                    ];
+                } elseif ($ap->status === ContractApprover::STATUS_QUEUED) {
+                    $timing = [
+                        'lb' => __('app.label.sla'),
+                        'vl' => trans_choice('app.label.days_count', $slaDays, ['count' => $slaDays]),
+                        'sub' => __('app.label.sla_hint'),
+                        'tone' => 'primary',
+                    ];
+                }
             @endphp
             <div class="cw-modal" x-show="approver === {{ $ap->user_id }}" x-cloak style="display:none;">
                 <div class="cw-modal__bg" @click="approver = null"
                      x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                      x-transition:leave="transition ease-in duration-120" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
-                <div class="cw-modal__card" style="max-width:44rem;" @click.stop
+                <div class="cw-modal__card" style="max-width:52rem;" @click.stop
                      x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95 translate-y-2" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-120" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+                    <div class="cw-modal__bar" style="background:{{ $apRing }};"></div>
                     <div class="cw-modal__hd">
-                        <img src="{{ $this->approverAvatar($ap) }}" alt="">
+                        <img src="{{ $this->approverAvatar($ap) }}" alt="" style="box-shadow:0 0 0 3px var(--s),0 0 0 5px {{ $apRing }};">
                         <div style="min-width:0;flex:1;">
                             <div class="cw-modal__nm">{{ $ap->user?->name }}</div>
                             <div class="cw-modal__dp">{{ $ap->user?->department?->name }}{{ $ap->user?->position?->name ? ' · '.$ap->user->position->name : '' }}</div>
                         </div>
-                        @if ($allRecords->count() > 1)
-                            <span style="font-size:.72rem;font-weight:600;color:var(--m);background:var(--soft);padding:.25rem .55rem;border-radius:.35rem;white-space:nowrap;">
-                                {{ trans_choice('app.label.attempts_count', $allRecords->count(), ['count' => $allRecords->count()]) }}
-                            </span>
-                        @endif
-                        <button type="button" class="cw-modal__x" @click="approver = null">{!! $ic('heroicon-o-x-mark', 16) !!}</button>
+                        <div class="cw-modal__hd-pill">
+                            <span class="cw-pill cw-pill--lg cw-pill--{{ $apTone }}">{{ $statusName($apShown) }}</span>
+                            <button type="button" class="cw-modal__x" @click="approver = null">{!! $ic('heroicon-o-x-mark', 16) !!}</button>
+                        </div>
                     </div>
+
+                    <div class="cw-stats">
+                        <div class="cw-stat">
+                            <span class="cw-stat__lb">{!! $ic('heroicon-m-queue-list', 12) !!} {{ __('app.label.step') }}</span>
+                            <div class="cw-stat__vl">{{ $ap->order }} / {{ $totalCount }}</div>
+                            <div class="cw-stat__sub">{{ trans_choice('app.label.attempts_count', $allRecords->count(), ['count' => $allRecords->count()]) }}</div>
+                        </div>
+                        @if ($timing)
+                            <div class="cw-stat cw-stat--{{ $timing['tone'] }}">
+                                <span class="cw-stat__lb">{!! $ic('heroicon-m-clock', 12) !!} {{ $timing['lb'] }}</span>
+                                <div class="cw-stat__vl">{{ $timing['vl'] }}</div>
+                                @if ($timing['sub'])<div class="cw-stat__sub">{{ $timing['sub'] }}</div>@endif
+                            </div>
+                        @endif
+                        @if ($ap->reminder_sent_at)
+                            <div class="cw-stat">
+                                <span class="cw-stat__lb">{!! $ic('heroicon-m-bell-alert', 12) !!} {{ __('app.label.reminders') }}</span>
+                                <div class="cw-stat__vl">{{ $ap->reminder_sent_at->format('d.m.Y') }}</div>
+                                <div class="cw-stat__sub">{{ __('app.label.reminder_sent_ago', ['time' => $ap->reminder_sent_at->diffForHumans(now(), ['parts' => 1, 'syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE])]) }}</div>
+                            </div>
+                        @endif
+                    </div>
+
                     <div class="cw-modal__bd">
                         {{-- One row per record. The live attempt reads normally;
                              cancelled / skipped rows are dimmed but still show the
@@ -2000,8 +2173,9 @@
                                     @php
                                         $past = $isHistorical($rec);
                                         $shown = $rec->displayStatus();
+                                        $rowAccent = $ringFor[$pillFor($shown)] ?? 'transparent';
                                     @endphp
-                                    <tr @class(['is-past' => $past])>
+                                    <tr @class(['is-past' => $past]) style="--row-accent:{{ $rowAccent }};">
                                         <td class="cw-rt__st">
                                             <span class="cw-pill cw-pill--{{ $pillFor($shown) }}">{{ $statusName($shown) }}</span>
                                             <span class="cw-rt__ord">#{{ $rec->order }}</span>
