@@ -229,9 +229,9 @@
         .cw-tab {
             display: flex;
             align-items: center;
-            gap: .4rem;
-            padding: .6rem .95rem;
-            font-size: 0.854rem;
+            gap: .45rem;
+            padding: .7rem 1.15rem;
+            font-size: 0.92rem;
             font-weight: 600;
             color: var(--m);
             background: transparent;
@@ -250,12 +250,12 @@
             box-shadow: 0 0 0 1px var(--r), 0 1px 2px rgba(0,0,0,.05);
         }
         .cw-tab__c {
-            font-size: 0.684rem;
+            font-size: 0.74rem;
             font-weight: 700;
             color: var(--m);
             background: var(--soft);
             border-radius: 999px;
-            padding: .05rem .4rem;
+            padding: .12rem .5rem;
         }
         .cw-tab--active .cw-tab__c {
             background: var(--accent-soft);
@@ -1161,13 +1161,13 @@
         .cw-day__hd {
             display: inline-flex;
             align-items: center;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 700;
             color: var(--m);
             text-transform: uppercase;
             letter-spacing: .05em;
-            padding: .24rem .6rem;
-            margin: .15rem 0 .55rem;
+            padding: .3rem .7rem;
+            margin: .15rem 0 .75rem;
             background: var(--soft);
             border-left: 3px solid var(--accent);
             border-radius: .35rem;
@@ -1179,15 +1179,15 @@
             position: relative;
             display: flex;
             gap: .85rem;
-            padding-bottom: 1.7rem;
+            padding-bottom: 2.1rem;
         }
         .cw-tl__time {
             width: 2.6rem;
             flex-shrink: 0;
             text-align: right;
-            font-size: 0.7rem;
+            font-size: 0.76rem;
             color: var(--m2);
-            padding-top: .45rem;
+            padding-top: .5rem;
             font-variant-numeric: tabular-nums;
         }
         .cw-tl:last-child {
@@ -1253,14 +1253,15 @@
             padding-top: .15rem;
         }
         .cw-tl__ds {
-            font-size: 0.845rem;
+            font-size: 0.92rem;
             font-weight: 600;
             color: var(--t);
+            line-height: 1.35;
         }
         .cw-tl__mt {
-            font-size: 0.734rem;
+            font-size: 0.8rem;
             color: var(--m2);
-            margin-top: .12rem;
+            margin-top: .2rem;
             display: flex;
             align-items: center;
             gap: .4rem;
