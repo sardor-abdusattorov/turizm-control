@@ -13,7 +13,7 @@ class ContractPdfService
 
     public function path(Contract $contract): string
     {
-        return "contracts/{$contract->id}/contract.pdf";
+        return "uploads/files/contracts/{$contract->id}/contract.pdf";
     }
 
     public function absolutePath(Contract $contract): string

@@ -25,26 +25,26 @@ it('deletes the template docx from disk when the template is deleted', function 
     Storage::fake('local');
 
     $template = ContractTemplate::factory()->create([
-        'template_file' => 'uploads/files/contract-templates/test.docx',
+        'template_file' => 'uploads/files/uploads/files/contract-templates/test.docx',
     ]);
     Storage::disk('local')->put($template->template_file, 'fake');
 
     $template->delete();
 
-    Storage::disk('local')->assertMissing('uploads/files/contract-templates/test.docx');
+    Storage::disk('local')->assertMissing('uploads/files/uploads/files/contract-templates/test.docx');
 });
 
 it('wipes the contract folder on disk when a contract is deleted', function () {
     Storage::fake('local');
 
     $contract = Contract::factory()->create();
-    Storage::disk('local')->put("contracts/{$contract->id}/draft.docx", 'fake');
-    Storage::disk('local')->put("contracts/{$contract->id}/contract.pdf", 'fake');
+    Storage::disk('local')->put("uploads/files/contracts/{$contract->id}/draft.docx", 'fake');
+    Storage::disk('local')->put("uploads/files/contracts/{$contract->id}/contract.pdf", 'fake');
 
     $contract->delete();
 
-    Storage::disk('local')->assertMissing("contracts/{$contract->id}/draft.docx");
-    Storage::disk('local')->assertMissing("contracts/{$contract->id}/contract.pdf");
+    Storage::disk('local')->assertMissing("uploads/files/contracts/{$contract->id}/draft.docx");
+    Storage::disk('local')->assertMissing("uploads/files/contracts/{$contract->id}/contract.pdf");
 });
 
 it('wipes files for every order in a bulk delete', function () {

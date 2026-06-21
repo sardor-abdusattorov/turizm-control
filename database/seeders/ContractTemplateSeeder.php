@@ -44,11 +44,11 @@ class ContractTemplateSeeder extends Seeder
                     'order_type_id' => $data['order_type']->id,
                     'sort' => $data['sort'],
                     'status' => true,
-                    'template_file' => 'contract-templates/pending/stub.docx',
+                    'template_file' => 'uploads/files/contract-templates/pending/stub.docx',
                 ]
             );
 
-            $relativePath = 'contract-templates/'.$template->id.'/template.docx';
+            $relativePath = 'uploads/files/contract-templates/'.$template->id.'/template.docx';
             Storage::disk('local')->put($relativePath, file_get_contents($stub));
 
             $template->update(['template_file' => $relativePath]);

@@ -44,7 +44,7 @@ function makeContractWithDocx(ContractStatus $status = Contract::STATUS_APPROVED
         'status' => $status,
     ]);
 
-    Storage::disk('local')->put("contracts/{$contract->id}/draft.docx", 'fake-docx-body');
+    Storage::disk('local')->put("uploads/files/contracts/{$contract->id}/draft.docx", 'fake-docx-body');
 
     return $contract->fresh();
 }
@@ -60,8 +60,8 @@ it('generates a PDF via OnlyOffice converter and stores it locally', function ()
     $path = app(ContractPdfService::class)->generate($contract);
 
     expect($path)->not->toBeNull();
-    Storage::disk('local')->assertExists("contracts/{$contract->id}/contract.pdf");
-    expect(Storage::disk('local')->get("contracts/{$contract->id}/contract.pdf"))
+    Storage::disk('local')->assertExists("uploads/files/contracts/{$contract->id}/contract.pdf");
+    expect(Storage::disk('local')->get("uploads/files/contracts/{$contract->id}/contract.pdf"))
         ->toBe('%PDF-fake-binary');
 });
 

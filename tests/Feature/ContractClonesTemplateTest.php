@@ -39,7 +39,7 @@ it('clones and fills the template into a separate contract file, leaving the tem
     Storage::fake('local');
 
     // A template with a placeholder, stored on the private (local) disk.
-    $templatePath = 'contract-templates/main.docx';
+    $templatePath = 'uploads/files/contract-templates/main.docx';
     Storage::disk('local')->put($templatePath, file_get_contents(makeMinimalDocx('Contract {{number}}')));
     $templateHashBefore = md5(Storage::disk('local')->get($templatePath));
 
@@ -56,7 +56,7 @@ it('clones and fills the template into a separate contract file, leaving the tem
 
     // 2) The contract gets its OWN document on the private (local) disk.
     $contract->refresh();
-    expect($contract->document_file)->toBe("contracts/{$contract->id}/draft.docx")
+    expect($contract->document_file)->toBe("uploads/files/contracts/{$contract->id}/draft.docx")
         ->and(Storage::disk('local')->exists($contract->document_file))->toBeTrue();
 
     // 3) The clone has the placeholder filled; the template keeps it raw.
@@ -70,7 +70,7 @@ it('clones and fills the template into a separate contract file, leaving the tem
 it('gives the contract a different document_key than the template', function () {
     Storage::fake('local');
 
-    $templatePath = 'contract-templates/main.docx';
+    $templatePath = 'uploads/files/contract-templates/main.docx';
     Storage::disk('local')->put($templatePath, file_get_contents(makeMinimalDocx('Contract {{number}}')));
 
     $template = ContractTemplate::factory()->create(['template_file' => $templatePath]);

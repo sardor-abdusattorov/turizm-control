@@ -86,7 +86,7 @@ class Contract extends Model
                 }
             }
 
-            $folder = "contracts/{$contract->id}";
+            $folder = "uploads/files/contracts/{$contract->id}";
 
             if (Storage::disk('local')->exists($folder)) {
                 Storage::disk('local')->deleteDirectory($folder);
@@ -192,7 +192,7 @@ class Contract extends Model
 
     public function documentPath(): string
     {
-        return "contracts/{$this->id}/draft.docx";
+        return "uploads/files/contracts/{$this->id}/draft.docx";
     }
 
     public function documentAbsolutePath(): string

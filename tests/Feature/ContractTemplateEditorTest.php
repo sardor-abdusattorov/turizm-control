@@ -43,7 +43,7 @@ it('keeps the document_key when template_file is mass-updated, leaving rotation 
     $template = ContractTemplate::factory()->create();
     $originalKey = $template->document_key;
 
-    $template->update(['template_file' => 'contract-templates/replaced.docx']);
+    $template->update(['template_file' => 'uploads/files/contract-templates/replaced.docx']);
 
     expect($template->fresh()->document_key)->toBe($originalKey);
 });
