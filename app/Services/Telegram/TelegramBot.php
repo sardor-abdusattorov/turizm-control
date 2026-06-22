@@ -425,7 +425,7 @@ class TelegramBot
 
     private function saveLocale(string $chatId, User $user, string $locale): void
     {
-        if (! in_array($locale, ['ru', 'uz', 'en'], true)) {
+        if (! in_array($locale, ['ru', 'uz'], true)) {
             return;
         }
 

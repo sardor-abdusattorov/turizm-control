@@ -13,7 +13,7 @@ return [
         'not_linked' => 'Twoj Telegram больше не привязан к аккаунту. Привяжи заново в профиле.',
         'cancelled' => 'Отменено.',
         'sent_to_director' => 'Отправлено директору.',
-        'choose_language' => "Выбери язык.\nTilni tanlang.\nPick your language.",
+        'choose_language' => "Выберите язык.\nTilni tanlang.",
         'help' => "Я присылаю уведомления и даю по ним действовать. Жми на кнопки под сообщением — или используй команды:\n\n/menu — главное меню\n/lang — язык\n/unlink — отвязать аккаунт\n/help — это сообщение",
         'unlink_confirm_title' => 'Отвязать этот аккаунт?',
         'unlink_confirm_body' => 'Уведомления сюда приходить перестанут. Заново привязать можно в профиле веб-панели.',

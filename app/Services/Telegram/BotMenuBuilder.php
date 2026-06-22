@@ -6,6 +6,7 @@ use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -29,7 +30,6 @@ class BotMenuBuilder
                     $this->cbBtn('🇷🇺 Русский', 'lang:ru'),
                     $this->cbBtn('🇺🇿 Oʻzbekcha', 'lang:uz'),
                 ],
-                [$this->cbBtn('🇬🇧 English', 'lang:en')],
             ],
         ];
     }
@@ -387,7 +387,11 @@ class BotMenuBuilder
 
     private function panelUrl(): string
     {
-        return config('app.url').'/admin';
+        // The Filament panel is mounted on the site root in this project
+        // (AdminPanelProvider::path('')), so don't slap an /admin suffix on
+        // top of it. Filament::getUrl() resolves the panel's actual path,
+        // so this stays correct if the path ever changes.
+        return Filament::getUrl() ?: config('app.url');
     }
 
     /** @return array<string, string> */

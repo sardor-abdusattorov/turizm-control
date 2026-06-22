@@ -13,7 +13,7 @@ return [
         'not_linked' => 'Telegram hisobingiz endi hisobga ulanmagan. Profil sahifasidan qayta ulang.',
         'cancelled' => 'Bekor qilindi.',
         'sent_to_director' => 'Direktorga yuborildi.',
-        'choose_language' => "Tilni tanlang.\nВыберите язык.\nPick your language.",
+        'choose_language' => "Tilni tanlang.\nВыберите язык.",
         'help' => "Men bildirishnomalarni yuboraman va ular bo‘yicha amal qilishga ruxsat beraman. Sxemaning tugmalarini bosing — yoki buyruqlardan foydalaning:\n\n/menu — asosiy menyu\n/lang — til\n/unlink — hisobni uzish\n/help — shu maslahat",
         'unlink_confirm_title' => 'Bu hisobni uzasizmi?',
         'unlink_confirm_body' => 'Bu yerga bildirishnomalar kelmay qoladi. Istalgan vaqt veb-paneldagi profilingizdan qayta ulashingiz mumkin.',

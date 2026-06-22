@@ -496,7 +496,7 @@ return [
         'not_linked' => 'Your Telegram account is no longer linked. Reconnect it from the profile page.',
         'cancelled' => 'Cancelled.',
         'sent_to_director' => 'Sent to the director.',
-        'choose_language' => "Pick your language.\nВыберите язык.\nTilni tanlang.",
+        'choose_language' => "Выберите язык.\nTilni tanlang.",
         'help' => "I send notifications and let you act on them. Tap a button under any message — or use:\n\n/menu — main menu\n/lang — language\n/unlink — disconnect this account\n/help — this hint",
         'unlink_confirm_title' => 'Disconnect this account?',
         'unlink_confirm_body' => 'You will stop receiving notifications here. You can always reconnect from your profile in the web panel.',
