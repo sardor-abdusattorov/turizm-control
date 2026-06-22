@@ -123,7 +123,12 @@ return [
     'policies' => [
         'path' => app_path('Policies'),
         'merge' => true,
-        'generate' => true,
+        // Policies are hand-managed — several carry custom rules (e.g.
+        // ContractPolicy's "Draft only" delete). Keep this false so
+        // `shield:generate` only ever syncs permissions and never overwrites a
+        // policy file. Flip on temporarily if you need a stock policy
+        // scaffolded for a brand-new resource, then turn it back off.
+        'generate' => false,
         'methods' => [
             'viewAny', 'view', 'create', 'update', 'delete', 'restore',
             'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
