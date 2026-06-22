@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Payments;
 
 use App\Filament\Resources\Payments\Pages\CreatePayment;
+use App\Filament\Resources\Payments\Pages\EditPayment;
 use App\Filament\Resources\Payments\Pages\ListPayments;
 use App\Filament\Resources\Payments\Pages\ViewPayment;
 use App\Filament\Resources\Payments\Schemas\PaymentForm;
@@ -69,6 +70,7 @@ class PaymentResource extends Resource
             'index' => ListPayments::route('/'),
             'create' => CreatePayment::route('/create'),
             'view' => ViewPayment::route('/{record}'),
+            'edit' => EditPayment::route('/{record}/edit'),
         ];
     }
 }

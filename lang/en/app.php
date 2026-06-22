@@ -392,6 +392,7 @@ return [
         'template_has_no_fields' => 'This template has no fields defined. Add some under Resources → Contract Templates → this template → Form Fields.',
         'preview_empty_hint' => 'Fill in the fields on the left — the rendered document will appear here.',
         'payment_recorded' => 'Payment recorded.',
+        'payment_updated' => 'Payment updated.',
         'payment_contract_not_approved' => 'Payments can only be recorded against approved contracts.',
         'payment_already_full' => 'This contract is already fully paid.',
         'payment_exceeds_remaining' => 'The payment percent cannot exceed the remaining :percent%.',

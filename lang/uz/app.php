@@ -202,6 +202,7 @@ return [
         'template_has_no_fields' => 'Shablonda maydonlar belgilanmagan. “Resurslar → Shartnoma shablonlari → ushbu shablon → Forma maydonlari”da qo‘shing.',
         'preview_empty_hint' => 'Chap tomondagi maydonlarni to‘ldiring — tayyor hujjat shu yerda paydo bo‘ladi.',
         'payment_recorded' => 'To‘lov qayd etildi.',
+        'payment_updated' => 'To‘lov yangilandi.',
         'payment_contract_not_approved' => 'To‘lovlarni faqat tasdiqlangan shartnomalar bo‘yicha qayd etish mumkin.',
         'payment_already_full' => 'Bu shartnoma allaqachon to‘liq to‘langan.',
         'payment_exceeds_remaining' => 'To‘lov foizi qoldiq :percent% dan oshib ketmasligi kerak.',

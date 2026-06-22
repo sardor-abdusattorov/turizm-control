@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\ImageColumn;
@@ -118,6 +119,8 @@ class PaymentsTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->color('gray'),
+
+                    EditAction::make()->color('gray'),
 
                     Action::make('openContract')
                         ->label(__('app.action.open_contract'))
