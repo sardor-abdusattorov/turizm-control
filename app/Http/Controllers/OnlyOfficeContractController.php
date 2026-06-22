@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contract;
+use App\Models\User;
 use App\Services\OnlyOffice\OnlyOfficeCallbackHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,9 +36,9 @@ class OnlyOfficeContractController extends Controller
             forcesaveEvent: 'Contract Document Forcesave',
             logDescription: 'Contract '.$contract->number.' saved via OnlyOffice',
             persist: $this->callback->persistToDisk('local', $contract->documentPath()),
-            onFinalSave: function () use ($contract): void {
+            onFinalSave: function (?User $editor) use ($contract): void {
                 $contract->refreshDocumentKey();
-                $contract->reinvalidateAfterDocumentEdit();
+                $contract->reinvalidateAfterDocumentEdit($editor);
             },
             logProperties: ['contract_number' => $contract->number],
         );

@@ -82,6 +82,37 @@ it('cancels approvals when OnlyOffice saves the document on an in-review contrac
         ->and(Storage::disk('local')->get($contract->documentPath()))->toBe('updated-docx-body');
 });
 
+it('does NOT reset when the current approver tweaks the document', function () {
+    Http::fake(['*/edited.docx' => Http::response('updated-docx-body')]);
+
+    [$contract, $approvers] = docInReviewContractWithPartialProgress();
+    Storage::disk('local')->put($contract->documentPath(), 'original');
+
+    // approvers[1] is the PENDING one (the current approver). OnlyOffice
+    // fires a save just from them opening + closing the editor — that must
+    // not bounce the contract back to Draft and hide the approve buttons.
+    $currentApprover = $approvers[1];
+
+    post(
+        route('contracts.save-callback', [
+            'contract' => $contract,
+            'shared_key' => $contract->document_key,
+        ]),
+        signOnlyOfficeCallback([
+            'status' => 2,
+            'url' => 'http://onlyoffice/cache/files/edited.docx',
+            'users' => [(string) $currentApprover->id],
+        ]),
+    )->assertOk();
+
+    $contract->refresh();
+
+    expect($contract->status)->toBe(Contract::STATUS_IN_REVIEW)
+        ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(0)
+        // the document is still written to disk — only the chain is left alone.
+        ->and(Storage::disk('local')->get($contract->documentPath()))->toBe('updated-docx-body');
+});
+
 it('leaves a draft contract untouched when OnlyOffice saves the document', function () {
     Http::fake(['*/edited.docx' => Http::response('updated-docx-body')]);
 

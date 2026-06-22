@@ -48,8 +48,13 @@ class OnlyOfficeCallbackHandler
 
             $persist($body);
 
+            $causer = $this->resolveCauser($payload);
+
             if ($status === 2) {
-                $onFinalSave();
+                // Hand the editor identity to onFinalSave so it can tell an
+                // author's mid-flow change (resets the chain) from an
+                // approver's review tweak (keeps the contract in review).
+                $onFinalSave($causer);
             }
 
             Log::info($logEvent, [
@@ -65,7 +70,7 @@ class OnlyOfficeCallbackHandler
                 options: [
                     'logName' => 'Document',
                     'subject' => $subject,
-                    'causer' => $this->resolveCauser($payload),
+                    'causer' => $causer,
                     'properties' => array_merge(
                         ['status' => $status, 'bytes' => strlen($body)],
                         $logProperties,

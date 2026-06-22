@@ -171,17 +171,25 @@ class Contract extends Model
 
     /**
      * Called from the OnlyOffice save-callback after the editor finalises a
-     * save (status 2 / 6). When the contract was already mid-flow, the doc
-     * we just received on disk is different from what previous approvers
-     * signed off on — so we reset the contract to Draft and cancel every
-     * approval (preserving the active chain in the queue so the manager can
-     * resubmit to the same people).
+     * save (status 2). When an author changes the document mid-flow the
+     * version on disk no longer matches what previous approvers signed off
+     * on — so reset to Draft and cancel every approval (the chain is kept
+     * queued so the author can resubmit to the same people).
+     *
+     * The current approver, however, is *expected* to tweak the document as
+     * part of their review (OnlyOffice fires a save even when they just open
+     * and close it), so their save must NOT bounce the contract back to
+     * Draft — otherwise the Approve / Reject buttons vanish.
      */
-    public function reinvalidateAfterDocumentEdit(): void
+    public function reinvalidateAfterDocumentEdit(?User $editor = null): void
     {
         $this->refresh();
 
         if ($this->status === self::STATUS_DRAFT) {
+            return;
+        }
+
+        if ($editor && $this->isCurrentApprover($editor)) {
             return;
         }
 
