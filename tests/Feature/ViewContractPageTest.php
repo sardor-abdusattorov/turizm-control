@@ -26,6 +26,28 @@ function viewerWithAccess(): User
     return $user;
 }
 
+it('shows localized human labels in the history, not raw English event strings', function () {
+    $user = viewerWithAccess();
+    $contract = Contract::factory()->create([
+        'responsible_id' => $user->id,
+        'status' => Contract::STATUS_PENDING_DIRECTOR,
+    ]);
+
+    // The accountant's approval that parked the contract for the director is
+    // stored as the raw event "Contract Awaiting Director".
+    activity()
+        ->performedOn($contract)
+        ->event('Contract Awaiting Director')
+        ->log('Contract Awaiting Director — '.$contract->number);
+
+    actingAs($user);
+
+    $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
+
+    expect($html)->toContain(__('app.activity.awaiting_director'))
+        ->and($html)->not->toContain('Contract Awaiting Director');
+});
+
 it('renders the custom contract view page for a draft contract', function () {
     $user = viewerWithAccess();
     $contract = Contract::factory()->create([

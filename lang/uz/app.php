@@ -221,6 +221,20 @@ return [
         'click_to_copy' => 'Nusxalash uchun bosing',
     ],
 
+    'activity' => [
+        'created' => 'Shartnoma yaratildi',
+        'updated' => 'Ma’lumotlar yangilandi',
+        'deleted' => 'Shartnoma o‘chirildi',
+        'submitted' => 'Kelishishga yuborildi',
+        'step_approved' => 'Kelishish bosqichi o‘tildi',
+        'awaiting_director' => 'Kelishildi — direktorga tayyor',
+        'sent_to_director' => 'Direktorga yuborildi',
+        'approved' => 'Shartnoma tasdiqlandi',
+        'rejected' => 'Shartnoma rad etildi',
+        'document_saved' => 'Hujjat yangilandi',
+        'edit_invalidated' => 'Kelishuv bekor qilindi (hujjat o‘zgardi)',
+    ],
+
     // ── Dashboard widget-lari ──────────────────────────────────────
     'dashboard' => [
         'awaiting_my_signature' => 'Mening kelishuvimni kutmoqda',

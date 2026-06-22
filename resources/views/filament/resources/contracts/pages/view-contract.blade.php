@@ -2065,7 +2065,7 @@
                     return (object) [
                         'idx' => $i,
                         'event' => $a->event ?? '',
-                        'description' => $a->description ?: $a->event,
+                        'description' => $this->activityLabel($a->event ?? '', $a->description),
                         'causer' => $a->causer?->name ?? __('app.label.system'),
                         'time' => $a->created_at?->format('H:i'),
                         'day' => $a->created_at?->format('Y-m-d'),
@@ -2320,11 +2320,11 @@
                             </div>
                             <div class="cw-act" x-data="{ all: false }">
                                 @foreach ($apActs as $a)
-                                    @php $v = $this->activityVisual($a->event ?? ''); @endphp
+                                    @php $v = $this->activityVisual($a->event ?? ''); $al = $this->activityLabel($a->event ?? '', $a->description); @endphp
                                     <div class="cw-act__row" @if ($loop->index >= 4) x-show="all" x-cloak @endif>
                                         <span class="cw-act__time">{{ $a->created_at?->format('H:i') }}</span>
                                         <span class="cw-act__ic cw-act__ic--{{ $v['color'] }}">{!! $ic($v['icon'], 13) !!}</span>
-                                        <span class="cw-act__ds" title="{{ $a->description ?: $a->event }}">{{ $a->description ?: $a->event }}</span>
+                                        <span class="cw-act__ds" title="{{ $al }}">{{ $al }}</span>
                                         <span class="cw-act__rel" title="{{ $a->created_at?->format('d.m.Y H:i') }}">{{ $a->created_at?->diffForHumans() }}</span>
                                     </div>
                                 @endforeach
