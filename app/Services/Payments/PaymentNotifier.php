@@ -46,7 +46,7 @@ class PaymentNotifier
             ->actions([
                 $this->openContractAction($contract),
             ])
-            ->sendToDatabase($recipient);
+            ->sendToDatabase($recipient, isEventDispatched: true);
 
         $this->sendTelegram(
             $recipient,

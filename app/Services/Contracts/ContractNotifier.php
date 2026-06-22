@@ -35,7 +35,7 @@ class ContractNotifier
             ->actions([
                 $this->openContractAction($contract),
             ])
-            ->sendToDatabase($recipient);
+            ->sendToDatabase($recipient, isEventDispatched: true);
 
         // Rich Telegram card (amount + responsible + Approve/Reject/Open),
         // built by the bot menu builder so the format stays in sync with
@@ -65,7 +65,7 @@ class ContractNotifier
             ->actions([
                 $this->openContractAction($contract),
             ])
-            ->sendToDatabase($recipient);
+            ->sendToDatabase($recipient, isEventDispatched: true);
 
         $this->sendTelegram($recipient, $contract,
             '✅ '.__('app.notification.contract_approved.title'),
@@ -92,7 +92,7 @@ class ContractNotifier
             ->actions([
                 $this->openContractAction($contract),
             ])
-            ->sendToDatabase($recipient);
+            ->sendToDatabase($recipient, isEventDispatched: true);
 
         $this->sendTelegram($recipient, $contract,
             '❌ '.__('app.notification.contract_rejected.title'),
@@ -120,7 +120,7 @@ class ContractNotifier
             ->actions([
                 $this->openContractAction($contract),
             ])
-            ->sendToDatabase($recipient);
+            ->sendToDatabase($recipient, isEventDispatched: true);
 
         $this->sendTelegram($recipient, $contract,
             ($overdue ? '⚠️ ' : '⏰ ').__("app.notification.{$key}.title"),

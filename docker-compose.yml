@@ -52,6 +52,29 @@ services:
       - app
     restart: unless-stopped
 
+  # Laravel Reverb WebSocket server — Filament's bell drop-down listens
+  # on it for new database notifications in real time instead of polling
+  # every 30s.
+  reverb:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: turizm-reverb
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/var/www
+      - vendor:/var/www/vendor
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app
+    restart: unless-stopped
+
   mysql:
     image: mysql:8.0
     container_name: turizm-mysql
