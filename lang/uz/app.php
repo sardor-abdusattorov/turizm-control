@@ -62,6 +62,12 @@ return [
             'title' => 'Shartnoma to‘liq tasdiqlandi',
             'body' => ':number raqamli shartnoma butun kelishish zanjiridan o‘tdi.',
         ],
+        'step_approved' => [
+            'title' => 'Kelishish bosqichi o‘tildi',
+            'body' => ':number raqamli shartnomani :name tasdiqladi.',
+        ],
+        'step_next' => 'Endi :name qarori kutilmoqda.',
+        'step_ready_director' => 'Hammasi kelishildi — direktorga yuborishingiz mumkin.',
         'contract_rejected' => [
             'title' => 'Shartnoma rad etildi',
             'body' => ':number raqamli shartnoma rad etildi. Sababi: :reason',

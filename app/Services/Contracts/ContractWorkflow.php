@@ -94,6 +94,10 @@ class ContractWorkflow
             if ($next) {
                 $next->startReview($this->slaDays());
                 $this->notifier->notifyApprovalRequested($next);
+                // Keep the manager in the loop on every step, not just the
+                // final sign-off: "approved by the lawyer, now with the
+                // accountant".
+                $this->notifier->notifyStepApproved($contract, $user);
             }
 
             $this->logWorkflowEvent(
@@ -116,6 +120,10 @@ class ContractWorkflow
 
         if ($fresh->directorUser() && ! $fresh->hasDirectorApprover()) {
             $contract->update(['status' => Contract::STATUS_PENDING_DIRECTOR]);
+
+            // Legal + accounting are done — nudge the manager that it's
+            // their turn to hand the contract to the director.
+            $this->notifier->notifyStepApproved($contract, $user);
 
             $this->logWorkflowEvent(
                 event: 'Contract Awaiting Director',

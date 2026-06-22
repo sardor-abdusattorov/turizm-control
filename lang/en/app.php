@@ -326,6 +326,12 @@ return [
             'title' => 'Contract fully approved',
             'body' => 'Contract :number has passed the entire approval chain.',
         ],
+        'step_approved' => [
+            'title' => 'Approval step passed',
+            'body' => 'Contract :number was approved by :name.',
+        ],
+        'step_next' => 'Now awaiting :name.',
+        'step_ready_director' => 'All approvers signed off — you can send it to the director.',
         'contract_rejected' => [
             'title' => 'Contract rejected',
             'body' => 'Contract :number was rejected — reason: :reason',
