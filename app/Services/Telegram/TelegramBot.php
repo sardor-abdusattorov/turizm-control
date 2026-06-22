@@ -130,10 +130,23 @@ class TelegramBot
             return;
         }
 
+        // If the user is already linked to THIS chat, the diplink they just
+        // followed was a no-op — don't reset locale and don't drag them
+        // through the language picker again, just drop them straight into
+        // the main menu.
+        $existing = $user->telegram;
+        $alreadyLinkedHere = $existing && (string) $existing->chat_id === $chatId;
+
         $user->telegram()->updateOrCreate(
             [],
             ['chat_id' => $chatId, 'linked_at' => now()],
         );
+
+        if ($alreadyLinkedHere) {
+            $this->withUserLocale($chatId, fn () => $this->sendMainMenu($chatId));
+
+            return;
+        }
 
         App::setLocale(config('app.locale'));
 

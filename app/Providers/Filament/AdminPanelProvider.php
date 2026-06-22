@@ -73,7 +73,8 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn (): string => route('telegram.connect'))
                     ->openUrlInNewTab()
                     ->icon('heroicon-o-paper-airplane')
-                    ->visible(fn (): bool => app(TelegramService::class)->isConfigured()),
+                    ->visible(fn (): bool => app(TelegramService::class)->isConfigured()
+                        && ! (bool) auth()->user()?->isTelegramLinked()),
             ])
             ->navigationGroups([
 
