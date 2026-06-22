@@ -53,7 +53,7 @@ class ContractNotifier
         );
     }
 
-    public function notifyApproved(Contract $contract): void
+    public function notifyApproved(Contract $contract, ?ContractApprover $finalApprover = null): void
     {
         $recipient = $contract->responsible;
 
@@ -61,9 +61,15 @@ class ContractNotifier
             return;
         }
 
+        $body = __('app.notification.contract_approved.body', [
+            'number' => $contract->number,
+            'name' => $finalApprover ? $this->approverLabel($finalApprover) : '—',
+            'time' => $finalApprover ? $this->actedAt($finalApprover) : now()->format('d.m.Y H:i'),
+        ]);
+
         Notification::make()
             ->title(__('app.notification.contract_approved.title'))
-            ->body(__('app.notification.contract_approved.body', ['number' => $contract->number]))
+            ->body($body)
             ->icon('heroicon-o-check-circle')
             ->success()
             ->actions([
@@ -73,7 +79,7 @@ class ContractNotifier
 
         $this->sendTelegram($recipient, $contract,
             '✅ '.__('app.notification.contract_approved.title'),
-            __('app.notification.contract_approved.body', ['number' => $contract->number]),
+            $body,
         );
     }
 

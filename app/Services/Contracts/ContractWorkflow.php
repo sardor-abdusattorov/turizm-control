@@ -139,7 +139,7 @@ class ContractWorkflow
             'status' => Contract::STATUS_APPROVED,
             'signed_at' => now()->toDateString(),
         ]);
-        $this->notifier->notifyApproved($contract);
+        $this->notifier->notifyApproved($contract, $current);
 
         $this->logWorkflowEvent(
             event: 'Contract Approved',

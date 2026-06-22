@@ -66,7 +66,7 @@ return [
         ],
         'contract_approved' => [
             'title' => 'Shartnoma to‘liq tasdiqlandi',
-            'body' => ':number raqamli shartnoma butun kelishish zanjiridan o‘tdi.',
+            'body' => 'Sizning №:number shartnomangiz to‘liq tasdiqlandi — yakuniy imzo: :name, :time.',
         ],
         'step_approved' => [
             'title' => 'Kelishish bosqichi o‘tildi',

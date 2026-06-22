@@ -341,7 +341,7 @@ return [
         ],
         'contract_approved' => [
             'title' => 'Contract fully approved',
-            'body' => 'Contract :number has passed the entire approval chain.',
+            'body' => 'Your contract №:number is fully approved — final sign-off by :name on :time.',
         ],
         'step_approved' => [
             'title' => 'Approval step passed',

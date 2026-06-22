@@ -77,6 +77,30 @@ it('includes the approver, their decision time and comment in the step-approved 
         ->and($body)->toContain((string) $contract->number);
 });
 
+it('names the final approver and time in the fully-approved notification', function () {
+    $manager = User::factory()->create();
+    $approver = User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Madina Saidova']);
+
+    $contract = Contract::factory()->withDocument()->create([
+        'responsible_id' => $manager->id,
+        'status' => Contract::STATUS_IN_REVIEW,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $approver->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+
+    actingAs($approver);
+    app(ContractWorkflow::class)->approve($contract->fresh(), $approver);
+
+    $body = $manager->fresh()->notifications
+        ->firstWhere('data.title', __('app.notification.contract_approved.title'))
+        ->data['body'];
+
+    expect($body)->toContain('Madina Saidova')
+        ->and($body)->toContain((string) $contract->number);
+});
+
 it('names the sender in the approval-requested notification', function () {
     $manager = User::factory()->create(['name' => 'Sardor Abdusattorov']);
     $approver = User::factory()->create(['status' => User::STATUS_ACTIVE]);
