@@ -17,19 +17,13 @@ class RolesAndPermissionsSeeder extends Seeder
         $superAdmin = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
         $superAdmin->syncPermissions(Permission::where('guard_name', 'web')->pluck('name'));
 
+        // The director only consumes the work that reaches them: every
+        // contract (to review + sign off), plus orders and payments. No
+        // settings, reference data or template management.
         $this->syncRole('director', [
-            'manage_settings',
             'view_all_contracts',
-            'export_contract',
-            ...$this->resourcePermissions('contract', ['view_any', 'view', 'update']),
-            ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
+            ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('order', ['view_any', 'view']),
-            ...$this->resourcePermissions('contact', ['view_any', 'view']),
-            ...$this->resourcePermissions('currency', ['view_any', 'view']),
-            ...$this->resourcePermissions('department', ['view_any', 'view']),
-            ...$this->resourcePermissions('position', ['view_any', 'view']),
-            ...$this->resourcePermissions('order_type', ['view_any', 'view']),
-            ...$this->resourcePermissions('activity', ['view_any', 'view']),
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
         ]);
 

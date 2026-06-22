@@ -40,6 +40,13 @@ class TestUsersSeeder extends Seeder
                 'position_ru' => 'Менеджер',
                 'role' => 'manager',
             ],
+            [
+                'name' => 'Bekzod Yusupov',
+                'email' => 'director@test.uz',
+                'department_code' => 'direction',
+                'position_ru' => 'Директор',
+                'role' => 'director',
+            ],
         ];
 
         foreach ($users as $data) {
@@ -70,18 +77,13 @@ class TestUsersSeeder extends Seeder
     {
         $legal = User::firstWhere('email', 'legal@test.uz');
         $accounting = User::firstWhere('email', 'accounting@test.uz');
-        $director = User::firstWhere('email', 'mr.silverwind1998@gmail.com');
 
-        $chain = collect([$legal, $accounting, $director])
-            ->filter()
-            ->pluck('id')
-            ->all();
+        // A manager's contracts auto-route through legal + accounting only.
+        // The director is NOT a default recipient — they sign off as a
+        // separate manual hand-off (Pending director → Send to director),
+        // so they must stay out of the auto-built chain.
+        $reviewers = collect([$legal, $accounting])->filter()->pluck('id')->all();
 
-        $director?->defaultRecipients()->sync(
-            collect([$legal, $accounting])->filter()->pluck('id')->all()
-        );
-
-        $manager = User::firstWhere('email', 'manager@test.uz');
-        $manager?->defaultRecipients()->sync($chain);
+        User::firstWhere('email', 'manager@test.uz')?->defaultRecipients()->sync($reviewers);
     }
 }
