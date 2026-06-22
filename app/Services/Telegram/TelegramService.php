@@ -124,12 +124,34 @@ class TelegramService
 
             return $response->successful();
         } catch (\Throwable $e) {
-            Log::warning("Telegram {$method} failed", ['error' => $e->getMessage()]);
+            $error = $this->redactToken($e->getMessage());
 
-            $this->record($method, $payload, false, null, $e->getMessage());
+            Log::warning("Telegram {$method} failed", ['error' => $error]);
+
+            $this->record($method, $payload, false, null, $error);
 
             return false;
         }
+    }
+
+    /**
+     * Strip the bot token out of an error string before it is logged or
+     * persisted — transport errors (e.g. cURL "could not resolve host")
+     * embed the full request URL, token and all.
+     */
+    private function redactToken(?string $text): ?string
+    {
+        if ($text === null || $text === '') {
+            return $text;
+        }
+
+        $token = $this->token();
+
+        if ($token) {
+            $text = str_replace($token, '***', $text);
+        }
+
+        return preg_replace('#bot\d+:[A-Za-z0-9_-]+#', 'bot***', $text);
     }
 
     /**

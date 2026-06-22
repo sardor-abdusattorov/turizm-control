@@ -261,10 +261,12 @@ class BotMenuBuilder
 
         $lines = [
             $this->headline('📨 '.__('app.notification.approval_requested.title')),
-            __('app.notification.approval_requested.body', ['number' => $contract->number]),
+            __('app.notification.approval_requested.body', [
+                'number' => $contract->number,
+                'sender' => $this->htmlEscape($contract->responsible?->name ?? '—'),
+            ]),
             '',
             __('app.telegram.field_amount').': '.$this->formatAmount($contract),
-            __('app.telegram.field_responsible').': '.$this->htmlEscape($contract->responsible?->name ?? '—'),
         ];
 
         return [

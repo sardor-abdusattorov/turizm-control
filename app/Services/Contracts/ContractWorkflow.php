@@ -78,7 +78,7 @@ class ContractWorkflow
             $current->markApproved($comment);
 
             if ($contract->fresh()->allApproved()) {
-                $this->finalizeOrAwaitDirector($contract, $user, $comment);
+                $this->finalizeOrAwaitDirector($contract, $user, $comment, $current);
 
                 return;
             }
@@ -86,7 +86,7 @@ class ContractWorkflow
             $next = $this->advanceToActiveApprover($contract);
 
             if (! $next && $contract->fresh()->allApproved()) {
-                $this->finalizeOrAwaitDirector($contract, $user, $comment);
+                $this->finalizeOrAwaitDirector($contract, $user, $comment, $current);
 
                 return;
             }
@@ -97,7 +97,7 @@ class ContractWorkflow
                 // Keep the manager in the loop on every step, not just the
                 // final sign-off: "approved by the lawyer, now with the
                 // accountant".
-                $this->notifier->notifyStepApproved($contract, $user);
+                $this->notifier->notifyStepApproved($contract, $current);
             }
 
             $this->logWorkflowEvent(
@@ -114,7 +114,7 @@ class ContractWorkflow
         return true;
     }
 
-    private function finalizeOrAwaitDirector(Contract $contract, User $user, ?string $comment): void
+    private function finalizeOrAwaitDirector(Contract $contract, User $user, ?string $comment, ContractApprover $current): void
     {
         $fresh = $contract->fresh();
 
@@ -123,7 +123,7 @@ class ContractWorkflow
 
             // Legal + accounting are done — nudge the manager that it's
             // their turn to hand the contract to the director.
-            $this->notifier->notifyStepApproved($contract, $user);
+            $this->notifier->notifyStepApproved($contract, $current);
 
             $this->logWorkflowEvent(
                 event: 'Contract Awaiting Director',
@@ -194,7 +194,7 @@ class ContractWorkflow
         DB::transaction(function () use ($contract, $current, $comment, $user): void {
             $current->markRejected($comment);
             $contract->update(['status' => Contract::STATUS_REJECTED]);
-            $this->notifier->notifyRejected($contract, $comment);
+            $this->notifier->notifyRejected($contract, $comment, $current);
 
             $this->logWorkflowEvent(
                 event: 'Contract Rejected',

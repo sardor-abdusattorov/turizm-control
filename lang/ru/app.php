@@ -62,7 +62,7 @@ return [
     'notification' => [
         'approval_requested' => [
             'title' => 'Договор ждёт твоего одобрения',
-            'body' => 'Договор :number отправлен на согласование, и ты — текущий согласующий.',
+            'body' => ':sender отправил вам договор №:number на рассмотрение.',
         ],
         'contract_approved' => [
             'title' => 'Договор полностью одобрен',
@@ -70,13 +70,14 @@ return [
         ],
         'step_approved' => [
             'title' => 'Этап согласования пройден',
-            'body' => 'Договор :number одобрил :name.',
+            'body' => 'Ваш договор №:number одобрил :name — :time.',
         ],
+        'step_comment' => 'Комментарий: :comment',
         'step_next' => 'Теперь ждём решения от :name.',
         'step_ready_director' => 'Все согласовали — можно отправлять директору.',
         'contract_rejected' => [
             'title' => 'Договор отклонён',
-            'body' => 'Договор :number отклонён. Причина: :reason',
+            'body' => 'Ваш договор №:number отклонил :name — :time. Причина: :reason',
         ],
         'approval_due_soon' => [
             'title' => 'Дедлайн согласования приближается',

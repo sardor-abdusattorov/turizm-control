@@ -3,6 +3,7 @@
 use App\Models\TelegramMessageLog;
 use App\Services\Telegram\TelegramService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
@@ -72,4 +73,22 @@ it('renders the message text without html tags or entities', function () {
     $log = new TelegramMessageLog(['text' => 'Hello <b>team</b> &amp; <i>all</i>']);
 
     expect($log->cleanText)->toBe('Hello team & all');
+});
+
+it('redacts the bot token from a stored transport error', function () {
+    config(['services.telegram.bot_token' => '8021400469:AAH5secrettoken']);
+
+    Http::fake(function () {
+        throw new ConnectionException(
+            'cURL error 6: Could not resolve host for https://api.telegram.org/bot8021400469:AAH5secrettoken/sendMessage',
+        );
+    });
+
+    app(TelegramService::class)->send('555', 'hi');
+
+    $log = TelegramMessageLog::query()->latest('id')->first();
+
+    expect($log->ok)->toBeFalse()
+        ->and($log->error)->not->toContain('AAH5secrettoken')
+        ->and($log->error)->toContain('***');
 });

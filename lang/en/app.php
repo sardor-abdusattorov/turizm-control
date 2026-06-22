@@ -337,7 +337,7 @@ return [
     'notification' => [
         'approval_requested' => [
             'title' => 'Contract is waiting for your approval',
-            'body' => 'Contract :number was submitted for review and you are the current approver.',
+            'body' => ':sender sent you contract №:number for review.',
         ],
         'contract_approved' => [
             'title' => 'Contract fully approved',
@@ -345,13 +345,14 @@ return [
         ],
         'step_approved' => [
             'title' => 'Approval step passed',
-            'body' => 'Contract :number was approved by :name.',
+            'body' => 'Your contract №:number was approved by :name on :time.',
         ],
+        'step_comment' => 'Comment: :comment',
         'step_next' => 'Now awaiting :name.',
         'step_ready_director' => 'All approvers signed off — you can send it to the director.',
         'contract_rejected' => [
             'title' => 'Contract rejected',
-            'body' => 'Contract :number was rejected — reason: :reason',
+            'body' => 'Your contract №:number was rejected by :name on :time — reason: :reason',
         ],
         'approval_due_soon' => [
             'title' => 'Approval deadline approaching',

@@ -62,7 +62,7 @@ return [
     'notification' => [
         'approval_requested' => [
             'title' => 'Shartnoma tasdig‘ingizni kutmoqda',
-            'body' => ':number raqamli shartnoma ko‘rib chiqishga yuborildi va siz joriy kelishuvchisiz.',
+            'body' => ':sender sizga №:number shartnomani ko‘rib chiqishga yubordi.',
         ],
         'contract_approved' => [
             'title' => 'Shartnoma to‘liq tasdiqlandi',
@@ -70,13 +70,14 @@ return [
         ],
         'step_approved' => [
             'title' => 'Kelishish bosqichi o‘tildi',
-            'body' => ':number raqamli shartnomani :name tasdiqladi.',
+            'body' => 'Sizning №:number shartnomangizni :name tasdiqladi — :time.',
         ],
+        'step_comment' => 'Izoh: :comment',
         'step_next' => 'Endi :name qarori kutilmoqda.',
         'step_ready_director' => 'Hammasi kelishildi — direktorga yuborishingiz mumkin.',
         'contract_rejected' => [
             'title' => 'Shartnoma rad etildi',
-            'body' => ':number raqamli shartnoma rad etildi. Sababi: :reason',
+            'body' => 'Sizning №:number shartnomangizni :name rad etdi — :time. Sababi: :reason',
         ],
         'approval_due_soon' => [
             'title' => 'Kelishish muddati yaqinlashmoqda',

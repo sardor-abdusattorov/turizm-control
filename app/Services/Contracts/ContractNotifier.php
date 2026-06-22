@@ -30,7 +30,10 @@ class ContractNotifier
 
         Notification::make()
             ->title(__('app.notification.approval_requested.title'))
-            ->body(__('app.notification.approval_requested.body', ['number' => $contract->number]))
+            ->body(__('app.notification.approval_requested.body', [
+                'number' => $contract->number,
+                'sender' => $contract->responsible?->name ?? '—',
+            ]))
             ->icon('heroicon-o-paper-airplane')
             ->warning()
             ->actions([
@@ -75,34 +78,28 @@ class ContractNotifier
     }
 
     /**
-     * Tell the manager that one approval step passed — "approved by the
-     * lawyer, now with the accountant" — so they can follow the contract
-     * down the chain without opening the panel. Fires on every non-final
-     * approval (the final one already gets notifyApproved). The approver
-     * themselves is never notified about their own click.
+     * Tell the manager that one approval step passed — who approved it, when,
+     * and the comment they left — so they can follow the contract down the
+     * chain without opening the panel. Fires on every non-final approval (the
+     * final one already gets notifyApproved). The approver themselves is
+     * never notified about their own click.
      */
-    public function notifyStepApproved(Contract $contract, User $approver): void
+    public function notifyStepApproved(Contract $contract, ContractApprover $approver): void
     {
         $recipient = $contract->responsible;
 
-        if (! $recipient || $recipient->id === $approver->id) {
+        if (! $recipient || $recipient->id === $approver->user_id) {
             return;
         }
 
         $fresh = $contract->fresh();
-
-        // Refetch with the department so we can say "approved by X · Legal"
-        // — the passed model may not have department_id hydrated, and strict
-        // mode (preventAccessingMissingAttributes) would throw on the lazy
-        // relation otherwise.
-        $approver = User::with('department')->find($approver->getKey()) ?? $approver;
-
-        $who = $approver->name
-            .($approver->department?->name ? ' · '.$approver->department->name : '');
+        $who = $this->approverLabel($approver);
+        $when = $this->actedAt($approver);
 
         $body = __('app.notification.step_approved.body', [
             'number' => $contract->number,
             'name' => $who,
+            'time' => $when,
         ]);
 
         $tail = match (true) {
@@ -113,13 +110,18 @@ class ContractNotifier
             default => '',
         };
 
-        if ($tail !== '') {
-            $body .= ' '.$tail;
-        }
+        $comment = trim((string) $approver->comment);
+        $commentLine = $comment !== ''
+            ? __('app.notification.step_comment', ['comment' => $comment])
+            : '';
+
+        $dbBody = $body
+            .($tail !== '' ? ' '.$tail : '')
+            .($commentLine !== '' ? ' '.$commentLine : '');
 
         Notification::make()
             ->title(__('app.notification.step_approved.title'))
-            ->body($body)
+            ->body($dbBody)
             ->icon('heroicon-o-check')
             ->color('info')
             ->actions([
@@ -127,13 +129,19 @@ class ContractNotifier
             ])
             ->sendToDatabase($recipient, isEventDispatched: true);
 
+        $tgBody = $body.($tail !== '' ? ' '.$tail : '');
+
+        if ($commentLine !== '') {
+            $tgBody .= "\n<i>".$this->escapeForTelegram($commentLine).'</i>';
+        }
+
         $this->sendTelegram($recipient, $contract,
             '✔️ '.__('app.notification.step_approved.title'),
-            $body,
+            $tgBody,
         );
     }
 
-    public function notifyRejected(Contract $contract, ?string $reason = null): void
+    public function notifyRejected(Contract $contract, ?string $reason = null, ?ContractApprover $rejecter = null): void
     {
         $recipient = $contract->responsible;
 
@@ -141,10 +149,15 @@ class ContractNotifier
             return;
         }
 
+        $who = $rejecter ? $this->approverLabel($rejecter) : '—';
+        $when = $rejecter ? $this->actedAt($rejecter) : now()->format('d.m.Y H:i');
+
         Notification::make()
             ->title(__('app.notification.contract_rejected.title'))
             ->body(__('app.notification.contract_rejected.body', [
                 'number' => $contract->number,
+                'name' => $who,
+                'time' => $when,
                 'reason' => $reason ?? '—',
             ]))
             ->icon('heroicon-o-x-circle')
@@ -156,7 +169,12 @@ class ContractNotifier
 
         $this->sendTelegram($recipient, $contract,
             '❌ '.__('app.notification.contract_rejected.title'),
-            __('app.notification.contract_rejected.body', ['number' => $contract->number, 'reason' => $reason ?? '—']),
+            __('app.notification.contract_rejected.body', [
+                'number' => $contract->number,
+                'name' => $who,
+                'time' => $when,
+                'reason' => $this->escapeForTelegram($reason ?? '—'),
+            ]),
         );
     }
 
@@ -186,5 +204,33 @@ class ContractNotifier
             ($overdue ? '⚠️ ' : '⏰ ').__("app.notification.{$key}.title"),
             __("app.notification.{$key}.body", ['number' => $contract->number]),
         );
+    }
+
+    /**
+     * "Alisher Yuldoshev · Legal Department" — the actor's name with their
+     * department. Refetched with the relation because the passed-in approver
+     * may not have its user/department hydrated, and strict mode would throw
+     * on the lazy load.
+     */
+    private function approverLabel(ContractApprover $approver): string
+    {
+        $user = User::with('department')->find($approver->user_id);
+
+        return ($user?->name ?? '—')
+            .($user?->department?->name ? ' · '.$user->department->name : '');
+    }
+
+    private function actedAt(ContractApprover $approver): string
+    {
+        return ($approver->acted_at ?? now())->format('d.m.Y H:i');
+    }
+
+    /**
+     * Escape free-form text (approver comments, rejection reasons) before it
+     * goes into a Telegram HTML message — only &, <, > as Telegram requires.
+     */
+    private function escapeForTelegram(string $value): string
+    {
+        return str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $value);
     }
 }

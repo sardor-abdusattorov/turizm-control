@@ -47,6 +47,55 @@ it('notifies the manager AND the next approver when a step is approved', functio
         ->toContain(__('app.notification.approval_requested.title'));
 });
 
+it('includes the approver, their decision time and comment in the step-approved notification', function () {
+    $manager = User::factory()->create();
+    $lawyer = User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Alisher Yuldoshev']);
+    $accountant = User::factory()->create(['status' => User::STATUS_ACTIVE]);
+
+    $contract = Contract::factory()->withDocument()->create([
+        'responsible_id' => $manager->id,
+        'status' => Contract::STATUS_IN_REVIEW,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $lawyer->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $accountant->id, 'order' => 2,
+        'status' => ContractApprover::STATUS_QUEUED,
+    ]);
+
+    actingAs($lawyer);
+    app(ContractWorkflow::class)->approve($contract->fresh(), $lawyer, 'Сумма верная, согласовано');
+
+    $body = $manager->fresh()->notifications
+        ->firstWhere('data.title', __('app.notification.step_approved.title'))
+        ->data['body'];
+
+    expect($body)->toContain('Alisher Yuldoshev')
+        ->and($body)->toContain('Сумма верная, согласовано')
+        ->and($body)->toContain((string) $contract->number);
+});
+
+it('names the sender in the approval-requested notification', function () {
+    $manager = User::factory()->create(['name' => 'Sardor Abdusattorov']);
+    $approver = User::factory()->create(['status' => User::STATUS_ACTIVE]);
+
+    $contract = Contract::factory()->withDocument()->create([
+        'responsible_id' => $manager->id,
+        'status' => Contract::STATUS_DRAFT,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $approver->id, 'order' => 1,
+    ]);
+
+    actingAs($manager);
+    app(ContractWorkflow::class)->submit($contract);
+
+    expect($approver->fresh()->notifications->first()->data['body'])
+        ->toContain('Sardor Abdusattorov');
+});
+
 it('notifies the responsible manager when someone else records a payment', function () {
     $manager = User::factory()->create();
     $accountant = User::factory()->create();
