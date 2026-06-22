@@ -207,9 +207,7 @@ class BotMenuBuilder
         }
 
         $lines[] = __('app.telegram.field_status').': '.$this->statusBadge($contract);
-        $lines[] = __('app.telegram.field_amount').': '
-            .number_format((float) $contract->amount, 0, '.', ' ')
-            .' '.$this->htmlEscape($contract->currency?->short_name ?? '');
+        $lines[] = __('app.telegram.field_amount').': '.$this->formatAmount($contract);
 
         if ($contract->contact?->name) {
             $lines[] = __('app.telegram.field_contact').': '.$this->htmlEscape($contract->contact->name);
@@ -265,9 +263,7 @@ class BotMenuBuilder
             $this->headline('📨 '.__('app.notification.approval_requested.title')),
             __('app.notification.approval_requested.body', ['number' => $contract->number]),
             '',
-            __('app.telegram.field_amount').': '
-                .number_format((float) $contract->amount, 0, '.', ' ')
-                .' '.$this->htmlEscape($contract->currency?->short_name ?? ''),
+            __('app.telegram.field_amount').': '.$this->formatAmount($contract),
             __('app.telegram.field_responsible').': '.$this->htmlEscape($contract->responsible?->name ?? '—'),
         ];
 
@@ -335,22 +331,25 @@ class BotMenuBuilder
         $page = min($page, $pages);
 
         $rows = (clone $query)
+            ->with(['currency', 'contact', 'responsible'])
             ->forPage($page, self::PAGE_SIZE)
-            ->get();
+            ->get()
+            ->values();
 
-        $lines = [
-            $this->headline($title),
-            __('app.telegram.list_total', ['count' => $total]),
-        ];
+        $entries = [];
+        $indexButtons = [];
 
-        $keyboard = [];
-
-        foreach ($rows as $contract) {
-            $keyboard[] = [$this->cbBtn(
-                "№ {$contract->number} · ".$this->shortStatus($contract),
-                "view:{$contract->id}",
-            )];
+        foreach ($rows as $i => $contract) {
+            $position = $i + 1;
+            $entries[] = $this->contractListEntry($contract, $position);
+            $indexButtons[] = $this->cbBtn($this->indexEmoji($position), "view:{$contract->id}");
         }
+
+        $body = '<b>'.$this->htmlEscape($title)."</b>\n"
+            .__('app.telegram.list_total', ['count' => $total])."\n\n"
+            .implode("\n\n", $entries);
+
+        $keyboard = array_chunk($indexButtons, self::PAGE_SIZE);
 
         if ($pages > 1) {
             $nav = [];
@@ -371,9 +370,59 @@ class BotMenuBuilder
         $keyboard[] = [$this->cbBtn('‹ '.__('app.telegram.btn_main_menu'), 'menu')];
 
         return [
-            'text' => implode("\n", $lines),
+            'text' => $body,
             'keyboard' => $keyboard,
         ];
+    }
+
+    /**
+     * One compact-but-informative block per contract in a list: number +
+     * status on the first line, the title, then amount / responsible /
+     * counterparty so the row is meaningful without opening the card.
+     */
+    private function contractListEntry(Contract $contract, int $position): string
+    {
+        $lines = [
+            "<b>{$position}.</b> № {$this->htmlEscape((string) $contract->number)} · ".$this->statusBadge($contract),
+        ];
+
+        if ($contract->title) {
+            $lines[] = '«'.$this->htmlEscape($this->truncate($contract->title, 56)).'»';
+        }
+
+        $meta = '💰 '.$this->formatAmount($contract);
+
+        if ($contract->responsible?->name) {
+            $meta .= ' · 👤 '.$this->htmlEscape($contract->responsible->name);
+        }
+
+        $lines[] = $meta;
+
+        if ($contract->contact?->name) {
+            $lines[] = '🏢 '.$this->htmlEscape($contract->contact->name);
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function formatAmount(Contract $contract): string
+    {
+        return trim(
+            number_format((float) $contract->amount, 0, '.', ' ')
+            .' '.$this->htmlEscape($contract->currency?->short_name ?? '')
+        );
+    }
+
+    private function truncate(string $value, int $limit): string
+    {
+        return mb_strlen($value) > $limit
+            ? rtrim(mb_substr($value, 0, $limit - 1)).'…'
+            : $value;
+    }
+
+    private function indexEmoji(int $position): string
+    {
+        return ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣'][$position - 1] ?? (string) $position;
     }
 
     /** @return array<int, string> */
@@ -419,11 +468,6 @@ class BotMenuBuilder
             Contract::STATUS_REJECTED => '🟥 '.__('app.contract.status.rejected'),
             default => (string) $contract->status->label(),
         };
-    }
-
-    private function shortStatus(Contract $contract): string
-    {
-        return $this->statusBadge($contract);
     }
 
     private function labelAwaiting(User $user): string

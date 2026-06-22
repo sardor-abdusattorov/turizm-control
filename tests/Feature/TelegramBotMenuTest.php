@@ -182,6 +182,42 @@ it('renders the awaiting list paginated', function () {
     });
 });
 
+it('renders contract title and amount inside the awaiting list body', function () {
+    $approver = User::factory()->withTelegram('670')->create(['status' => User::STATUS_ACTIVE]);
+    $contract = Contract::factory()->create([
+        'status' => Contract::STATUS_IN_REVIEW,
+        'title' => 'Договор на поставку оборудования',
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $approver->id,
+        'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+
+    app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb',
+            'from' => ['id' => 670],
+            'message' => ['message_id' => 1],
+            'data' => 'aw:1',
+        ],
+    ]);
+
+    Http::assertSent(function ($request) use ($contract) {
+        if (! str_contains($request->url(), '/editMessageText')) {
+            return false;
+        }
+
+        $text = $request['text'] ?? '';
+        $kb = collect($request['reply_markup']['inline_keyboard'] ?? [])->flatten(1);
+
+        return str_contains($text, 'Договор на поставку оборудования')
+            && str_contains($text, "№ {$contract->number}")
+            && $kb->contains(fn ($btn) => ($btn['callback_data'] ?? null) === "view:{$contract->id}");
+    });
+});
+
 it('confirms then deletes the telegram link on /unlink', function () {
     $user = User::factory()->withTelegram('888')->create();
 

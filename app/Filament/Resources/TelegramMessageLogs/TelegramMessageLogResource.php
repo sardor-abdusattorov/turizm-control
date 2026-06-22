@@ -6,7 +6,12 @@ use App\Filament\Resources\TelegramMessageLogs\Pages\ListTelegramMessageLogs;
 use App\Models\TelegramMessageLog;
 use App\Services\Telegram\TelegramService;
 use BackedEnum;
+use Filament\Actions\ViewAction;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -75,34 +80,37 @@ class TelegramMessageLogResource extends Resource
                 TextColumn::make('method')
                     ->label(__('app.label.method'))
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => $state === 'sendMessage'
+                        ? __('app.label.telegram_log_sent')
+                        : __('app.label.telegram_log_edited'))
+                    ->icon(fn (string $state): string => $state === 'sendMessage'
+                        ? 'heroicon-m-paper-airplane'
+                        : 'heroicon-m-pencil-square')
                     ->color(fn (string $state): string => $state === 'sendMessage' ? 'info' : 'gray'),
 
                 TextColumn::make('telegramUser.user.name')
                     ->label(__('app.label.recipient'))
-                    ->placeholder('—')
+                    ->description(fn (TelegramMessageLog $record): ?string => $record->telegramUser?->user?->name
+                        ? $record->chat_id
+                        : null)
+                    ->placeholder(fn (TelegramMessageLog $record): string => $record->chat_id ?? '—')
                     ->searchable(),
 
-                TextColumn::make('chat_id')
-                    ->label('chat_id')
-                    ->toggleable()
-                    ->copyable()
-                    ->fontFamily('mono'),
-
-                TextColumn::make('text')
+                TextColumn::make('cleanText')
                     ->label(__('app.label.message'))
-                    ->formatStateUsing(fn (?string $state): string => trim(preg_replace('/<[^>]+>/', '', (string) $state)))
-                    ->limit(70)
+                    ->placeholder('—')
+                    ->limit(60)
                     ->wrap()
-                    ->tooltip(fn (TelegramMessageLog $record): ?string => $record->text
-                        ? trim(preg_replace('/<[^>]+>/', '', $record->text))
-                        : null),
+                    ->tooltip(fn (TelegramMessageLog $record): ?string => $record->cleanText),
 
-                TextColumn::make('error')
+                TextColumn::make('humanError')
                     ->label(__('app.label.error'))
                     ->placeholder('—')
-                    ->limit(40)
+                    ->badge()
                     ->color('danger')
-                    ->toggleable(),
+                    ->limit(60)
+                    ->wrap()
+                    ->tooltip(fn (TelegramMessageLog $record): ?string => $record->humanError),
             ])
             ->filters([
                 TernaryFilter::make('ok')
@@ -111,11 +119,63 @@ class TelegramMessageLogResource extends Resource
                 SelectFilter::make('method')
                     ->label(__('app.label.method'))
                     ->options([
-                        'sendMessage' => 'sendMessage',
-                        'editMessageText' => 'editMessageText',
+                        'sendMessage' => __('app.label.telegram_log_sent'),
+                        'editMessageText' => __('app.label.telegram_log_edited'),
                     ]),
             ])
-            ->recordActions([])
+            ->recordActions([
+                ViewAction::make()
+                    ->modalHeading(fn (TelegramMessageLog $record): string => '№ '.$record->getKey())
+                    ->schema([
+                        Section::make()
+                            ->schema([
+                                Grid::make(2)
+                                    ->schema([
+                                        TextEntry::make('created_at')
+                                            ->label(__('app.label.created_at'))
+                                            ->dateTime('d.m.Y H:i:s'),
+
+                                        IconEntry::make('ok')
+                                            ->label(__('app.label.status'))
+                                            ->boolean(),
+
+                                        TextEntry::make('method')
+                                            ->label(__('app.label.method'))
+                                            ->badge()
+                                            ->formatStateUsing(fn (string $state): string => $state === 'sendMessage'
+                                                ? __('app.label.telegram_log_sent')
+                                                : __('app.label.telegram_log_edited'))
+                                            ->color(fn (string $state): string => $state === 'sendMessage' ? 'info' : 'gray'),
+
+                                        TextEntry::make('status')
+                                            ->label(__('app.label.telegram_log_http'))
+                                            ->placeholder('—'),
+
+                                        TextEntry::make('telegramUser.user.name')
+                                            ->label(__('app.label.recipient'))
+                                            ->placeholder('—'),
+
+                                        TextEntry::make('chat_id')
+                                            ->label('chat_id')
+                                            ->copyable()
+                                            ->fontFamily('mono')
+                                            ->placeholder('—'),
+                                    ]),
+
+                                TextEntry::make('cleanText')
+                                    ->label(__('app.label.message'))
+                                    ->placeholder('—')
+                                    ->prose()
+                                    ->columnSpanFull(),
+
+                                TextEntry::make('humanError')
+                                    ->label(__('app.label.error'))
+                                    ->color('danger')
+                                    ->columnSpanFull()
+                                    ->visible(fn (TelegramMessageLog $record): bool => (bool) $record->error),
+                            ]),
+                    ]),
+            ])
             ->toolbarActions([]);
     }
 
