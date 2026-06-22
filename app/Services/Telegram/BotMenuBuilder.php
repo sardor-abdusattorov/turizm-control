@@ -198,16 +198,17 @@ class BotMenuBuilder
         $contract->loadMissing(['approvers.user', 'contact', 'currency', 'responsible']);
 
         $lines = [
-            $this->headline("№ {$contract->number}"),
+            '<b>№ '.$this->htmlEscape((string) $contract->number).'</b>',
         ];
 
         if ($contract->title) {
-            $lines[] = "«{$this->htmlEscape($contract->title)}»";
             $lines[] = '';
+            $lines[] = '<b>«'.$this->htmlEscape($contract->title).'»</b>';
         }
 
+        $lines[] = '';
         $lines[] = __('app.telegram.field_status').': '.$this->statusBadge($contract);
-        $lines[] = __('app.telegram.field_amount').': '.$this->formatAmount($contract);
+        $lines[] = __('app.telegram.field_amount').': <b>'.$this->formatAmount($contract).'</b>';
 
         if ($contract->contact?->name) {
             $lines[] = __('app.telegram.field_contact').': '.$this->htmlEscape($contract->contact->name);
@@ -219,11 +220,8 @@ class BotMenuBuilder
 
         if ($chainLines !== []) {
             $lines[] = '';
-            $lines[] = '<b>'.__('app.telegram.field_chain').':</b>';
-
-            foreach ($chainLines as $chainLine) {
-                $lines[] = $chainLine;
-            }
+            $lines[] = '<b>'.__('app.telegram.field_chain').'</b>';
+            $lines[] = '<blockquote>'.implode("\n", $chainLines).'</blockquote>';
         }
 
         $keyboard = [];
@@ -385,17 +383,17 @@ class BotMenuBuilder
     private function contractListEntry(Contract $contract, int $position): string
     {
         $lines = [
-            "<b>{$position}.</b> № {$this->htmlEscape((string) $contract->number)} · ".$this->statusBadge($contract),
+            "<b>{$position}. № {$this->htmlEscape((string) $contract->number)}</b>  ".$this->statusBadge($contract),
         ];
 
         if ($contract->title) {
-            $lines[] = '«'.$this->htmlEscape($this->truncate($contract->title, 56)).'»';
+            $lines[] = '<i>«'.$this->htmlEscape($this->truncate($contract->title, 56)).'»</i>';
         }
 
-        $meta = '💰 '.$this->formatAmount($contract);
+        $meta = '💰 <b>'.$this->formatAmount($contract).'</b>';
 
         if ($contract->responsible?->name) {
-            $meta .= ' · 👤 '.$this->htmlEscape($contract->responsible->name);
+            $meta .= '   👤 '.$this->htmlEscape($contract->responsible->name);
         }
 
         $lines[] = $meta;
@@ -404,7 +402,7 @@ class BotMenuBuilder
             $lines[] = '🏢 '.$this->htmlEscape($contract->contact->name);
         }
 
-        return implode("\n", $lines);
+        return '<blockquote>'.implode("\n", $lines).'</blockquote>';
     }
 
     private function formatAmount(Contract $contract): string
@@ -455,7 +453,7 @@ class BotMenuBuilder
                 ? ' · '.$this->htmlEscape($a->user->department->name)
                 : '';
 
-            return "  {$icon} {$name}{$dept}";
+            return "{$icon} {$name}{$dept}";
         })->all();
     }
 
