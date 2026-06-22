@@ -40,6 +40,8 @@ class BotMenuBuilder
         $awaiting = $this->roles->awaitingMyDecisionCount($user);
         $myContracts = $this->roles->myContractsCount($user);
         $pendingDirector = $this->roles->pendingDirectorHandoffCount($user);
+        $history = $this->roles->historyCount($user);
+        $canSeeAll = $this->roles->canSeeAllContracts($user);
 
         $rows = [];
 
@@ -64,6 +66,20 @@ class BotMenuBuilder
             )];
         }
 
+        if ($history > 0) {
+            $rows[] = [$this->cbBtn(
+                '📜 '.__('app.telegram.menu_history')." · {$history}",
+                'hist:1',
+            )];
+        }
+
+        if ($canSeeAll) {
+            $rows[] = [$this->cbBtn(
+                '🔎 '.__('app.telegram.menu_all_contracts')." · {$this->roles->allContractsCount()}",
+                'all:1',
+            )];
+        }
+
         $rows[] = [
             $this->cbBtn('🌐 '.__('app.telegram.menu_language'), 'lang'),
             $this->urlBtn('📋 '.__('app.telegram.menu_open_in_system'), $this->panelUrl()),
@@ -74,6 +90,63 @@ class BotMenuBuilder
                 .__('app.telegram.menu_hint'),
             'keyboard' => $rows,
         ];
+    }
+
+    /**
+     * Contracts the user already decided on (approved or rejected),
+     * sorted by their action time so the most recent verdict is on top.
+     *
+     * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
+     */
+    public function historyList(User $user, int $page): array
+    {
+        $query = Contract::query()
+            ->whereHas('approvers', fn ($q) => $q
+                ->where('user_id', $user->id)
+                ->whereIn('status', [
+                    ContractApprover::STATUS_APPROVED,
+                    ContractApprover::STATUS_REJECTED,
+                ])
+            )
+            ->orderByDesc(
+                ContractApprover::query()
+                    ->select('acted_at')
+                    ->whereColumn('contract_approvers.contract_id', 'contracts.id')
+                    ->where('user_id', $user->id)
+                    ->whereIn('status', [
+                        ContractApprover::STATUS_APPROVED,
+                        ContractApprover::STATUS_REJECTED,
+                    ])
+                    ->orderByDesc('acted_at')
+                    ->limit(1)
+            );
+
+        return $this->renderContractList(
+            query: $query,
+            page: $page,
+            title: __('app.telegram.list_history_title'),
+            emptyMessage: __('app.telegram.list_history_empty'),
+            callbackPrefix: 'hist',
+        );
+    }
+
+    /**
+     * All contracts visible system-wide — only super_admin / oversight
+     * roles see this entry from the main menu.
+     *
+     * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
+     */
+    public function allContractsList(int $page): array
+    {
+        $query = Contract::query()->orderByDesc('id');
+
+        return $this->renderContractList(
+            query: $query,
+            page: $page,
+            title: __('app.telegram.list_all_title'),
+            emptyMessage: __('app.telegram.list_all_empty'),
+            callbackPrefix: 'all',
+        );
     }
 
     /**

@@ -204,6 +204,25 @@ class TelegramBot
 
                 return;
 
+            case 'hist':
+                $page = max(1, (int) ($arg ?? 1));
+                $this->editToList($chatId, $messageId, $this->menu->historyList($user, $page));
+                $this->telegram->answerCallbackQuery($callbackId);
+
+                return;
+
+            case 'all':
+                if (! $this->menu->roles->canSeeAllContracts($user)) {
+                    $this->telegram->answerCallbackQuery($callbackId, __('app.telegram.not_allowed'));
+
+                    return;
+                }
+                $page = max(1, (int) ($arg ?? 1));
+                $this->editToList($chatId, $messageId, $this->menu->allContractsList($page));
+                $this->telegram->answerCallbackQuery($callbackId);
+
+                return;
+
             case 'view':
                 $this->openContractCard($chatId, $messageId, (int) $arg, $user);
                 $this->telegram->answerCallbackQuery($callbackId);

@@ -8,6 +8,7 @@ use App\Services\Telegram\TelegramBot;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 
@@ -224,6 +225,109 @@ it('does not render the unlink banner for users who have already linked', functi
     $html = view('filament.partials.telegram-nag')->render();
 
     expect(trim($html))->toBe('');
+});
+
+it('shows the history menu item when the user has past approvals', function () {
+    $approver = User::factory()->withTelegram('700')->create(['status' => User::STATUS_ACTIVE]);
+
+    // One approved + one rejected — both go into history.
+    foreach ([
+        [ContractApprover::STATUS_APPROVED, Contract::STATUS_APPROVED],
+        [ContractApprover::STATUS_REJECTED, Contract::STATUS_REJECTED],
+    ] as [$approverStatus, $contractStatus]) {
+        $contract = Contract::factory()->create(['status' => $contractStatus]);
+        ContractApprover::factory()->create([
+            'contract_id' => $contract->id,
+            'user_id' => $approver->id,
+            'order' => 1,
+            'status' => $approverStatus,
+            'acted_at' => now(),
+        ]);
+    }
+
+    app(TelegramBot::class)->handleUpdate([
+        'message' => ['chat' => ['id' => 700], 'text' => '/menu'],
+    ]);
+
+    Http::assertSent(function ($request) {
+        if (! str_contains($request->url(), '/sendMessage')) {
+            return false;
+        }
+
+        $kb = collect($request['reply_markup']['inline_keyboard'] ?? [])->flatten(1);
+
+        return $kb->contains(fn ($btn) => ($btn['callback_data'] ?? null) === 'hist:1');
+    });
+});
+
+it('lists the contracts the user has acted on under /hist', function () {
+    $approver = User::factory()->withTelegram('701')->create(['status' => User::STATUS_ACTIVE]);
+    $contract = Contract::factory()->create(['status' => Contract::STATUS_APPROVED]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $approver->id,
+        'order' => 1,
+        'status' => ContractApprover::STATUS_APPROVED,
+        'acted_at' => now(),
+    ]);
+
+    app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb',
+            'from' => ['id' => 701],
+            'message' => ['message_id' => 1],
+            'data' => 'hist:1',
+        ],
+    ]);
+
+    Http::assertSent(function ($request) use ($contract) {
+        if (! str_contains($request->url(), '/editMessageText')) {
+            return false;
+        }
+
+        $kb = collect($request['reply_markup']['inline_keyboard'] ?? [])->flatten(1);
+
+        return $kb->contains(fn ($btn) => ($btn['callback_data'] ?? null) === "view:{$contract->id}");
+    });
+});
+
+it('shows the all-contracts menu item only to super admins', function () {
+    Role::findOrCreate('super_admin', 'web');
+
+    $admin = User::factory()->withTelegram('801')->create();
+    $admin->assignRole('super_admin');
+
+    Contract::factory()->count(2)->create();
+
+    app(TelegramBot::class)->handleUpdate([
+        'message' => ['chat' => ['id' => 801], 'text' => '/menu'],
+    ]);
+
+    Http::assertSent(function ($request) {
+        if (! str_contains($request->url(), '/sendMessage')) {
+            return false;
+        }
+
+        $kb = collect($request['reply_markup']['inline_keyboard'] ?? [])->flatten(1);
+
+        return $kb->contains(fn ($btn) => ($btn['callback_data'] ?? null) === 'all:1');
+    });
+});
+
+it('refuses the /all callback for users without view-all rights', function () {
+    User::factory()->withTelegram('802')->create();
+
+    app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb',
+            'from' => ['id' => 802],
+            'message' => ['message_id' => 1],
+            'data' => 'all:1',
+        ],
+    ]);
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/answerCallbackQuery')
+        && str_contains($request['text'] ?? '', __('app.telegram.not_allowed')));
 });
 
 afterEach(function () {

@@ -34,6 +34,34 @@ class BotRoleResolver
             ->count();
     }
 
+    /**
+     * Contracts the user has already acted on as an approver — approved
+     * or rejected. Drives the "History of my decisions" bucket in the
+     * bot menu.
+     */
+    public function historyCount(User $user): int
+    {
+        return Contract::query()
+            ->whereHas('approvers', fn ($q) => $q
+                ->where('user_id', $user->id)
+                ->whereIn('status', [
+                    ContractApprover::STATUS_APPROVED,
+                    ContractApprover::STATUS_REJECTED,
+                ])
+            )
+            ->count();
+    }
+
+    public function canSeeAllContracts(User $user): bool
+    {
+        return $user->hasRole('super_admin') || $user->can('view_all_contracts');
+    }
+
+    public function allContractsCount(): int
+    {
+        return Contract::query()->count();
+    }
+
     public function isLawyer(User $user): bool
     {
         return $user->department?->code === 'legal';
