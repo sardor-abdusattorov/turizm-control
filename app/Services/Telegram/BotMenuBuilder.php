@@ -377,7 +377,11 @@ class BotMenuBuilder
 
     private function htmlEscape(string $value): string
     {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        // Telegram's HTML mode wants ONLY <, > and & escaped. Encoding
+        // quotes (ENT_QUOTES) turned "yoʻli" into "yo&apos;li" in the
+        // chat — the apostrophe entity is not in Telegram's accepted
+        // list, so it leaked through unescaped.
+        return str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $value);
     }
 
     private function contractUrl(Contract $contract): string
