@@ -82,6 +82,35 @@ it('cancels approvals when OnlyOffice saves the document on an in-review contrac
         ->and(Storage::disk('local')->get($contract->documentPath()))->toBe('updated-docx-body');
 });
 
+it('resets the chain when the responsible manager (a non-approver) edits the document', function () {
+    Http::fake(['*/edited.docx' => Http::response('manager-edited-body')]);
+
+    [$contract, $approvers] = docInReviewContractWithPartialProgress();
+    Storage::disk('local')->put($contract->documentPath(), 'original');
+
+    // The manager who owns the contract is the responsible user — never part
+    // of the approver chain. Their save MUST bounce the contract to Draft.
+    $manager = User::find($contract->responsible_id);
+
+    post(
+        route('contracts.save-callback', [
+            'contract' => $contract,
+            'shared_key' => $contract->document_key,
+        ]),
+        signOnlyOfficeCallback([
+            'status' => 2,
+            'url' => 'http://onlyoffice/cache/files/edited.docx',
+            'users' => [(string) $manager->id],
+        ]),
+    )->assertOk();
+
+    $contract->refresh();
+
+    expect($contract->status)->toBe(Contract::STATUS_DRAFT)
+        ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(3)
+        ->and($contract->approvers()->where('status', ContractApprover::STATUS_QUEUED)->count())->toBe(3);
+});
+
 it('does NOT reset when the current approver tweaks the document', function () {
     Http::fake(['*/edited.docx' => Http::response('updated-docx-body')]);
 
@@ -111,6 +140,36 @@ it('does NOT reset when the current approver tweaks the document', function () {
         ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(0)
         // the document is still written to disk — only the chain is left alone.
         ->and(Storage::disk('local')->get($contract->documentPath()))->toBe('updated-docx-body');
+});
+
+it('resets when the current approver co-edits alongside someone else', function () {
+    Http::fake(['*/edited.docx' => Http::response('co-edited-body')]);
+
+    [$contract, $approvers] = docInReviewContractWithPartialProgress();
+    Storage::disk('local')->put($contract->documentPath(), 'original');
+
+    // approvers[1] is the PENDING approver; the responsible manager edited the
+    // document in the same session. Because someone other than the current
+    // approver touched it, the chain is stale and must reset.
+    $currentApprover = $approvers[1];
+    $manager = User::find($contract->responsible_id);
+
+    post(
+        route('contracts.save-callback', [
+            'contract' => $contract,
+            'shared_key' => $contract->document_key,
+        ]),
+        signOnlyOfficeCallback([
+            'status' => 2,
+            'url' => 'http://onlyoffice/cache/files/edited.docx',
+            'users' => [(string) $currentApprover->id, (string) $manager->id],
+        ]),
+    )->assertOk();
+
+    $contract->refresh();
+
+    expect($contract->status)->toBe(Contract::STATUS_DRAFT)
+        ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(3);
 });
 
 it('leaves a draft contract untouched when OnlyOffice saves the document', function () {

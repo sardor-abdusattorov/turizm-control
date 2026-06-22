@@ -181,7 +181,16 @@ class Contract extends Model
      * and close it), so their save must NOT bounce the contract back to
      * Draft — otherwise the Approve / Reject buttons vanish.
      */
-    public function reinvalidateAfterDocumentEdit(?User $editor = null): void
+    /**
+     * Bounce the contract back to Draft after its document was edited, unless
+     * the *only* person who edited was the current approver tweaking the doc
+     * before their verdict (we keep their Approve / Reject buttons alive).
+     * Any other editor — the author, a different approver, or the approver
+     * co-editing alongside someone else — means approvals are now stale.
+     *
+     * @param  list<int>  $editorIds  user ids OnlyOffice reported as editors
+     */
+    public function reinvalidateAfterDocumentEdit(array $editorIds = []): void
     {
         $this->refresh();
 
@@ -189,7 +198,9 @@ class Contract extends Model
             return;
         }
 
-        if ($editor && $this->isCurrentApprover($editor)) {
+        $current = $this->currentApprover();
+
+        if ($current && $editorIds === [$current->user_id]) {
             return;
         }
 

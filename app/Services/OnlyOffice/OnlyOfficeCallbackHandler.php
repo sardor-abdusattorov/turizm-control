@@ -19,7 +19,7 @@ class OnlyOfficeCallbackHandler
      * Handle a /{subject}s/{id}/save-callback request from the editor server.
      *
      * @param  Closure(string $body): void  $persist  Writes the docx bytes
-     * @param  Closure(): void  $onFinalSave  Runs after status=2 (rotate key, refresh model, etc.)
+     * @param  Closure(list<int> $editorIds): void  $onFinalSave  Runs after status=2 (rotate key, reinvalidate, etc.)
      * @param  array<string, mixed>  $logProperties  Extra properties to merge into the activity log entry
      */
     public function handle(
@@ -48,13 +48,16 @@ class OnlyOfficeCallbackHandler
 
             $persist($body);
 
-            $causer = $this->resolveCauser($payload);
+            $editorIds = $this->resolveEditorIds($payload);
+            $causer = $editorIds !== [] ? User::find($editorIds[0]) : null;
 
             if ($status === 2) {
-                // Hand the editor identity to onFinalSave so it can tell an
-                // author's mid-flow change (resets the chain) from an
-                // approver's review tweak (keeps the contract in review).
-                $onFinalSave($causer);
+                // Hand the full set of editor identities to onFinalSave so it
+                // can tell an author's mid-flow change (resets the chain) from
+                // an approver's solo review tweak (keeps the contract in
+                // review). Passing every editor — not just the first — keeps
+                // the decision correct when several people co-edit the doc.
+                $onFinalSave($editorIds);
             }
 
             Log::info($logEvent, [
@@ -131,16 +134,20 @@ class OnlyOfficeCallbackHandler
     }
 
     /**
+     * The ids of every user OnlyOffice reports as having edited the document
+     * during the session being saved. Normalised to a unique list of ints.
+     *
      * @param  array<string, mixed>  $payload  verified JWT payload (trusted)
+     * @return list<int>
      */
-    private function resolveCauser(array $payload): ?User
+    private function resolveEditorIds(array $payload): array
     {
         $userIds = $payload['users'] ?? [];
 
-        if (! is_array($userIds) || $userIds === []) {
-            return null;
+        if (! is_array($userIds)) {
+            return [];
         }
 
-        return User::find($userIds[0] ?? null);
+        return array_values(array_unique(array_map('intval', $userIds)));
     }
 }
