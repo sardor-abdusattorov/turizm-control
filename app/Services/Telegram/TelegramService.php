@@ -2,6 +2,7 @@
 
 namespace App\Services\Telegram;
 
+use App\Models\TelegramMessageLog;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -118,11 +119,45 @@ class TelegramService
                 ]);
             }
 
+            $this->record($method, $payload, $response->successful(), $response->status(),
+                $response->successful() ? null : $response->body());
+
             return $response->successful();
         } catch (\Throwable $e) {
             Log::warning("Telegram {$method} failed", ['error' => $e->getMessage()]);
 
+            $this->record($method, $payload, false, null, $e->getMessage());
+
             return false;
+        }
+    }
+
+    /**
+     * Append a row to the Telegram message log for the content-bearing
+     * methods (the ones that actually deliver text to a person). The pure
+     * ACKs (answerCallbackQuery) and infra calls (setWebhook) are skipped —
+     * they have no "who got what message". Never lets logging break a send.
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    private function record(string $method, array $payload, bool $ok, ?int $status, ?string $error): void
+    {
+        if (! in_array($method, ['sendMessage', 'editMessageText'], true)) {
+            return;
+        }
+
+        try {
+            TelegramMessageLog::create([
+                'chat_id' => isset($payload['chat_id']) ? (string) $payload['chat_id'] : null,
+                'method' => $method,
+                'text' => $payload['text'] ?? null,
+                'ok' => $ok,
+                'status' => $status,
+                'error' => $error ? mb_substr($error, 0, 500) : null,
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable) {
+            // A logging failure must never take down the actual notification.
         }
     }
 }
