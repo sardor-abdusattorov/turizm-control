@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
+use App\Models\ContractApprover;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -22,28 +23,49 @@ class ListContracts extends ListRecords
 
     public function getTabs(): array
     {
-        $awaitingCount = Contract::query()->awaitingApprovalBy()->count();
+        $user = auth()->user();
+
+        if (! $user) {
+            return [];
+        }
+
+        // The user-shaped feature flags that decide which tabs make sense:
+        //   • author  — anyone with create_contract, or who has ever been
+        //               the responsible_id on a contract (manager seat);
+        //   • approver — anyone who has ever sat in a contract approval
+        //               chain, in any status. We don't gate on a role
+        //               because in practice the same person can be both.
+        $isAuthor = $user->can('create_contract')
+            || Contract::query()->where('responsible_id', $user->id)->exists();
+        $isApprover = ContractApprover::query()->where('user_id', $user->id)->exists();
+        $isOversight = $user->hasAnyRole(Contract::OVERSIGHT_ROLES);
 
         $tabs = [];
 
-        if (auth()->user()?->hasAnyRole(Contract::OVERSIGHT_ROLES)) {
+        if ($isOversight) {
             $tabs['all'] = Tab::make(__('app.tab.all_contracts'))
                 ->icon('heroicon-o-rectangle-stack');
         }
 
-        $tabs['my_contracts'] = Tab::make(__('app.tab.my_contracts'))
-            ->icon('heroicon-o-user')
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('responsible_id', auth()->id()));
+        if ($isAuthor) {
+            $tabs['my_contracts'] = Tab::make(__('app.tab.my_contracts'))
+                ->icon('heroicon-o-user')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('responsible_id', $user->id));
+        }
 
-        $tabs['awaiting_me'] = Tab::make(__('app.tab.awaiting_me'))
-            ->icon('heroicon-o-inbox-arrow-down')
-            ->modifyQueryUsing(fn (Builder $query) => $query->awaitingApprovalBy())
-            ->badge($awaitingCount > 0 ? $awaitingCount : null)
-            ->badgeColor('warning');
+        if ($isApprover) {
+            $awaitingCount = Contract::query()->awaitingApprovalBy()->count();
 
-        $tabs['involving_me'] = Tab::make(__('app.tab.involving_me'))
-            ->icon('heroicon-o-users')
-            ->modifyQueryUsing(fn (Builder $query) => $query->involvingApprover());
+            $tabs['awaiting_me'] = Tab::make(__('app.tab.awaiting_me'))
+                ->icon('heroicon-o-inbox-arrow-down')
+                ->modifyQueryUsing(fn (Builder $query) => $query->awaitingApprovalBy())
+                ->badge($awaitingCount > 0 ? $awaitingCount : null)
+                ->badgeColor('warning');
+
+            $tabs['involving_me'] = Tab::make(__('app.tab.involving_me'))
+                ->icon('heroicon-o-users')
+                ->modifyQueryUsing(fn (Builder $query) => $query->involvingApprover());
+        }
 
         return $tabs;
     }
@@ -56,10 +78,8 @@ class ListContracts extends ListRecords
             return 'awaiting_me';
         }
 
-        if ($user?->hasAnyRole(Contract::OVERSIGHT_ROLES)) {
-            return 'all';
-        }
+        $tabs = $this->getTabs();
 
-        return 'my_contracts';
+        return array_key_first($tabs);
     }
 }

@@ -22,6 +22,13 @@ function contractUser(?string $role = null): User
     Permission::findOrCreate('view_any_contract', 'web');
     $user->givePermissionTo('view_any_contract');
 
+    if ($role === 'manager') {
+        // Managers are the ones who author contracts — make sure they have
+        // the create permission so the "My contracts" tab is offered.
+        Permission::findOrCreate('create_contract', 'web');
+        $user->givePermissionTo('create_contract');
+    }
+
     if ($role) {
         $user->assignRole(Role::findOrCreate($role, 'web'));
     }

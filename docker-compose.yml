@@ -52,6 +52,28 @@ services:
       - app
     restart: unless-stopped
 
+  # Background queue worker — drives QUEUE_CONNECTION=database. Filament's
+  # database-notifications broadcast event (DatabaseNotificationsSent) goes
+  # through the queue, so without this the bell drop-down would not light
+  # up in real time. --tries=3 prevents one bad job from blocking the lane.
+  queue:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: turizm-queue
+    command: ["php", "artisan", "queue:work", "--tries=3", "--sleep=1", "--max-time=3600"]
+    volumes:
+      - ./:/var/www
+      - vendor:/var/www/vendor
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app
+    restart: unless-stopped
+
   # Laravel Reverb WebSocket server — Filament's bell drop-down listens
   # on it for new database notifications in real time instead of polling
   # every 30s.

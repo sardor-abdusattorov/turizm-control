@@ -26,6 +26,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ContractsTable
@@ -226,7 +227,28 @@ class ContractsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        // The per-row Delete button is gated by canBeDeletedBy;
+                        // make sure the bulk variant respects the same rule —
+                        // only Drafts owned by the user (or super_admin) get
+                        // dropped, the rest of the selection is left alone.
+                        ->action(function (Collection $records) {
+                            $deletable = $records->filter(
+                                fn (Contract $contract): bool => $contract->canBeDeletedBy(),
+                            );
+
+                            $deletable->each->delete();
+
+                            $skipped = $records->count() - $deletable->count();
+
+                            Notification::make()
+                                ->title(__('app.message.bulk_delete_done', [
+                                    'deleted' => $deletable->count(),
+                                    'skipped' => $skipped,
+                                ]))
+                                ->success()
+                                ->send();
+                        }),
                 ]),
             ]);
     }

@@ -379,6 +379,7 @@ return [
         'telegram_disconnected' => 'Telegram account disconnected',
         'broadcast_confirm' => 'This message will be sent to :count connected Telegram chats right now. Continue?',
         'broadcast_sent' => 'Broadcast delivered to :count chats.',
+        'bulk_delete_done' => 'Deleted :deleted contract(s); :skipped were skipped because they are not Draft.',
         'submit_for_approval_confirm' => 'The contract will be sent to the configured approval chain and you will not be able to edit it without resetting approvals. Continue?',
         'submitted_for_approval' => 'Contract sent for approval',
         'send_to_director_confirm' => 'The lawyer and accountant have approved. Send the contract to the director for final sign-off?',

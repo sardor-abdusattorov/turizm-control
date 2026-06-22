@@ -188,6 +188,7 @@ return [
         'telegram_disconnected' => 'Telegram hisobi uzildi',
         'broadcast_confirm' => 'Xabar hozir :count ulangan Telegram chatga yuboriladi. Davom etamizmi?',
         'broadcast_sent' => 'Xabar :count chatga yetkazildi.',
+        'bulk_delete_done' => 'O‘chirildi: :deleted. :skipped tasi «Qoralama» bo‘lmagani uchun o‘tkazib yuborildi.',
         'submit_for_approval_confirm' => 'Shartnoma sozlangan kelishish zanjiriga yuboriladi. Shundan keyin uni kelishuvni qayta tiklamasdan tahrirlab bo‘lmaydi. Davom etamizmi?',
         'submitted_for_approval' => 'Shartnoma kelishishga yuborildi',
         'send_to_director_confirm' => 'Yurist va buxgalter tasdiqladi. Shartnomani direktorga yakuniy imzo uchun yuboramizmi?',

@@ -4,8 +4,10 @@ use App\Enums\ContractStatus;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
+use App\Policies\ContractPolicy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
@@ -146,4 +148,37 @@ it('denies sending to director when the user is not the responsible author', fun
     [$contract] = permissionContext(Contract::STATUS_PENDING_DIRECTOR);
     $outsider = User::factory()->create(['status' => User::STATUS_ACTIVE]);
     expect($contract->canBeSentToDirectorBy($outsider))->toBeFalse();
+});
+
+// ── canBeDeletedBy ───────────────────────────────────────────────
+
+it('lets the author delete their own draft', function () {
+    [$contract, $responsible] = permissionContext(Contract::STATUS_DRAFT);
+    expect($contract->canBeDeletedBy($responsible))->toBeTrue();
+});
+
+it('refuses to delete a contract once it is on review', function () {
+    [$contract, $responsible] = permissionContext(Contract::STATUS_IN_REVIEW);
+    expect($contract->canBeDeletedBy($responsible))->toBeFalse();
+});
+
+it('refuses to delete an approved contract — even for super_admin', function () {
+    [$contract] = permissionContext(Contract::STATUS_APPROVED);
+
+    $admin = User::factory()->create();
+    Role::findOrCreate('super_admin', 'web');
+    $admin->assignRole('super_admin');
+
+    expect($contract->canBeDeletedBy($admin->fresh()))->toBeFalse();
+});
+
+it('makes the policy honour the status rule, not just the permission', function () {
+    [$contract, $responsible] = permissionContext(Contract::STATUS_IN_REVIEW);
+    $responsible->givePermissionTo(
+        Permission::findOrCreate('delete_contract', 'web'),
+    );
+
+    // Permission alone isn't enough — the contract's own rule blocks it.
+    expect(app(ContractPolicy::class)->delete($responsible->fresh(), $contract))
+        ->toBeFalse();
 });
