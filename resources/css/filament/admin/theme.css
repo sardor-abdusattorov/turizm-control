@@ -321,3 +321,13 @@
     outline: 2px solid var(--accent, #6366f1);
     outline-offset: 2px;
 }
+
+/* ─── Notifications dropdown: drop the horizontal scrollbar ─────────
+   The Filament bell drop-down picked up a horizontal scrollbar even on
+   a single short notification — the action row inside has a min-width
+   that sticks out past the panel by a few pixels. Suppress horizontal
+   overflow inside the panel; long titles wrap as usual. */
+.fi-no-notification,
+.fi-dropdown-panel:has(.fi-no-notification) {
+    overflow-x: hidden;
+}
