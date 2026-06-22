@@ -58,7 +58,7 @@ class AdminPanelProvider extends PanelProvider
                 '*/editor',
                 '*/editor?*',
             ])
-            ->font('Poppins')
+            ->font('Inter')
             ->navigationItems([
 
             ])

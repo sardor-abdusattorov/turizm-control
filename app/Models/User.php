@@ -94,10 +94,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     }
 
     /**
-     * Active users from approver departments, grouped by department name, with
-     * avatar markup so an `allowHtml()` Select can show photo + name. Shared by
-     * the profile's default-recipients picker and the contract approval chain.
-     *
      * @return array<string, array<int, string>>
      */
     public static function approverOptionsGroupedByDepartment(?int $excludeId = null): array
@@ -110,19 +106,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             ->get()
             ->reduce(function (array $grouped, self $user): array {
                 $department = $user->department?->name ?? __('app.label.no_department');
-
                 $avatar = $user->getFilamentAvatarUrl()
                     ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF';
-
                 $position = $user->position?->name ? ' · '.e($user->position->name) : '';
-
-                // Compact label (small avatar + name · position on one line).
-                // Inline styles, not Tailwind classes: this markup is built in a
-                // model, which Tailwind's JIT does not scan, so utility classes
-                // would not be compiled and the avatar would render unsized.
                 $grouped[$department][$user->id] = sprintf(
-                    '<span style="display:inline-flex;align-items:center;gap:.4rem;font-size:.8125rem;">'
-                    .'<img src="%s" alt="" style="width:1.25rem;height:1.25rem;border-radius:9999px;object-fit:cover;flex-shrink:0;">'
+                    '<span style="display:inline-flex;align-items:center;gap:.4rem;font-size:14px;">'
+                    .'<img src="%s" alt="" style="width:30px;height:30px;border-radius:9999px;object-fit:cover;flex-shrink:0;">'
                     .'<span>%s%s</span></span>',
                     e($avatar),
                     e($user->name),
