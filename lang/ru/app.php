@@ -10,7 +10,7 @@ return [
         'approved' => 'Договор :number одобрен.',
         'not_allowed' => 'Сейчас это действие недоступно.',
         'action_failed' => 'Не удалось выполнить действие.',
-        'not_linked' => 'Twoj Telegram больше не привязан к аккаунту. Привяжи заново в профиле.',
+        'not_linked' => 'Твой Telegram больше не привязан к аккаунту. Привяжи заново в профиле.',
         'cancelled' => 'Отменено.',
         'sent_to_director' => 'Отправлено директору.',
         'choose_language' => "Выберите язык.\nTilni tanlang.",
