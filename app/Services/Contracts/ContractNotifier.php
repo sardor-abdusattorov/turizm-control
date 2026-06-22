@@ -44,13 +44,15 @@ class ContractNotifier
         // Rich Telegram card (amount + responsible + Approve/Reject/Open),
         // built by the bot menu builder so the format stays in sync with
         // what the bot itself renders.
-        $screen = $this->botMenu->notificationApprovalRequested($contract);
+        $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract): void {
+            $screen = $this->botMenu->notificationApprovalRequested($contract);
 
-        $this->telegram->send(
-            $recipient->telegram?->chat_id,
-            $screen['text'],
-            $screen['keyboard'],
-        );
+            $this->telegram->send(
+                $recipient->telegram?->chat_id,
+                $screen['text'],
+                $screen['keyboard'],
+            );
+        });
     }
 
     public function notifyApproved(Contract $contract, ?ContractApprover $finalApprover = null): void
@@ -77,10 +79,16 @@ class ContractNotifier
             ])
             ->sendToDatabase($recipient, isEventDispatched: true);
 
-        $this->sendTelegram($recipient, $contract,
-            '✅ '.__('app.notification.contract_approved.title'),
-            $body,
-        );
+        $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $finalApprover): void {
+            $this->sendTelegram($recipient, $contract,
+                '✅ '.__('app.notification.contract_approved.title'),
+                __('app.notification.contract_approved.body', [
+                    'number' => $contract->number,
+                    'name' => $finalApprover ? $this->approverLabel($finalApprover) : '—',
+                    'time' => $finalApprover ? $this->actedAt($finalApprover) : now()->format('d.m.Y H:i'),
+                ]),
+            );
+        });
     }
 
     /**
@@ -135,16 +143,36 @@ class ContractNotifier
             ])
             ->sendToDatabase($recipient, isEventDispatched: true);
 
-        $tgBody = $body.($tail !== '' ? ' '.$tail : '');
+        $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $fresh, $who, $when, $comment): void {
+            $tgBody = __('app.notification.step_approved.body', [
+                'number' => $contract->number,
+                'name' => $who,
+                'time' => $when,
+            ]);
 
-        if ($commentLine !== '') {
-            $tgBody .= "\n<i>".$this->escapeForTelegram($commentLine).'</i>';
-        }
+            $tgTail = match (true) {
+                $fresh?->status === Contract::STATUS_PENDING_DIRECTOR => __('app.notification.step_ready_director'),
+                $fresh?->currentApprover()?->user !== null => __('app.notification.step_next', [
+                    'name' => $fresh->currentApprover()->user->name,
+                ]),
+                default => '',
+            };
 
-        $this->sendTelegram($recipient, $contract,
-            '✔️ '.__('app.notification.step_approved.title'),
-            $tgBody,
-        );
+            if ($tgTail !== '') {
+                $tgBody .= ' '.$tgTail;
+            }
+
+            if ($comment !== '') {
+                $tgBody .= "\n<i>".$this->escapeForTelegram(
+                    __('app.notification.step_comment', ['comment' => $comment])
+                ).'</i>';
+            }
+
+            $this->sendTelegram($recipient, $contract,
+                '✔️ '.__('app.notification.step_approved.title'),
+                $tgBody,
+            );
+        });
     }
 
     public function notifyRejected(Contract $contract, ?string $reason = null, ?ContractApprover $rejecter = null): void
@@ -173,15 +201,17 @@ class ContractNotifier
             ])
             ->sendToDatabase($recipient, isEventDispatched: true);
 
-        $this->sendTelegram($recipient, $contract,
-            '❌ '.__('app.notification.contract_rejected.title'),
-            __('app.notification.contract_rejected.body', [
-                'number' => $contract->number,
-                'name' => $who,
-                'time' => $when,
-                'reason' => $this->escapeForTelegram($reason ?? '—'),
-            ]),
-        );
+        $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $who, $when, $reason): void {
+            $this->sendTelegram($recipient, $contract,
+                '❌ '.__('app.notification.contract_rejected.title'),
+                __('app.notification.contract_rejected.body', [
+                    'number' => $contract->number,
+                    'name' => $who,
+                    'time' => $when,
+                    'reason' => $this->escapeForTelegram($reason ?? '—'),
+                ]),
+            );
+        });
     }
 
     public function notifyReminder(ContractApprover $approver): void
@@ -206,10 +236,12 @@ class ContractNotifier
             ])
             ->sendToDatabase($recipient, isEventDispatched: true);
 
-        $this->sendTelegram($recipient, $contract,
-            ($overdue ? '⚠️ ' : '⏰ ').__("app.notification.{$key}.title"),
-            __("app.notification.{$key}.body", ['number' => $contract->number]),
-        );
+        $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $overdue, $key): void {
+            $this->sendTelegram($recipient, $contract,
+                ($overdue ? '⚠️ ' : '⏰ ').__("app.notification.{$key}.title"),
+                __("app.notification.{$key}.body", ['number' => $contract->number]),
+            );
+        });
     }
 
     /**

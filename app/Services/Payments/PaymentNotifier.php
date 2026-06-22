@@ -48,12 +48,14 @@ class PaymentNotifier
             ])
             ->sendToDatabase($recipient, isEventDispatched: true);
 
-        $this->sendTelegram(
-            $recipient,
-            $contract,
-            ($contract->isFullyPaid() ? '💰 ' : '🧾 ').__("app.notification.{$key}.title"),
-            __("app.notification.{$key}.body", ['number' => $contract->number, 'percent' => $percent]),
-        );
+        $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $key, $percent): void {
+            $this->sendTelegram(
+                $recipient,
+                $contract,
+                ($contract->isFullyPaid() ? '💰 ' : '🧾 ').__("app.notification.{$key}.title"),
+                __("app.notification.{$key}.body", ['number' => $contract->number, 'percent' => $percent]),
+            );
+        });
     }
 
     private function formatPercent(float $percent): string

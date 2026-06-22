@@ -5,7 +5,9 @@ namespace App\Services\Notifications;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Models\User;
+use Closure;
 use Filament\Actions\Action;
+use Illuminate\Support\Facades\App;
 
 /**
  * Shared building blocks for the contract/payment notifiers: the "open
@@ -45,5 +47,23 @@ trait InteractsWithContractNotifications
             "<b>{$title}</b>\n{$body}",
             $keyboard,
         );
+    }
+
+    /**
+     * Render anything inside the callback in the recipient's Telegram locale,
+     * not the sender's panel locale — the bell may say "Approval step passed"
+     * to a manager browsing in English, but their Telegram should land in the
+     * `ru` / `uz` they picked in the bot.
+     */
+    protected function inRecipientTelegramLocale(User $recipient, Closure $callback): void
+    {
+        $previous = App::getLocale();
+        App::setLocale($recipient->telegram?->locale ?? $previous);
+
+        try {
+            $callback();
+        } finally {
+            App::setLocale($previous);
+        }
     }
 }

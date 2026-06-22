@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
 use App\Services\Payments\PaymentNotifier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
@@ -99,6 +101,47 @@ it('names the final approver and time in the fully-approved notification', funct
 
     expect($body)->toContain('Madina Saidova')
         ->and($body)->toContain((string) $contract->number);
+});
+
+it('sends the Telegram step-approved message in the recipient locale, not the sender panel locale', function () {
+    config(['services.telegram.bot_token' => 'test-token']);
+    Http::fake(['api.telegram.org/*' => Http::response(['ok' => true])]);
+
+    $manager = User::factory()->withTelegram('600', 'ru')->create();
+    $lawyer = User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Alisher Yuldoshev']);
+    $accountant = User::factory()->create(['status' => User::STATUS_ACTIVE]);
+
+    $contract = Contract::factory()->withDocument()->create([
+        'responsible_id' => $manager->id,
+        'status' => Contract::STATUS_IN_REVIEW,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $lawyer->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $accountant->id, 'order' => 2,
+        'status' => ContractApprover::STATUS_QUEUED,
+    ]);
+
+    // Lawyer is browsing the panel in English — that must NOT leak into the
+    // Telegram message that goes to the manager (who picked Russian in the bot).
+    App::setLocale('en');
+    actingAs($lawyer);
+    app(ContractWorkflow::class)->approve($contract->fresh(), $lawyer, 'окей');
+
+    Http::assertSent(function ($request) {
+        if (! str_contains($request->url(), '/sendMessage')) {
+            return false;
+        }
+
+        $text = $request['text'] ?? '';
+
+        return str_contains($text, 'Этап согласования пройден')
+            && ! str_contains($text, 'Approval step passed');
+    });
+
+    expect(App::getLocale())->toBe('en');
 });
 
 it('names the sender in the approval-requested notification', function () {
