@@ -56,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         FilamentView::registerRenderHook(
-            'panels::page.start',
+            'panels::page.header-widgets.after',
             fn (): string => view('filament.partials.telegram-nag')->render()
         );
     }
