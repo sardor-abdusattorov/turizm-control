@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\Payments\Tables;
 
 use App\Enums\PaymentStatus;
+use App\Exports\PaymentsExport;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Payments\PaymentResource;
+use App\Filament\Support\ExportPermission;
 use App\Models\Payment;
 use App\Models\User;
 use Filament\Actions\Action;
@@ -20,6 +22,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PaymentsTable
 {
@@ -116,6 +119,17 @@ class PaymentsTable
                     }),
             ])
             ->recordUrl(fn (Payment $record) => PaymentResource::getUrl('view', ['record' => $record]))
+            ->headerActions([
+                Action::make('exportXlsx')
+                    ->label(__('app.action.export_xlsx'))
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('gray')
+                    ->visible(fn (): bool => ExportPermission::allows('export_payment'))
+                    ->action(fn ($livewire) => Excel::download(
+                        new PaymentsExport($livewire->getFilteredTableQuery()),
+                        'payments-'.now()->format('Y-m-d').'.xlsx',
+                    )),
+            ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->color('gray'),

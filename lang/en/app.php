@@ -338,6 +338,8 @@ return [
         'contacts_individual_title' => 'Individuals registry :year',
         'contacts_legal_sheet' => 'Legal entities',
         'contacts_individual_sheet' => 'Individuals',
+        'payments_title' => 'Payments registry :year',
+        'payments_sheet' => 'Payments',
     ],
     'notification' => [
         'approval_requested' => [

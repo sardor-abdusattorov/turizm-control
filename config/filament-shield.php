@@ -250,6 +250,12 @@ return [
         // someone who can view a contract isn't automatically able to leak
         // the rendered PDF.
         'export_contract',
+
+        // Export gates for the other registries — separate from "view" so an
+        // admin can let a role browse the list without letting it pull the
+        // whole dataset out as a spreadsheet.
+        'export_contact',
+        'export_payment',
     ],
 
     /*

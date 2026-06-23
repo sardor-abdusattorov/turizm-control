@@ -2,10 +2,32 @@
 
 use App\Exports\ContactsExport;
 use App\Exports\ContactsSheet;
+use App\Filament\Resources\Contacts\Pages\ListContacts;
 use App\Models\Contact;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Spatie\Permission\Models\Permission;
+
+use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
+
+it('shows the contacts export action only to permission holders', function () {
+    Permission::findOrCreate('view_any_contact', 'web');
+    Permission::findOrCreate('export_contact', 'web');
+
+    $user = User::factory()->create();
+    $user->givePermissionTo('view_any_contact');
+    actingAs($user->fresh());
+
+    Livewire::test(ListContacts::class)->assertTableActionHidden('exportXlsx');
+
+    $user->givePermissionTo('export_contact');
+    actingAs($user->fresh());
+
+    Livewire::test(ListContacts::class)->assertTableActionVisible('exportXlsx');
+});
 
 function seedMixedContacts(): void
 {

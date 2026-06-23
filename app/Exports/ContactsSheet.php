@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\StyledExportSheet;
 use App\Models\Contact;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -12,21 +13,18 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 /**
  * One worksheet of the contacts export, scoped to a single contact type so a
  * column only ever appears where it applies: legal entities carry their
  * requisites (legal form, INN, OKED, director, bank details), individuals only
- * their PINFL. Shares the blue header, borders and text-formatted identifier
- * columns with its sibling sheet.
+ * their PINFL. Shares the blue registry look with its sibling sheet.
  */
 class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadings, WithMapping, WithStyles, WithTitle
 {
+    use StyledExportSheet;
+
     private int $rowNumber = 0;
 
     /** @param  Builder<Contact>  $query */
@@ -127,64 +125,19 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
     /** @return array<int, array<string, mixed>> */
     public function styles(Worksheet $sheet): array
     {
-        return [
-            1 => [
-                'font' => ['bold' => true, 'name' => 'Times New Roman', 'size' => 12],
-                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => 'D9E1F2'],
-                ],
-            ],
-        ];
+        return [1 => $this->headingStyle()];
     }
 
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function (AfterSheet $event): void {
-                $sheet = $event->sheet->getDelegate();
-                $lastColumn = $sheet->getHighestColumn();
-                $lastRow = $sheet->getHighestRow();
-
-                $sheet->insertNewRowBefore(1, 1);
-                $titleRange = "A1:{$lastColumn}1";
-                $sheet->mergeCells($titleRange);
-                $sheet->setCellValue('A1', $this->isLegal()
+            AfterSheet::class => fn (AfterSheet $event) => $this->applyLayout(
+                $event,
+                $this->isLegal()
                     ? __('app.export.contacts_legal_title', ['year' => now()->year])
-                    : __('app.export.contacts_individual_title', ['year' => now()->year]));
-                $sheet->getStyle($titleRange)->applyFromArray([
-                    'font' => ['bold' => true, 'name' => 'Times New Roman', 'size' => 14],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                ]);
-                $sheet->getRowDimension(1)->setRowHeight(28);
-
-                $tableRange = "A2:{$lastColumn}".($lastRow + 1);
-                $sheet->getStyle($tableRange)->getFont()->setName('Times New Roman')->setSize(11);
-                $sheet->getStyle($tableRange)->applyFromArray([
-                    'borders' => [
-                        'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']],
-                    ],
-                    'alignment' => ['vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true],
-                ]);
-
-                foreach ($this->textColumns() as $column) {
-                    $sheet->getStyle("{$column}3:{$column}".($lastRow + 1))
-                        ->getNumberFormat()
-                        ->setFormatCode('@');
-
-                    for ($row = 3; $row <= $lastRow + 1; $row++) {
-                        $value = $sheet->getCell("{$column}{$row}")->getValue();
-
-                        if ($value !== null && $value !== '') {
-                            $sheet->getCell("{$column}{$row}")
-                                ->setValueExplicit((string) $value, DataType::TYPE_STRING);
-                        }
-                    }
-                }
-
-                $sheet->freezePane('A3');
-            },
+                    : __('app.export.contacts_individual_title', ['year' => now()->year]),
+                $this->textColumns(),
+            ),
         ];
     }
 

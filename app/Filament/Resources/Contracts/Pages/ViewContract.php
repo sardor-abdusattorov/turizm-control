@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Support\ExportPermission;
 use App\Filament\Support\ImageUpload;
 use App\Models\Contract;
 use App\Models\ContractApprover;
@@ -172,10 +173,7 @@ class ViewContract extends ViewRecord
 
     public static function userCanExportContract(): bool
     {
-        $user = auth()->user();
-
-        return $user !== null
-            && ($user->hasRole('super_admin') || $user->can('export_contract'));
+        return ExportPermission::allows('export_contract');
     }
 
     public function getActivities(): Collection

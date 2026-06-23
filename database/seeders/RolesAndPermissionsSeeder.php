@@ -22,12 +22,16 @@ class RolesAndPermissionsSeeder extends Seeder
         // settings, reference data or template management.
         $this->syncRole('director', [
             'view_all_contracts',
+            'export_contract',
+            'export_payment',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('order', ['view_any', 'view']),
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
         ]);
 
         $this->syncRole('manager', [
+            'export_contract',
+            'export_contact',
             ...$this->resourcePermissions('contract', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
             ...$this->resourcePermissions('order', ['view_any', 'view', 'create', 'update']),
@@ -41,6 +45,8 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $this->syncRole('legal_officer', [
             'view_all_contracts',
+            'export_contract',
+            'export_contact',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),
@@ -48,6 +54,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $this->syncRole('accountant', [
             'view_all_contracts',
+            'export_contract',
+            'export_contact',
+            'export_payment',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),

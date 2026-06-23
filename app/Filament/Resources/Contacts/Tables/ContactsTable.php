@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Contacts\Tables;
 use App\Exports\ContactsExport;
 use App\Filament\Resources\Contacts\ContactResource;
 use App\Filament\Support\CreatedAtColumn;
+use App\Filament\Support\ExportPermission;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Contact;
 use Filament\Actions\Action;
@@ -89,6 +90,7 @@ class ContactsTable
                     ->label(__('app.action.export_xlsx'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
+                    ->visible(fn (): bool => ExportPermission::allows('export_contact'))
                     ->action(fn ($livewire) => Excel::download(
                         new ContactsExport($livewire->getFilteredTableQuery()),
                         'contacts-'.now()->format('Y-m-d').'.xlsx',
