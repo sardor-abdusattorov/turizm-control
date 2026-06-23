@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ContractStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Concerns\HasDocumentKey;
+use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractFiles;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
@@ -147,16 +148,7 @@ class Contract extends Model
             return;
         }
 
-        $order = 1;
-
-        foreach ($previousUserIds as $userId) {
-            ContractApprover::create([
-                'contract_id' => $this->id,
-                'user_id' => $userId,
-                'order' => $order++,
-                'status' => ContractApprover::STATUS_QUEUED,
-            ]);
-        }
+        $this->approvalChain()->requeue($this, $previousUserIds);
     }
 
     /**
@@ -206,16 +198,7 @@ class Contract extends Model
 
         $this->invalidateAllApprovers(__('app.message.invalidated_on_document_save'));
 
-        $order = 1;
-
-        foreach ($previousUserIds as $userId) {
-            ContractApprover::create([
-                'contract_id' => $this->id,
-                'user_id' => $userId,
-                'order' => $order++,
-                'status' => ContractApprover::STATUS_QUEUED,
-            ]);
-        }
+        $this->approvalChain()->requeue($this, $previousUserIds);
     }
 
     public function files(): ContractFiles
@@ -243,31 +226,14 @@ class Contract extends Model
         $this->files()->buildFromTemplate($this, $filler, $values);
     }
 
+    public function approvalChain(): ApprovalChain
+    {
+        return app(ApprovalChain::class);
+    }
+
     public function buildApprovalChainFromFlow(): int
     {
-        $order = 1;
-        $created = 0;
-        $seen = [];
-
-        foreach (Department::approvalFlow() as $code) {
-            $user = Department::findByCode($code)?->approverUser();
-
-            if (! $user || in_array($user->id, $seen, true)) {
-                continue;
-            }
-
-            ContractApprover::create([
-                'contract_id' => $this->id,
-                'user_id' => $user->id,
-                'order' => $order++,
-                'status' => ContractApprover::STATUS_QUEUED,
-            ]);
-
-            $seen[] = $user->id;
-            $created++;
-        }
-
-        return $created;
+        return $this->approvalChain()->buildFromFlow($this);
     }
 
     /**
@@ -278,25 +244,7 @@ class Contract extends Model
      */
     public static function approvalChainPreview(): array
     {
-        $rows = [];
-        $position = 1;
-        $seen = [];
-
-        foreach (Department::approvalFlow() as $code) {
-            $department = Department::findByCode($code);
-            $user = $department?->approverUser();
-
-            if (! $user || in_array($user->id, $seen, true)) {
-                continue;
-            }
-
-            $deptName = $department->getTranslation('name', app()->getLocale());
-            $rows[] = "{$position}. {$deptName} — {$user->name}";
-            $seen[] = $user->id;
-            $position++;
-        }
-
-        return $rows;
+        return app(ApprovalChain::class)->preview();
     }
 
     public function template(): BelongsTo

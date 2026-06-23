@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Filament\Resources\Contracts\ContractResource;
-use App\Models\ContractApprover;
+use App\Services\Contracts\ApprovalChain;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
 use Filament\Resources\Pages\CreateRecord;
@@ -33,16 +33,7 @@ class CreateContract extends CreateRecord
             app(ContractPlaceholderValues::class),
         );
 
-        $order = 1;
-
-        foreach ($this->approverChain as $userId) {
-            ContractApprover::create([
-                'contract_id' => $this->record->id,
-                'user_id' => $userId,
-                'order' => $order++,
-                'status' => ContractApprover::STATUS_QUEUED,
-            ]);
-        }
+        app(ApprovalChain::class)->requeue($this->record, $this->approverChain);
 
         if (! $this->record->hasApprovers()) {
             $this->record->buildApprovalChainFromFlow();
