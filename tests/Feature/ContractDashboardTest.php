@@ -1,9 +1,7 @@
 <?php
 
-use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\Contracts\Pages\ListContracts;
 use App\Filament\Widgets\ContractStatsWidget;
-use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
@@ -40,35 +38,6 @@ it('renders the contract stats widget with a count of contracts awaiting the use
     actingAs($user);
 
     Livewire::test(ContractStatsWidget::class)->assertOk();
-});
-
-it('greets the user as the page heading and offers a New-contract action to authors', function () {
-    $user = dashboardUser();
-    Permission::findOrCreate('create_contract', 'web');
-    $user->givePermissionTo('create_contract');
-
-    actingAs($user->fresh());
-
-    Livewire::test(Dashboard::class)
-        ->assertOk()
-        ->assertSee(__('app.dashboard.greeting'))
-        ->assertSee(__('app.action.create_contract'));
-});
-
-it('shows the author their own contracts that are in review, not drafts or others', function () {
-    $manager = dashboardUser();
-
-    $inReview = Contract::factory()->inReview()->create(['responsible_id' => $manager->id]);
-    $draft = Contract::factory()->create(['responsible_id' => $manager->id]);
-    $someoneElses = Contract::factory()->inReview()->create();
-
-    actingAs($manager);
-
-    expect(MyContractsInReviewWidget::canView())->toBeTrue();
-
-    Livewire::test(MyContractsInReviewWidget::class)
-        ->assertCanSeeTableRecords([$inReview])
-        ->assertCanNotSeeTableRecords([$draft, $someoneElses]);
 });
 
 it('renders the list page tabs and filters to contracts awaiting the user', function () {

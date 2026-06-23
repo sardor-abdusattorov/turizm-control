@@ -168,7 +168,6 @@ return [
         'add_payment' => 'Добавить оплату',
         'record_payment' => 'Зарегистрировать оплату',
         'export_xlsx' => 'Экспорт в Excel',
-        'create_contract' => 'Создать договор',
     ],
 
     // ── Toast / modal messages ─────────────────────────────────────
@@ -246,15 +245,6 @@ return [
         'held_by' => 'Завис на :name',
         'overdue_by' => 'Просрочено на :time',
         'due_in' => 'Через :time',
-        'greeting' => 'С возвращением',
-        'greeting_named' => 'С возвращением, :name',
-        'summary_overdue' => 'Просрочено :count из :total, ждущих твоего решения.',
-        'summary_awaiting' => 'Ждут твоего решения: :count.',
-        'summary_stalled' => 'Зависло у согласующего: :count.',
-        'summary_clear' => 'Сейчас ничего не требует внимания.',
-        'my_in_review_heading' => 'Мои договоры на согласовании',
-        'my_in_review_empty' => 'Нет договоров на согласовании.',
-        'now_with' => 'Сейчас у',
     ],
 
     // ── Labels (most-visible subset; rest falls back to en) ────────

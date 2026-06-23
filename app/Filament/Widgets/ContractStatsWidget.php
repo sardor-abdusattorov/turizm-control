@@ -41,15 +41,6 @@ class ContractStatsWidget extends StatsOverviewWidget
                 ->color($counts['drafts'] > 0 ? 'info' : 'gray')
                 ->icon('heroicon-o-pencil-square')
                 ->url($listUrl.'?activeTab=my_contracts&tableFilters[status][value]='.Contract::STATUS_DRAFT->value),
-
-            Stat::make(__('app.stats.my_rejected'), $counts['rejected'])
-                ->description($counts['rejected'] > 0
-                    ? __('app.stats.my_rejected_description')
-                    : __('app.stats.no_rejected'))
-                ->descriptionIcon('heroicon-m-arrow-uturn-left')
-                ->color($counts['rejected'] > 0 ? 'danger' : 'gray')
-                ->icon('heroicon-o-x-circle')
-                ->url($listUrl.'?activeTab=my_contracts&tableFilters[status][value]='.Contract::STATUS_REJECTED->value),
         ];
     }
 }

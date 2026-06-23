@@ -168,7 +168,6 @@ return [
         'add_payment' => 'To‘lov qo‘shish',
         'record_payment' => 'To‘lovni qayd etish',
         'export_xlsx' => 'Excelga eksport',
-        'create_contract' => 'Shartnoma yaratish',
     ],
 
     // ── Toast / modal xabarlari ────────────────────────────────────
@@ -246,15 +245,6 @@ return [
         'held_by' => ':name da turibdi',
         'overdue_by' => ':time muddatdan oshgan',
         'due_in' => ':time dan keyin',
-        'greeting' => 'Xush kelibsiz',
-        'greeting_named' => 'Xush kelibsiz, :name',
-        'summary_overdue' => 'Qaroringizni kutayotgan :total tadan :count tasining muddati o‘tgan.',
-        'summary_awaiting' => 'Qaroringizni kutmoqda: :count.',
-        'summary_stalled' => 'Tasdiqlovchida qotib qolgan: :count.',
-        'summary_clear' => 'Hozircha sizdan hech narsa kutilmayapti.',
-        'my_in_review_heading' => 'Tasdiqdagi shartnomalarim',
-        'my_in_review_empty' => 'Tasdiqdagi shartnomalar yo‘q.',
-        'now_with' => 'Hozir kimda',
     ],
 
     // ── Labellar (eng ko‘rinadigan qism; qolgani en ga fallback) ───
