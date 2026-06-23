@@ -2,12 +2,14 @@
 
 use App\Filament\Resources\Contracts\Pages\ListContracts;
 use App\Filament\Widgets\ContractStatsWidget;
+use App\Filament\Widgets\ContractsTrendChartWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 
@@ -38,6 +40,18 @@ it('renders the contract stats widget with a count of contracts awaiting the use
     actingAs($user);
 
     Livewire::test(ContractStatsWidget::class)->assertOk();
+});
+
+it('renders the contracts trend chart with grouped monthly aggregates', function () {
+    $user = User::factory()->create();
+    $user->assignRole(Role::findOrCreate('super_admin', 'web'));
+
+    Contract::factory()->count(2)->create(['created_at' => now()->subMonth()]);
+    Contract::factory()->approved()->create();
+
+    actingAs($user->fresh());
+
+    Livewire::test(ContractsTrendChartWidget::class)->assertOk();
 });
 
 it('renders the list page tabs and filters to contracts awaiting the user', function () {
