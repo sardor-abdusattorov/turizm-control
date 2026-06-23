@@ -494,6 +494,20 @@ class Contract extends Model
             && ($this->responsible_id === $user->id || $user->hasRole('super_admin'));
     }
 
+    /**
+     * Whether editing the document right now would invalidate the approvals and
+     * bounce the contract back to draft — true once it is anywhere in the
+     * approval flow. Used to warn the editor before they open the document.
+     */
+    public function documentEditWouldResetApprovals(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_IN_REVIEW,
+            self::STATUS_PENDING_DIRECTOR,
+            self::STATUS_IN_REVIEW_DIRECTOR,
+        ], true);
+    }
+
     public function scopeAwaitingApprovalBy(Builder $query, ?User $user = null): Builder
     {
         $user ??= auth()->user();

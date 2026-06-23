@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ContractStatus;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
@@ -191,6 +192,17 @@ it('leaves a draft contract untouched when OnlyOffice saves the document', funct
 
     expect($contract->fresh()->status)->toBe(Contract::STATUS_DRAFT)
         ->and(Storage::disk('local')->get($contract->documentPath()))->toBe('updated-docx-body');
+});
+
+it('flags that editing would reset approvals only while under approval', function () {
+    $flag = fn (ContractStatus $status): bool => (new Contract(['status' => $status]))->documentEditWouldResetApprovals();
+
+    expect($flag(ContractStatus::InReview))->toBeTrue()
+        ->and($flag(ContractStatus::PendingDirector))->toBeTrue()
+        ->and($flag(ContractStatus::InReviewDirector))->toBeTrue()
+        ->and($flag(ContractStatus::Draft))->toBeFalse()
+        ->and($flag(ContractStatus::Approved))->toBeFalse()
+        ->and($flag(ContractStatus::Rejected))->toBeFalse();
 });
 
 it('does not invalidate approvals on an OnlyOffice forcesave status that did not finalise', function () {

@@ -14,7 +14,12 @@
         : number_format($bytes / 1024, 1, '.', ' ').' KB';
 
     $createdLabel = $record->created_at?->translatedFormat('d M Y H:i');
-    $editUrl = route('contracts.editor', ['contract' => $record, 'mode' => $record->canBeEditedBy() ? 'edit' : 'view']);
+    $canEdit = $record->canBeEditedBy();
+    $editUrl = route('contracts.editor', ['contract' => $record, 'mode' => $canEdit ? 'edit' : 'view']);
+
+    // Opening the editor mid-approval lets the user change the document, which
+    // resets the whole chain once they close it — warn them first.
+    $warnReset = $canEdit && $record->documentEditWouldResetApprovals();
     $previewUrl = $record->documentExists() && $record->status === \App\Models\Contract::STATUS_APPROVED
         ? route('contracts.pdf.inline', ['contract' => $record])
         : null;
@@ -53,7 +58,9 @@
         </div>
     </div>
     <div class="cf-file__act">
-        <a href="{{ $editUrl }}" class="cf-btn cf-btn--primary">
+        <a href="{{ $editUrl }}" class="cf-btn cf-btn--primary"
+            @if ($warnReset) onclick="return confirm(@js(__('app.message.editor_reset_warning')))" @endif
+        >
             {!! $ic('heroicon-o-pencil-square', 16) !!}
             <span>{{ __('app.action.open_editor') }}</span>
         </a>

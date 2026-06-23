@@ -407,6 +407,7 @@ return [
         'invalidated_on_edit' => 'Cancelled — contract was edited.',
         'invalidated_on_document_save' => 'Cancelled — document was modified in the editor.',
         'save_warning_mid_flow' => 'Saving will cancel the current approval chain. A fresh chain will be queued with the same approvers, and you will need to send the contract for approval again. Continue?',
+        'editor_reset_warning' => 'This contract is under approval. Editing the document will cancel all approvals and send it back to draft once you close the editor. Open it anyway?',
         'save_warning_draft' => 'Save changes to the contract?',
         'edit_invalidates_approvals' => 'Saving changes will cancel all current approvals. The contract will return to Draft and you will need to send it for approval again.',
         'approvals_cancelled_after_edit' => 'Previous approvals were cancelled because the contract was edited. The chain below was pre-filled from your profile defaults — adjust if needed and send for approval again.',
