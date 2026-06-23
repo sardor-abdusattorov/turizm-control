@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Contract;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class ContractPolicy
 {
     use HandlesAuthorization;
-    
+
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('view_any_contract');
@@ -34,7 +34,11 @@ class ContractPolicy
 
     public function delete(AuthUser $authUser, Contract $contract): bool
     {
-        return $authUser->can('delete_contract');
+        // NOTE: keep the status rule — `shield:generate` regenerates this file
+        // and drops it, so it must be restored after each regeneration. The
+        // permission alone is not enough: only a draft (owned by the user, or
+        // any draft for super_admin) may be deleted.
+        return $authUser->can('delete_contract') && $contract->canBeDeletedBy($authUser);
     }
 
     public function restore(AuthUser $authUser, Contract $contract): bool
@@ -66,5 +70,4 @@ class ContractPolicy
     {
         return $authUser->can('reorder_contract');
     }
-
 }
