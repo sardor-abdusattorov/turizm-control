@@ -157,46 +157,28 @@
         display: block;
         flex-shrink: 0;
     }
-    .af-overdue {
+    /* The "Due" column turns red once the slot has blown its SLA, with a small
+       "Overdue" flag under the date so the deadline and the alarm live together
+       in one tidy column instead of crowding the Status cell. */
+    .af-date--over {
+        color: #b91c1c;
+        font-weight: 650;
+    }
+    .dark .af-date--over {
+        color: #fca5a5;
+    }
+    .af-date-flag {
         display: inline-flex;
         align-items: center;
-        gap: .25rem;
-        margin-top: .3rem;
-        font-size: .7rem;
+        gap: .2rem;
+        margin-top: .25rem;
+        font-size: .68rem;
         font-weight: 650;
         color: #dc2626;
+        white-space: nowrap;
     }
-    /* SLA hint under the Status pill — clearly belongs to Status, not to the
-       Acted-on column next to it. */
-    .af-due {
-        display: inline-flex;
-        align-items: center;
-        gap: .25rem;
-        margin-top: .35rem;
-        padding: .15rem .45rem;
-        border-radius: .35rem;
-        background: rgba(127,127,127,.07);
-        border: 1px dashed rgba(127,127,127,.28);
-        font-size: .68rem;
-        font-weight: 600;
-        color: currentColor;
-        opacity: .75;
-    }
-    .af-due > svg {
-        opacity: .7;
-    }
-    /* When the slot has blown its SLA, the deadline line turns red so the
-       "why is this overdue" answer — the date and time it was due — is right
-       there next to the "Overdue" flag. */
-    .af-due--over {
-        background: rgba(239,68,68,.08);
-        border-color: rgba(239,68,68,.35);
-        border-style: solid;
-        color: #b91c1c;
-        opacity: 1;
-    }
-    .dark .af-due--over {
-        color: #fca5a5;
+    .af-date-flag > svg {
+        flex-shrink: 0;
     }
 
     .af-date {
@@ -219,7 +201,7 @@
        (the index data tables behave the same way) instead of stacking rows. */
     @media (max-width: 720px) {
         .af {
-            min-width: 44rem;
+            min-width: 52rem;
         }
     }
 </style>
@@ -234,6 +216,7 @@
                 <th>{{ __('app.label.approver') }}</th>
                 <th>{{ __('app.label.comment') }}</th>
                 <th>{{ __('app.label.status') }}</th>
+                <th>{{ __('app.label.due') }}</th>
                 <th>{{ __('app.label.acted_at') }}</th>
                 <th>{{ __('app.label.updated_at') }}</th>
             </tr>
@@ -274,18 +257,22 @@
                             <i style="background:{{ $c['dot'] }};"></i>
                             {{ $labelFor($a) }}
                         </span>
+                    </td>
+                    <td>
                         @if ($a->status === ContractApprover::STATUS_PENDING && $a->due_at)
                             @php $overdue = $a->isOverdue(); @endphp
-                            @if ($overdue)
-                                <div class="af-overdue">
-                                    {!! svg('heroicon-m-exclamation-triangle', '', ['width' => 12, 'height' => 12])->toHtml() !!}
-                                    {{ __('app.label.overdue') }}
-                                </div>
-                            @endif
-                            <span @class(['af-due', 'af-due--over' => $overdue])>
-                                {!! svg('heroicon-m-clock', '', ['width' => 11, 'height' => 11])->toHtml() !!}
-                                {{ __('app.label.due') }}: {{ $a->due_at->translatedFormat('d.m.Y, H:i') }}
-                            </span>
+                            <div @class(['af-date', 'af-date--over' => $overdue])>
+                                {{ $a->due_at->translatedFormat('d.m.Y') }}
+                                <small>{{ $a->due_at->format('H:i') }}</small>
+                                @if ($overdue)
+                                    <span class="af-date-flag">
+                                        {!! svg('heroicon-m-exclamation-triangle', '', ['width' => 11, 'height' => 11])->toHtml() !!}
+                                        {{ __('app.label.overdue') }}
+                                    </span>
+                                @endif
+                            </div>
+                        @else
+                            <div class="af-date af-date--muted">—</div>
                         @endif
                     </td>
                     <td>
