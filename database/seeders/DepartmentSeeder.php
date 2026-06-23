@@ -41,6 +41,16 @@ class DepartmentSeeder extends Seeder
                 'sort' => 3,
                 'positions' => ['Главный бухгалтер', 'Бухгалтер'],
             ],
+            [
+                'code' => 'external',
+                'name' => [
+                    'ru' => 'Внешние договоры',
+                    'uz' => 'Tashqi shartnomalar',
+                    'en' => 'External Contracts',
+                ],
+                'sort' => 4,
+                'positions' => ['Менеджер'],
+            ],
         ];
 
         foreach ($departments as $data) {

@@ -36,7 +36,7 @@ class TestUsersSeeder extends Seeder
             [
                 'name' => 'Rustam Nazarov',
                 'email' => 'manager@test.uz',
-                'department_code' => null,
+                'department_code' => 'external',
                 'position_ru' => 'Менеджер',
                 'role' => 'manager',
             ],
@@ -66,6 +66,23 @@ class TestUsersSeeder extends Seeder
                     'status' => true,
                 ]
             );
+
+            // Back-fill org placement on demo users seeded before they had one
+            // (the manager originally had no department), without clobbering a
+            // value an admin may have set by hand.
+            $backfill = [];
+
+            if ($user->department_id === null && $department) {
+                $backfill['department_id'] = $department->id;
+            }
+
+            if ($user->position_id === null && $position) {
+                $backfill['position_id'] = $position->id;
+            }
+
+            if ($backfill !== []) {
+                $user->update($backfill);
+            }
 
             $user->syncRoles([$data['role']]);
         }
