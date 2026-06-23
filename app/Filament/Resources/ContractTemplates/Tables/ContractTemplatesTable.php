@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ContractTemplates\Tables;
 
 use App\Filament\Resources\ContractTemplates\ContractTemplateResource;
+use App\Filament\Support\StatusToggleColumn;
 use App\Models\ContractTemplate;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -11,7 +12,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -49,12 +49,7 @@ class ContractTemplatesTable
                     ->label(__('app.label.sort'))
                     ->sortable(),
 
-                ToggleColumn::make('status')
-                    ->label(__('app.label.status'))
-                    ->onIcon('heroicon-m-check-circle')
-                    ->offIcon('heroicon-m-x-circle')
-                    ->onColor('success')
-                    ->offColor('danger'),
+                StatusToggleColumn::make(),
 
                 TextColumn::make('created_at')
                     ->label(__('app.label.created_at'))

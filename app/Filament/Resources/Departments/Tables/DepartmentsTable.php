@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Departments\Tables;
 
+use App\Filament\Support\StatusToggleColumn;
 use App\Models\Department;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -9,7 +10,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -40,13 +40,8 @@ class DepartmentsTable
                     ->label(__('app.label.sort'))
                     ->sortable(),
 
-                ToggleColumn::make('status')
-                    ->label(__('app.label.status'))
-                    ->sortable()
-                    ->onIcon('heroicon-m-check-circle')
-                    ->offIcon('heroicon-m-x-circle')
-                    ->onColor('success')
-                    ->offColor('danger'),
+                StatusToggleColumn::make()
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label(__('app.label.created_at'))
