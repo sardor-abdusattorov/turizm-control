@@ -334,6 +334,10 @@ return [
         'contracts_sheet_title' => 'Contracts',
         'contacts_title' => 'Contacts registry :year',
         'contacts_sheet_title' => 'Contacts',
+        'contacts_legal_title' => 'Legal entities registry :year',
+        'contacts_individual_title' => 'Individuals registry :year',
+        'contacts_legal_sheet' => 'Legal entities',
+        'contacts_individual_sheet' => 'Individuals',
     ],
     'notification' => [
         'approval_requested' => [
