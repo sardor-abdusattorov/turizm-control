@@ -28,6 +28,10 @@ class UserSeeder extends Seeder
 
         $superadmin->assignRole('super_admin');
 
+        if ($superadmin->avatar_url === null && ($avatar = DemoMedia::avatar($superadmin->name))) {
+            $superadmin->update(['avatar_url' => $avatar]);
+        }
+
         if ($direction && $direction->head_of_department === null) {
             $direction->update(['head_of_department' => $superadmin->id]);
         }

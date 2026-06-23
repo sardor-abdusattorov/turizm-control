@@ -14,8 +14,9 @@ class DatabaseSeeder extends Seeder
             CurrencySeeder::class,
             OrderTypeSeeder::class,
             ContactSeeder::class,
-            UserSeeder::class,
+            // Roles must exist before the user seeders assign them.
             RolesAndPermissionsSeeder::class,
+            UserSeeder::class,
             TestUsersSeeder::class,
             SettingsSeeder::class,
             OrdersSeeder::class,
