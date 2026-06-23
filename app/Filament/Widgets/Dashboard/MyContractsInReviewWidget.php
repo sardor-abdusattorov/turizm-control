@@ -43,7 +43,9 @@ class MyContractsInReviewWidget extends TableWidget
         return $table
             ->query(fn (): Builder => self::baseQuery((int) auth()->id())
                 ->with(['activeApprovers.user']))
-            ->paginated(false)
+            ->queryStringIdentifier('myContractsInReview')
+            ->paginated([5, 10, 25])
+            ->defaultPaginationPageOption(5)
             ->defaultSort('updated_at', 'asc')
             ->columns([
                 TextColumn::make('number')

@@ -7,6 +7,7 @@ use App\Filament\Widgets\ContractStatsWidget;
 use App\Filament\Widgets\ContractsTrendChartWidget;
 use App\Filament\Widgets\Dashboard\ApprovalHealthWidget;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
+use App\Filament\Widgets\Dashboard\MyApprovalQueueWidget;
 use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
 use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
 use App\Filament\Widgets\LatestPaymentsWidget;
@@ -130,6 +131,18 @@ it('paginates each finance table under its own query-string key', function () {
     expect($outstanding)->toBe('outstandingPaymentsPage')
         ->and($latest)->toBe('latestPaymentsPage')
         ->and($outstanding)->not->toBe($latest);
+});
+
+it('paginates each manager dashboard table under its own query-string key', function () {
+    actingAs(dashboardUser());
+
+    $inReview = Livewire::test(MyContractsInReviewWidget::class)->instance()->getTablePaginationPageName();
+    $queue = Livewire::test(MyApprovalQueueWidget::class)->instance()->getTablePaginationPageName();
+
+    // Each manager table pages independently of the other and of the finance tables.
+    expect($inReview)->toBe('myContractsInReviewPage')
+        ->and($queue)->toBe('myApprovalQueuePage')
+        ->and($inReview)->not->toBe($queue);
 });
 
 it('renders the approval health widget for the director', function () {
