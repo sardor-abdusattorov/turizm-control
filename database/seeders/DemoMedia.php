@@ -16,6 +16,56 @@ class DemoMedia
     private const FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 
     /**
+     * Real portrait photos for the named demo users, mapped by e-mail. The
+     * files live in database/seeders/media/avatars and are copied onto the
+     * disk as-is; anyone without a mapping falls back to an initials avatar.
+     *
+     * @var array<string, string>
+     */
+    private const PORTRAITS = [
+        'mr.silverwind1998@gmail.com' => 'man-1.jpg',
+        'director@test.uz' => 'man-2.jpg',
+        'legal@test.uz' => 'man-3.jpg',
+        'manager@test.uz' => 'man-4.jpg',
+        'accounting@test.uz' => 'woman-1.jpg',
+    ];
+
+    /**
+     * The best avatar for a user: a real portrait when one is mapped to their
+     * e-mail, otherwise a generated initials avatar. Returns the stored
+     * relative path on the local disk (or null when nothing could be produced).
+     */
+    public static function avatarFor(string $email, string $name): ?string
+    {
+        $portrait = self::PORTRAITS[$email] ?? null;
+
+        if ($portrait !== null && ($stored = self::copyPortrait($portrait, $name)) !== null) {
+            return $stored;
+        }
+
+        return self::avatar($name);
+    }
+
+    /**
+     * Copy a bundled portrait photo onto the local disk under the user's slug,
+     * returning the stored path (or null when the source file is absent).
+     */
+    private static function copyPortrait(string $file, string $name): ?string
+    {
+        $source = database_path('seeders/media/avatars/'.$file);
+
+        if (! is_file($source)) {
+            return null;
+        }
+
+        $extension = pathinfo($file, PATHINFO_EXTENSION) ?: 'jpg';
+        $path = 'uploads/images/users/seeded/'.Str::slug(Str::ascii($name)).'.'.$extension;
+        Storage::disk('local')->put($path, (string) file_get_contents($source));
+
+        return $path;
+    }
+
+    /**
      * An initials avatar on a colour derived from the name. Returns the stored
      * relative path on the local disk (or null if GD is unavailable).
      */

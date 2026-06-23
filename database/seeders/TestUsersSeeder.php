@@ -80,7 +80,7 @@ class TestUsersSeeder extends Seeder
                 $backfill['position_id'] = $position->id;
             }
 
-            if ($user->avatar_url === null && ($avatar = DemoMedia::avatar($user->name))) {
+            if ($user->avatar_url === null && ($avatar = DemoMedia::avatarFor($user->email, $user->name))) {
                 $backfill['avatar_url'] = $avatar;
             }
 
