@@ -4,8 +4,10 @@ use App\Enums\ContractStatus;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
+use App\Policies\ContractAccessPolicy;
 use App\Policies\ContractPolicy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -172,13 +174,18 @@ it('refuses to delete an approved contract — even for super_admin', function (
     expect($contract->canBeDeletedBy($admin->fresh()))->toBeFalse();
 });
 
-it('makes the policy honour the status rule, not just the permission', function () {
+it('enforces the delete status rule from outside the regenerated policy', function () {
     [$contract, $responsible] = permissionContext(Contract::STATUS_IN_REVIEW);
     $responsible->givePermissionTo(
         Permission::findOrCreate('delete_contract', 'web'),
     );
 
-    // Permission alone isn't enough — the contract's own rule blocks it.
-    expect(app(ContractPolicy::class)->delete($responsible->fresh(), $contract))
-        ->toBeFalse();
+    // The Shield-generated base policy is a plain permission map and stays that
+    // way through project:init — so on its own the permission would allow it.
+    expect(app(ContractPolicy::class)->delete($responsible->fresh(), $contract))->toBeTrue();
+
+    // The override registered over it carries the business rule, so the
+    // effective authorization still blocks deleting a contract under review.
+    expect(Gate::getPolicyFor(Contract::class))->toBeInstanceOf(ContractAccessPolicy::class)
+        ->and($responsible->fresh()->can('delete', $contract))->toBeFalse();
 });

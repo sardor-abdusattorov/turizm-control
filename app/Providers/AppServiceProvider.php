@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
+use App\Models\Contract;
 use App\Policies\ActivityPolicy;
+use App\Policies\ContractAccessPolicy;
 use App\Services\Dashboard\DashboardContext;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
@@ -26,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         Gate::policy(Activity::class, ActivityPolicy::class);
+
+        // Override the Shield-generated ContractPolicy with our subclass so the
+        // delete status rule survives `project:init` / `shield:generate`, which
+        // overwrite the generated policy file.
+        Gate::policy(Contract::class, ContractAccessPolicy::class);
 
         $this->app->scoped(DashboardContext::class);
 

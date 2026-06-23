@@ -34,11 +34,7 @@ class ContractPolicy
 
     public function delete(AuthUser $authUser, Contract $contract): bool
     {
-        // NOTE: keep the status rule — `shield:generate` regenerates this file
-        // and drops it, so it must be restored after each regeneration. The
-        // permission alone is not enough: only a draft (owned by the user, or
-        // any draft for super_admin) may be deleted.
-        return $authUser->can('delete_contract') && $contract->canBeDeletedBy($authUser);
+        return $authUser->can('delete_contract');
     }
 
     public function restore(AuthUser $authUser, Contract $contract): bool
