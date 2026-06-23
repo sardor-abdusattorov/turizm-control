@@ -232,10 +232,21 @@ final class DashboardContext
                     }
                 });
 
+            // Accumulate into a running total so the sparkline reads as a
+            // visible rising trend even when there are only one or two
+            // contracts — a raw weekly count would be a near-flat line.
+            $runningTotal = function (array $weekly): array {
+                $total = 0;
+
+                return array_map(function (int $count) use (&$total): int {
+                    return $total += $count;
+                }, array_values($weekly));
+            };
+
             return [
-                'drafts' => array_values($series[Contract::STATUS_DRAFT->value]),
-                'in_review' => array_values($series[Contract::STATUS_IN_REVIEW->value]),
-                'rejected' => array_values($series[Contract::STATUS_REJECTED->value]),
+                'drafts' => $runningTotal($series[Contract::STATUS_DRAFT->value]),
+                'in_review' => $runningTotal($series[Contract::STATUS_IN_REVIEW->value]),
+                'rejected' => $runningTotal($series[Contract::STATUS_REJECTED->value]),
             ];
         })();
     }
