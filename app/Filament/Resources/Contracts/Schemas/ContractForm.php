@@ -8,9 +8,9 @@ use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\ContractTemplate;
 use App\Models\Currency;
-use App\Models\Department;
 use App\Models\OrderType;
 use App\Models\User;
+use App\Services\Contracts\ApprovalChainService;
 use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -143,7 +143,7 @@ class ContractForm
                                     ->hiddenLabel()
                                     ->multiple()
                                     ->options(fn (): array => User::approverOptionsGroupedByDepartment(Auth::id()))
-                                    ->default(fn (): array => self::defaultApproverIds())
+                                    ->default(fn (): array => self::approvalChain()->defaultApproverIds())
                                     ->allowHtml()
                                     ->searchable()
                                     ->preload()
@@ -151,14 +151,14 @@ class ContractForm
                                     ->required()
                                     ->rules([
                                         fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
-                                            self::validateRequiredApproverDepartments($value, $fail);
+                                            self::approvalChain()->validateRequiredDepartments($value, $fail);
                                         },
                                     ])
                                     ->columnSpanFull(),
 
                                 TextEntry::make('approver_chain_preview')
                                     ->hiddenLabel()
-                                    ->state(fn (Get $get): string => self::approvalChainPreview($get('approver_chain')))
+                                    ->state(fn (Get $get) => self::approvalChain()->previewHtml($get('approver_chain')))
                                     ->html()
                                     ->columnSpanFull(),
                             ]),
@@ -192,109 +192,8 @@ class ContractForm
             ->toArray();
     }
 
-    public static function validateRequiredApproverDepartments(mixed $value, Closure $fail): void
+    private static function approvalChain(): ApprovalChainService
     {
-        $ids = array_values(array_filter(array_map('intval', (array) $value)));
-
-        if ($ids === []) {
-            return;
-        }
-
-        $presentCodes = User::query()
-            ->whereIn('id', $ids)
-            ->with('department')
-            ->get()
-            ->map(fn (User $user): ?string => $user->department?->code)
-            ->filter()
-            ->unique();
-
-        $missing = collect(Department::REQUIRED_APPROVER_CODES)
-            ->reject(fn (string $code): bool => $presentCodes->contains($code));
-
-        if ($missing->isNotEmpty()) {
-            $fail(__('app.validation.approver_chain_required_departments'));
-        }
-    }
-
-    /**
-     * Pre-filled approver IDs (in order) from the manager's profile default
-     * recipients, falling back to the global settings flow when none are set.
-     *
-     * @return array<int, int>
-     */
-    public static function defaultApproverIds(): array
-    {
-        $user = Auth::user();
-
-        if (! $user) {
-            return [];
-        }
-
-        $ids = $user->defaultRecipients()
-            ->where('users.status', User::STATUS_ACTIVE)
-            ->pluck('users.id')
-            ->all();
-
-        if (empty($ids)) {
-            $ids = collect(Department::approvalFlow())
-                ->map(fn (string $code) => Department::findByCode($code)?->approverUser()?->id)
-                ->filter()
-                ->unique()
-                ->values()
-                ->all();
-        }
-
-        return array_map('intval', $ids);
-    }
-
-    protected static function approvalChainPreview(mixed $ids): string
-    {
-        $ids = array_values(array_filter(array_map('intval', (array) $ids)));
-
-        if ($ids === []) {
-            return '<p style="margin:0;color:#9ca3af;font-size:.875rem;">'.e(__('app.helper.approval_chain_empty')).'</p>';
-        }
-
-        $users = User::with(['department', 'position'])->whereIn('id', $ids)->get()->keyBy('id');
-
-        $rowStyle = 'display:flex;align-items:center;gap:.7rem;padding:.6rem .8rem;'
-            .'border:1px solid rgba(127,127,127,.22);border-radius:.65rem;'
-            .'background:rgba(127,127,127,.05);';
-        $numStyle = 'flex-shrink:0;width:1.55rem;height:1.55rem;display:flex;align-items:center;'
-            .'justify-content:center;border-radius:50%;background:rgba(99,102,241,.18);'
-            .'color:#6366f1;font-size:.78rem;font-weight:700;';
-        $avStyle = 'width:2rem;height:2rem;border-radius:50%;object-fit:cover;flex-shrink:0;';
-        $idStyle = 'min-width:0;display:flex;flex-direction:column;gap:.12rem;';
-        $nmStyle = 'font-size:.92rem;font-weight:600;color:currentColor;';
-        $mtStyle = 'font-size:.82rem;color:currentColor;opacity:.65;';
-
-        $rows = '';
-        $step = 1;
-
-        foreach ($ids as $id) {
-            $user = $users->get($id);
-
-            if (! $user) {
-                continue;
-            }
-
-            $avatar = $user->getFilamentAvatarUrl()
-                ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF';
-
-            $meta = trim(($user->department?->name ?? '').($user->position?->name ? ' · '.$user->position->name : ''), ' ·');
-
-            $rows .= '<div style="'.$rowStyle.'">'
-                .'<span style="'.$numStyle.'">'.$step.'</span>'
-                .'<img src="'.e($avatar).'" alt="" style="'.$avStyle.'">'
-                .'<span style="'.$idStyle.'">'
-                .'<span style="'.$nmStyle.'">'.e($user->name).'</span>'
-                .'<span style="'.$mtStyle.'">'.e($meta).'</span>'
-                .'</span>'
-                .'</div>';
-
-            $step++;
-        }
-
-        return '<div style="display:flex;flex-direction:column;gap:.45rem;margin-top:.25rem;">'.$rows.'</div>';
+        return app(ApprovalChainService::class);
     }
 }
