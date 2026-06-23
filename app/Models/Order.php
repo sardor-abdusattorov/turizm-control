@@ -4,12 +4,15 @@ namespace App\Models;
 
 use App\Models\Concerns\HasActiveStatus;
 use App\Models\Concerns\HasDocumentKey;
+use App\Observers\OrderObserver;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
+#[ObservedBy(OrderObserver::class)]
 class Order extends Model
 {
     use HasActiveStatus;
@@ -34,25 +37,6 @@ class Order extends Model
     ];
 
     public const NUMBER_PREFIX = 'ПРК';
-
-    protected static function booted(): void
-    {
-        static::creating(function (self $order): void {
-            if (! $order->document_key) {
-                $order->document_key = static::generateDocumentKey();
-            }
-
-            if (! $order->number) {
-                $order->number = static::generateNumber($order->issued_at);
-            }
-        });
-
-        static::deleting(function (self $order): void {
-            if ($order->file_path && Storage::disk('local')->exists($order->file_path)) {
-                Storage::disk('local')->delete($order->file_path);
-            }
-        });
-    }
 
     public static function generateNumber(\DateTimeInterface|CarbonInterface|null $issuedAt = null): string
     {
