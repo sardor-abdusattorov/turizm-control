@@ -58,7 +58,8 @@ class PositionsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => auth()->user()?->can('delete_position') ?? false),
                 ]),
             ]);
     }

@@ -219,6 +219,10 @@ class ContractsTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
+                        // Shield generates no `deleteAny` ability, so Filament
+                        // would otherwise show bulk delete to anyone who can
+                        // open the list. Gate it on the delete permission.
+                        ->visible(fn (): bool => auth()->user()?->can('delete_contract') ?? false)
                         // The per-row Delete button is gated by canBeDeletedBy;
                         // make sure the bulk variant respects the same rule —
                         // only Drafts owned by the user (or super_admin) get

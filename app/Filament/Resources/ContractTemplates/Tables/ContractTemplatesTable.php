@@ -77,7 +77,8 @@ class ContractTemplatesTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => auth()->user()?->can('delete_contract_template') ?? false),
                 ]),
             ]);
     }

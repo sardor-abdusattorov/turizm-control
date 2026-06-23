@@ -57,7 +57,8 @@ class CurrenciesTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => auth()->user()?->can('delete_currency') ?? false),
                 ]),
             ]);
     }

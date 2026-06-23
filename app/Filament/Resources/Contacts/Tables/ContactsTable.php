@@ -98,7 +98,8 @@ class ContactsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => auth()->user()?->can('delete_contact') ?? false),
                 ]),
             ]);
     }
