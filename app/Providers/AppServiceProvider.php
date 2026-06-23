@@ -28,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        // Set the scheme before the panel provider registers — Filament
+        // evaluates asset() for the brand logo eagerly, so https must be forced
+        // first or the logo URL gets baked as http (mixed content).
+        $this->configureUrl();
+
         Gate::policy(Activity::class, ActivityPolicy::class);
 
         // Override the Shield-generated ContractPolicy with our subclass so the
@@ -72,7 +77,6 @@ class AppServiceProvider extends ServiceProvider
         $this->configureLimit();
         $this->configureLanguageSwitch();
         $this->configureTranslatableTabs();
-        $this->configureUrl();
 
         Filament::serving(fn () => $this->translateFilamentLoggerConfig());
     }

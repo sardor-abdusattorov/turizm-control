@@ -46,7 +46,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('')
             ->authGuard('web')
             ->passwordReset()
-            ->brandLogo(asset('images/logo.png'))
+            ->brandLogo(fn (): string => asset('images/logo.png'))
             ->brandLogoHeight('3rem')
             ->login()
             ->defaultThemeMode(ThemeMode::Light)

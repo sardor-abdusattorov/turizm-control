@@ -188,6 +188,12 @@ server {
     server_name www.prcontrol.uz prcontrol.uz;
     client_max_body_size 60M;
 
+    # Канонический хост: апекс → www. Иначе apex и www — разные origin, и
+    # картинки из /storage (генерятся по APP_URL=www) ловят CORS на apex-странице.
+    if ($host = prcontrol.uz) {
+        return 301 https://www.prcontrol.uz$request_uri;
+    }
+
     location /app {                       # Reverb (WebSocket)
         proxy_pass http://127.0.0.1:8080;
         proxy_http_version 1.1;
