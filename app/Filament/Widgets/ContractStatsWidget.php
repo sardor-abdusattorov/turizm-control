@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\ContractStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Services\Dashboard\DashboardContext;
@@ -23,7 +24,7 @@ class ContractStatsWidget extends StatsOverviewWidget
     {
         $context = app(DashboardContext::class);
         $counts = $context->managerCounts();
-        $listUrl = ContractResource::getUrl('index');
+        $trends = $context->managerStatusTrends();
 
         return [
             Stat::make(__('app.stats.my_in_review'), $counts['in_review'])
@@ -33,14 +34,16 @@ class ContractStatsWidget extends StatsOverviewWidget
                 ->descriptionIcon($counts['stalled'] > 0 ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-check-circle')
                 ->color($counts['stalled'] > 0 ? 'danger' : ($counts['in_review'] > 0 ? 'warning' : 'gray'))
                 ->icon('heroicon-o-clock')
-                ->url($listUrl.'?activeTab=my_contracts&tableFilters[status][value]='.Contract::STATUS_IN_REVIEW->value),
+                ->chart($trends['in_review'])
+                ->url($this->statusUrl(Contract::STATUS_IN_REVIEW)),
 
             Stat::make(__('app.stats.my_drafts'), $counts['drafts'])
                 ->description(__('app.stats.drafts_description'))
                 ->descriptionIcon('heroicon-m-pencil-square')
                 ->color($counts['drafts'] > 0 ? 'info' : 'gray')
                 ->icon('heroicon-o-pencil-square')
-                ->url($listUrl.'?activeTab=my_contracts&tableFilters[status][value]='.Contract::STATUS_DRAFT->value),
+                ->chart($trends['drafts'])
+                ->url($this->statusUrl(Contract::STATUS_DRAFT)),
 
             Stat::make(__('app.stats.my_rejected'), $counts['rejected'])
                 ->description($counts['rejected'] > 0
@@ -49,7 +52,21 @@ class ContractStatsWidget extends StatsOverviewWidget
                 ->descriptionIcon('heroicon-m-arrow-uturn-left')
                 ->color($counts['rejected'] > 0 ? 'danger' : 'gray')
                 ->icon('heroicon-o-x-circle')
-                ->url($listUrl.'?activeTab=my_contracts&tableFilters[status][value]='.Contract::STATUS_REJECTED->value),
+                ->chart($trends['rejected'])
+                ->url($this->statusUrl(Contract::STATUS_REJECTED)),
         ];
+    }
+
+    /**
+     * Link to the contract list pre-filtered by status. The manager's list is
+     * already scoped to their own contracts and has no tabs, so we only carry
+     * the status filter — never an `activeTab`, which would point at a tab that
+     * doesn't exist for them.
+     */
+    private function statusUrl(ContractStatus $status): string
+    {
+        return ContractResource::getUrl('index', [
+            'tableFilters' => ['status' => ['value' => $status->value]],
+        ]);
     }
 }

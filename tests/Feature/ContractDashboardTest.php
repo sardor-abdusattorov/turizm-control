@@ -11,6 +11,7 @@ use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
+use App\Services\Dashboard\DashboardContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
@@ -87,6 +88,26 @@ it('renders the approval health widget for the director', function () {
     expect(ApprovalHealthWidget::canView())->toBeTrue();
 
     Livewire::test(ApprovalHealthWidget::class)->assertOk();
+});
+
+it('builds an eight-week per-status sparkline series for the manager strip', function () {
+    $manager = dashboardUser();
+
+    Contract::factory()->inReview()->create(['responsible_id' => $manager->id]);
+    Contract::factory()->create(['responsible_id' => $manager->id]); // draft
+    Contract::factory()->inReview()->create(['responsible_id' => $manager->id, 'updated_at' => now()->subMonths(6)]);
+
+    actingAs($manager);
+
+    $trends = app(DashboardContext::class)->managerStatusTrends();
+
+    expect($trends['in_review'])->toHaveCount(8)
+        ->and($trends['drafts'])->toHaveCount(8)
+        ->and($trends['rejected'])->toHaveCount(8)
+        ->and($trends['in_review'][7])->toBe(1)  // this week
+        ->and($trends['drafts'][7])->toBe(1)
+        ->and(array_sum($trends['in_review']))->toBe(1) // the 6-month-old row is outside the window
+        ->and(array_sum($trends['rejected']))->toBe(0);
 });
 
 it('renders the contract stats widget with a count of contracts awaiting the user', function () {

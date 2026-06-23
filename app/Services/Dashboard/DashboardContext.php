@@ -7,6 +7,7 @@ namespace App\Services\Dashboard;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
 final class DashboardContext
@@ -181,5 +182,61 @@ final class DashboardContext
                 ->count(),
             'stalled' => $this->myStalledContracts()->count(),
         ];
+    }
+
+    /**
+     * Weekly sparkline series for the manager's stat strip — one integer per
+     * week over the trailing window. Drafts are bucketed by when the contract
+     * was created; in-review and rejected by when the row last moved, a close
+     * proxy for when it entered that state. Rows older than the window (or with
+     * a future timestamp) fall outside it and are ignored.
+     *
+     * @return array{drafts: list<int>, in_review: list<int>, rejected: list<int>}
+     */
+    public function managerStatusTrends(int $weeks = 8): array
+    {
+        /** @var list<int> $empty */
+        $empty = array_fill(0, $weeks, 0);
+
+        if (! $this->user) {
+            return ['drafts' => $empty, 'in_review' => $empty, 'rejected' => $empty];
+        }
+
+        return $this->memo['managerStatusTrends'] ??= (function () use ($weeks, $empty): array {
+            $windowStart = CarbonImmutable::now()->startOfWeek()->subWeeks($weeks - 1);
+
+            $series = [
+                Contract::STATUS_DRAFT->value => $empty,
+                Contract::STATUS_IN_REVIEW->value => $empty,
+                Contract::STATUS_REJECTED->value => $empty,
+            ];
+
+            Contract::query()
+                ->where('responsible_id', $this->user->id)
+                ->whereIn('status', [Contract::STATUS_DRAFT, Contract::STATUS_IN_REVIEW, Contract::STATUS_REJECTED])
+                ->get(['status', 'created_at', 'updated_at'])
+                ->each(function (Contract $contract) use (&$series, $windowStart, $weeks): void {
+                    $movedAt = $contract->status === Contract::STATUS_DRAFT
+                        ? $contract->created_at
+                        : $contract->updated_at;
+
+                    if ($movedAt === null) {
+                        return;
+                    }
+
+                    $week = CarbonImmutable::make($movedAt)->startOfWeek();
+                    $index = (int) round($windowStart->diffInDays($week, false) / 7);
+
+                    if ($index >= 0 && $index < $weeks) {
+                        $series[$contract->status->value][$index]++;
+                    }
+                });
+
+            return [
+                'drafts' => array_values($series[Contract::STATUS_DRAFT->value]),
+                'in_review' => array_values($series[Contract::STATUS_IN_REVIEW->value]),
+                'rejected' => array_values($series[Contract::STATUS_REJECTED->value]),
+            ];
+        })();
     }
 }
