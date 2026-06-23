@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets\Dashboard;
 
 use App\Services\Dashboard\DashboardContext;
+use App\Services\Telegram\TelegramService;
 use Filament\Widgets\Widget;
 
 class DashboardHeaderWidget extends Widget
@@ -63,5 +64,20 @@ class DashboardHeaderWidget extends Widget
             'summary' => __('app.dashboard.summary_clear'),
             'tone' => 'success',
         ];
+    }
+
+    /**
+     * Whether to surface the "connect Telegram" prompt inside the header card.
+     * Lives here — on the dashboard only — instead of a panel-wide render hook,
+     * so the reminder shows once where the user lands, not on every page. The
+     * user menu keeps a permanent "Connect Telegram" item for the other pages.
+     */
+    public function shouldOfferTelegram(): bool
+    {
+        $user = auth()->user();
+
+        return $user !== null
+            && app(TelegramService::class)->isConfigured()
+            && ! $user->isTelegramLinked();
     }
 }

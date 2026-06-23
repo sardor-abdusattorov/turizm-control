@@ -2,16 +2,18 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\ContractStatsWidget;
 use App\Filament\Widgets\ContractsTrendChartWidget;
+use App\Filament\Widgets\Dashboard\ApprovalHealthWidget;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use App\Filament\Widgets\Dashboard\MyApprovalQueueWidget;
-use App\Filament\Widgets\Dashboard\OverdueAlertBanner;
+use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
+use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
 use App\Filament\Widgets\Dashboard\RecentActivityWidget;
 use App\Filament\Widgets\LatestPaymentsWidget;
 use App\Filament\Widgets\PaymentStatsWidget;
-use App\Services\Telegram\TelegramService;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
@@ -22,7 +24,6 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -67,14 +68,6 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn () => __('app.label.profile_settings'))
                     ->url(fn (): string => ProfileSettings::getUrl())
                     ->icon('heroicon-o-user-circle'),
-
-                'telegram' => Action::make('telegram')
-                    ->label(fn () => __('app.label.connect_telegram'))
-                    ->url(fn (): string => route('telegram.connect'))
-                    ->openUrlInNewTab()
-                    ->icon('heroicon-o-paper-airplane')
-                    ->visible(fn (): bool => app(TelegramService::class)->isConfigured()
-                        && ! (bool) auth()->user()?->isTelegramLinked()),
             ])
             ->navigationGroups([
 
@@ -99,13 +92,15 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->widgets([
                 DashboardHeaderWidget::class,
-                OverdueAlertBanner::class,
                 MyApprovalQueueWidget::class,
+                MyContractsInReviewWidget::class,
                 ContractStatsWidget::class,
                 PaymentStatsWidget::class,
+                OutstandingPaymentsWidget::class,
                 LatestPaymentsWidget::class,
-                RecentActivityWidget::class,
+                ApprovalHealthWidget::class,
                 ContractsTrendChartWidget::class,
+                RecentActivityWidget::class,
             ])
             ->resources([
 

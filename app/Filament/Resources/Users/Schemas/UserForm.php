@@ -3,11 +3,16 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use App\Filament\Support\ImageUpload;
+use App\Models\Department;
+use App\Models\Position;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 
 class UserForm
@@ -40,13 +45,15 @@ class UserForm
                     ->schema([
                         Select::make('department_id')
                             ->label(__('app.label.department'))
-                            ->relationship('department', 'name')
+                            ->options(Department::getActive())
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(fn (Set $set) => $set('position_id', null)),
 
                         Select::make('position_id')
                             ->label(__('app.label.position'))
-                            ->relationship('position', 'name')
+                            ->options(fn (Get $get): array => self::positionOptions($get('department_id')))
                             ->searchable()
                             ->preload(),
 
@@ -83,5 +90,29 @@ class UserForm
                     ])
                     ->columns(1),
             ]);
+    }
+
+    /**
+     * Positions available for the chosen department (via the department_position
+     * pivot). With no department picked yet, fall back to every active position
+     * so the field is never empty.
+     *
+     * @return array<int, string>
+     */
+    private static function positionOptions(mixed $departmentId): array
+    {
+        if (! $departmentId) {
+            return Position::getActive();
+        }
+
+        return Position::query()
+            ->active()
+            ->whereHas('departments', fn (Builder $query) => $query->whereKey($departmentId))
+            ->orderBy('sort')
+            ->get()
+            ->mapWithKeys(fn (Position $position) => [
+                $position->id => $position->getTranslation('name', app()->getLocale()),
+            ])
+            ->all();
     }
 }

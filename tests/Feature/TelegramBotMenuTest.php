@@ -1,5 +1,6 @@
 <?php
 
+use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
@@ -8,6 +9,7 @@ use App\Services\Telegram\TelegramBot;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
@@ -242,25 +244,28 @@ it('confirms then deletes the telegram link on /unlink', function () {
     expect($user->fresh()->telegram)->toBeNull();
 });
 
-it('renders the unlink banner on a panel page for users who have not linked', function () {
+it('offers the Telegram connect prompt for users who have not linked', function () {
     $user = User::factory()->create();
 
     actingAs($user);
 
-    $html = view('filament.partials.telegram-nag')->render();
+    expect((new DashboardHeaderWidget)->shouldOfferTelegram())->toBeTrue();
 
-    expect($html)->toContain(__('app.label.telegram_nag_title'))
-        ->and($html)->toContain(route('telegram.connect'));
+    Livewire::test(DashboardHeaderWidget::class)
+        ->assertSee(__('app.label.telegram_nag_title'))
+        ->assertSee(route('telegram.connect'))
+        ->assertSee(__('app.action.close'));
 });
 
-it('does not render the unlink banner for users who have already linked', function () {
+it('hides the Telegram connect prompt once the user has linked', function () {
     $user = User::factory()->withTelegram('999')->create();
 
     actingAs($user);
 
-    $html = view('filament.partials.telegram-nag')->render();
+    expect((new DashboardHeaderWidget)->shouldOfferTelegram())->toBeFalse();
 
-    expect(trim($html))->toBe('');
+    Livewire::test(DashboardHeaderWidget::class)
+        ->assertDontSee(__('app.label.telegram_nag_title'));
 });
 
 it('shows the history menu item when the user has past approvals', function () {

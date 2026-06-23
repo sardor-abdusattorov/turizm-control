@@ -75,7 +75,7 @@ class BotMenuBuilder
 
         if ($canSeeAll) {
             $rows[] = [$this->cbBtn(
-                '🔎 '.__('app.telegram.menu_all_contracts')." · {$this->roles->allContractsCount()}",
+                '🔎 '.__('app.telegram.menu_all_contracts')." · {$this->roles->allContractsCount($user)}",
                 'all:1',
             )];
         }
@@ -136,9 +136,9 @@ class BotMenuBuilder
      *
      * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
      */
-    public function allContractsList(int $page): array
+    public function allContractsList(User $user, int $page): array
     {
-        $query = Contract::query()->orderByDesc('id');
+        $query = Contract::query()->visibleTo($user)->orderByDesc('id');
 
         return $this->renderContractList(
             query: $query,

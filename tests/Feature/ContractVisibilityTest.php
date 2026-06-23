@@ -57,12 +57,39 @@ it('limits a manager to contracts they own or approve', function () {
         ->not->toContain($someoneElses->id);
 });
 
-it('lets oversight roles see every contract', function (string $role) {
-    $user = contractUser($role);
+it('lets a super admin see every contract, drafts included', function () {
+    $admin = contractUser('super_admin');
     Contract::factory()->count(3)->create();
 
-    expect(Contract::query()->visibleTo($user)->count())->toBe(Contract::count());
-})->with(['super_admin', 'director']);
+    expect(Contract::query()->visibleTo($admin)->count())->toBe(Contract::count());
+});
+
+it("hides other authors' drafts from the director but shows the live pipeline", function () {
+    $director = contractUser('director');
+
+    $othersDraft = Contract::factory()->create();
+    $livePipeline = Contract::factory()->inReview()->create();
+    $ownDraft = Contract::factory()->create(['responsible_id' => $director->id]);
+
+    $visible = Contract::query()->visibleTo($director)->pluck('id');
+
+    expect($visible)
+        ->not->toContain($othersDraft->id)
+        ->toContain($livePipeline->id)
+        ->toContain($ownDraft->id);
+});
+
+it("keeps other authors' drafts unopenable by the director", function () {
+    $director = contractUser('director');
+
+    $othersDraft = Contract::factory()->create();
+    $livePipeline = Contract::factory()->inReview()->create();
+    $ownDraft = Contract::factory()->create(['responsible_id' => $director->id]);
+
+    expect($othersDraft->canBeViewedBy($director))->toBeFalse()
+        ->and($livePipeline->canBeViewedBy($director))->toBeTrue()
+        ->and($ownDraft->canBeViewedBy($director))->toBeTrue();
+});
 
 it('hides the All tab from a manager but shows it to oversight roles', function () {
     actingAs(contractUser('manager'));
@@ -82,11 +109,21 @@ it('defaults an oversight user with no pending approvals to the All tab', functi
         ->toBe('all');
 });
 
-it('defaults a manager to their own contracts', function () {
+it('drops the lone My contracts tab for a pure manager', function () {
     actingAs(contractUser('manager'));
 
-    expect(Livewire::test(ListContracts::class)->instance()->getDefaultActiveTab())
-        ->toBe('my_contracts');
+    $page = Livewire::test(ListContracts::class)->instance();
+
+    expect($page->getTabs())->toBe([])
+        ->and($page->getDefaultActiveTab())->toBeNull();
+});
+
+it('hides the Responsible filter from a manager but shows it to oversight', function () {
+    actingAs(contractUser('manager'));
+    Livewire::test(ListContracts::class)->assertTableFilterHidden('responsible_id');
+
+    actingAs(contractUser('director'));
+    Livewire::test(ListContracts::class)->assertTableFilterVisible('responsible_id');
 });
 
 it('defaults a user with pending approvals to the awaiting tab', function () {
