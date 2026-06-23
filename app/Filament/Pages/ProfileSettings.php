@@ -6,8 +6,8 @@ use App\Filament\Support\ImageUpload;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\User;
+use App\Services\Auth\UserSessions;
 use BackedEnum;
-use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -25,9 +25,7 @@ use Filament\Support\Enums\Alignment;
 use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileSettings extends Page implements HasActions, HasForms
@@ -312,7 +310,7 @@ class ProfileSettings extends Page implements HasActions, HasForms
                     ->revealable(),
             ])
             ->action(function (array $data) {
-                if (config('session.driver') !== 'database') {
+                if (! app(UserSessions::class)->logoutOthers($data['password'])) {
                     Notification::make()
                         ->title(__('app.message.session_driver_not_supported'))
                         ->danger()
@@ -320,17 +318,6 @@ class ProfileSettings extends Page implements HasActions, HasForms
 
                     return;
                 }
-
-                Auth::guard('web')->logoutOtherDevices($data['password']);
-
-                DB::table(config('session.table', 'sessions'))
-                    ->where('user_id', Auth::id())
-                    ->where('id', '!=', Session::getId())
-                    ->delete();
-
-                request()->session()->put([
-                    'password_hash_'.Auth::getDefaultDriver() => Auth::user()->getAuthPassword(),
-                ]);
 
                 Notification::make()
                     ->title(__('app.message.other_sessions_logged_out'))
@@ -344,69 +331,7 @@ class ProfileSettings extends Page implements HasActions, HasForms
      */
     public function getSessions(): array
     {
-        if (config('session.driver') !== 'database') {
-            return [];
-        }
-
-        $activityThreshold = now()
-            ->subMinutes((int) config('session.lifetime', 120))
-            ->getTimestamp();
-
-        return DB::table(config('session.table', 'sessions'))
-            ->where('user_id', Auth::id())
-            ->where('last_activity', '>=', $activityThreshold)
-            ->orderByDesc('last_activity')
-            ->get()
-            ->map(function ($session) {
-                $agent = $this->parseUserAgent($session->user_agent);
-
-                return [
-                    'id' => $session->id,
-                    'ip_address' => $session->ip_address,
-                    'browser' => $agent['browser'],
-                    'platform' => $agent['platform'],
-                    'is_current_device' => $session->id === Session::getId(),
-                    'last_active' => Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
-                ];
-            })
-            ->toArray();
-    }
-
-    protected function parseUserAgent(?string $userAgent): array
-    {
-        $browser = 'Unknown';
-        $platform = 'Unknown';
-
-        if ($userAgent) {
-            if (preg_match('/Windows/i', $userAgent)) {
-                $platform = 'Windows';
-            } elseif (preg_match('/Macintosh|Mac OS/i', $userAgent)) {
-                $platform = 'Mac';
-            } elseif (preg_match('/Linux/i', $userAgent)) {
-                $platform = 'Linux';
-            } elseif (preg_match('/iPhone/i', $userAgent)) {
-                $platform = 'iPhone';
-            } elseif (preg_match('/Android/i', $userAgent)) {
-                $platform = 'Android';
-            }
-
-            if (preg_match('/Chrome/i', $userAgent) && ! preg_match('/Edge/i', $userAgent)) {
-                $browser = 'Chrome';
-            } elseif (preg_match('/Firefox/i', $userAgent)) {
-                $browser = 'Firefox';
-            } elseif (preg_match('/Safari/i', $userAgent) && ! preg_match('/Chrome/i', $userAgent)) {
-                $browser = 'Safari';
-            } elseif (preg_match('/Edge/i', $userAgent)) {
-                $browser = 'Edge';
-            } elseif (preg_match('/Opera|OPR/i', $userAgent)) {
-                $browser = 'Opera';
-            }
-        }
-
-        return [
-            'browser' => $browser,
-            'platform' => $platform,
-        ];
+        return app(UserSessions::class)->forCurrentUser();
     }
 
     /**
