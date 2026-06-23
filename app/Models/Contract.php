@@ -5,10 +5,12 @@ namespace App\Models;
 use App\Enums\ContractStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Concerns\HasDocumentKey;
+use App\Observers\ContractObserver;
 use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractFiles;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
+#[ObservedBy(ContractObserver::class)]
 class Contract extends Model
 {
     use HasDocumentKey, HasFactory;
@@ -64,23 +67,6 @@ class Contract extends Model
         return ContractStatus::options();
     }
 
-    protected static function booted(): void
-    {
-        static::creating(function (self $contract): void {
-            if (! $contract->document_key) {
-                $contract->document_key = static::generateDocumentKey();
-            }
-        });
-
-        static::updating(function (self $contract): void {
-            $contract->maybeInvalidateOnEdit();
-        });
-
-        static::deleting(function (self $contract): void {
-            app(ContractFiles::class)->purge($contract);
-        });
-    }
-
     /**
      * Business fields whose change mid-flow must invalidate prior approvals.
      * Bookkeeping columns (status, document_key, pdf_file, signed_at, …) are
@@ -109,7 +95,7 @@ class Contract extends Model
         return $this;
     }
 
-    private function maybeInvalidateOnEdit(): void
+    public function maybeInvalidateOnEdit(): void
     {
         if ($this->preserveApprovedStatus) {
             return;
