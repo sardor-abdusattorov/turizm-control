@@ -48,6 +48,31 @@ it('aggregates approved value, collected and outstanding in UZS', function () {
         ->and($totals['outstanding'])->toBe(1_000_000.0);
 });
 
+it('aggregates without a column-ambiguity error for a non-oversight finance role', function () {
+    // An accountant is not an oversight role, so visibleTo() adds a `status`
+    // filter — which, joined against currencies (also has `status`), used to
+    // throw "ambiguous column". This pins the table-qualified fix.
+    $accountant = User::factory()->create();
+    $accountant->assignRole(Role::findOrCreate('accountant', 'web'));
+    actingAs($accountant->fresh());
+
+    $currency = Currency::factory()->create(['value' => 1000]);
+
+    Contract::factory()->create([
+        'status' => Contract::STATUS_APPROVED,
+        'currency_id' => $currency->id,
+        'responsible_id' => $accountant->id,
+        'amount' => 1000,
+        'paid_percent' => 25,
+    ]);
+
+    $totals = app(FinancialSummary::class)->totals();
+
+    expect($totals['approved'])->toBe(1_000_000.0)
+        ->and($totals['collected'])->toBe(250_000.0)
+        ->and($totals['outstanding'])->toBe(750_000.0);
+});
+
 it('returns zeroes when there are no approved contracts', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('super_admin', 'web'));

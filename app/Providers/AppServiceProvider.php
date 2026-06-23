@@ -54,6 +54,16 @@ class AppServiceProvider extends ServiceProvider
             'panels::body.end',
             fn (): string => '<script>window.addEventListener("pageshow",function(e){if(e.persisted){window.location.reload();}});</script>'
         );
+
+        // When two dashboard widgets share a row (the paired finance tables on
+        // wide screens), the grid stretches the cell but the card inside keeps
+        // its content height — leaving the shorter one visibly stubby. Make the
+        // widget card fill its cell so paired cards match. A no-op for the
+        // full-width widgets that sit alone on their row.
+        FilamentView::registerRenderHook(
+            'panels::head.end',
+            fn (): string => '<style>.fi-wi-widget{height:100%}.fi-wi-widget>*{height:100%}</style>'
+        );
     }
 
     public function boot(): void

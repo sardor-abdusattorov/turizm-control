@@ -602,10 +602,13 @@ class Contract extends Model
             || $user->can('view_all_contracts');
 
         return $query->where(function (Builder $scoped) use ($user, $seesWholePipeline): void {
-            $scoped->where('responsible_id', $user->id);
+            // Columns are table-qualified so the scope is safe to use on a
+            // query that joins another table carrying a `status` column (e.g.
+            // the financial summary joins `currencies`).
+            $scoped->where('contracts.responsible_id', $user->id);
 
             $scoped->orWhere(function (Builder $pipeline) use ($user, $seesWholePipeline): void {
-                $pipeline->where('status', '!=', self::STATUS_DRAFT);
+                $pipeline->where('contracts.status', '!=', self::STATUS_DRAFT);
 
                 if (! $seesWholePipeline) {
                     $pipeline->whereHas('approvers', fn (Builder $q) => $q->where('user_id', $user->id));
