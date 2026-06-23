@@ -37,6 +37,7 @@ class OutstandingPaymentsWidget extends TableWidget
                 ->acceptingPayments()
                 ->with(['contact', 'currency'])
                 ->orderByRaw('amount * (100 - paid_percent) DESC'))
+            ->queryStringIdentifier('outstandingPayments')
             ->paginated([5, 10, 25])
             ->defaultPaginationPageOption(5)
             ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))

@@ -39,6 +39,7 @@ class LatestPaymentsWidget extends TableWidget
                 ->with('contract', 'creator')
                 ->latest('paid_at')
                 ->latest('id'))
+            ->queryStringIdentifier('latestPayments')
             ->paginated([5, 10, 25])
             ->defaultPaginationPageOption(5)
             ->recordUrl(fn (Payment $record) => PaymentResource::getUrl('view', ['record' => $record]))

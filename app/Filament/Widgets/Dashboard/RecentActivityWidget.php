@@ -28,6 +28,7 @@ class RecentActivityWidget extends TableWidget
     {
         return $table
             ->query(fn (): Builder => Activity::query()->with('causer')->latest('id'))
+            ->queryStringIdentifier('recentActivity')
             ->columns([
                 TextColumn::make('event')
                     ->label(__('app.label.status'))

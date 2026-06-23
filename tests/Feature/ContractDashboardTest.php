@@ -9,6 +9,7 @@ use App\Filament\Widgets\Dashboard\ApprovalHealthWidget;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
 use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
+use App\Filament\Widgets\LatestPaymentsWidget;
 use App\Filament\Widgets\PaymentStatsWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
@@ -115,6 +116,20 @@ it('lists approved-but-unpaid contracts in the outstanding widget for finance', 
     Livewire::test(OutstandingPaymentsWidget::class)
         ->assertCanSeeTableRecords([$unpaid])
         ->assertCanNotSeeTableRecords([$paid]);
+});
+
+it('paginates each finance table under its own query-string key', function () {
+    $user = dashboardUser();
+    $user->assignRole(Role::findOrCreate('accountant', 'web'));
+    actingAs($user->fresh());
+
+    $outstanding = Livewire::test(OutstandingPaymentsWidget::class)->instance()->getTablePaginationPageName();
+    $latest = Livewire::test(LatestPaymentsWidget::class)->instance()->getTablePaginationPageName();
+
+    // Distinct names mean paging one table no longer moves the other.
+    expect($outstanding)->toBe('outstandingPaymentsPage')
+        ->and($latest)->toBe('latestPaymentsPage')
+        ->and($outstanding)->not->toBe($latest);
 });
 
 it('renders the approval health widget for the director', function () {
