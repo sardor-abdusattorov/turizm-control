@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasActiveStatus;
 use App\Models\Concerns\HasDocumentKey;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -58,6 +59,23 @@ class ContractTemplate extends Model
     {
         return $this->template_file
             && Storage::disk('local')->exists($this->template_file);
+    }
+
+    /**
+     * Active templates usable for the given order type: the ones tied to that
+     * type plus untyped "general" templates, in sort order.
+     *
+     * @param  Builder<ContractTemplate>  $query
+     * @return Builder<ContractTemplate>
+     */
+    public function scopeForOrderType(Builder $query, int $orderTypeId): Builder
+    {
+        return $query
+            ->active()
+            ->where(fn (Builder $inner) => $inner
+                ->where('order_type_id', $orderTypeId)
+                ->orWhereNull('order_type_id'))
+            ->orderBy('sort');
     }
 
     public function orderType(): BelongsTo

@@ -562,6 +562,20 @@ class Contract extends Model
         return $this->status === self::STATUS_APPROVED && ! $this->isFullyPaid();
     }
 
+    /**
+     * Contracts that can still take a payment: approved and not yet fully paid.
+     * The query-level counterpart of canAcceptPayment().
+     *
+     * @param  Builder<Contract>  $query
+     * @return Builder<Contract>
+     */
+    public function scopeAcceptingPayments(Builder $query): Builder
+    {
+        return $query
+            ->where('status', self::STATUS_APPROVED)
+            ->where('payment_status', '!=', PaymentStatus::FullyPaid->value);
+    }
+
     public const DIRECTOR_ROLE = 'director';
 
     public const OVERSIGHT_ROLES = ['super_admin', self::DIRECTOR_ROLE];

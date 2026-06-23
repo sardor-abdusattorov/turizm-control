@@ -180,11 +180,7 @@ class ContractForm
         }
 
         return ContractTemplate::query()
-            ->active()
-            ->where(fn ($query) => $query
-                ->where('order_type_id', $orderTypeId)
-                ->orWhereNull('order_type_id'))
-            ->orderBy('sort')
+            ->forOrderType($orderTypeId)
             ->get()
             ->mapWithKeys(fn (ContractTemplate $t): array => [
                 $t->id => $t->name,

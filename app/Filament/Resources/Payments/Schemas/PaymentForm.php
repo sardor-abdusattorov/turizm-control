@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Payments\Schemas;
 
-use App\Enums\PaymentStatus;
 use App\Filament\Support\ImageUpload;
 use App\Models\Contract;
 use App\Models\Payment;
@@ -84,8 +83,7 @@ class PaymentForm
     {
         return Contract::query()
             ->visibleTo()
-            ->where('status', Contract::STATUS_APPROVED)
-            ->where('payment_status', '!=', PaymentStatus::FullyPaid->value)
+            ->acceptingPayments()
             ->orderByDesc('id')
             ->get()
             ->mapWithKeys(fn (Contract $contract) => [
