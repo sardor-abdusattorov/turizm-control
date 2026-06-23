@@ -1,0 +1,108 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_mysql, mbstring, exif, bcmath, gd, zip, intl, redis, pcntl
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Install PHP deps
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Build assets
+        run: npm ci && npm run build
+
+      - name: Upload built assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-build
+          path: public/build
+          retention-days: 1
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+      - name: Download built assets
+        uses: actions/download-artifact@v4
+        with:
+          name: public-build
+          path: public/build
+
+      - name: Upload assets to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: public/build
+          target: ${{ secrets.SERVER_APP_PATH }}
+          overwrite: true
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            set -e
+            cd ${{ secrets.SERVER_APP_PATH }}
+
+            # Рабочее дерево сервера должно быть точным зеркалом main.
+            # git pull здесь ломается, если на сервере «уплыли» отслеживаемые
+            # файлы (например package-lock.json) — fetch + reset --hard
+            # принудительно выравнивает дерево, не трогая untracked-файлы
+            # (.env, storage, public/build, загруженные медиа).
+            git fetch origin main
+            git reset --hard origin/main
+
+            docker compose up -d --no-deps app queue scheduler
+            docker compose restart nginx
+
+            # chown/chmod требуют root: dev-образ запускается под USER app,
+            # а файлы принадлежат хостовому деплой-юзеру — потому -u root.
+            # public тоже нужен app на запись: filament:assets / livewire:publish /
+            # icons:cache / storage:link пишут в public/vendor и public/.
+            docker compose exec -T -u root app chown -R app:app storage bootstrap/cache public
+            docker compose exec -T -u root app chmod -R 775 storage bootstrap/cache
+
+            docker compose exec -T app php artisan migrate --force
+            docker compose exec -T app php artisan filament:assets
+            docker compose exec -T app php artisan shield:generate --all
+            docker compose exec -T app php artisan livewire:publish --assets
+            docker compose exec -T app php artisan optimize:clear
+            docker compose exec -T app php artisan project:cache
+            docker compose exec -T app php artisan storage:link || true
+
+            echo "Deploy complete"

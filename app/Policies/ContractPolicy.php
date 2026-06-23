@@ -34,12 +34,7 @@ class ContractPolicy
 
     public function delete(AuthUser $authUser, Contract $contract): bool
     {
-        // Both the permission AND the contract's own rule have to allow it —
-        // delete_contract on its own isn't enough to drop a non-Draft
-        // contract (canBeDeletedBy enforces "Draft only, by the author or
-        // super_admin"). Keeps API / bulk paths in line with the UI rule.
-        return $authUser->can('delete_contract')
-            && $contract->canBeDeletedBy($authUser);
+        return $authUser->can('delete_contract');
     }
 
     public function restore(AuthUser $authUser, Contract $contract): bool
