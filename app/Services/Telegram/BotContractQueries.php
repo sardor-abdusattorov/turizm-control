@@ -10,8 +10,6 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * The contract list queries behind the bot menus. Kept out of BotMenuBuilder
  * so that class can stay pure presentation, as its docblock promises.
- *
- * @phpstan-type ContractQuery Builder<Contract>
  */
 class BotContractQueries
 {
