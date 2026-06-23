@@ -637,6 +637,9 @@ return [
         'my_in_review' => 'My contracts in review',
         'my_approved' => 'My approved contracts',
         'my_drafts' => 'My drafts',
+        'my_rejected' => 'Rejected — needs rework',
+        'my_rejected_description' => 'Sent back during approval',
+        'no_rejected' => 'Nothing was sent back',
 
         // ContractStatsWidget — oversight variants (counts across the company)
         'in_review_total' => 'In review (total)',
