@@ -325,6 +325,7 @@ return [
         'add_payment' => 'Add payment',
         'record_payment' => 'Record payment',
         'export_xlsx' => 'Export to Excel',
+        'create_contract' => 'New contract',
     ],
     'export' => [
         'completed_body' => 'Your export is ready: :count rows exported.',
