@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Contract;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Foundation\Auth\User as AuthUser;
 
 class ContractPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('view_any_contract');
@@ -34,12 +34,7 @@ class ContractPolicy
 
     public function delete(AuthUser $authUser, Contract $contract): bool
     {
-        // Both the permission AND the contract's own rule have to allow it —
-        // delete_contract on its own isn't enough to drop a non-Draft
-        // contract (canBeDeletedBy enforces "Draft only, by the author or
-        // super_admin"). Keeps API / bulk paths in line with the UI rule.
-        return $authUser->can('delete_contract')
-            && $contract->canBeDeletedBy($authUser);
+        return $authUser->can('delete_contract');
     }
 
     public function restore(AuthUser $authUser, Contract $contract): bool
@@ -71,4 +66,5 @@ class ContractPolicy
     {
         return $authUser->can('reorder_contract');
     }
+
 }
