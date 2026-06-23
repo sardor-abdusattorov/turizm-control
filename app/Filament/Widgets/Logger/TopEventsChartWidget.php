@@ -9,7 +9,7 @@ class TopEventsChartWidget extends BaseWidget
 {
     public function getHeading(): string|Htmlable|null
     {
-        return $this->activityReviewHeadingForPlaybook(__('Top Events'), 'all_activity');
+        return $this->activityReviewHeadingForPlaybook(__('app.activity.top_events_heading'), 'all_activity');
     }
 
     protected function getData(): array
@@ -17,7 +17,7 @@ class TopEventsChartWidget extends BaseWidget
         $data = parent::getData();
 
         if (isset($data['datasets'][0])) {
-            $data['datasets'][0]['label'] = __('Events');
+            $data['datasets'][0]['label'] = __('app.activity.events');
         }
 
         return $data;

@@ -85,8 +85,8 @@ class UserSessions
      */
     public function parseUserAgent(?string $userAgent): array
     {
-        $browser = 'Unknown';
-        $platform = 'Unknown';
+        $browser = __('app.label.unknown');
+        $platform = __('app.label.unknown');
 
         if ($userAgent) {
             if (preg_match('/Windows/i', $userAgent)) {

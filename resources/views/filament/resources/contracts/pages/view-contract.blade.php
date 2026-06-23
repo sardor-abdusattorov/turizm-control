@@ -110,8 +110,8 @@
 
         [__('app.label.legal_details'), array_values(array_filter([
             ['heroicon-o-finger-print', __('app.label.inn'), $contact->inn],
-            ['heroicon-o-finger-print', 'PINFL', $contact->pinfl],
-            ['heroicon-o-bookmark', 'OKED', $contact->oked],
+            ['heroicon-o-finger-print', __('app.label.pinfl'), $contact->pinfl],
+            ['heroicon-o-bookmark', __('app.label.oked'), $contact->oked],
             ['heroicon-o-user', __('app.label.director_name'), $contact->director_name],
             ['heroicon-o-user-circle', __('app.label.contact_person'), $contact->contact_person],
         ], fn ($r) => ! empty($r[2])))],
@@ -124,7 +124,7 @@
         [__('app.label.bank_requisites'), array_values(array_filter([
             ['heroicon-o-building-library', __('app.label.bank_name'), $contact->bank_name],
             ['heroicon-o-banknotes', __('app.label.bank_account'), $contact->bank_account],
-            ['heroicon-o-hashtag', 'MFO', $contact->mfo],
+            ['heroicon-o-hashtag', __('app.label.mfo'), $contact->mfo],
         ], fn ($r) => ! empty($r[2])))],
     ] : [];
     // Drop any group that ended up empty after filtering.

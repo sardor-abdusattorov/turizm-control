@@ -8,7 +8,7 @@ class ActivityOverviewWidget extends BaseWidget
 {
     public function getHeading(): ?string
     {
-        return __('Activity Overview');
+        return __('app.activity.overview_heading');
     }
 
     protected function getStats(): array
@@ -16,10 +16,10 @@ class ActivityOverviewWidget extends BaseWidget
         $stats = parent::getStats();
 
         $labels = [
-            ['label' => __('Total Activity'),  'description' => __('Last :days days', ['days' => $this->days])],
-            ['label' => __('High Risk'),       'description' => __('High-risk actions detected')],
-            ['label' => __('Failed Logins'),   'description' => __('Authentication failures')],
-            ['label' => __('Unique Actors'),   'description' => __('Distinct causers recorded')],
+            ['label' => __('app.activity.total_activity'), 'description' => __('app.activity.last_days', ['days' => $this->days])],
+            ['label' => __('app.activity.high_risk'),      'description' => __('app.activity.high_risk_description')],
+            ['label' => __('app.activity.failed_logins'),  'description' => __('app.activity.failed_logins_description')],
+            ['label' => __('app.activity.unique_actors'),  'description' => __('app.activity.unique_actors_description')],
         ];
 
         foreach ($stats as $i => $stat) {

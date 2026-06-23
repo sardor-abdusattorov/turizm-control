@@ -9,7 +9,7 @@ class ActivityTrendChartWidget extends BaseWidget
 {
     public function getHeading(): string|Htmlable|null
     {
-        return $this->activityReviewHeadingForPlaybook(__('Activity Trend'), 'all_activity');
+        return $this->activityReviewHeadingForPlaybook(__('app.activity.activity_trend_heading'), 'all_activity');
     }
 
     protected function getData(): array
@@ -17,7 +17,7 @@ class ActivityTrendChartWidget extends BaseWidget
         $data = parent::getData();
 
         if (isset($data['datasets'][0])) {
-            $data['datasets'][0]['label'] = __('Activity');
+            $data['datasets'][0]['label'] = __('app.activity.trend_dataset');
         }
 
         return $data;

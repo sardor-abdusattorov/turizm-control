@@ -9,7 +9,7 @@ class HighRiskActionsChartWidget extends BaseWidget
 {
     public function getHeading(): string|Htmlable|null
     {
-        return $this->activityReviewHeadingForPlaybook(__('High-Risk Actions'), 'high_risk_incidents');
+        return $this->activityReviewHeadingForPlaybook(__('app.activity.high_risk_actions_heading'), 'high_risk_incidents');
     }
 
     protected function getData(): array
@@ -17,7 +17,7 @@ class HighRiskActionsChartWidget extends BaseWidget
         $data = parent::getData();
 
         if (isset($data['datasets'][0])) {
-            $data['datasets'][0]['label'] = __('High-Risk Events');
+            $data['datasets'][0]['label'] = __('app.activity.high_risk_events');
         }
 
         return $data;
