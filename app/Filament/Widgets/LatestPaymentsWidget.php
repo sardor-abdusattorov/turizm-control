@@ -50,7 +50,7 @@ class LatestPaymentsWidget extends TableWidget
 
                 TextColumn::make('percent')
                     ->label(__('app.label.percent'))
-                    ->formatStateUsing(fn ($state): string => rtrim(rtrim(number_format((float) $state, 2, '.', ''), '0'), '.').'%')
+                    ->formatStateUsing(fn ($state): string => format_percent((float) $state).'%')
                     ->badge()
                     ->color('success'),
 

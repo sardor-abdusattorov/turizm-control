@@ -2,7 +2,7 @@
     /** @var \App\Models\Payment $record */
     $record = $this->record;
 
-    $percent = rtrim(rtrim(number_format((float) $record->percent, 2, '.', ''), '0'), '.');
+    $percent = format_percent((float) $record->percent);
     $contractUrl = $this->contractUrl();
     $shotUrl = $this->screenshotUrl();
 

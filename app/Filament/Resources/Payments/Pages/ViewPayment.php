@@ -15,7 +15,7 @@ class ViewPayment extends ViewRecord
 
     public function getHeading(): string
     {
-        return rtrim(rtrim(number_format((float) $this->record->percent, 2, '.', ''), '0'), '.')
+        return format_percent((float) $this->record->percent)
             .'% · '.($this->record->contract?->number ?? __('app.label.payment_single'));
     }
 

@@ -6,7 +6,7 @@
 
     $status = $record->payment_status ?? PaymentStatus::NotPaid;
     $percent = (float) $record->paid_percent;
-    $percentLabel = rtrim(rtrim(number_format($percent, 2, '.', ''), '0'), '.');
+    $percentLabel = format_percent($percent);
 
     // Same tonal language as the contract status pill: soft tinted background,
     // a saturated dot, and a readable foreground — so approval state and

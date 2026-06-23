@@ -67,7 +67,7 @@ class PaymentForm
                                 $remaining = $contract->remainingPercent();
 
                                 if ((float) $value > $remaining + 0.001) {
-                                    $fail(__('app.message.payment_exceeds_remaining', ['percent' => rtrim(rtrim(number_format($remaining, 2, '.', ''), '0'), '.')]));
+                                    $fail(__('app.message.payment_exceeds_remaining', ['percent' => format_percent($remaining)]));
                                 }
                             }),
 
@@ -118,7 +118,7 @@ class PaymentForm
         }
 
         return __('app.label.remaining_to_pay', [
-            'percent' => rtrim(rtrim(number_format($contract->remainingPercent(), 2, '.', ''), '0'), '.'),
+            'percent' => format_percent($contract->remainingPercent()),
         ]);
     }
 }

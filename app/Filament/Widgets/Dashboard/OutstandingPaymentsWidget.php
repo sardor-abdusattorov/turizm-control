@@ -57,7 +57,7 @@ class OutstandingPaymentsWidget extends TableWidget
                 TextColumn::make('paid_percent')
                     ->label(__('app.label.percent'))
                     ->badge()
-                    ->formatStateUsing(fn ($state): string => rtrim(rtrim(number_format((float) $state, 2, '.', ''), '0'), '.').'%')
+                    ->formatStateUsing(fn ($state): string => format_percent((float) $state).'%')
                     ->color(fn ($state): string => (float) $state > 0 ? 'warning' : 'gray'),
 
                 TextColumn::make('remaining')

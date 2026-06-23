@@ -31,7 +31,7 @@ class PaymentNotifier
             return;
         }
 
-        $percent = $this->formatPercent((float) $payment->percent);
+        $percent = format_percent($payment->percent);
         $key = $contract->isFullyPaid() ? 'payment_completed' : 'payment_recorded';
         $icon = $contract->isFullyPaid() ? 'heroicon-o-check-badge' : 'heroicon-o-banknotes';
 
@@ -56,10 +56,5 @@ class PaymentNotifier
                 __("app.notification.{$key}.body", ['number' => $contract->number, 'percent' => $percent]),
             );
         });
-    }
-
-    private function formatPercent(float $percent): string
-    {
-        return rtrim(rtrim(number_format($percent, 2, '.', ''), '0'), '.');
     }
 }

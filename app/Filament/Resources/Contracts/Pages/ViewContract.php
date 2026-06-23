@@ -137,7 +137,7 @@ class ViewContract extends ViewRecord
                         ->step('0.01')
                         ->suffix('%')
                         ->helperText(fn (): string => __('app.label.remaining_to_pay', [
-                            'percent' => rtrim(rtrim(number_format($this->record->remainingPercent(), 2, '.', ''), '0'), '.'),
+                            'percent' => format_percent($this->record->remainingPercent()),
                         ])),
 
                     DatePicker::make('paid_at')
@@ -163,7 +163,7 @@ class ViewContract extends ViewRecord
                     if ((float) $data['percent'] > $remaining + 0.001) {
                         Notification::make()
                             ->title(__('app.message.payment_exceeds_remaining', [
-                                'percent' => rtrim(rtrim(number_format($remaining, 2, '.', ''), '0'), '.'),
+                                'percent' => format_percent($remaining),
                             ]))
                             ->danger()
                             ->send();

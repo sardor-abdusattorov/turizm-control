@@ -143,9 +143,9 @@
                     <div class="cw-prog" style="padding-top:.6rem;">
                         <div class="cw-prog__top">
                             <div class="cw-prog__l">
-                                <span class="cw-prog__count"><b>{{ rtrim(rtrim(number_format($paidPercent, 2, '.', ''), '0'), '.') }}%</b> / 100%</span>
+                                <span class="cw-prog__count"><b>{{ format_percent($paidPercent) }}%</b> / 100%</span>
                                 @if ($remainingPercent > 0)
-                                    <span class="cw-prog__sub">{{ __('app.label.remaining_to_pay', ['percent' => rtrim(rtrim(number_format($remainingPercent, 2, '.', ''), '0'), '.')]) }}</span>
+                                    <span class="cw-prog__sub">{{ __('app.label.remaining_to_pay', ['percent' => format_percent($remainingPercent)]) }}</span>
                                 @endif
                             </div>
                         </div>
@@ -166,7 +166,7 @@
                                     </div>
                                     <div class="cw-step__bd">
                                         <div class="cw-step__nm">
-                                            {{ rtrim(rtrim(number_format((float) $payment->percent, 2, '.', ''), '0'), '.') }}%
+                                            {{ format_percent((float) $payment->percent) }}%
                                             <span class="cw-ord">{{ $payment->paid_at?->format('d.m.Y') }}</span>
                                         </div>
                                         <div class="cw-step__dp">

@@ -22,6 +22,18 @@ if (! function_exists('settings')) {
     }
 }
 
+if (! function_exists('format_percent')) {
+    /**
+     * Format a percent value compactly: two decimals, trailing zeros and a
+     * dangling decimal point trimmed (12.50 -> "12.5", 100.00 -> "100").
+     * The "%" sign is left to the caller.
+     */
+    function format_percent(mixed $value): string
+    {
+        return rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.');
+    }
+}
+
 if (! function_exists('clear_settings_cache')) {
     /**
      * Clear settings cache
