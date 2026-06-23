@@ -7,11 +7,11 @@ use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\ContractStatsWidget;
 use App\Filament\Widgets\ContractsTrendChartWidget;
 use App\Filament\Widgets\Dashboard\ApprovalHealthWidget;
+use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use App\Filament\Widgets\Dashboard\MyApprovalQueueWidget;
 use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
 use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
 use App\Filament\Widgets\Dashboard\RecentActivityWidget;
-use App\Filament\Widgets\Dashboard\TelegramConnectWidget;
 use App\Filament\Widgets\LatestPaymentsWidget;
 use App\Filament\Widgets\PaymentStatsWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
@@ -91,7 +91,7 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
-                TelegramConnectWidget::class,
+                DashboardHeaderWidget::class,
                 MyApprovalQueueWidget::class,
                 MyContractsInReviewWidget::class,
                 ContractStatsWidget::class,

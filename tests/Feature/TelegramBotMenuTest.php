@@ -1,6 +1,6 @@
 <?php
 
-use App\Filament\Widgets\Dashboard\TelegramConnectWidget;
+use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
@@ -249,9 +249,9 @@ it('offers the Telegram connect prompt for users who have not linked', function 
 
     actingAs($user);
 
-    expect(TelegramConnectWidget::canView())->toBeTrue();
+    expect((new DashboardHeaderWidget)->shouldOfferTelegram())->toBeTrue();
 
-    Livewire::test(TelegramConnectWidget::class)
+    Livewire::test(DashboardHeaderWidget::class)
         ->assertSee(__('app.label.telegram_nag_title'))
         ->assertSee(route('telegram.connect'))
         ->assertSee(__('app.action.close'));
@@ -262,7 +262,10 @@ it('hides the Telegram connect prompt once the user has linked', function () {
 
     actingAs($user);
 
-    expect(TelegramConnectWidget::canView())->toBeFalse();
+    expect((new DashboardHeaderWidget)->shouldOfferTelegram())->toBeFalse();
+
+    Livewire::test(DashboardHeaderWidget::class)
+        ->assertDontSee(__('app.label.telegram_nag_title'));
 });
 
 it('shows the history menu item when the user has past approvals', function () {
