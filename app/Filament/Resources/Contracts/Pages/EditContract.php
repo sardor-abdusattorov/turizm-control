@@ -6,7 +6,7 @@ use App\Enums\ContractStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Contracts\Schemas\ContractForm;
 use App\Models\Contract;
-use App\Models\ContractApprover;
+use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractWorkflow;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -125,27 +125,11 @@ class EditContract extends EditRecord
         // promise to cancel the existing approval chain — honour it even
         // when no visible field actually changed (the OnlyOffice document on
         // disk may have changed between load and save).
-        if ($startedMidFlow && ! $observerHandledReset) {
-            $this->record->forceFill([
-                'status' => Contract::STATUS_DRAFT,
-                'signed_at' => null,
-            ])->saveQuietly();
-            $this->record->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
-        }
-
-        $this->record->approvers()
-            ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
-            ->update([
-                'status' => ContractApprover::STATUS_INVALIDATED,
-                'system_comment' => __('app.message.invalidated_on_edit'),
-                'acted_at' => now(),
-            ]);
-
-        $this->approverChain = $chainChanged
-            ? $this->approverChain
-            : $this->originalChain;
-
-        $this->rebuildQueuedChain();
+        app(ApprovalChain::class)->resyncOnEdit(
+            $this->record,
+            $chainChanged ? $this->approverChain : $this->originalChain,
+            cancelDecided: $startedMidFlow && ! $observerHandledReset,
+        );
     }
 
     /**
@@ -161,20 +145,6 @@ class EditContract extends EditRecord
             ->unique()
             ->values()
             ->all();
-    }
-
-    protected function rebuildQueuedChain(): void
-    {
-        $order = 1;
-
-        foreach ($this->approverChain as $userId) {
-            ContractApprover::create([
-                'contract_id' => $this->record->id,
-                'user_id' => $userId,
-                'order' => $order++,
-                'status' => ContractApprover::STATUS_QUEUED,
-            ]);
-        }
     }
 
     protected function getHeaderActions(): array

@@ -47,6 +47,36 @@ class ApprovalChain
     }
 
     /**
+     * Re-apply the approver chain after the author edited the contract: cancel
+     * the live (queued/pending) approvers and re-queue the given users in order.
+     * When $cancelDecided is true — an explicit mid-flow save — prior verdicts
+     * are invalidated and the contract is bounced back to Draft as well.
+     *
+     * @param  array<int, int>  $userIds
+     */
+    public function resyncOnEdit(Contract $contract, array $userIds, bool $cancelDecided): void
+    {
+        if ($cancelDecided) {
+            $contract->forceFill([
+                'status' => Contract::STATUS_DRAFT,
+                'signed_at' => null,
+            ])->saveQuietly();
+
+            $contract->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
+        }
+
+        $contract->approvers()
+            ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
+            ->update([
+                'status' => ContractApprover::STATUS_INVALIDATED,
+                'system_comment' => __('app.message.invalidated_on_edit'),
+                'acted_at' => now(),
+            ]);
+
+        $this->requeue($contract, $userIds);
+    }
+
+    /**
      * Preview of the chain the flow would produce, as "Department — User" lines
      * for the create form.
      *
