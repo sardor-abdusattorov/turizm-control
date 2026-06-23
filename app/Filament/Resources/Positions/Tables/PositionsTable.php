@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Positions\Tables;
 
+use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Position;
 use Filament\Actions\BulkActionGroup;
@@ -36,10 +37,7 @@ class PositionsTable
                 StatusToggleColumn::make()
                     ->sortable(),
 
-                TextColumn::make('created_at')
-                    ->label(__('app.label.created_at'))
-                    ->dateTime('d.m.Y H:i')
-                    ->sortable(),
+                CreatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('status')

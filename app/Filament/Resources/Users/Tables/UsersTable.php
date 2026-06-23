@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -51,10 +52,7 @@ class UsersTable
                 StatusToggleColumn::make()
                     ->sortable(),
 
-                TextColumn::make('created_at')
-                    ->label(__('app.label.created_at'))
-                    ->dateTime()
-                    ->sortable()
+                CreatedAtColumn::make()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')

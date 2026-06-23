@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Orders\Tables;
 
 use App\Filament\Resources\Orders\OrderResource;
+use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Order;
 use App\Models\User;
@@ -68,10 +69,7 @@ class OrdersTable
                 StatusToggleColumn::make()
                     ->sortable(),
 
-                TextColumn::make('created_at')
-                    ->label(__('app.label.created_at'))
-                    ->dateTime('d.m.Y H:i')
-                    ->sortable()
+                CreatedAtColumn::make()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([

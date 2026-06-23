@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contacts\Tables;
 
 use App\Exports\ContactsExport;
 use App\Filament\Resources\Contacts\ContactResource;
+use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Contact;
 use Filament\Actions\Action;
@@ -62,10 +63,7 @@ class ContactsTable
 
                 StatusToggleColumn::make(),
 
-                TextColumn::make('created_at')
-                    ->label(__('app.label.created_at'))
-                    ->dateTime('d.m.Y H:i')
-                    ->sortable()
+                CreatedAtColumn::make()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
