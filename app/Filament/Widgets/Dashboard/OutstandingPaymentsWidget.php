@@ -2,7 +2,6 @@
 
 namespace App\Filament\Widgets\Dashboard;
 
-use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use Filament\Tables\Columns\TextColumn;
@@ -35,8 +34,7 @@ class OutstandingPaymentsWidget extends TableWidget
         return $table
             ->query(fn (): Builder => Contract::query()
                 ->visibleTo()
-                ->where('status', Contract::STATUS_APPROVED)
-                ->where('payment_status', '!=', PaymentStatus::FullyPaid->value)
+                ->acceptingPayments()
                 ->with(['contact', 'currency'])
                 ->orderByRaw('amount * (100 - paid_percent) DESC')
                 ->limit(8))
