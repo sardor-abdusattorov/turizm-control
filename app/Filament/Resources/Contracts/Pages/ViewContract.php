@@ -10,7 +10,7 @@ use App\Models\ContractApprover;
 use App\Models\Payment;
 use App\Rules\PaymentWithinRemaining;
 use App\Services\Contracts\ContractWorkflow;
-use App\Services\Payments\PaymentNotifier;
+use App\Services\Payments\RecordPayment;
 use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -154,20 +154,11 @@ class ViewContract extends ViewRecord
                         ->required(),
                 ])
                 ->action(function (array $data): void {
-                    if (! $this->record->canAcceptPayment()) {
+                    if (! app(RecordPayment::class)->record($this->record, $data)) {
                         Notification::make()->title(__('app.message.action_not_allowed'))->danger()->send();
 
                         return;
                     }
-
-                    $payment = Payment::create([
-                        'contract_id' => $this->record->id,
-                        'percent' => $data['percent'],
-                        'paid_at' => $data['paid_at'],
-                        'screenshot' => $data['screenshot'],
-                    ]);
-
-                    app(PaymentNotifier::class)->notifyPaymentRecorded($payment);
 
                     Notification::make()->title(__('app.message.payment_recorded'))->success()->send();
                     $this->record->refresh();
