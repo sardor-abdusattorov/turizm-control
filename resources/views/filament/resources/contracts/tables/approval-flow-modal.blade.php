@@ -185,6 +185,19 @@
     .af-due > svg {
         opacity: .7;
     }
+    /* When the slot has blown its SLA, the deadline line turns red so the
+       "why is this overdue" answer — the date and time it was due — is right
+       there next to the "Overdue" flag. */
+    .af-due--over {
+        background: rgba(239,68,68,.08);
+        border-color: rgba(239,68,68,.35);
+        border-style: solid;
+        color: #b91c1c;
+        opacity: 1;
+    }
+    .dark .af-due--over {
+        color: #fca5a5;
+    }
 
     .af-date {
         font-size: .78rem;
@@ -261,15 +274,17 @@
                             <i style="background:{{ $c['dot'] }};"></i>
                             {{ $labelFor($a) }}
                         </span>
-                        @if ($a->isOverdue())
-                            <div class="af-overdue">
-                                {!! svg('heroicon-m-exclamation-triangle', '', ['width' => 12, 'height' => 12])->toHtml() !!}
-                                {{ __('app.label.overdue') }}
-                            </div>
-                        @elseif ($a->status === ContractApprover::STATUS_PENDING && $a->due_at)
-                            <span class="af-due">
+                        @if ($a->status === ContractApprover::STATUS_PENDING && $a->due_at)
+                            @php $overdue = $a->isOverdue(); @endphp
+                            @if ($overdue)
+                                <div class="af-overdue">
+                                    {!! svg('heroicon-m-exclamation-triangle', '', ['width' => 12, 'height' => 12])->toHtml() !!}
+                                    {{ __('app.label.overdue') }}
+                                </div>
+                            @endif
+                            <span @class(['af-due', 'af-due--over' => $overdue])>
                                 {!! svg('heroicon-m-clock', '', ['width' => 11, 'height' => 11])->toHtml() !!}
-                                {{ __('app.label.due') }} {{ $a->due_at->translatedFormat('d.m.Y') }}
+                                {{ __('app.label.due') }}: {{ $a->due_at->translatedFormat('d.m.Y, H:i') }}
                             </span>
                         @endif
                     </td>
