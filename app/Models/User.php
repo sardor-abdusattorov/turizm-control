@@ -52,7 +52,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        // A user whose role grants no permissions at all has nothing to do in
+        // the panel — keep them out instead of dropping them on an empty
+        // dashboard. super_admin passes via its wildcard role even before any
+        // permissions are synced onto it.
+        return $this->hasRole('super_admin') || $this->getAllPermissions()->isNotEmpty();
     }
 
     public function getFilamentAvatarUrl(): ?string

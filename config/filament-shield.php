@@ -1,7 +1,10 @@
 <?php
 
+use App\Filament\Pages\Dashboard;
+use App\Filament\Pages\ProfileSettings;
+use App\Filament\Pages\Settings;
+use App\Filament\Pages\TelegramBroadcast;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
-use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 
@@ -197,11 +200,19 @@ return [
     |
     */
 
+    // These pages are not gated by a generated `view_<page>` permission:
+    // the Dashboard and the user's own Profile are open to anyone who can
+    // reach the panel, while Main Settings and Telegram broadcast enforce
+    // their own checks (`manage_settings` / super_admin). Excluding them keeps
+    // the role editor from showing page permissions that nothing reads.
     'pages' => [
         'subject' => 'class',
         'prefix' => 'view',
         'exclude' => [
             Dashboard::class,
+            ProfileSettings::class,
+            Settings::class,
+            TelegramBroadcast::class,
         ],
     ],
 
