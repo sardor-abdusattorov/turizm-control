@@ -27,8 +27,7 @@ class RecentActivityWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(fn (): Builder => Activity::query()->with('causer')->latest('id')->limit(8))
-            ->paginated(false)
+            ->query(fn (): Builder => Activity::query()->with('causer')->latest('id'))
             ->columns([
                 TextColumn::make('event')
                     ->label(__('app.label.status'))

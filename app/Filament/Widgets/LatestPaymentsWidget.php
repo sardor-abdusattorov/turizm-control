@@ -38,15 +38,16 @@ class LatestPaymentsWidget extends TableWidget
                 ->visibleTo()
                 ->with('contract', 'creator')
                 ->latest('paid_at')
-                ->latest('id')
-                ->limit(5))
-            ->paginated(false)
+                ->latest('id'))
+            ->paginated([5, 10, 25])
+            ->defaultPaginationPageOption(5)
             ->recordUrl(fn (Payment $record) => PaymentResource::getUrl('view', ['record' => $record]))
             ->columns([
                 TextColumn::make('contract.number')
                     ->label(__('app.label.contract_number'))
                     ->searchable(false)
-                    ->sortable(false),
+                    ->sortable(false)
+                    ->description(fn (Payment $record): ?string => $record->creator?->name),
 
                 TextColumn::make('percent')
                     ->label(__('app.label.percent'))
@@ -57,11 +58,6 @@ class LatestPaymentsWidget extends TableWidget
                 TextColumn::make('paid_at')
                     ->label(__('app.label.paid_at'))
                     ->date('d.m.Y'),
-
-                TextColumn::make('creator.name')
-                    ->label(__('app.label.created_by'))
-                    ->limit(20)
-                    ->toggleable(),
             ])
             ->emptyStateHeading(__('app.label.no_payments_yet'))
             ->emptyStateIcon('heroicon-o-banknotes');

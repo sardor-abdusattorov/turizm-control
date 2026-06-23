@@ -15,6 +15,7 @@ use App\Models\ContractApprover;
 use App\Models\User;
 use App\Services\Dashboard\DashboardContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -125,6 +126,29 @@ it('renders the approval health widget for the director', function () {
     expect(ApprovalHealthWidget::canView())->toBeTrue();
 
     Livewire::test(ApprovalHealthWidget::class)->assertOk();
+});
+
+it('reports an on-time rate once decisions carry due dates', function () {
+    Cache::forget('dashboard.approval_health');
+
+    $user = dashboardUser();
+    $user->assignRole(Role::findOrCreate('director', 'web'));
+
+    $contract = Contract::factory()->approved()->create();
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $user->id,
+        'order' => 1,
+        'status' => ContractApprover::STATUS_APPROVED,
+        'acted_at' => now()->subDays(3),
+        'due_at' => now()->subDays(2), // acted before due → on-time
+    ]);
+
+    actingAs($user->fresh());
+
+    Livewire::test(ApprovalHealthWidget::class)
+        ->assertOk()
+        ->assertSee('100%');
 });
 
 it('builds an eight-week per-status sparkline series for the manager strip', function () {

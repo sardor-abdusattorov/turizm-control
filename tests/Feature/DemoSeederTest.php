@@ -45,6 +45,13 @@ it('seeds a rich, file-backed demo dataset', function () {
         ->whereNotNull('due_at')
         ->where('due_at', '<', now())
         ->exists())->toBeTrue();
+
+    // Decided approvals carry a due date too, so the on-time rate is measurable.
+    expect(ContractApprover::query()
+        ->whereIn('status', [ContractApprover::STATUS_APPROVED->value, ContractApprover::STATUS_REJECTED->value])
+        ->whereNotNull('due_at')
+        ->whereNotNull('acted_at')
+        ->exists())->toBeTrue();
 });
 
 it('writes real media files for users, payments and documents', function () {

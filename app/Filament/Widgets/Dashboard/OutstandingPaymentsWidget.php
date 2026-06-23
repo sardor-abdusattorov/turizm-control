@@ -36,20 +36,16 @@ class OutstandingPaymentsWidget extends TableWidget
                 ->visibleTo()
                 ->acceptingPayments()
                 ->with(['contact', 'currency'])
-                ->orderByRaw('amount * (100 - paid_percent) DESC')
-                ->limit(8))
-            ->paginated(false)
+                ->orderByRaw('amount * (100 - paid_percent) DESC'))
+            ->paginated([5, 10, 25])
+            ->defaultPaginationPageOption(5)
             ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))
             ->columns([
                 TextColumn::make('number')
                     ->label(__('app.label.contract_number'))
                     ->weight('semibold')
-                    ->sortable(false),
-
-                TextColumn::make('contact.name')
-                    ->label(__('app.label.contact_single'))
-                    ->limit(28)
-                    ->toggleable(),
+                    ->sortable(false)
+                    ->description(fn (Contract $record): ?string => $record->contact?->name),
 
                 TextColumn::make('paid_percent')
                     ->label(__('app.label.percent'))

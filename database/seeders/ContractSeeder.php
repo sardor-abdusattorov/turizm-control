@@ -180,16 +180,24 @@ class ContractSeeder extends Seeder
             default => null,
         };
 
+        $actedAt = $hasVerdict ? $createdAt->copy()->addDays($order * 2) : null;
+
+        // Decided rows carry a due date too, so the dashboard's on-time rate
+        // has something to measure; roughly one in five came in late.
+        $dueAt = match (true) {
+            $status === ContractApprover::STATUS_PENDING => $overdue ? now()->subDays(2) : now()->addDays(2),
+            $actedAt !== null => $actedAt->copy()->addDays(($contract->id + $order) % 5 === 0 ? -2 : 2),
+            default => null,
+        };
+
         ContractApprover::create([
             'contract_id' => $contract->id,
             'user_id' => $user->id,
             'order' => $order,
             'status' => $status,
             'comment' => $comment,
-            'acted_at' => $hasVerdict ? $createdAt->copy()->addDays($order * 2) : null,
-            'due_at' => $status === ContractApprover::STATUS_PENDING
-                ? ($overdue ? now()->subDays(2) : now()->addDays(2))
-                : null,
+            'acted_at' => $actedAt,
+            'due_at' => $dueAt,
         ]);
     }
 
