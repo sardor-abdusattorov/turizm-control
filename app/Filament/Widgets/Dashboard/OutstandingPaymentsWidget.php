@@ -19,7 +19,6 @@ class OutstandingPaymentsWidget extends TableWidget
     public static function canView(): bool
     {
         return auth()->user()?->hasAnyRole([
-            'legal_officer',
             'accountant',
             'director',
             'super_admin',

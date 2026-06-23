@@ -8,6 +8,7 @@ use App\Filament\Widgets\ContractsTrendChartWidget;
 use App\Filament\Widgets\Dashboard\ApprovalHealthWidget;
 use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
 use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
+use App\Filament\Widgets\PaymentStatsWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
@@ -32,6 +33,24 @@ function dashboardUser(): User
 
     return $user;
 }
+
+it('hides the collection/outstanding finance widgets from a legal officer', function () {
+    $legal = User::factory()->create();
+    $legal->assignRole(Role::findOrCreate('legal_officer', 'web'));
+    actingAs($legal->fresh());
+
+    expect(PaymentStatsWidget::canView())->toBeFalse()
+        ->and(OutstandingPaymentsWidget::canView())->toBeFalse();
+});
+
+it('still shows the finance widgets to an accountant', function () {
+    $accountant = User::factory()->create();
+    $accountant->assignRole(Role::findOrCreate('accountant', 'web'));
+    actingAs($accountant->fresh());
+
+    expect(PaymentStatsWidget::canView())->toBeTrue()
+        ->and(OutstandingPaymentsWidget::canView())->toBeTrue();
+});
 
 it('greets the user as the dashboard page heading', function () {
     actingAs(dashboardUser());

@@ -31,7 +31,7 @@ class PaymentStatsWidget extends StatsOverviewWidget
             return false;
         }
 
-        return $user->hasAnyRole(['legal_officer', 'accountant', 'director', 'super_admin']);
+        return $user->hasAnyRole(['accountant', 'director', 'super_admin']);
     }
 
     protected function getStats(): array
