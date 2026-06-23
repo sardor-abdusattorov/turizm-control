@@ -40,12 +40,14 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
 
         $this->syncRole('legal_officer', [
+            'view_all_contracts',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),
         ]);
 
         $this->syncRole('accountant', [
+            'view_all_contracts',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),

@@ -38,11 +38,15 @@ class ListContracts extends ListRecords
         $isAuthor = $user->can('create_contract')
             || Contract::query()->where('responsible_id', $user->id)->exists();
         $isApprover = ContractApprover::query()->where('user_id', $user->id)->exists();
-        $isOversight = $user->hasAnyRole(Contract::OVERSIGHT_ROLES);
+
+        // Oversight roles, plus finance & legal who hold view_all_contracts,
+        // get the full "All" list: every contract except other authors' drafts.
+        $canViewAll = $user->hasAnyRole(Contract::OVERSIGHT_ROLES)
+            || $user->can('view_all_contracts');
 
         $tabs = [];
 
-        if ($isOversight) {
+        if ($canViewAll) {
             $tabs['all'] = Tab::make(__('app.tab.all_contracts'))
                 ->icon('heroicon-o-rectangle-stack');
         }

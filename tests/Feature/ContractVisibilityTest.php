@@ -102,6 +102,48 @@ it('hides the All tab from a manager but shows it to oversight roles', function 
         ->and(array_key_first($tabs))->toBe('all'); // All leads for oversight
 });
 
+function financeReviewer(string $role): User
+{
+    $user = contractUser($role);
+    Permission::findOrCreate('view_all_contracts', 'web');
+    $user->givePermissionTo('view_all_contracts');
+
+    return $user->fresh();
+}
+
+it('shows the All tab to finance and legal reviewers, not just oversight', function () {
+    foreach (['accountant', 'legal_officer'] as $role) {
+        actingAs(financeReviewer($role));
+
+        expect(Livewire::test(ListContracts::class)->instance()->getTabs())
+            ->toHaveKey('all');
+    }
+});
+
+it('lets a finance reviewer see the live pipeline but not other authors drafts', function () {
+    $accountant = financeReviewer('accountant');
+
+    $othersDraft = Contract::factory()->create();
+    $livePipeline = Contract::factory()->inReview()->create();
+
+    $visible = Contract::query()->visibleTo($accountant)->pluck('id');
+
+    expect($visible)
+        ->toContain($livePipeline->id)
+        ->not->toContain($othersDraft->id);
+});
+
+it('lands a finance reviewer with nothing awaiting on the All tab', function () {
+    $accountant = financeReviewer('accountant');
+
+    Contract::factory()->inReview()->create(); // pipeline exists, but not theirs to action
+
+    actingAs($accountant);
+
+    expect(Livewire::test(ListContracts::class)->instance()->getDefaultActiveTab())
+        ->toBe('all');
+});
+
 it('defaults an oversight user with no pending approvals to the All tab', function () {
     actingAs(contractUser('super_admin'));
 
