@@ -84,7 +84,6 @@ jobs:
 
             docker compose -f docker-compose.yml exec -T app php artisan migrate --force
             docker compose -f docker-compose.yml exec -T app php artisan filament:assets
-            docker compose -f docker-compose.yml exec -T app php artisan livewire:publish --assets
             docker compose -f docker-compose.yml exec -T app php artisan optimize:clear
             docker compose -f docker-compose.yml exec -T app php artisan project:cache
             docker compose -f docker-compose.yml exec -T app php artisan storage:link || true
