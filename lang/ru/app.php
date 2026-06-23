@@ -251,6 +251,13 @@ return [
         'summary_awaiting' => 'Ждут твоего решения: :count.',
         'summary_stalled' => 'Зависло у согласующего: :count.',
         'summary_clear' => 'Сейчас ничего не требует внимания.',
+        'my_in_review_heading' => 'Мои договоры на согласовании',
+        'my_in_review_empty' => 'Нет договоров на согласовании.',
+        'now_with' => 'Сейчас у',
+        'outstanding_heading' => 'Остаток к оплате',
+        'outstanding_empty' => 'Все одобренные договоры оплачены.',
+        'remaining' => 'Остаток',
+        'approval_health_heading' => 'Здоровье согласования',
     ],
 
     // ── Labels (most-visible subset; rest falls back to en) ────────

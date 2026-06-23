@@ -251,6 +251,13 @@ return [
         'summary_awaiting' => 'Qaroringizni kutmoqda: :count.',
         'summary_stalled' => 'Tasdiqlovchida qotib qolgan: :count.',
         'summary_clear' => 'Hozircha sizdan hech narsa kutilmayapti.',
+        'my_in_review_heading' => 'Tasdiqdagi shartnomalarim',
+        'my_in_review_empty' => 'Tasdiqdagi shartnomalar yo‘q.',
+        'now_with' => 'Hozir kimda',
+        'outstanding_heading' => 'To‘lov qoldig‘i',
+        'outstanding_empty' => 'Barcha tasdiqlangan shartnomalar to‘langan.',
+        'remaining' => 'Qoldiq',
+        'approval_health_heading' => 'Kelishuv salomatligi',
     ],
 
     // ── Labellar (eng ko‘rinadigan qism; qolgani en ga fallback) ───

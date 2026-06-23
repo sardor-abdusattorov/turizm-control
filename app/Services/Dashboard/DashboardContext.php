@@ -37,6 +37,41 @@ final class DashboardContext
         return explode(' ', $name)[0];
     }
 
+    public function greetingHeading(): string
+    {
+        $name = $this->firstName();
+
+        return $name !== ''
+            ? __('app.dashboard.greeting_named', ['name' => $name])
+            : __('app.dashboard.greeting');
+    }
+
+    /**
+     * The single line under the greeting that names whatever is most pressing
+     * for this user right now — overdue work, then awaiting work, then a
+     * manager's stalled contracts, otherwise an all-clear.
+     */
+    public function summaryLine(): string
+    {
+        $overdue = $this->isApprover() ? $this->overdueForMe()->count() : 0;
+        $awaiting = $this->isApprover() ? $this->awaitingMe()->count() : 0;
+        $stalled = $this->isManager() ? $this->managerCounts()['stalled'] : 0;
+
+        if ($overdue > 0) {
+            return __('app.dashboard.summary_overdue', ['count' => $overdue, 'total' => $awaiting]);
+        }
+
+        if ($awaiting > 0) {
+            return __('app.dashboard.summary_awaiting', ['count' => $awaiting]);
+        }
+
+        if ($stalled > 0) {
+            return __('app.dashboard.summary_stalled', ['count' => $stalled]);
+        }
+
+        return __('app.dashboard.summary_clear');
+    }
+
     public function isApprover(): bool
     {
         return $this->user?->hasAnyRole(['director', 'legal_officer', 'accountant', 'super_admin']) ?? false;
@@ -123,12 +158,12 @@ final class DashboardContext
     /**
      * Counts that feed the manager's personal stat strip.
      *
-     * @return array{drafts: int, in_review: int, stalled: int}
+     * @return array{drafts: int, in_review: int, rejected: int, stalled: int}
      */
     public function managerCounts(): array
     {
         if (! $this->user) {
-            return ['drafts' => 0, 'in_review' => 0, 'stalled' => 0];
+            return ['drafts' => 0, 'in_review' => 0, 'rejected' => 0, 'stalled' => 0];
         }
 
         return $this->memo['managerCounts'] ??= [
@@ -139,6 +174,10 @@ final class DashboardContext
             'in_review' => Contract::query()
                 ->where('responsible_id', $this->user->id)
                 ->where('status', Contract::STATUS_IN_REVIEW)
+                ->count(),
+            'rejected' => Contract::query()
+                ->where('responsible_id', $this->user->id)
+                ->where('status', Contract::STATUS_REJECTED)
                 ->count(),
             'stalled' => $this->myStalledContracts()->count(),
         ];

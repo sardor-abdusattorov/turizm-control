@@ -1,8 +1,13 @@
 <?php
 
+use App\Enums\PaymentStatus;
+use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\Contracts\Pages\ListContracts;
 use App\Filament\Widgets\ContractStatsWidget;
 use App\Filament\Widgets\ContractsTrendChartWidget;
+use App\Filament\Widgets\Dashboard\ApprovalHealthWidget;
+use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
+use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
@@ -26,6 +31,63 @@ function dashboardUser(): User
 
     return $user;
 }
+
+it('greets the user as the dashboard page heading', function () {
+    actingAs(dashboardUser());
+
+    Livewire::test(Dashboard::class)
+        ->assertOk()
+        ->assertSee(__('app.dashboard.greeting'));
+});
+
+it('shows the author their own in-review contracts, not drafts or others', function () {
+    $manager = dashboardUser();
+
+    $inReview = Contract::factory()->inReview()->create(['responsible_id' => $manager->id]);
+    $draft = Contract::factory()->create(['responsible_id' => $manager->id]);
+    $someoneElses = Contract::factory()->inReview()->create();
+
+    actingAs($manager);
+
+    expect(MyContractsInReviewWidget::canView())->toBeTrue();
+
+    Livewire::test(MyContractsInReviewWidget::class)
+        ->assertCanSeeTableRecords([$inReview])
+        ->assertCanNotSeeTableRecords([$draft, $someoneElses]);
+});
+
+it('lists approved-but-unpaid contracts in the outstanding widget for finance', function () {
+    $user = dashboardUser();
+    $user->assignRole(Role::findOrCreate('accountant', 'web'));
+    Permission::findOrCreate('view_all_contracts', 'web');
+    $user->givePermissionTo('view_all_contracts');
+
+    $unpaid = Contract::factory()->approved()->create(['amount' => 1000, 'paid_percent' => 0]);
+    $paid = Contract::factory()->approved()->create([
+        'amount' => 1000,
+        'paid_percent' => 100,
+        'payment_status' => PaymentStatus::FullyPaid->value,
+    ]);
+
+    actingAs($user->fresh());
+
+    expect(OutstandingPaymentsWidget::canView())->toBeTrue();
+
+    Livewire::test(OutstandingPaymentsWidget::class)
+        ->assertCanSeeTableRecords([$unpaid])
+        ->assertCanNotSeeTableRecords([$paid]);
+});
+
+it('renders the approval health widget for the director', function () {
+    $user = dashboardUser();
+    $user->assignRole(Role::findOrCreate('director', 'web'));
+
+    actingAs($user->fresh());
+
+    expect(ApprovalHealthWidget::canView())->toBeTrue();
+
+    Livewire::test(ApprovalHealthWidget::class)->assertOk();
+});
 
 it('renders the contract stats widget with a count of contracts awaiting the user', function () {
     $user = dashboardUser();

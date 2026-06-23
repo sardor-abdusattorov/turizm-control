@@ -37,7 +37,7 @@ class ContractsTrendChartWidget extends ChartWidget
             return false;
         }
 
-        return $user->hasAnyRole(['super_admin', 'director', 'accountant'])
+        return $user->hasAnyRole(['super_admin', 'director', 'accountant', 'legal_officer'])
             || $user->can('view_all_contracts');
     }
 

@@ -616,6 +616,13 @@ return [
         'summary_awaiting' => ':count contract(s) are waiting for your action.',
         'summary_stalled' => ':count of your contracts have stalled on an approver.',
         'summary_clear' => 'Nothing needs your attention right now.',
+        'my_in_review_heading' => 'My contracts in review',
+        'my_in_review_empty' => 'No contracts in review.',
+        'now_with' => 'Now with',
+        'outstanding_heading' => 'Outstanding payments',
+        'outstanding_empty' => 'All approved contracts are paid.',
+        'remaining' => 'Remaining',
+        'approval_health_heading' => 'Approval health',
         'overdue_title' => '{1} 1 item is overdue|[2,*] :count items are overdue',
         'days_overdue' => '{1} :count day overdue|[2,*] :count days overdue',
         'waiting_on_you' => 'Waiting on you',
@@ -633,6 +640,17 @@ return [
         'my_in_review' => 'My contracts in review',
         'my_approved' => 'My approved contracts',
         'my_drafts' => 'My drafts',
+        'my_rejected' => 'Rejected — needs rework',
+        'my_rejected_description' => 'Sent back during approval',
+        'no_rejected' => 'Nothing was sent back',
+
+        // ApprovalHealthWidget
+        'pending_decisions' => 'Pending decisions',
+        'on_time_rate' => 'On-time rate',
+        'bottleneck' => 'Bottleneck',
+        'on_time_of' => 'across :count decisions',
+        'bottleneck_desc' => ':count awaiting',
+        'queue_clear' => 'Queue is clear',
 
         // ContractStatsWidget — oversight variants (counts across the company)
         'in_review_total' => 'In review (total)',
