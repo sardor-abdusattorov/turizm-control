@@ -148,7 +148,9 @@ docker compose -f docker-compose.yml up -d --remove-orphans
 docker compose -f docker-compose.yml exec app composer install --no-dev --optimize-autoloader
 docker compose -f docker-compose.yml exec app php artisan key:generate
 docker compose -f docker-compose.yml exec app php artisan migrate --force
-docker compose -f docker-compose.yml exec app php artisan shield:generate --all
+# shield:generate запрещён в production (FilamentShield::prohibitDestructiveCommands),
+# поэтому для разовой генерации прав переопредели окружение на эту команду:
+docker compose -f docker-compose.yml exec -e APP_ENV=local app php artisan shield:generate --all --panel=admin
 docker compose -f docker-compose.yml exec app php artisan db:seed --force      # демо-данные (по желанию)
 docker compose -f docker-compose.yml exec app php artisan filament:assets
 docker compose -f docker-compose.yml exec app php artisan storage:link
@@ -156,7 +158,8 @@ docker compose -f docker-compose.yml exec app php artisan storage:link
 
 > ⚠️ `db:seed` создаёт демо-договоры/контакты/платежи и супер-админа
 > `mr.silverwind1998@gmail.com`. На «чистый» прод без демо — пропусти этот шаг и
-> назначь админа вручную: `php artisan shield:super-admin --user=1`.
+> назначь админа вручную (тоже с переопределением env):
+> `docker compose -f docker-compose.yml exec -e APP_ENV=local app php artisan shield:super-admin --user=1 --panel=admin`.
 
 ### 4. Сборка фронта (ассеты)
 

@@ -105,7 +105,9 @@ jobs:
 
             docker compose -f docker-compose.yml exec -T app php artisan migrate --force
             docker compose -f docker-compose.yml exec -T app php artisan filament:assets
-            docker compose -f docker-compose.yml exec -T app php artisan shield:generate --all
+            # shield:generate / shield:super-admin are prohibited in production and
+            # only needed at first setup or when resources change — run them by hand
+            # with `-e APP_ENV=local` (see DEPLOY.md), not on every deploy.
             docker compose -f docker-compose.yml exec -T app php artisan livewire:publish --assets
             docker compose -f docker-compose.yml exec -T app php artisan optimize:clear
             docker compose -f docker-compose.yml exec -T app php artisan project:cache
