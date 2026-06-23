@@ -87,22 +87,28 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            docker compose up -d --no-deps app queue scheduler
-            docker compose restart nginx
+            # -f docker-compose.yml: use the production stack only, never the
+            # dev override (MySQL/phpMyAdmin/Vite). --remove-orphans clears any
+            # leftover dev containers from before the prod/dev split.
+            docker compose -f docker-compose.yml up -d --remove-orphans
+
+            # composer.lock may have changed with the new code — refresh the
+            # vendor volume inside the container before anything that boots the app.
+            docker compose -f docker-compose.yml exec -T app composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
 
             # chown/chmod требуют root: dev-образ запускается под USER app,
             # а файлы принадлежат хостовому деплой-юзеру — потому -u root.
             # public тоже нужен app на запись: filament:assets / livewire:publish /
             # icons:cache / storage:link пишут в public/vendor и public/.
-            docker compose exec -T -u root app chown -R app:app storage bootstrap/cache public
-            docker compose exec -T -u root app chmod -R 775 storage bootstrap/cache
+            docker compose -f docker-compose.yml exec -T -u root app chown -R app:app storage bootstrap/cache public
+            docker compose -f docker-compose.yml exec -T -u root app chmod -R 775 storage bootstrap/cache
 
-            docker compose exec -T app php artisan migrate --force
-            docker compose exec -T app php artisan filament:assets
-            docker compose exec -T app php artisan shield:generate --all
-            docker compose exec -T app php artisan livewire:publish --assets
-            docker compose exec -T app php artisan optimize:clear
-            docker compose exec -T app php artisan project:cache
-            docker compose exec -T app php artisan storage:link || true
+            docker compose -f docker-compose.yml exec -T app php artisan migrate --force
+            docker compose -f docker-compose.yml exec -T app php artisan filament:assets
+            docker compose -f docker-compose.yml exec -T app php artisan shield:generate --all
+            docker compose -f docker-compose.yml exec -T app php artisan livewire:publish --assets
+            docker compose -f docker-compose.yml exec -T app php artisan optimize:clear
+            docker compose -f docker-compose.yml exec -T app php artisan project:cache
+            docker compose -f docker-compose.yml exec -T app php artisan storage:link || true
 
             echo "Deploy complete"
