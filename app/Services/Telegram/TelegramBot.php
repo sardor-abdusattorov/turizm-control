@@ -218,7 +218,7 @@ class TelegramBot
                     return;
                 }
                 $page = max(1, (int) ($arg ?? 1));
-                $this->editToList($chatId, $messageId, $this->menu->allContractsList($page));
+                $this->editToList($chatId, $messageId, $this->menu->allContractsList($user, $page));
                 $this->telegram->answerCallbackQuery($callbackId);
 
                 return;

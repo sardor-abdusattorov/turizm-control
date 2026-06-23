@@ -67,6 +67,14 @@ class ListContracts extends ListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->involvingApprover());
         }
 
+        // A pure author only ever gets the lone "My contracts" tab — and since
+        // their whole list already IS their contracts, that single tab is just
+        // noise. Hand them a clean, untabbed list. Approvers and oversight keep
+        // their tabs, where the choice between buckets actually matters.
+        if (array_keys($tabs) === ['my_contracts']) {
+            return [];
+        }
+
         return $tabs;
     }
 

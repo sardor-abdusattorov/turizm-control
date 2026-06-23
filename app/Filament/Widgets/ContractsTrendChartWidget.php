@@ -6,6 +6,8 @@ use App\Models\Contract;
 use Carbon\CarbonImmutable;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ContractsTrendChartWidget extends ChartWidget
 {
@@ -35,7 +37,7 @@ class ContractsTrendChartWidget extends ChartWidget
             return false;
         }
 
-        return $user->hasAnyRole(['super_admin', 'director', 'accountant'])
+        return $user->hasAnyRole(['super_admin', 'director', 'accountant', 'legal_officer'])
             || $user->can('view_all_contracts');
     }
 
@@ -43,22 +45,16 @@ class ContractsTrendChartWidget extends ChartWidget
     {
         $months = $this->buildMonthBuckets(6);
         $windowStart = $months->first()['start'];
+        $userId = (int) (auth()->id() ?? 0);
 
-        $contracts = Contract::query()
-            ->visibleTo()
-            ->where(function ($query) use ($windowStart): void {
-                $query->where('created_at', '>=', $windowStart)
-                    ->orWhere('signed_at', '>=', $windowStart->toDateString());
-            })
-            ->get(['created_at', 'signed_at']);
-
-        $createdByBucket = $contracts
-            ->filter(fn ($c) => $c->created_at && $c->created_at->greaterThanOrEqualTo($windowStart))
-            ->countBy(fn ($c) => $c->created_at->format('Y-m'));
-
-        $signedByBucket = $contracts
-            ->filter(fn ($c) => $c->signed_at && $c->signed_at->greaterThanOrEqualTo($windowStart))
-            ->countBy(fn ($c) => $c->signed_at->format('Y-m'));
+        [$createdByBucket, $signedByBucket] = Cache::remember(
+            "dashboard.trend.{$userId}.{$windowStart->format('Y-m')}",
+            now()->addMinutes(5),
+            fn (): array => [
+                $this->countByMonth('created_at', $windowStart),
+                $this->countByMonth('signed_at', $windowStart),
+            ],
+        );
 
         $createdSeries = $months->map(fn (array $m) => (int) ($createdByBucket[$m['key']] ?? 0))->all();
         $signedSeries = $months->map(fn (array $m) => (int) ($signedByBucket[$m['key']] ?? 0))->all();
@@ -89,6 +85,32 @@ class ContractsTrendChartWidget extends ChartWidget
     protected function getType(): string
     {
         return 'line';
+    }
+
+    /**
+     * Count visible contracts per YYYY-MM bucket by the given date column in a
+     * single grouped query. The month expression is driver-aware so it works
+     * on MySQL (production) and SQLite (tests) alike.
+     *
+     * @return array<string, int>
+     */
+    private function countByMonth(string $column, CarbonImmutable $windowStart): array
+    {
+        $monthExpr = DB::connection()->getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m', {$column})"
+            : "DATE_FORMAT({$column}, '%Y-%m')";
+
+        $start = $column === 'signed_at' ? $windowStart->toDateString() : $windowStart;
+
+        return Contract::query()
+            ->visibleTo()
+            ->whereNotNull($column)
+            ->where($column, '>=', $start)
+            ->groupByRaw($monthExpr)
+            ->selectRaw("{$monthExpr} as bucket, COUNT(*) as aggregate")
+            ->pluck('aggregate', 'bucket')
+            ->map(fn ($value): int => (int) $value)
+            ->all();
     }
 
     protected function getOptions(): array

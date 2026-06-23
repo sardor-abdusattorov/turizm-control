@@ -44,13 +44,15 @@ class BotContractQueries
     }
 
     /**
-     * Every contract system-wide — only oversight roles reach this list.
+     * Every contract this user is entitled to see, newest first. The menu only
+     * surfaces this list to oversight roles, but the scope is still applied so
+     * the result respects per-user visibility (e.g. other authors' drafts).
      *
      * @return Builder<Contract>
      */
-    public function all(): Builder
+    public function all(User $user): Builder
     {
-        return Contract::query()->orderByDesc('id');
+        return Contract::query()->visibleTo($user)->orderByDesc('id');
     }
 
     /**

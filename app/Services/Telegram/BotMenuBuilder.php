@@ -79,7 +79,7 @@ class BotMenuBuilder
 
         if ($canSeeAll) {
             $rows[] = [$this->cbBtn(
-                '🔎 '.__('app.telegram.menu_all_contracts')." · {$this->roles->allContractsCount()}",
+                '🔎 '.__('app.telegram.menu_all_contracts')." · {$this->roles->allContractsCount($user)}",
                 'all:1',
             )];
         }
@@ -119,10 +119,10 @@ class BotMenuBuilder
      *
      * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
      */
-    public function allContractsList(int $page): array
+    public function allContractsList(User $user, int $page): array
     {
         return $this->renderContractList(
-            query: $this->queries->all(),
+            query: $this->queries->all($user),
             page: $page,
             title: __('app.telegram.list_all_title'),
             emptyMessage: __('app.telegram.list_all_empty'),

@@ -427,11 +427,24 @@ class Contract extends Model
             return false;
         }
 
-        if ($user->hasRole('super_admin') || $user->can('view_all_contracts')) {
+        // Super admin is the only universal exception — drafts included.
+        if ($user->hasRole('super_admin')) {
             return true;
         }
 
+        // Your own contract is visible in any status, drafts included.
         if ($this->responsible_id === $user->id) {
+            return true;
+        }
+
+        // Someone else's draft is private to its author until it is submitted.
+        if ($this->status === self::STATUS_DRAFT) {
+            return false;
+        }
+
+        // Past the draft stage: oversight and view_all_contracts see the whole
+        // pipeline; everyone else must sit in the approval chain.
+        if ($user->hasAnyRole(self::OVERSIGHT_ROLES) || $user->can('view_all_contracts')) {
             return true;
         }
 
@@ -561,13 +574,29 @@ class Contract extends Model
             return $query->whereRaw('0 = 1');
         }
 
-        if ($user->hasAnyRole(self::OVERSIGHT_ROLES) || $user->can('view_all_contracts')) {
+        // Super admin is the only universal exception — they see every
+        // contract, everyone's drafts included.
+        if ($user->hasRole('super_admin')) {
             return $query;
         }
 
-        return $query->where(function (Builder $scoped) use ($user): void {
-            $scoped->where('responsible_id', $user->id)
-                ->orWhereHas('approvers', fn (Builder $q) => $q->where('user_id', $user->id));
+        // A draft is private to its author until it is submitted for approval.
+        // Everyone else sees their own contracts (any status) plus the
+        // non-draft contracts they're entitled to: the whole live pipeline for
+        // oversight / view_all_contracts, otherwise just the ones they approve.
+        $seesWholePipeline = $user->hasAnyRole(self::OVERSIGHT_ROLES)
+            || $user->can('view_all_contracts');
+
+        return $query->where(function (Builder $scoped) use ($user, $seesWholePipeline): void {
+            $scoped->where('responsible_id', $user->id);
+
+            $scoped->orWhere(function (Builder $pipeline) use ($user, $seesWholePipeline): void {
+                $pipeline->where('status', '!=', self::STATUS_DRAFT);
+
+                if (! $seesWholePipeline) {
+                    $pipeline->whereHas('approvers', fn (Builder $q) => $q->where('user_id', $user->id));
+                }
+            });
         });
     }
 }

@@ -57,9 +57,9 @@ class BotRoleResolver
         return $user->hasRole('super_admin') || $user->can('view_all_contracts');
     }
 
-    public function allContractsCount(): int
+    public function allContractsCount(User $user): int
     {
-        return Contract::query()->count();
+        return Contract::query()->visibleTo($user)->count();
     }
 
     public function isLawyer(User $user): bool
