@@ -6,6 +6,7 @@ use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
+use App\Support\TelegramText;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -498,7 +499,7 @@ class BotMenuBuilder
         // quotes (ENT_QUOTES) turned "yoʻli" into "yo&apos;li" in the
         // chat — the apostrophe entity is not in Telegram's accepted
         // list, so it leaked through unescaped.
-        return str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $value);
+        return TelegramText::escape($value);
     }
 
     private function contractUrl(Contract $contract): string

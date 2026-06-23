@@ -3,6 +3,7 @@
 namespace App\Services\Telegram;
 
 use App\Models\TelegramUser;
+use App\Support\TelegramText;
 
 /**
  * Fan a free-form announcement out to every linked Telegram account.
@@ -39,6 +40,6 @@ class TelegramBroadcaster
 
     private function escape(string $value): string
     {
-        return str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $value);
+        return TelegramText::escape($value);
     }
 }

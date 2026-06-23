@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\Notifications\InteractsWithContractNotifications;
 use App\Services\Telegram\BotMenuBuilder;
 use App\Services\Telegram\TelegramService;
+use App\Support\TelegramText;
 use Filament\Notifications\Notification;
 
 class ContractNotifier
@@ -269,6 +270,6 @@ class ContractNotifier
      */
     private function escapeForTelegram(string $value): string
     {
-        return str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $value);
+        return TelegramText::escape($value);
     }
 }
