@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Activitylog\Models\Activity;
 
@@ -71,6 +72,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureLimit();
         $this->configureLanguageSwitch();
         $this->configureTranslatableTabs();
+        $this->configureUrl();
 
         Filament::serving(fn () => $this->translateFilamentLoggerConfig());
     }
@@ -93,6 +95,18 @@ class AppServiceProvider extends ServiceProvider
     private function configureDB(): void
     {
         DB::prohibitDestructiveCommands($this->app->environment('production'));
+    }
+
+    /**
+     * Behind the TLS-terminating reverse proxy the app is served over HTTPS, so
+     * force generated URLs (assets, links) to https in production — otherwise
+     * asset() emits http:// and the browser flags mixed content.
+     */
+    private function configureUrl(): void
+    {
+        if ($this->app->isProduction()) {
+            URL::forceScheme('https');
+        }
     }
 
     private function configureModels(): void
