@@ -687,12 +687,12 @@ return [
         'drafts_description' => 'Not submitted for approval yet',
 
         // PaymentStatsWidget
-        'approved_value' => 'Approved value',
-        'approved_value_description' => 'Total value of signed contracts',
-        'collected' => 'Collected',
-        'collected_description' => 'Booked payments',
-        'outstanding' => 'Outstanding',
-        'outstanding_description' => 'Still expected to be paid',
+        'approved_value' => 'Approved amount',
+        'approved_value_description' => 'Total value of approved contracts',
+        'paid' => 'Paid',
+        'paid_description' => 'Paid on contracts so far',
+        'remaining' => 'Remaining to pay',
+        'remaining_description' => 'Not yet paid',
         'fully_paid_count' => 'Fully paid contracts',
         'fully_paid_count_description' => 'Reached 100% payments',
 

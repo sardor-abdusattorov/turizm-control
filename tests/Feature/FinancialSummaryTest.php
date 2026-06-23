@@ -44,8 +44,8 @@ it('aggregates approved value, collected and outstanding in UZS', function () {
     $totals = app(FinancialSummary::class)->totals();
 
     expect($totals['approved'])->toBe(1_500_000.0)
-        ->and($totals['collected'])->toBe(500_000.0)
-        ->and($totals['outstanding'])->toBe(1_000_000.0);
+        ->and($totals['paid'])->toBe(500_000.0)
+        ->and($totals['remaining'])->toBe(1_000_000.0);
 });
 
 it('aggregates without a column-ambiguity error for a non-oversight finance role', function () {
@@ -69,8 +69,8 @@ it('aggregates without a column-ambiguity error for a non-oversight finance role
     $totals = app(FinancialSummary::class)->totals();
 
     expect($totals['approved'])->toBe(1_000_000.0)
-        ->and($totals['collected'])->toBe(250_000.0)
-        ->and($totals['outstanding'])->toBe(750_000.0);
+        ->and($totals['paid'])->toBe(250_000.0)
+        ->and($totals['remaining'])->toBe(750_000.0);
 });
 
 it('returns zeroes when there are no approved contracts', function () {
@@ -79,5 +79,5 @@ it('returns zeroes when there are no approved contracts', function () {
     actingAs($admin->fresh());
 
     expect(app(FinancialSummary::class)->totals())
-        ->toBe(['approved' => 0.0, 'collected' => 0.0, 'outstanding' => 0.0]);
+        ->toBe(['approved' => 0.0, 'paid' => 0.0, 'remaining' => 0.0]);
 });

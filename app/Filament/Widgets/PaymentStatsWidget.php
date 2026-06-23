@@ -49,29 +49,29 @@ class PaymentStatsWidget extends StatsOverviewWidget
                 ->icon('heroicon-o-document-check')
                 ->url($contractsUrl.'?tableFilters[status][value]='.Contract::STATUS_APPROVED->value),
 
-            Stat::make(__('app.stats.collected'), self::formatUzs($totals['collected']))
-                ->description(__('app.stats.collected_description'))
+            Stat::make(__('app.stats.paid'), self::formatUzs($totals['paid']))
+                ->description(__('app.stats.paid_description'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success')
                 ->icon('heroicon-o-banknotes')
                 ->url($paymentsUrl),
 
-            Stat::make(__('app.stats.outstanding'), self::formatUzs($totals['outstanding']))
-                ->description(__('app.stats.outstanding_description'))
+            Stat::make(__('app.stats.remaining'), self::formatUzs($totals['remaining']))
+                ->description(__('app.stats.remaining_description'))
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
-                ->color($totals['outstanding'] > 0 ? 'warning' : 'gray')
+                ->color($totals['remaining'] > 0 ? 'warning' : 'gray')
                 ->icon('heroicon-o-clock')
                 ->url($contractsUrl.'?tableFilters[payment_status][value]='.PaymentStatus::PartiallyPaid->value),
         ];
     }
 
     /**
-     * Approved value / collected / outstanding across every visible approved
-     * contract, in UZS. Cached for 5 minutes — the figures only change when a
-     * payment is booked or a contract is signed, neither of which is
-     * second-by-second; the cache is busted on payment changes.
+     * Approved value / paid / remaining across every visible approved contract,
+     * in UZS. Cached for 5 minutes — the figures only change when a payment is
+     * booked or a contract is signed, neither of which is second-by-second; the
+     * cache is busted on payment changes.
      *
-     * @return array{approved: float, collected: float, outstanding: float}
+     * @return array{approved: float, paid: float, remaining: float}
      */
     private function financialTotals(): array
     {
