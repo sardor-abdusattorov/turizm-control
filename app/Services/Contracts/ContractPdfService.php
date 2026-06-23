@@ -9,11 +9,14 @@ use Illuminate\Support\Facades\Storage;
 
 class ContractPdfService
 {
-    public function __construct(public OnlyOfficeService $onlyOffice) {}
+    public function __construct(
+        public OnlyOfficeService $onlyOffice,
+        public ContractFiles $files,
+    ) {}
 
     public function path(Contract $contract): string
     {
-        return "uploads/files/contracts/{$contract->id}/contract.pdf";
+        return $this->files->pdfPath($contract);
     }
 
     public function absolutePath(Contract $contract): string

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ContractStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Concerns\HasDocumentKey;
+use App\Services\Contracts\ContractFiles;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,7 +14,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class Contract extends Model
 {
@@ -76,17 +76,7 @@ class Contract extends Model
         });
 
         static::deleting(function (self $contract): void {
-            foreach ([$contract->document_file, $contract->pdf_file] as $path) {
-                if ($path && Storage::disk('local')->exists($path)) {
-                    Storage::disk('local')->delete($path);
-                }
-            }
-
-            $folder = "uploads/files/contracts/{$contract->id}";
-
-            if (Storage::disk('local')->exists($folder)) {
-                Storage::disk('local')->deleteDirectory($folder);
-            }
+            app(ContractFiles::class)->purge($contract);
         });
     }
 
@@ -228,41 +218,29 @@ class Contract extends Model
         }
     }
 
+    public function files(): ContractFiles
+    {
+        return app(ContractFiles::class);
+    }
+
     public function documentPath(): string
     {
-        return "uploads/files/contracts/{$this->id}/draft.docx";
+        return $this->files()->documentPath($this);
     }
 
     public function documentAbsolutePath(): string
     {
-        return Storage::disk('local')->path($this->documentPath());
+        return $this->files()->documentAbsolutePath($this);
     }
 
     public function documentExists(): bool
     {
-        return Storage::disk('local')->exists($this->documentPath());
+        return $this->files()->documentExists($this);
     }
 
     public function buildDocumentFromTemplate(TemplateFiller $filler, ContractPlaceholderValues $values): void
     {
-        $template = $this->template;
-
-        if (! $template || ! $template->template_file) {
-            return;
-        }
-
-        $templateAbsolute = Storage::disk('local')->path($template->template_file);
-
-        if (! is_file($templateAbsolute)) {
-            return;
-        }
-
-        $filler->fill($templateAbsolute, $this->documentAbsolutePath(), $values->for($this));
-
-        $this->update([
-            'document_file' => $this->documentPath(),
-            'document_key' => static::generateDocumentKey(),
-        ]);
+        $this->files()->buildFromTemplate($this, $filler, $values);
     }
 
     public function buildApprovalChainFromFlow(): int
