@@ -28,6 +28,10 @@ services:
       - vendor:/var/www/vendor
     env_file:
       - .env
+    # Reach services on the host — notably the production MySQL, which runs on
+    # the host rather than in a container. Set DB_HOST=host.docker.internal.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - app
     restart: unless-stopped
@@ -46,6 +50,10 @@ services:
       - vendor:/var/www/vendor
     env_file:
       - .env
+    # Reach services on the host — notably the production MySQL, which runs on
+    # the host rather than in a container. Set DB_HOST=host.docker.internal.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - app
     restart: unless-stopped
@@ -65,6 +73,10 @@ services:
       - vendor:/var/www/vendor
     env_file:
       - .env
+    # Reach services on the host — notably the production MySQL, which runs on
+    # the host rather than in a container. Set DB_HOST=host.docker.internal.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - app
     restart: unless-stopped
@@ -84,6 +96,10 @@ services:
       - vendor:/var/www/vendor
     env_file:
       - .env
+    # Reach services on the host — notably the production MySQL, which runs on
+    # the host rather than in a container. Set DB_HOST=host.docker.internal.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - app
     restart: unless-stopped

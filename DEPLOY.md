@@ -73,7 +73,7 @@ APP_URL=https://www.prcontrol.uz
 APP_KEY=                         # заполнит key:generate
 
 DB_CONNECTION=mysql
-DB_HOST=<внешний MySQL host>
+DB_HOST=host.docker.internal      # MySQL на самом хосте; для отдельного сервера — его IP/домен
 DB_PORT=3306
 DB_DATABASE=...
 DB_USERNAME=...
@@ -100,6 +100,39 @@ ONLYOFFICE_JWT_SECRET=<сильный секрет>
 ```
 
 > ⚠️ `VITE_REVERB_*` должны быть в `.env` **до сборки ассетов** — Vite зашивает их в JS.
+
+#### MySQL на хосте (а не отдельным сервером)
+
+Контейнеры обращаются к хостовой БД через `host.docker.internal` — это уже
+прописано в `docker-compose.yml` (`extra_hosts: host.docker.internal:host-gateway`
+на `app`/`queue`/`scheduler`/`reverb`), поэтому в `.env` достаточно
+`DB_HOST=host.docker.internal`.
+
+Хостовый MySQL должен принимать подключение из контейнера:
+
+```bash
+sudo ss -tlnp | grep 3306            # если слышит только 127.0.0.1 — контейнер не достучится
+```
+
+1. **bind-address** — в `/etc/mysql/mysql.conf.d/mysqld.cnf` указать адрес
+   docker-моста (безопаснее, чем `0.0.0.0`) и перезапустить MySQL:
+   ```
+   bind-address = 172.17.0.1
+   ```
+   ```bash
+   sudo systemctl restart mysql
+   ```
+2. **Доступ пользователю** — разрешить коннект не только с `localhost`:
+   ```sql
+   CREATE USER 'pr_control'@'172.%' IDENTIFIED BY '<пароль>';
+   GRANT ALL PRIVILEGES ON pr_control.* TO 'pr_control'@'172.%';
+   FLUSH PRIVILEGES;
+   ```
+3. **Файрвол** — если стоит ufw, открыть 3306 только для docker-подсети:
+   `sudo ufw allow from 172.16.0.0/12 to any port 3306`.
+
+После правок пересоздай контейнеры (`up -d` подхватит `extra_hosts`), и
+`turizm-queue` перестанет рестартовать.
 
 ### 2. Поднять прод-стек
 
