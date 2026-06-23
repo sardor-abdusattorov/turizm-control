@@ -173,16 +173,6 @@ class ContractsTable
                         ->visible(fn (Contract $record): bool => $record->status === Contract::STATUS_APPROVED
                             && ViewContract::userCanExportContract()),
 
-                    Action::make('openEditor')
-                        ->label(__('app.action.open_editor'))
-                        ->icon('heroicon-o-pencil-square')
-                        ->color('gray')
-                        ->url(fn (Contract $record) => route('contracts.editor', [
-                            'contract' => $record,
-                            'mode' => 'edit',
-                        ]))
-                        ->visible(fn (Contract $record) => $record->documentExists() && $record->canBeEditedBy()),
-
                     EditAction::make()
                         ->color('gray')
                         ->visible(fn (Contract $record) => $record->canBeEditedBy()),
