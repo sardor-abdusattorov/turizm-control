@@ -19,7 +19,10 @@ class BotMenuBuilder
 {
     public const PAGE_SIZE = 5;
 
-    public function __construct(public BotRoleResolver $roles) {}
+    public function __construct(
+        public BotRoleResolver $roles,
+        public BotContractQueries $queries,
+    ) {}
 
     /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
     public function localePicker(): array
@@ -101,29 +104,8 @@ class BotMenuBuilder
      */
     public function historyList(User $user, int $page): array
     {
-        $query = Contract::query()
-            ->whereHas('approvers', fn ($q) => $q
-                ->where('user_id', $user->id)
-                ->whereIn('status', [
-                    ContractApprover::STATUS_APPROVED,
-                    ContractApprover::STATUS_REJECTED,
-                ])
-            )
-            ->orderByDesc(
-                ContractApprover::query()
-                    ->select('acted_at')
-                    ->whereColumn('contract_approvers.contract_id', 'contracts.id')
-                    ->where('user_id', $user->id)
-                    ->whereIn('status', [
-                        ContractApprover::STATUS_APPROVED,
-                        ContractApprover::STATUS_REJECTED,
-                    ])
-                    ->orderByDesc('acted_at')
-                    ->limit(1)
-            );
-
         return $this->renderContractList(
-            query: $query,
+            query: $this->queries->history($user),
             page: $page,
             title: __('app.telegram.list_history_title'),
             emptyMessage: __('app.telegram.list_history_empty'),
@@ -139,10 +121,8 @@ class BotMenuBuilder
      */
     public function allContractsList(int $page): array
     {
-        $query = Contract::query()->orderByDesc('id');
-
         return $this->renderContractList(
-            query: $query,
+            query: $this->queries->all(),
             page: $page,
             title: __('app.telegram.list_all_title'),
             emptyMessage: __('app.telegram.list_all_empty'),
@@ -157,15 +137,8 @@ class BotMenuBuilder
      */
     public function awaitingList(User $user, int $page): array
     {
-        $query = Contract::query()
-            ->whereHas('approvers', fn ($q) => $q
-                ->where('user_id', $user->id)
-                ->where('status', ContractApprover::STATUS_PENDING)
-            )
-            ->orderByDesc('id');
-
         return $this->renderContractList(
-            query: $query,
+            query: $this->queries->awaiting($user),
             page: $page,
             title: __('app.telegram.list_awaiting_title'),
             emptyMessage: __('app.telegram.list_awaiting_empty'),
@@ -180,12 +153,8 @@ class BotMenuBuilder
      */
     public function myContractsList(User $user, int $page): array
     {
-        $query = Contract::query()
-            ->where('responsible_id', $user->id)
-            ->orderByDesc('id');
-
         return $this->renderContractList(
-            query: $query,
+            query: $this->queries->mine($user),
             page: $page,
             title: __('app.telegram.list_mine_title'),
             emptyMessage: __('app.telegram.list_mine_empty'),
@@ -278,6 +247,30 @@ class BotMenuBuilder
                 [$this->urlBtn('📋 '.__('app.telegram.btn_open_in_system'), $this->contractUrl($contract))],
             ],
         ];
+    }
+
+    /**
+     * Confirmation screen for unlinking the Telegram account.
+     *
+     * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
+     */
+    public function unlinkConfirm(): array
+    {
+        return [
+            'text' => '<b>'.__('app.telegram.unlink_confirm_title')."</b>\n\n".__('app.telegram.unlink_confirm_body'),
+            'keyboard' => [
+                [
+                    $this->cbBtn('🔓 '.__('app.telegram.unlink_confirm_yes'), 'unlink'),
+                    $this->cbBtn('✖ '.__('app.action.cancel'), 'menu'),
+                ],
+            ],
+        ];
+    }
+
+    /** @return array<int, array<int, array<string, string>>> */
+    public function backToMenuKeyboard(): array
+    {
+        return [[$this->cbBtn('‹ '.__('app.telegram.btn_main_menu'), 'menu')]];
     }
 
     public function rejectPromptText(Contract $contract): string

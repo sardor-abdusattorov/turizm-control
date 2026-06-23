@@ -293,7 +293,7 @@ class TelegramBot
             $chatId,
             $messageId,
             $this->menu->decisionStamp($contract->fresh(), 'approve'),
-            $this->backToMenuKeyboard(),
+            $this->menu->backToMenuKeyboard(),
         );
 
         $this->telegram->answerCallbackQuery(
@@ -348,7 +348,7 @@ class TelegramBot
             $this->telegram->send(
                 $chatId,
                 $this->menu->decisionStamp($contract->fresh(), 'reject', $reason),
-                $this->backToMenuKeyboard(),
+                $this->menu->backToMenuKeyboard(),
             );
         });
     }
@@ -421,16 +421,8 @@ class TelegramBot
                 return;
             }
 
-            $this->telegram->send(
-                $chatId,
-                '<b>'.__('app.telegram.unlink_confirm_title')."</b>\n\n".__('app.telegram.unlink_confirm_body'),
-                [
-                    [
-                        ['text' => '🔓 '.__('app.telegram.unlink_confirm_yes'), 'callback_data' => 'unlink'],
-                        ['text' => '✖ '.__('app.action.cancel'), 'callback_data' => 'menu'],
-                    ],
-                ],
-            );
+            $screen = $this->menu->unlinkConfirm();
+            $this->telegram->send($chatId, $screen['text'], $screen['keyboard']);
         });
     }
 
@@ -463,12 +455,6 @@ class TelegramBot
 
         $user->telegram?->forceFill(['locale' => $locale])->save();
         App::setLocale($locale);
-    }
-
-    /** @return array<int, array<int, array<string, string>>> */
-    private function backToMenuKeyboard(): array
-    {
-        return [[['text' => '‹ '.__('app.telegram.btn_main_menu'), 'callback_data' => 'menu']]];
     }
 
     private function resolveUser(string $chatId): ?User
