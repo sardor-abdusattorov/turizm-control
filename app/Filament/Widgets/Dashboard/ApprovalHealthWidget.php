@@ -11,7 +11,7 @@ class ApprovalHealthWidget extends StatsOverviewWidget
 {
     protected ?string $pollingInterval = null;
 
-    protected static ?int $sort = 8;
+    protected static ?int $sort = 9;
 
     public static function canView(): bool
     {

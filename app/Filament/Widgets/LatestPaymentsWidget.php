@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LatestPaymentsWidget extends TableWidget
 {
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = ['default' => 'full', 'xl' => 1];
 
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 8;
 
     public function getTableHeading(): ?string
     {

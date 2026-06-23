@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class OutstandingPaymentsWidget extends TableWidget
 {
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = ['default' => 'full', 'xl' => 1];
 
     protected static ?int $sort = 7;
 
