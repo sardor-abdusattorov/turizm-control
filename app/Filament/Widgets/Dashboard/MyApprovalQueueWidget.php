@@ -38,6 +38,7 @@ class MyApprovalQueueWidget extends TableWidget
                 ->awaitingApprovalBy()
                 ->with(['contact', 'currency', 'activeApprovers']))
             ->paginated(false)
+            ->poll('60s')
             ->defaultSort('updated_at', 'asc')
             ->columns([
                 TextColumn::make('number')
