@@ -6,6 +6,7 @@ use App\Enums\PaymentStatus;
 use App\Filament\Support\ImageUpload;
 use App\Models\Contract;
 use App\Models\Payment;
+use App\Rules\PaymentWithinRemaining;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -57,19 +58,7 @@ class PaymentForm
                             ->step('0.01')
                             ->suffix('%')
                             ->helperText(fn (Get $get): ?string => self::remainingHelper($get('contract_id')))
-                            ->rule(static fn (Get $get) => static function (string $attribute, $value, $fail) use ($get): void {
-                                $contract = Contract::find($get('contract_id'));
-
-                                if (! $contract) {
-                                    return;
-                                }
-
-                                $remaining = $contract->remainingPercent();
-
-                                if ((float) $value > $remaining + 0.001) {
-                                    $fail(__('app.message.payment_exceeds_remaining', ['percent' => format_percent($remaining)]));
-                                }
-                            }),
+                            ->rule(static fn (Get $get) => new PaymentWithinRemaining(Contract::find($get('contract_id')))),
 
                         DatePicker::make('paid_at')
                             ->label(__('app.label.paid_at'))

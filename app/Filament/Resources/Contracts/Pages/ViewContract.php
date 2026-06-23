@@ -8,6 +8,7 @@ use App\Filament\Support\ImageUpload;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\Payment;
+use App\Rules\PaymentWithinRemaining;
 use App\Services\Contracts\ContractWorkflow;
 use App\Services\Payments\PaymentNotifier;
 use Carbon\CarbonInterface;
@@ -134,6 +135,7 @@ class ViewContract extends ViewRecord
                         ->required()
                         ->minValue(0.01)
                         ->maxValue(fn (): float => max(0.01, $this->record->remainingPercent()))
+                        ->rule(fn () => new PaymentWithinRemaining($this->record))
                         ->step('0.01')
                         ->suffix('%')
                         ->helperText(fn (): string => __('app.label.remaining_to_pay', [
@@ -154,19 +156,6 @@ class ViewContract extends ViewRecord
                 ->action(function (array $data): void {
                     if (! $this->record->canAcceptPayment()) {
                         Notification::make()->title(__('app.message.action_not_allowed'))->danger()->send();
-
-                        return;
-                    }
-
-                    $remaining = $this->record->remainingPercent();
-
-                    if ((float) $data['percent'] > $remaining + 0.001) {
-                        Notification::make()
-                            ->title(__('app.message.payment_exceeds_remaining', [
-                                'percent' => format_percent($remaining),
-                            ]))
-                            ->danger()
-                            ->send();
 
                         return;
                     }
