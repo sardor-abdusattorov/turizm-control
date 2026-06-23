@@ -7,7 +7,7 @@ use App\Filament\Widgets\ContractStatsWidget;
 use App\Filament\Widgets\ContractsTrendChartWidget;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use App\Filament\Widgets\Dashboard\MyApprovalQueueWidget;
-use App\Filament\Widgets\Dashboard\OverdueAlertBanner;
+use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
 use App\Filament\Widgets\Dashboard\RecentActivityWidget;
 use App\Filament\Widgets\Dashboard\TelegramConnectWidget;
 use App\Filament\Widgets\LatestPaymentsWidget;
@@ -92,8 +92,8 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 DashboardHeaderWidget::class,
                 TelegramConnectWidget::class,
-                OverdueAlertBanner::class,
                 MyApprovalQueueWidget::class,
+                MyContractsInReviewWidget::class,
                 ContractStatsWidget::class,
                 PaymentStatsWidget::class,
                 LatestPaymentsWidget::class,

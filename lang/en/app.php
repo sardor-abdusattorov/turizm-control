@@ -626,6 +626,9 @@ return [
         'overdue_by' => 'Overdue by :time',
         'due_in' => 'Due in :time',
         'recent_activity' => 'Recent activity',
+        'my_in_review_heading' => 'My contracts in review',
+        'my_in_review_empty' => 'No contracts in review.',
+        'now_with' => 'Now with',
     ],
     'stats' => [
         'overdue_count' => ':count overdue',
