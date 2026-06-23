@@ -97,12 +97,20 @@ class TelegramBot
             return;
         }
 
-        // Conversation continuation — currently only the reject-reason flow.
+        // Conversation continuation — the reject-reason or approve-comment flow.
         $state = $this->state->get($chatId);
 
-        if ($state && ($state['action'] ?? null) === 'reject') {
-            $this->finishRejectFlow($chatId, (int) ($state['contract_id'] ?? 0), $text);
+        if ($state === null) {
+            return;
         }
+
+        $contractId = (int) ($state['contract_id'] ?? 0);
+
+        match ($state['action'] ?? null) {
+            'reject' => $this->finishRejectFlow($chatId, $contractId, $text),
+            'approve' => $this->finishApproveFlow($chatId, $contractId, $text),
+            default => null,
+        };
     }
 
     private function handleStart(string $chatId, string $token): void
@@ -230,7 +238,12 @@ class TelegramBot
                 return;
 
             case 'approve':
-                $this->handleApprove($callbackId, $chatId, $messageId, (int) $arg, $user);
+                $this->startApproveFlow($callbackId, $chatId, $messageId, (int) $arg, $user);
+
+                return;
+
+            case 'apnc':
+                $this->approveWithoutComment($callbackId, $chatId, $messageId, (int) $arg, $user);
 
                 return;
 
@@ -273,7 +286,71 @@ class TelegramBot
         }
     }
 
-    private function handleApprove(string $callbackId, string $chatId, ?int $messageId, int $contractId, User $user): void
+    /**
+     * Tapping "Approve" opens an optional comment step (mirrors the web panel,
+     * where approval carries an optional note). The approver either types the
+     * comment as the next message or taps "Approve without comment".
+     */
+    private function startApproveFlow(string $callbackId, string $chatId, ?int $messageId, int $contractId, User $user): void
+    {
+        $contract = Contract::find($contractId);
+
+        if (! $contract || ! $contract->canBeApprovedBy($user)) {
+            $this->telegram->answerCallbackQuery($callbackId, __('app.telegram.not_allowed'));
+
+            return;
+        }
+
+        $this->state->set($chatId, 'approve', ['contract_id' => $contract->id]);
+
+        $this->telegram->editMessage(
+            $chatId,
+            $messageId,
+            $this->menu->approvePromptText($contract),
+            $this->menu->approvePromptKeyboard($contract),
+        );
+
+        $this->telegram->answerCallbackQuery($callbackId);
+    }
+
+    /**
+     * Apply the approval together with the comment the approver just typed —
+     * triggered by the next text message after the approve prompt.
+     */
+    private function finishApproveFlow(string $chatId, int $contractId, string $comment): void
+    {
+        $user = $this->resolveUser($chatId);
+        $contract = Contract::find($contractId);
+
+        if (! $user || ! $contract) {
+            $this->telegram->send($chatId, __('app.telegram.action_failed'));
+            $this->state->clear($chatId);
+
+            return;
+        }
+
+        $this->withUserLocale($chatId, function () use ($chatId, $contract, $user, $comment): void {
+            if (! $this->workflow->approve($contract, $user, $comment)) {
+                $this->telegram->send($chatId, __('app.telegram.not_allowed'));
+                $this->state->clear($chatId);
+
+                return;
+            }
+
+            $this->state->clear($chatId);
+            $this->telegram->send(
+                $chatId,
+                $this->menu->decisionStamp($contract->fresh(), 'approve', $comment),
+                $this->menu->backToMenuKeyboard(),
+            );
+        });
+    }
+
+    /**
+     * The "approve without a comment" shortcut on the prompt keyboard. The
+     * comment is optional, so this approves straight away and stamps the card.
+     */
+    private function approveWithoutComment(string $callbackId, string $chatId, ?int $messageId, int $contractId, User $user): void
     {
         $contract = Contract::find($contractId);
 
@@ -288,6 +365,8 @@ class TelegramBot
 
             return;
         }
+
+        $this->state->clear($chatId);
 
         $this->telegram->editMessage(
             $chatId,

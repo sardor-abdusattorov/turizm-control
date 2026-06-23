@@ -56,8 +56,43 @@ it('rejects the webhook with a wrong secret and accepts the right one', function
     ])->assertOk();
 });
 
-it('approves the contract from an inline callback by the current approver', function () {
+it('opens a comment step on approve and stores the typed comment', function () {
     $approver = User::factory()->withTelegram('555')->create();
+    $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $approver->id,
+        'order' => 1,
+    ]);
+
+    // Tapping approve must NOT decide yet — it opens the optional comment step.
+    app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb1',
+            'from' => ['id' => 555],
+            'data' => "approve:{$contract->id}",
+        ],
+    ]);
+
+    expect($contract->fresh()->status)->toBe(Contract::STATUS_IN_REVIEW);
+
+    // The next message is taken as the approval comment and finalises it.
+    app(TelegramBot::class)->handleUpdate([
+        'message' => [
+            'chat' => ['id' => 555],
+            'text' => 'Looks good to me',
+        ],
+    ]);
+
+    expect($contract->fresh()->status)->toBe(Contract::STATUS_APPROVED)
+        ->and($contract->approvers()->where('user_id', $approver->id)->first()->comment)
+        ->toBe('Looks good to me');
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/answerCallbackQuery'));
+});
+
+it('approves without a comment via the shortcut button', function () {
+    $approver = User::factory()->withTelegram('556')->create();
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
     ContractApprover::factory()->create([
         'contract_id' => $contract->id,
@@ -68,14 +103,14 @@ it('approves the contract from an inline callback by the current approver', func
     app(TelegramBot::class)->handleUpdate([
         'callback_query' => [
             'id' => 'cb1',
-            'from' => ['id' => 555],
-            'data' => "approve:{$contract->id}",
+            'from' => ['id' => 556],
+            'data' => "apnc:{$contract->id}",
         ],
     ]);
 
-    expect($contract->fresh()->status)->toBe(Contract::STATUS_APPROVED);
-
-    Http::assertSent(fn ($request) => str_contains($request->url(), '/answerCallbackQuery'));
+    expect($contract->fresh()->status)->toBe(Contract::STATUS_APPROVED)
+        ->and($contract->approvers()->where('user_id', $approver->id)->first()->comment)
+        ->toBeNull();
 });
 
 it('does not approve when the caller is not the current approver', function () {

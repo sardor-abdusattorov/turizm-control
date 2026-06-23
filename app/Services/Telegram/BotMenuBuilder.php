@@ -285,6 +285,21 @@ class BotMenuBuilder
         return [[$this->cbBtn('✖ '.__('app.action.cancel'), 'cancel')]];
     }
 
+    public function approvePromptText(Contract $contract): string
+    {
+        return $this->headline('✅ '.__('app.telegram.approve_prompt_title'))
+            .__('app.telegram.approve_prompt_body', ['number' => $contract->number]);
+    }
+
+    /** @return array<int, array<int, array<string, string>>> */
+    public function approvePromptKeyboard(Contract $contract): array
+    {
+        return [
+            [$this->cbBtn('✅ '.__('app.telegram.approve_without_comment'), "apnc:{$contract->id}")],
+            [$this->cbBtn('✖ '.__('app.action.cancel'), 'cancel')],
+        ];
+    }
+
     public function decisionStamp(Contract $contract, string $decision, ?string $comment = null): string
     {
         $title = $decision === 'approve'
