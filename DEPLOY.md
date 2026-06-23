@@ -261,21 +261,44 @@ Certbot сам допишет 443 и редирект http→https.
 
 ## CI/CD (автодеплой)
 
-Workflow `.github/workflows/deploy.yml` срабатывает на push в `main`: собирает
-ассеты, заливает на сервер, делает `git reset --hard`, поднимает прод-стек,
-`composer install`, миграции и кэш.
+Workflow `.github/workflows/deploy.yml` срабатывает на push в `main`:
 
-В GitHub → **Settings → Secrets and variables → Actions** добавь:
+1. **test** — ставит PHP 8.4, `composer install`, гоняет `php artisan test`
+   (sqlite в памяти, БД не нужна). Красные тесты блокируют деплой.
+2. **deploy** — по SSH на сервере: `git reset --hard origin/main`, поднимает
+   прод-стек, `composer install`, **собирает ассеты прямо на сервере**
+   (`npm ci && npm run build` — чтобы `VITE_REVERB_*` взялись из прод-`.env`),
+   миграции, `filament:assets`, кэш, `storage:link`.
+
+> Ассеты собираются **на сервере, а не в CI**: Vite зашивает `VITE_REVERB_*` в
+> бандл на этапе сборки, а правильный `wss`-хост есть только в прод-`.env`.
+> Поэтому на сервере должен стоять Node 20.19+ / 22.12+.
+
+### Секреты GitHub
+
+GitHub → **Settings → Secrets and variables → Actions** → *New repository secret*:
 
 | Secret | Значение |
 |--------|----------|
 | `SERVER_HOST` | IP сервера |
 | `SERVER_USER` | `s_abdusattorov` |
-| `SERVER_SSH_KEY` | приватный SSH-ключ |
+| `SERVER_SSH_KEY` | приватный SSH-ключ (целиком, с `-----BEGIN…`) |
 | `SERVER_PORT` | `22` |
 | `SERVER_APP_PATH` | `/home/www/sardor_projects/turizm-control` |
 
-Дальше: merge в `main` → push → деплой автоматически.
+### SSH-ключ для деплоя
+
+На сервере сгенерируй пару ключей для GitHub Actions и разреши вход по ней:
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/github_deploy -N "" -C "github-actions"
+cat ~/.ssh/github_deploy.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+cat ~/.ssh/github_deploy        # ← это значение целиком в секрет SERVER_SSH_KEY
+```
+
+Приватный ключ (`github_deploy`) — в секрет `SERVER_SSH_KEY`, публичный остаётся
+на сервере. После этого: merge ветки в `main` → push → деплой пойдёт сам.
 
 ---
 
