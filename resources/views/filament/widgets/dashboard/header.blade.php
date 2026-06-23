@@ -1,6 +1,7 @@
 @php
     $h = $this->headerData();
     $offerTelegram = $this->shouldOfferTelegram();
+    $createUrl = $this->createContractUrl();
 @endphp
 
 <x-filament-widgets::widget>
@@ -10,7 +11,18 @@
                 <h2 class="dh__greeting">{{ $h['greeting'] }}</h2>
                 <p class="dh__summary">{{ $h['summary'] }}</p>
             </div>
-            <div class="dh__date">{{ now()->translatedFormat('l, d F Y') }}</div>
+
+            @if ($createUrl)
+                <div class="dh__top-r">
+                    <a href="{{ $createUrl }}" class="dh__cta" wire:navigate>
+                        {{ svg('heroicon-m-plus', 'dh__cta-ic') }}
+                        <span>{{ __('app.action.create_contract') }}</span>
+                    </a>
+                    <div class="dh__date">{{ now()->translatedFormat('l, d F Y') }}</div>
+                </div>
+            @else
+                <div class="dh__date">{{ now()->translatedFormat('l, d F Y') }}</div>
+            @endif
         </div>
 
         @if ($offerTelegram)
@@ -117,6 +129,28 @@
             flex-shrink: 0;
             padding-top: 0.15rem;
         }
+        .dh__top-r {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            flex-shrink: 0;
+        }
+        .dh__cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            text-decoration: none;
+            background: #2563eb;
+            transition: background 0.12s ease;
+        }
+        .dh__cta:hover { background: #1d4ed8; }
+        .dh__cta-ic { width: 0.95rem; height: 0.95rem; }
 
         /* Telegram connect prompt — a flat, Filament-style info row shown until
            the account is linked. No gradients, no hover lift. */
@@ -207,6 +241,11 @@
             .dh { padding: 1rem 1.1rem; }
             .dh__date { display: none; }
             .dh__tg-sub { display: none; }
+            /* Drop the create action onto its own full-width row under the
+               greeting; the date is hidden so the cluster holds just the CTA. */
+            .dh__top { flex-wrap: wrap; }
+            .dh__top-r { flex: 1 0 100%; }
+            .dh__cta { flex: 1; justify-content: center; padding: 0.6rem; }
             /* Stack the action onto its own full-width row, keep the close
                button up on the title row. */
             .dh__tg-cta {

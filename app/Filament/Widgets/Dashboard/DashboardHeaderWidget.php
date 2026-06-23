@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Dashboard;
 
+use App\Filament\Resources\Contracts\ContractResource;
 use App\Services\Dashboard\DashboardContext;
 use App\Services\Telegram\TelegramService;
 use Filament\Widgets\Widget;
@@ -64,6 +65,18 @@ class DashboardHeaderWidget extends Widget
             'summary' => __('app.dashboard.summary_clear'),
             'tone' => 'success',
         ];
+    }
+
+    /**
+     * The "create contract" quick action for users who may author contracts —
+     * the dashboard is otherwise read-only, and a manager lands here to start
+     * work. Null hides the button for everyone else.
+     */
+    public function createContractUrl(): ?string
+    {
+        return auth()->user()?->can('create_contract')
+            ? ContractResource::getUrl('create')
+            : null;
     }
 
     /**

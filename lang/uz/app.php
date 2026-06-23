@@ -166,6 +166,7 @@ return [
         'preview_pdf' => 'PDF ko‘rish',
         'open_contract' => 'Shartnomani ochish',
         'add_payment' => 'To‘lov qo‘shish',
+        'create_contract' => 'Shartnoma yaratish',
         'record_payment' => 'To‘lovni qayd etish',
         'export_xlsx' => 'Excelga eksport',
     ],

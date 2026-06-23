@@ -166,6 +166,7 @@ return [
         'preview_pdf' => 'Просмотр PDF',
         'open_contract' => 'Открыть договор',
         'add_payment' => 'Добавить оплату',
+        'create_contract' => 'Создать договор',
         'record_payment' => 'Зарегистрировать оплату',
         'export_xlsx' => 'Экспорт в Excel',
     ],

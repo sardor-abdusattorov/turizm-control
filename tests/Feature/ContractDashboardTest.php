@@ -6,6 +6,7 @@ use App\Filament\Resources\Contracts\Pages\ListContracts;
 use App\Filament\Widgets\ContractStatsWidget;
 use App\Filament\Widgets\ContractsTrendChartWidget;
 use App\Filament\Widgets\Dashboard\ApprovalHealthWidget;
+use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
 use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
 use App\Filament\Widgets\PaymentStatsWidget;
@@ -50,6 +51,23 @@ it('still shows the finance widgets to an accountant', function () {
 
     expect(PaymentStatsWidget::canView())->toBeTrue()
         ->and(OutstandingPaymentsWidget::canView())->toBeTrue();
+});
+
+it('offers a create-contract action in the header to users who may create', function () {
+    $manager = User::factory()->create();
+    Permission::findOrCreate('create_contract', 'web');
+    $manager->givePermissionTo('create_contract');
+    actingAs($manager->fresh());
+
+    Livewire::test(DashboardHeaderWidget::class)
+        ->assertSee(__('app.action.create_contract'));
+});
+
+it('hides the create-contract action from users who cannot create', function () {
+    actingAs(dashboardUser());
+
+    Livewire::test(DashboardHeaderWidget::class)
+        ->assertDontSee(__('app.action.create_contract'));
 });
 
 it('greets the user as the dashboard page heading', function () {

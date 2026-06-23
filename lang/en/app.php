@@ -323,6 +323,7 @@ return [
         'preview_pdf' => 'Preview PDF',
         'open_contract' => 'Open contract',
         'add_payment' => 'Add payment',
+        'create_contract' => 'Create contract',
         'record_payment' => 'Record payment',
         'export_xlsx' => 'Export to Excel',
     ],
