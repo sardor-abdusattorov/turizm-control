@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets\Dashboard;
 
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Support\WidgetPermission;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Services\Dashboard\DashboardContext;
@@ -23,7 +24,9 @@ class MyApprovalQueueWidget extends TableWidget
     {
         $context = app(DashboardContext::class);
 
-        return $context->isApprover() && $context->awaitingMe()->isNotEmpty();
+        return WidgetPermission::allows(static::class)
+            && $context->isApprover()
+            && $context->awaitingMe()->isNotEmpty();
     }
 
     public function getTableHeading(): string

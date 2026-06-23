@@ -6,7 +6,6 @@ use App\Services\Telegram\TelegramBroadcaster;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 
@@ -42,15 +41,13 @@ it('escapes html-special characters so the message is not broken', function () {
     Http::assertSent(fn ($request) => str_contains($request['text'] ?? '', '5 &lt; 10 &amp; ok'));
 });
 
-it('lets a super admin open the broadcast page when telegram is configured', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('super_admin', 'web'));
-    actingAs($admin->fresh());
+it('lets a user with the broadcast permission open the page', function () {
+    actingAs(userWithPermission('view_telegram_broadcast'));
 
     Livewire::test(TelegramBroadcast::class)->assertSuccessful();
 });
 
-it('hides the broadcast page from non super admins', function () {
+it('hides the broadcast page from a user without the permission', function () {
     actingAs(User::factory()->create());
 
     expect(TelegramBroadcast::canAccess())->toBeFalse();

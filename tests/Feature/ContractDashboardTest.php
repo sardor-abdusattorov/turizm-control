@@ -38,19 +38,15 @@ function dashboardUser(): User
     return $user;
 }
 
-it('hides the collection/outstanding finance widgets from a legal officer', function () {
-    $legal = User::factory()->create();
-    $legal->assignRole(Role::findOrCreate('legal_officer', 'web'));
-    actingAs($legal->fresh());
+it('hides the finance widgets from a user without their permissions', function () {
+    actingAs(User::factory()->create());
 
     expect(PaymentStatsWidget::canView())->toBeFalse()
         ->and(OutstandingPaymentsWidget::canView())->toBeFalse();
 });
 
-it('still shows the finance widgets to an accountant', function () {
-    $accountant = User::factory()->create();
-    $accountant->assignRole(Role::findOrCreate('accountant', 'web'));
-    actingAs($accountant->fresh());
+it('shows the finance widgets to a user granted their permissions', function () {
+    actingAs(userWithPermission('view_payment_stats_widget', 'view_outstanding_payments_widget'));
 
     expect(PaymentStatsWidget::canView())->toBeTrue()
         ->and(OutstandingPaymentsWidget::canView())->toBeTrue();
@@ -83,6 +79,7 @@ it('greets the user as the dashboard page heading', function () {
 
 it('shows the author their own in-review contracts, not drafts or others', function () {
     $manager = dashboardUser();
+    $manager->givePermissionTo(Permission::findOrCreate('view_my_contracts_in_review_widget', 'web'));
 
     $inReview = Contract::factory()->inReview()->create(['responsible_id' => $manager->id]);
     $draft = Contract::factory()->create(['responsible_id' => $manager->id]);
@@ -100,8 +97,9 @@ it('shows the author their own in-review contracts, not drafts or others', funct
 it('lists approved-but-unpaid contracts in the outstanding widget for finance', function () {
     $user = dashboardUser();
     $user->assignRole(Role::findOrCreate('accountant', 'web'));
-    Permission::findOrCreate('view_all_contracts', 'web');
-    $user->givePermissionTo('view_all_contracts');
+    foreach (['view_all_contracts', 'view_outstanding_payments_widget'] as $ability) {
+        $user->givePermissionTo(Permission::findOrCreate($ability, 'web'));
+    }
 
     $unpaid = Contract::factory()->approved()->create(['amount' => 1000, 'paid_percent' => 0]);
     $paid = Contract::factory()->approved()->create([
@@ -148,6 +146,7 @@ it('paginates each manager dashboard table under its own query-string key', func
 it('renders the approval health widget for the director', function () {
     $user = dashboardUser();
     $user->assignRole(Role::findOrCreate('director', 'web'));
+    $user->givePermissionTo(Permission::findOrCreate('view_approval_health_widget', 'web'));
 
     actingAs($user->fresh());
 

@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Dashboard;
 
 use App\Enums\ContractStatus;
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Support\WidgetPermission;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use Filament\Actions\Action;
@@ -30,7 +31,9 @@ class MyContractsInReviewWidget extends TableWidget
     {
         $user = auth()->user();
 
-        return $user !== null && self::baseQuery((int) $user->id)->exists();
+        return $user !== null
+            && WidgetPermission::allows(static::class)
+            && self::baseQuery((int) $user->id)->exists();
     }
 
     public function getTableHeading(): string

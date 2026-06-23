@@ -8,6 +8,7 @@ use App\Models\Position;
 use App\Models\User;
 use App\Services\Auth\UserSessions;
 use BackedEnum;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -30,6 +31,7 @@ use Illuminate\Validation\Rules\Password;
 
 class ProfileSettings extends Page implements HasActions, HasForms
 {
+    use HasPageShield;
     use InteractsWithActions;
     use InteractsWithForms;
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Dashboard;
 
+use App\Filament\Support\WidgetPermission;
 use App\Models\ContractApprover;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -16,7 +17,7 @@ class ApprovalHealthWidget extends StatsOverviewWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->hasAnyRole(['director', 'super_admin']) ?? false;
+        return WidgetPermission::allows(static::class);
     }
 
     public function getHeading(): ?string

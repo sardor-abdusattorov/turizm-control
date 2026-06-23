@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets\Dashboard;
 
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Support\WidgetPermission;
 use App\Models\Contract;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -17,11 +18,7 @@ class OutstandingPaymentsWidget extends TableWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->hasAnyRole([
-            'accountant',
-            'director',
-            'super_admin',
-        ]) ?? false;
+        return WidgetPermission::allows(static::class);
     }
 
     public function getTableHeading(): string

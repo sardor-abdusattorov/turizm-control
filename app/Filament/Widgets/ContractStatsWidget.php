@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Enums\ContractStatus;
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Support\WidgetPermission;
 use App\Models\Contract;
 use App\Services\Dashboard\DashboardContext;
 use Filament\Widgets\StatsOverviewWidget;
@@ -17,7 +18,7 @@ class ContractStatsWidget extends StatsOverviewWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->hasRole('manager') ?? false;
+        return WidgetPermission::allows(static::class);
     }
 
     protected function getStats(): array

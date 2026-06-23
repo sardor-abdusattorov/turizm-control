@@ -67,6 +67,7 @@ class AdminPanelProvider extends PanelProvider
                 'profile' => Action::make('profile')
                     ->label(fn () => __('app.label.profile_settings'))
                     ->url(fn (): string => ProfileSettings::getUrl())
+                    ->visible(fn (): bool => ProfileSettings::canAccess())
                     ->icon('heroicon-o-user-circle'),
             ])
             ->navigationGroups([

@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Resources\Payments\PaymentResource;
+use App\Filament\Support\WidgetPermission;
 use App\Models\Payment;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -22,13 +23,7 @@ class LatestPaymentsWidget extends TableWidget
 
     public static function canView(): bool
     {
-        $user = auth()->user();
-
-        if (! $user) {
-            return false;
-        }
-
-        return $user->hasAnyRole(['accountant', 'director', 'super_admin']);
+        return WidgetPermission::allows(static::class);
     }
 
     public function table(Table $table): Table

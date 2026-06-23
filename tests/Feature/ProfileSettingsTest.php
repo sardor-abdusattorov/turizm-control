@@ -14,7 +14,7 @@ it('renders the profile page with the avatar uploader and approver picker', func
     $department = Department::factory()->create(['code' => 'legal']);
     User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $department->id]);
 
-    actingAs(User::factory()->create()->fresh());
+    actingAs(userWithPermission('view_profile_settings'));
 
     Livewire::test(ProfileSettings::class)
         ->assertOk()

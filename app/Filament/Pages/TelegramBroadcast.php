@@ -4,7 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\TelegramUser;
 use App\Services\Telegram\TelegramBroadcaster;
-use App\Services\Telegram\TelegramService;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
@@ -12,6 +12,8 @@ use Filament\Pages\Page;
 
 class TelegramBroadcast extends Page
 {
+    use HasPageShield;
+
     protected string $view = 'filament.pages.telegram-broadcast';
 
     protected static ?string $slug = 'telegram-broadcast';
@@ -44,17 +46,6 @@ class TelegramBroadcast extends Page
     public function getSubheading(): ?string
     {
         return __('app.label.telegram_broadcast_sub');
-    }
-
-    public static function canAccess(): bool
-    {
-        return (bool) auth()->user()?->hasRole('super_admin')
-            && app(TelegramService::class)->isConfigured();
-    }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return static::canAccess();
     }
 
     public function connectedCount(): int

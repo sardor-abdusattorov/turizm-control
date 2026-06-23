@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Payments\PaymentResource;
+use App\Filament\Support\WidgetPermission;
 use App\Models\Contract;
 use App\Services\Dashboard\FinancialSummary;
 use Filament\Widgets\StatsOverviewWidget;
@@ -26,13 +27,7 @@ class PaymentStatsWidget extends StatsOverviewWidget
 
     public static function canView(): bool
     {
-        $user = auth()->user();
-
-        if (! $user) {
-            return false;
-        }
-
-        return $user->hasAnyRole(['accountant', 'director', 'super_admin']);
+        return WidgetPermission::allows(static::class);
     }
 
     protected function getStats(): array

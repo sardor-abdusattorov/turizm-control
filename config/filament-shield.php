@@ -1,9 +1,7 @@
 <?php
 
 use App\Filament\Pages\Dashboard;
-use App\Filament\Pages\ProfileSettings;
-use App\Filament\Pages\Settings;
-use App\Filament\Pages\TelegramBroadcast;
+use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -200,19 +198,15 @@ return [
     |
     */
 
-    // These pages are not gated by a generated `view_<page>` permission:
-    // the Dashboard and the user's own Profile are open to anyone who can
-    // reach the panel, while Main Settings and Telegram broadcast enforce
-    // their own checks (`manage_settings` / super_admin). Excluding them keeps
-    // the role editor from showing page permissions that nothing reads.
+    // Only the dashboard is excluded: it is the panel home that every user who
+    // can reach the panel lands on, so it has no `view_dashboard` gate (the
+    // widgets on it are gated individually). Every other page generates a
+    // `view_<page>` permission that its HasPageShield trait enforces.
     'pages' => [
         'subject' => 'class',
         'prefix' => 'view',
         'exclude' => [
             Dashboard::class,
-            ProfileSettings::class,
-            Settings::class,
-            TelegramBroadcast::class,
         ],
     ],
 
@@ -233,6 +227,9 @@ return [
         'exclude' => [
             AccountWidget::class,
             FilamentInfoWidget::class,
+            // Panel chrome (greeting + create button + Telegram prompt), not a
+            // data widget — always visible to anyone who can reach the dashboard.
+            DashboardHeaderWidget::class,
         ],
     ],
 
@@ -248,10 +245,6 @@ return [
     */
 
     'custom_permissions' => [
-        // Page-level: access the Main Settings page (also used to hide it
-        // from the navigation for non-admins).
-        'manage_settings',
-
         // Contract-scoped: lets oversight roles see every contract on the
         // list; without it a user only sees their own contracts plus those
         // where they are an approver.

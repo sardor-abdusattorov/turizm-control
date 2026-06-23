@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Support\WidgetPermission;
 use App\Models\Contract;
 use Carbon\CarbonImmutable;
 use Filament\Widgets\ChartWidget;
@@ -31,14 +32,7 @@ class ContractsTrendChartWidget extends ChartWidget
 
     public static function canView(): bool
     {
-        $user = auth()->user();
-
-        if (! $user) {
-            return false;
-        }
-
-        return $user->hasAnyRole(['super_admin', 'director', 'accountant', 'legal_officer'])
-            || $user->can('view_all_contracts');
+        return WidgetPermission::allows(static::class);
     }
 
     protected function getData(): array

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Dashboard;
 
+use App\Filament\Support\WidgetPermission;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -21,7 +22,7 @@ class RecentActivityWidget extends TableWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->hasRole('super_admin') ?? false;
+        return WidgetPermission::allows(static::class);
     }
 
     public function table(Table $table): Table

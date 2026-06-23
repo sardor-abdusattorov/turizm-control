@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
 use App\Models\Department;
 use App\Models\Settings as SettingsModel;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -22,6 +23,7 @@ use Filament\Schemas\Schema;
 
 class Settings extends Page implements HasForms
 {
+    use HasPageShield;
     use InteractsWithFormActions;
     use InteractsWithForms;
 
@@ -49,22 +51,6 @@ class Settings extends Page implements HasForms
     public static function getNavigationGroup(): ?string
     {
         return __('app.label.administration');
-    }
-
-    public static function canAccess(): bool
-    {
-        $user = auth()->user();
-
-        if (! $user) {
-            return false;
-        }
-
-        return $user->hasRole('super_admin') || $user->can('manage_settings');
-    }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return static::canAccess();
     }
 
     public function getTitle(): string
