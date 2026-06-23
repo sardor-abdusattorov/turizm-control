@@ -109,11 +109,21 @@ it('defaults an oversight user with no pending approvals to the All tab', functi
         ->toBe('all');
 });
 
-it('defaults a manager to their own contracts', function () {
+it('drops the lone My contracts tab for a pure manager', function () {
     actingAs(contractUser('manager'));
 
-    expect(Livewire::test(ListContracts::class)->instance()->getDefaultActiveTab())
-        ->toBe('my_contracts');
+    $page = Livewire::test(ListContracts::class)->instance();
+
+    expect($page->getTabs())->toBe([])
+        ->and($page->getDefaultActiveTab())->toBeNull();
+});
+
+it('hides the Responsible filter from a manager but shows it to oversight', function () {
+    actingAs(contractUser('manager'));
+    Livewire::test(ListContracts::class)->assertTableFilterHidden('responsible_id');
+
+    actingAs(contractUser('director'));
+    Livewire::test(ListContracts::class)->assertTableFilterVisible('responsible_id');
 });
 
 it('defaults a user with pending approvals to the awaiting tab', function () {

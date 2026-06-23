@@ -110,7 +110,8 @@ class ContractsTable
                 SelectFilter::make('responsible_id')
                     ->label(__('app.label.responsible'))
                     ->options(fn () => User::query()->where('status', User::STATUS_ACTIVE)->orderBy('name')->pluck('name', 'id'))
-                    ->searchable(),
+                    ->searchable()
+                    ->visible(fn (): bool => self::canFilterByResponsible()),
 
                 SelectFilter::make('currency_id')
                     ->label(__('app.label.currency_single'))
@@ -251,5 +252,19 @@ class ContractsTable
                         }),
                 ]),
             ]);
+    }
+
+    /**
+     * The "Responsible" filter only makes sense for users who can see more
+     * than their own contracts. A manager's list is already scoped to
+     * themselves, so the picker would be a confusing no-op — show it to
+     * oversight (and view_all_contracts holders) only.
+     */
+    private static function canFilterByResponsible(): bool
+    {
+        $user = auth()->user();
+
+        return $user !== null
+            && ($user->hasAnyRole(Contract::OVERSIGHT_ROLES) || $user->can('view_all_contracts'));
     }
 }
