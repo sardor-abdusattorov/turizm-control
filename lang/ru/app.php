@@ -245,6 +245,12 @@ return [
         'held_by' => 'Завис на :name',
         'overdue_by' => 'Просрочено на :time',
         'due_in' => 'Через :time',
+        'greeting' => 'С возвращением',
+        'greeting_named' => 'С возвращением, :name',
+        'summary_overdue' => 'Просрочено :count из :total, ждущих твоего решения.',
+        'summary_awaiting' => 'Ждут твоего решения: :count.',
+        'summary_stalled' => 'Зависло у согласующего: :count.',
+        'summary_clear' => 'Сейчас ничего не требует внимания.',
     ],
 
     // ── Labels (most-visible subset; rest falls back to en) ────────

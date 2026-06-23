@@ -245,6 +245,12 @@ return [
         'held_by' => ':name da turibdi',
         'overdue_by' => ':time muddatdan oshgan',
         'due_in' => ':time dan keyin',
+        'greeting' => 'Xush kelibsiz',
+        'greeting_named' => 'Xush kelibsiz, :name',
+        'summary_overdue' => 'Qaroringizni kutayotgan :total tadan :count tasining muddati o‘tgan.',
+        'summary_awaiting' => 'Qaroringizni kutmoqda: :count.',
+        'summary_stalled' => 'Tasdiqlovchida qotib qolgan: :count.',
+        'summary_clear' => 'Hozircha sizdan hech narsa kutilmayapti.',
     ],
 
     // ── Labellar (eng ko‘rinadigan qism; qolgani en ga fallback) ───
