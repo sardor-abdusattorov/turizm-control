@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\Cache;
 /**
  * Per-chat short-lived state for multi-step bot flows (currently: "I tapped
  * Reject, now waiting for you to type the reason"). Backed by cache, expires
- * after a few minutes so abandoned flows don't trap the chat.
+ * after an hour so abandoned flows don't trap the chat. The window is generous
+ * on purpose — the prompts no longer mention a deadline, so a reply that lands
+ * a while later should still be picked up rather than silently dropped.
  */
 class BotConversationState
 {
-    private const TTL_MINUTES = 10;
+    private const TTL_MINUTES = 60;
 
     /** @param  array<string, mixed>  $data */
     public function set(string $chatId, string $action, array $data = []): void
