@@ -11,6 +11,8 @@
         </div>
     </div>
 
+    {{ $this->table }}
+
     @push('styles')
         <style>
             .tgb {

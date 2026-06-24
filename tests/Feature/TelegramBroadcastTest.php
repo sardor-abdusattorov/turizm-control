@@ -47,6 +47,18 @@ it('lets a user with the broadcast permission open the page', function () {
     Livewire::test(TelegramBroadcast::class)->assertSuccessful();
 });
 
+it('lists the connected telegram accounts and skips unlinked users', function () {
+    actingAs(userWithPermission('view_telegram_broadcast'));
+
+    $connected = User::factory()->withTelegram('111')->create(['name' => 'Connected Person']);
+    $unlinked = User::factory()->create(['name' => 'Offline Person']);
+
+    Livewire::test(TelegramBroadcast::class)
+        ->assertCanSeeTableRecords([$connected->telegram])
+        ->assertSee('Connected Person')
+        ->assertDontSee('Offline Person');
+});
+
 it('hides the broadcast page from a user without the permission', function () {
     actingAs(User::factory()->create());
 
