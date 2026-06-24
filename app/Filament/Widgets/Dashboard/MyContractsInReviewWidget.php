@@ -20,8 +20,6 @@ class MyContractsInReviewWidget extends TableWidget
 
     protected static ?int $sort = 6;
 
-    protected ?string $pollingInterval = '60s';
-
     /**
      * The author's own contracts still working through the approval pipeline —
      * shows where each one is parked and whether the current approver has blown
@@ -75,7 +73,7 @@ class MyContractsInReviewWidget extends TableWidget
                     ->label(__('app.label.due'))
                     ->view('filament.components.sla-countdown')
                     ->state(fn (Contract $record) => $this->currentPending($record)?->due_at)
-                    ->disableClick(),
+                    ->disabledClick(),
             ])
             ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))
             ->recordActions([

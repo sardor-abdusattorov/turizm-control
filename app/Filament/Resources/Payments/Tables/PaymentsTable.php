@@ -67,7 +67,7 @@ class PaymentsTable
                 ImageColumn::make('screenshot')
                     ->label(__('app.label.screenshot'))
                     ->disk('local')
-                    ->height(40)
+                    ->imageHeight(40)
                     ->square(),
 
                 TextColumn::make('creator.name')

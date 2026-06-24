@@ -493,3 +493,27 @@
     padding: 1rem 0;
     text-align: center;
 }
+
+/* ─── Styling pulled out of PHP Filament config ─────────────────────────────
+   These were raw style="" strings set on columns/fields/actions inside the
+   resource & widget classes. Moved here so visual styling lives in the
+   stylesheet (one place, reusable) instead of being scattered through PHP. */
+
+/* Contracts list: stop the approver-chain column from collapsing and vertically
+   centre its avatar row. Filament has no native column min-width, so it's CSS. */
+.contracts-col-approvers {
+    min-width: 14rem;
+    vertical-align: middle;
+}
+
+/* A record action that is rendered but opened only from JS (the approval-flow
+   modal is mounted via mountTableAction in the approvers column), so its
+   auto-rendered button stays hidden. */
+.is-action-hidden {
+    display: none;
+}
+
+/* Profile page: keep the avatar upload dropzone compact. */
+.profile-avatar-uploader {
+    max-width: 9rem;
+}

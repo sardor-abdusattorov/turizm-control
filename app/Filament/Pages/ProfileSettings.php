@@ -91,7 +91,7 @@ class ProfileSettings extends Page implements HasActions, HasForms
                             ->avatar()
                             ->imageEditorAspectRatios(['1:1'])
                             ->placeholder(__('app.label.upload_photo'))
-                            ->extraAttributes(['style' => 'max-width:9rem;']),
+                            ->extraAttributes(['class' => 'profile-avatar-uploader']),
 
                         Grid::make(['default' => 1, 'sm' => 2])
                             ->schema([

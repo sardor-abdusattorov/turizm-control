@@ -78,15 +78,15 @@ class ContractsTable
                 ViewColumn::make('approvers_chain')
                     ->label(__('app.label.approvers'))
                     ->view('filament.resources.contracts.tables.approvers-column')
-                    ->disableClick()
-                    ->extraHeaderAttributes(['style' => 'min-width:14rem;'])
-                    ->extraAttributes(['style' => 'min-width:14rem;vertical-align:middle;']),
+                    ->disabledClick()
+                    ->extraHeaderAttributes(['class' => 'contracts-col-approvers'])
+                    ->extraAttributes(['class' => 'contracts-col-approvers']),
 
                 ViewColumn::make('sla')
                     ->label(__('app.label.due'))
                     ->view('filament.components.sla-countdown')
                     ->state(fn (Contract $record) => $record->currentApprover()?->due_at)
-                    ->disableClick(),
+                    ->disabledClick(),
 
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))
@@ -154,7 +154,7 @@ class ContractsTable
                         'filament.resources.contracts.tables.approval-flow-modal',
                         ['contract' => $record],
                     ))
-                    ->extraAttributes(['style' => 'display:none;']),
+                    ->extraAttributes(['class' => 'is-action-hidden']),
 
                 ActionGroup::make([
                     ViewAction::make()
