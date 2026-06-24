@@ -77,6 +77,28 @@ class ApprovalChain
     }
 
     /**
+     * The default approver user IDs for a contract authored by $user: their
+     * active default recipients, falling back to the department flow when the
+     * user has none configured. This is the chain a freshly created draft
+     * receives — used by the create form's pre-fill and the backfill command.
+     *
+     * @return array<int, int>
+     */
+    public function defaultUserIdsFor(User $user): array
+    {
+        $ids = $user->defaultRecipients()
+            ->where('users.status', User::STATUS_ACTIVE)
+            ->pluck('users.id')
+            ->all();
+
+        if ($ids === []) {
+            $ids = $this->flowUserIds();
+        }
+
+        return array_map('intval', $ids);
+    }
+
+    /**
      * Preview of the chain the flow would produce, as "Department — User" lines
      * for the create form.
      *
