@@ -322,3 +322,12 @@
     outline: 2px solid var(--accent, #6366f1);
     outline-offset: 2px;
 }
+
+/* ─── Auth theme switcher: true horizontal centring ─────────────────────────
+   The auth-designer pins the light/dark/system switcher with `left: 50%` but
+   never pulls it back by half its own width, so it sits right-of-centre — barely
+   noticeable on a wide screen, clearly off on a phone. Offset it so 50% lands on
+   the centre of the control, not its left edge. */
+.fi-auth-theme-switcher-wrapper {
+    transform: translateX(-50%);
+}
