@@ -1354,8 +1354,15 @@
         /* Per-record table inside the eye-modal — every row this user has on
            the contract (current + cancelled attempts), newest first. Mirrors
            the chain modal's table, scoped to one person. */
+        /* The record table scrolls sideways INSIDE this wrapper when the modal
+           is narrower than the table — so on a phone the table scrolls, not the
+           whole modal, and the columns never collapse into one-word-per-line. */
+        .cw-rt-wrap {
+            overflow-x: auto;
+        }
         .cw-rt {
             width: 100%;
+            min-width: 38rem;
             border-collapse: collapse;
             font-size: .86rem;
         }
@@ -1611,24 +1618,7 @@
             .cw-modal__bd {
                 padding: .9rem 1rem 1.2rem;
             }
-            .cw-rt thead {
-                display: none;
-            }
-            .cw-rt tbody tr {
-                display: block;
-                padding: .35rem 0;
-                border-bottom: 1px solid var(--d);
-            }
-            .cw-rt tbody tr:last-child {
-                border-bottom: 0;
-            }
-            .cw-rt tbody td {
-                display: block;
-                border-bottom: 0;
-                padding: .2rem .6rem;
-            }
-            .cw-rt tbody td:first-child {
-                padding-top: .6rem;
-            }
+            /* The record table stays a table and scrolls sideways inside its
+               wrapper (see .cw-rt-wrap) rather than stacking into blocks. */
         }
     </style>

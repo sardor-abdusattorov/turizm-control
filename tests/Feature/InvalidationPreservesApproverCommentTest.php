@@ -52,7 +52,8 @@ it('preserves an approver original comment when the chain is invalidated by an e
     expect($row->status)->toBe(ContractApprover::STATUS_INVALIDATED)
         ->and($row->original_status)->toBe(ContractApprover::STATUS_APPROVED)
         ->and($row->comment)->toBe('Looks good, ship it.')
-        ->and($row->system_comment)->toBe(__('app.message.invalidated_on_edit'))
+        ->and($row->system_comment)->toBe('invalidated_on_edit')
+        ->and($row->systemNoteLabel())->toBe(__('app.message.invalidated_on_edit'))
         ->and($row->acted_at->format('Y-m-d H:i:s'))->toBe($approvedAt->format('Y-m-d H:i:s'))
         ->and($row->wasCancelledAfterVerdict())->toBeTrue()
         ->and($row->displayStatus())->toBe(ContractApprover::STATUS_APPROVED);

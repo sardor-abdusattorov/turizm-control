@@ -126,7 +126,7 @@ class Contract extends Model
             ->pluck('user_id')
             ->all();
 
-        $this->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
+        $this->invalidateAllApprovers('invalidated_on_edit');
 
         if ($previousUserIds === []) {
             $this->buildApprovalChainFromFlow();
@@ -175,7 +175,7 @@ class Contract extends Model
             'signed_at' => null,
         ])->saveQuietly();
 
-        $this->invalidateAllApprovers(__('app.message.invalidated_on_document_save'));
+        $this->invalidateAllApprovers('invalidated_on_document_save');
 
         $this->approvalChain()->requeue($this, $previousUserIds);
     }

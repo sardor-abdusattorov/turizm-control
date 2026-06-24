@@ -92,13 +92,14 @@
                         {{-- One row per record. The live attempt reads normally;
                              cancelled / skipped rows are dimmed but still show the
                              verdict the approver reached and their own comment. --}}
+                        <div class="cw-rt-wrap">
                         <table class="cw-rt">
                             <thead>
                                 <tr>
                                     <th>{{ __('app.label.status') }}</th>
                                     <th>{{ __('app.label.comment') }}</th>
+                                    <th>{{ __('app.label.system_note') }}</th>
                                     <th>{{ __('app.label.acted_at') }}</th>
-                                    <th>{{ __('app.label.updated_at') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -124,8 +125,12 @@
                                             @else
                                                 <div class="cw-rt__cmt cw-rt__cmt--muted">—</div>
                                             @endif
+                                        </td>
+                                        <td>
                                             @if ($rec->system_comment)
-                                                <div class="cw-rt__sys"><span class="cw-rt__sys-lb">{{ __('app.label.system_note') }}:</span>{{ $rec->system_comment }}</div>
+                                                <div class="cw-rt__sys">{{ $rec->systemNoteLabel() }}</div>
+                                            @else
+                                                <div class="cw-rt__cmt cw-rt__cmt--muted">—</div>
                                             @endif
                                         </td>
                                         <td>
@@ -137,17 +142,11 @@
                                                 <div class="cw-rt__date cw-rt__date--muted">—</div>
                                             @endif
                                         </td>
-                                        <td>
-                                            @if ($rec->updated_at)
-                                                <div class="cw-rt__date">{{ $rec->updated_at->format('d.m.Y') }}<small>{{ $rec->updated_at->format('H:i') }}</small></div>
-                                            @else
-                                                <div class="cw-rt__date cw-rt__date--muted">—</div>
-                                            @endif
-                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
 
                         @if ($apActs->isNotEmpty())
                             <div class="cw-sub">

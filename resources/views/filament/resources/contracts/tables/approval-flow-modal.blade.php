@@ -52,8 +52,16 @@
     }
     .af {
         width: 100%;
+        /* A real minimum so the columns never collapse — when the modal is
+           narrower than this (tablet / phone) the WRAPPER scrolls sideways and
+           the table keeps its shape, instead of squeezing the comment column
+           until the text wraps one word per line. */
+        min-width: 46rem;
         border-collapse: collapse;
         font-size: .82rem;
+    }
+    .af-col-cmt {
+        min-width: 14rem;
     }
     .af thead th {
         position: sticky;
@@ -197,13 +205,6 @@
         opacity: .35;
     }
 
-    /* Mobile: keep the table as a table and let the wrapper scroll sideways
-       (the index data tables behave the same way) instead of stacking rows. */
-    @media (max-width: 720px) {
-        .af {
-            min-width: 52rem;
-        }
-    }
 </style>
 
 @if ($rows->isEmpty())
@@ -218,7 +219,6 @@
                 <th>{{ __('app.label.status') }}</th>
                 <th>{{ __('app.label.due') }}</th>
                 <th>{{ __('app.label.acted_at') }}</th>
-                <th>{{ __('app.label.updated_at') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -242,14 +242,14 @@
                             </div>
                         </div>
                     </td>
-                    <td>
+                    <td class="af-col-cmt">
                         @if ($a->comment)
                             <div class="af-cmt">{{ $a->comment }}</div>
                         @else
                             <div class="af-cmt af-cmt--muted">—</div>
                         @endif
                         @if ($a->system_comment)
-                            <div class="af-sys"><b>{{ __('app.label.system_note') }}:</b> {{ $a->system_comment }}</div>
+                            <div class="af-sys"><b>{{ __('app.label.system_note') }}:</b> {{ $a->systemNoteLabel() }}</div>
                         @endif
                     </td>
                     <td>
@@ -280,16 +280,6 @@
                             <div class="af-date">
                                 {{ $a->acted_at->translatedFormat('d.m.Y') }}
                                 <small>{{ $a->acted_at->format('H:i') }}</small>
-                            </div>
-                        @else
-                            <div class="af-date af-date--muted">—</div>
-                        @endif
-                    </td>
-                    <td>
-                        @if ($a->updated_at)
-                            <div class="af-date">
-                                {{ $a->updated_at->translatedFormat('d.m.Y') }}
-                                <small>{{ $a->updated_at->format('H:i') }}</small>
                             </div>
                         @else
                             <div class="af-date af-date--muted">—</div>
