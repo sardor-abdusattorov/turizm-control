@@ -205,14 +205,15 @@ it('flags that editing would reset approvals only while under approval', functio
         ->and($flag(ContractStatus::Rejected))->toBeFalse();
 });
 
-it('does not invalidate approvals on an OnlyOffice forcesave status that did not finalise', function () {
+it('does not invalidate approvals on an anonymous forcesave with no named editor', function () {
     Http::fake(['*/edited.docx' => Http::response('forcesave-body')]);
 
     [$contract] = docInReviewContractWithPartialProgress();
     Storage::disk('local')->put($contract->documentPath(), 'original');
 
-    // status 6 = forcesave: file gets written but the editor session is
-    // still live, so we keep the contract in review.
+    // status 6 forcesave with no `users` — a timed/system autosave we can't
+    // attribute to anyone. Since we can't tell an author's change from the
+    // current approver's tweak, we leave the reset to the status-2 save.
     post(
         route('contracts.save-callback', [
             'contract' => $contract,
@@ -221,6 +222,65 @@ it('does not invalidate approvals on an OnlyOffice forcesave status that did not
         signOnlyOfficeCallback([
             'status' => 6,
             'url' => 'http://onlyoffice/cache/files/edited.docx',
+        ]),
+    )->assertOk();
+
+    $contract->refresh();
+
+    expect($contract->status)->toBe(Contract::STATUS_IN_REVIEW)
+        ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(0);
+});
+
+it('resets approvals on a forcesave when a non-approver actually edits the document', function () {
+    // The real-world bug: the author edits, OnlyOffice flushes the change via a
+    // forcesave (status 6), and the closing save reports no further changes — so
+    // the edit used to slip through without resetting the chain.
+    Http::fake(['*/edited.docx' => Http::response('manager-forcesave-body')]);
+
+    [$contract] = docInReviewContractWithPartialProgress();
+    Storage::disk('local')->put($contract->documentPath(), 'original');
+
+    $manager = User::find($contract->responsible_id);
+
+    post(
+        route('contracts.save-callback', [
+            'contract' => $contract,
+            'shared_key' => $contract->document_key,
+        ]),
+        signOnlyOfficeCallback([
+            'status' => 6,
+            'url' => 'http://onlyoffice/cache/files/edited.docx',
+            'users' => [(string) $manager->id],
+        ]),
+    )->assertOk();
+
+    $contract->refresh();
+
+    expect($contract->status)->toBe(Contract::STATUS_DRAFT)
+        ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(3)
+        ->and(Storage::disk('local')->get($contract->documentPath()))->toBe('manager-forcesave-body');
+});
+
+it('does not reset when the saved document is identical to the stored one', function () {
+    // The other half of the bug: just opening and closing the editor emits a
+    // save whose bytes match what is already on disk. Nothing really changed,
+    // so the chain must stay live.
+    Http::fake(['*/edited.docx' => Http::response('identical-bytes')]);
+
+    [$contract] = docInReviewContractWithPartialProgress();
+    Storage::disk('local')->put($contract->documentPath(), 'identical-bytes');
+
+    $manager = User::find($contract->responsible_id);
+
+    post(
+        route('contracts.save-callback', [
+            'contract' => $contract,
+            'shared_key' => $contract->document_key,
+        ]),
+        signOnlyOfficeCallback([
+            'status' => 2,
+            'url' => 'http://onlyoffice/cache/files/edited.docx',
+            'users' => [(string) $manager->id],
         ]),
     )->assertOk();
 

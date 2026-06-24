@@ -19,8 +19,10 @@ class OnlyOfficeCallbackHandler
      * Handle a /{subject}s/{id}/save-callback request from the editor server.
      *
      * @param  Closure(string $body): void  $persist  Writes the docx bytes
-     * @param  Closure(list<int> $editorIds): void  $onFinalSave  Runs after status=2 (rotate key, reinvalidate, etc.)
+     * @param  Closure(list<int> $editorIds, bool $contentChanged): void  $onFinalSave  Runs after status=2 — the session ended (rotate key, reinvalidate, etc.)
      * @param  array<string, mixed>  $logProperties  Extra properties to merge into the activity log entry
+     * @param  Closure(list<int> $editorIds, bool $contentChanged): void|null  $onForcesave  Runs after status=6 — the document was persisted mid-session (reinvalidate, but do NOT rotate the key)
+     * @param  Closure(string $body): bool|null  $hasContentChanged  Decides, before the new bytes overwrite the old, whether the document actually changed (defaults to "always changed" when omitted)
      */
     public function handle(
         Request $request,
@@ -31,6 +33,8 @@ class OnlyOfficeCallbackHandler
         Closure $persist,
         Closure $onFinalSave,
         array $logProperties = [],
+        ?Closure $onForcesave = null,
+        ?Closure $hasContentChanged = null,
     ): array {
         $logEvent = $savedEvent;
         $payload = $this->verifiedPayload($request);
@@ -46,18 +50,34 @@ class OnlyOfficeCallbackHandler
                 ->get($this->service->internalDownloadUrl($url))
                 ->body();
 
+            // Decide whether the document actually changed BEFORE the new bytes
+            // overwrite the old ones. This is what separates a real edit from a
+            // no-op "save" the editor emits just for opening and closing the
+            // document — only a real change may reset the approval chain.
+            $changed = $hasContentChanged === null ? true : (bool) $hasContentChanged($body);
+
             $persist($body);
 
             $editorIds = $this->resolveEditorIds($payload);
             $causer = $editorIds !== [] ? User::find($editorIds[0]) : null;
 
+            // Hand the editor identities and the change flag to the hooks so
+            // they can tell an author's mid-flow change (resets the chain) from
+            // an approver's solo review tweak (keeps the contract in review),
+            // and skip both when nothing actually changed. Passing every
+            // editor — not just the first — keeps the decision correct when
+            // several people co-edit the doc.
             if ($status === 2) {
-                // Hand the full set of editor identities to onFinalSave so it
-                // can tell an author's mid-flow change (resets the chain) from
-                // an approver's solo review tweak (keeps the contract in
-                // review). Passing every editor — not just the first — keeps
-                // the decision correct when several people co-edit the doc.
-                $onFinalSave($editorIds);
+                // Session ended: rotate the key and (if changed) reinvalidate.
+                $onFinalSave($editorIds, $changed);
+            } elseif ($status === 6 && $onForcesave !== null) {
+                // Forcesave: the user hit save or the editor autosaved their
+                // changes mid-session, so the edited bytes are already on disk
+                // while the session is still open. Reinvalidate now instead of
+                // waiting for status 2 (which, once a forcesave has flushed the
+                // changes, often never carries them). The key is deliberately
+                // NOT rotated here — that would break the live editing session.
+                $onForcesave($editorIds, $changed);
             }
 
             Log::info($logEvent, [
