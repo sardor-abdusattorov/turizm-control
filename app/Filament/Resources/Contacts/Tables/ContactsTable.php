@@ -50,6 +50,9 @@ class ContactsTable
                     ->alignCenter()
                     ->state(fn (Contact $record): int => (int) ($record->contracts_count ?? 0))
                     ->color(fn (Contact $record): string => ($record->contracts_count ?? 0) > 0 ? 'info' : 'gray')
+                    ->tooltip(fn (Contact $record): ?string => ($record->contracts_count ?? 0) > 0
+                        ? __('app.label.contracts_breakdown_hint')
+                        : null)
                     ->action(
                         Action::make('contractsBreakdown')
                             ->modalHeading(fn (Contact $record): string => $record->name)

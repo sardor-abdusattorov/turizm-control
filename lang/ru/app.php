@@ -236,6 +236,7 @@ return [
         'currency_single' => 'Валюта',
         'contracts' => 'Контракты',
         'contracts_count' => 'Количество контрактов',
+        'contracts_breakdown_hint' => 'Показать разбивку по валютам',
         'total_amount' => 'Общая сумма',
         'currency_plural' => 'Валюты',
         'currency_code' => 'Код',

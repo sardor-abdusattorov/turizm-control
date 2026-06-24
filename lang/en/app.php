@@ -236,6 +236,7 @@ return [
         'currency_single' => 'Currency',
         'contracts' => 'Contracts',
         'contracts_count' => 'Number of contracts',
+        'contracts_breakdown_hint' => 'Show the breakdown by currency',
         'total_amount' => 'Total amount',
         'currency_plural' => 'Currencies',
         'currency_code' => 'Code',

@@ -236,6 +236,7 @@ return [
         'currency_single' => 'Valyuta',
         'contracts' => 'Shartnomalar',
         'contracts_count' => 'Shartnomalar soni',
+        'contracts_breakdown_hint' => 'Valyutalar bo‘yicha taqsimotni ko‘rsatish',
         'total_amount' => 'Umumiy summa',
         'currency_plural' => 'Valyutalar',
         'currency_code' => 'Kod',
