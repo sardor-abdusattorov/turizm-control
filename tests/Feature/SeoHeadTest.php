@@ -45,3 +45,9 @@ it('adds the og:image tag from the public disk when one is configured', function
         ->toContain('property="og:image"')
         ->toContain('/storage/images/og.png');
 });
+
+it('falls back to the brand icon so link previews always have an image', function () {
+    expect(seoHead())
+        ->toContain('property="og:image"')
+        ->toContain('images/favicon/android-chrome-512x512.png');
+});

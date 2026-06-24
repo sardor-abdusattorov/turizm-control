@@ -77,7 +77,9 @@ class AppServiceProvider extends ServiceProvider
      * description and keywords are localised (fall back to the Russian copy);
      * `seo.indexing_enabled` drives the robots tag (so an admin can allow or
      * block search indexing without code), and `seo.og_image` powers link
-     * previews when the URL is shared (Telegram, etc.).
+     * previews when the URL is shared (Telegram, etc.). We always emit an
+     * `og:image` — falling back to the brand icon when none is uploaded —
+     * because Telegram only renders a preview card when it finds an image.
      */
     private function renderSeoHead(): string
     {
@@ -94,7 +96,7 @@ class AppServiceProvider extends ServiceProvider
         $ogImage = settings('seo.og_image');
         $ogImageUrl = is_string($ogImage) && $ogImage !== ''
             ? Storage::disk('public')->url($ogImage)
-            : null;
+            : asset('images/favicon/android-chrome-512x512.png');
 
         $tags = [
             '<meta name="robots" content="'.((bool) settings('seo.indexing_enabled', false) ? 'index,follow' : 'noindex,nofollow').'">',
@@ -115,11 +117,9 @@ class AppServiceProvider extends ServiceProvider
             $tags[] = '<meta property="og:title" content="'.e($title).'">';
         }
 
-        if ($ogImageUrl !== null) {
-            $tags[] = '<meta property="og:image" content="'.e($ogImageUrl).'">';
-            $tags[] = '<meta name="twitter:card" content="summary_large_image">';
-            $tags[] = '<meta name="twitter:image" content="'.e($ogImageUrl).'">';
-        }
+        $tags[] = '<meta property="og:image" content="'.e($ogImageUrl).'">';
+        $tags[] = '<meta name="twitter:card" content="summary_large_image">';
+        $tags[] = '<meta name="twitter:image" content="'.e($ogImageUrl).'">';
 
         return implode("\n", $tags);
     }
