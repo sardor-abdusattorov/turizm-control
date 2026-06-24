@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contacts\Tables;
 
 use App\Exports\ContactsExport;
 use App\Filament\Resources\Contacts\ContactResource;
+use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\StatusToggleColumn;
@@ -18,6 +19,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ContactsTable
@@ -26,6 +28,9 @@ class ContactsTable
     {
         return $table
             ->defaultSort('id', 'desc')
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount([
+                'contracts' => fn (Builder $contracts) => $contracts->visibleTo(),
+            ]))
             ->columns([
                 TextColumn::make('type')
                     ->label(__('app.label.contact_type'))
@@ -38,6 +43,33 @@ class ContactsTable
                     ->label(__('app.label.contact_name'))
                     ->searchable()
                     ->sortable(),
+
+                TextColumn::make('contracts_count')
+                    ->label(__('app.label.contracts'))
+                    ->badge()
+                    ->alignCenter()
+                    ->state(fn (Contact $record): int => (int) ($record->contracts_count ?? 0))
+                    ->color(fn (Contact $record): string => ($record->contracts_count ?? 0) > 0 ? 'info' : 'gray')
+                    ->action(
+                        Action::make('contractsBreakdown')
+                            ->modalHeading(fn (Contact $record): string => $record->name)
+                            ->modalIcon('heroicon-o-document-text')
+                            ->modalContent(fn (Contact $record) => view(
+                                'filament.resources.contacts.contracts-breakdown',
+                                ['rows' => $record->contractTotalsByCurrency()],
+                            ))
+                            ->modalSubmitAction(false)
+                            ->modalCancelActionLabel(__('app.action.close'))
+                            ->extraModalFooterActions([
+                                Action::make('viewContracts')
+                                    ->label(__('app.action.details'))
+                                    ->icon('heroicon-o-arrow-top-right-on-square')
+                                    ->url(fn (Contact $record): string => ContractResource::getUrl('index', [
+                                        'tableFilters' => ['contact_id' => ['value' => $record->id]],
+                                    ]))
+                                    ->visible(fn (Contact $record): bool => (int) ($record->contracts_count ?? 0) > 0),
+                            ]),
+                    ),
 
                 TextColumn::make('inn')
                     ->label(__('app.label.inn'))

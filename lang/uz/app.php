@@ -234,6 +234,9 @@ return [
 
         // Valyutalar
         'currency_single' => 'Valyuta',
+        'contracts' => 'Shartnomalar',
+        'contracts_count' => 'Shartnomalar soni',
+        'total_amount' => 'Umumiy summa',
         'currency_plural' => 'Valyutalar',
         'currency_code' => 'Kod',
         'currency_value' => 'Kurs',
@@ -312,6 +315,7 @@ return [
         'archive' => 'Arxivga',
         'back_to_contract' => 'Shartnomaga qaytish',
         'close' => 'Yopish',
+        'details' => 'Batafsil',
         'add_field' => 'Maydon qo‘shish',
         'add_item' => 'Pozitsiya qo‘shish',
         'edit_document' => 'Hujjatni tahrirlash',
@@ -404,6 +408,7 @@ return [
         'sent_to_director' => 'Yakuniy tasdiqlash uchun direktorga yuborildi',
         'action_not_allowed' => 'Bu amal shartnomaning joriy holatida ruxsat etilmagan',
         'approver_inactive' => 'O‘tkazib yuborildi — kelishuvchi akkaunti nofaol.',
+        'no_contracts_for_contact' => 'Bu kontragent bilan hozircha shartnomalar yo‘q.',
         'invalidated_on_edit' => 'Bekor qilindi — shartnoma tahrirlandi.',
         'invalidated_on_document_save' => 'Bekor qilindi — hujjat muharrirda o‘zgartirildi.',
         'save_warning_mid_flow' => 'Saqlash joriy kelishuv zanjirini bekor qiladi. Xuddi shu kelishuvchilar bilan yangi zanjir navbatga qo‘yiladi va shartnomani qayta kelishuvga yuborishingiz kerak bo‘ladi. Davom etilsinmi?',

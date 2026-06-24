@@ -6,6 +6,7 @@ use App\Enums\PaymentStatus;
 use App\Exports\ContractsExport;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Contracts\Pages\ViewContract;
+use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\Currency;
 use App\Models\OrderType;
@@ -116,6 +117,11 @@ class ContractsTable
                 SelectFilter::make('currency_id')
                     ->label(__('app.label.currency_single'))
                     ->options(fn () => Currency::query()->where('status', true)->orderBy('short_name')->pluck('short_name', 'id')),
+
+                SelectFilter::make('contact_id')
+                    ->label(__('app.label.contact_single'))
+                    ->options(fn () => Contact::getActive())
+                    ->searchable(),
 
                 SelectFilter::make('order_type_id')
                     ->label(__('app.label.order_type_single'))

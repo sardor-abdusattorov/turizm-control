@@ -234,6 +234,9 @@ return [
 
         // Currencies
         'currency_single' => 'Currency',
+        'contracts' => 'Contracts',
+        'contracts_count' => 'Number of contracts',
+        'total_amount' => 'Total amount',
         'currency_plural' => 'Currencies',
         'currency_code' => 'Code',
         'currency_value' => 'Value',
@@ -317,6 +320,7 @@ return [
         'archive' => 'Archive',
         'back_to_contract' => 'Back to contract',
         'close' => 'Close',
+        'details' => 'Details',
         'add_field' => 'Add field',
         'add_item' => 'Add item',
         'edit_document' => 'Edit document',
@@ -409,6 +413,7 @@ return [
         'sent_to_director' => 'Sent to the director for final approval',
         'action_not_allowed' => 'This action is not allowed for the contract in its current state',
         'approver_inactive' => 'Skipped — approver account is inactive.',
+        'no_contracts_for_contact' => 'No contracts with this counterparty yet.',
         'invalidated_on_edit' => 'Cancelled — contract was edited.',
         'invalidated_on_document_save' => 'Cancelled — document was modified in the editor.',
         'save_warning_mid_flow' => 'Saving will cancel the current approval chain. A fresh chain will be queued with the same approvers, and you will need to send the contract for approval again. Continue?',
