@@ -46,6 +46,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('')
             ->authGuard('web')
             ->passwordReset()
+            ->brandName(fn (): string => settings('organization.name.'.app()->getLocale()) ?: 'PR-Kontrol')
             ->brandLogo(fn (): string => asset('images/logo.png'))
             ->brandLogoHeight('3rem')
             ->login()

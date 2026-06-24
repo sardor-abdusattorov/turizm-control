@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Activitylog\Models\Activity;
@@ -47,10 +48,12 @@ class AppServiceProvider extends ServiceProvider
 
     private function configureRenderHooks(): void
     {
-//        FilamentView::registerRenderHook(
-//            'panels::head.start',
-//            fn (): string => '<meta name="robots" content="noindex,nofollow">'
-//        );
+        // SEO + Open Graph tags from the Settings page (localised title /
+        // description / keywords, the indexing toggle and the OG image).
+        FilamentView::registerRenderHook(
+            'panels::head.start',
+            fn (): string => $this->renderSeoHead(),
+        );
 
         FilamentView::registerRenderHook(
             'panels::head.end',
@@ -67,6 +70,58 @@ class AppServiceProvider extends ServiceProvider
             'panels::body.end',
             fn (): string => '<script>window.addEventListener("pageshow",function(e){if(e.persisted){window.location.reload();}});</script>'
         );
+    }
+
+    /**
+     * Build the SEO / Open Graph `<head>` tags from the Settings page. Title,
+     * description and keywords are localised (fall back to the Russian copy);
+     * `seo.indexing_enabled` drives the robots tag (so an admin can allow or
+     * block search indexing without code), and `seo.og_image` powers link
+     * previews when the URL is shared (Telegram, etc.).
+     */
+    private function renderSeoHead(): string
+    {
+        $locale = app()->getLocale();
+
+        $localized = fn (string $key): string => (string) (
+            settings("seo.{$key}.{$locale}") ?: settings("seo.{$key}.ru", '')
+        );
+
+        $title = $localized('title');
+        $description = $localized('description');
+        $keywords = $localized('keywords');
+
+        $ogImage = settings('seo.og_image');
+        $ogImageUrl = is_string($ogImage) && $ogImage !== ''
+            ? Storage::disk('public')->url($ogImage)
+            : null;
+
+        $tags = [
+            '<meta name="robots" content="'.((bool) settings('seo.indexing_enabled', false) ? 'index,follow' : 'noindex,nofollow').'">',
+            '<meta property="og:type" content="website">',
+            '<meta property="og:url" content="'.e(url()->current()).'">',
+        ];
+
+        if ($description !== '') {
+            $tags[] = '<meta name="description" content="'.e($description).'">';
+            $tags[] = '<meta property="og:description" content="'.e($description).'">';
+        }
+
+        if ($keywords !== '') {
+            $tags[] = '<meta name="keywords" content="'.e($keywords).'">';
+        }
+
+        if ($title !== '') {
+            $tags[] = '<meta property="og:title" content="'.e($title).'">';
+        }
+
+        if ($ogImageUrl !== null) {
+            $tags[] = '<meta property="og:image" content="'.e($ogImageUrl).'">';
+            $tags[] = '<meta name="twitter:card" content="summary_large_image">';
+            $tags[] = '<meta name="twitter:image" content="'.e($ogImageUrl).'">';
+        }
+
+        return implode("\n", $tags);
     }
 
     public function boot(): void
