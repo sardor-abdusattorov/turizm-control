@@ -44,7 +44,7 @@
     <span x-text="label"></span>
 </span>
 
-@once
+@assets
     <script>
         window.slaCountdown = (iso) => ({
             due: new Date(iso),
@@ -146,4 +146,4 @@
             .sla-cd--over { animation: none; }
         }
     </style>
-@endonce
+@endassets

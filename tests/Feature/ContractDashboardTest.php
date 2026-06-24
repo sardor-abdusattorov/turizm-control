@@ -143,6 +143,26 @@ it('paginates each manager dashboard table under its own query-string key', func
         ->and($inReview)->not->toBe($queue);
 });
 
+it('renders the live SLA badge column without erroring', function () {
+    $user = dashboardUser();
+    $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $user->id,
+        'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+        'due_at' => now()->addDay(),
+    ]);
+
+    actingAs($user);
+
+    // The "Due" column renders the sla-countdown partial (which registers its
+    // Alpine helper via @assets) — make sure that compiles and renders.
+    Livewire::test(MyApprovalQueueWidget::class)
+        ->assertOk()
+        ->assertSee($contract->number);
+});
+
 it('renders the approval health widget for the director', function () {
     $user = dashboardUser();
     $user->assignRole(Role::findOrCreate('director', 'web'));
