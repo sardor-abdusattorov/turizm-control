@@ -47,10 +47,10 @@ class AppServiceProvider extends ServiceProvider
 
     private function configureRenderHooks(): void
     {
-        FilamentView::registerRenderHook(
-            'panels::head.start',
-            fn (): string => '<meta name="robots" content="noindex,nofollow">'
-        );
+//        FilamentView::registerRenderHook(
+//            'panels::head.start',
+//            fn (): string => '<meta name="robots" content="noindex,nofollow">'
+//        );
 
         FilamentView::registerRenderHook(
             'panels::head.end',
