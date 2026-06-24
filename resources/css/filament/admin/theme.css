@@ -331,3 +331,165 @@
 .fi-auth-theme-switcher-wrapper {
     transform: translateX(-50%);
 }
+
+/* ─── Approval-flow modal (contracts list) ──────────────────────────────────
+   The approver chain shown from the contracts list. Lived in a <style> block
+   inside the modal partial; moved here so it's plain classes in one place.
+   Headers stay on one line and the table scrolls sideways inside its wrapper
+   (the table scrolls, never the modal). */
+.af-wrap {
+    max-height: 65vh;
+    overflow: auto;
+    overflow-x: auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+.af {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .82rem;
+}
+.af thead th {
+    text-align: left;
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--m, #57606a);
+    padding: .6rem .6rem;
+    border-bottom: 1px solid rgba(127, 127, 127, .2);
+    white-space: nowrap;
+}
+.af tbody td {
+    padding: .75rem .9rem .75rem .6rem;
+    border-bottom: 1px solid rgba(127, 127, 127, .12);
+    vertical-align: top;
+}
+.af tbody tr:last-child td {
+    border-bottom: 0;
+}
+.af tbody tr.is-inactive td {
+    opacity: .72;
+}
+.af-user {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    min-width: 11rem;
+}
+.af-user__av {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.af-user__nm {
+    font-weight: 650;
+    line-height: 1.2;
+    font-size: .85rem;
+}
+.af-user__nm small {
+    font-weight: 500;
+    opacity: .5;
+    margin-left: .15rem;
+    font-size: .75rem;
+}
+.af-user__dp {
+    font-size: .72rem;
+    opacity: .6;
+    margin-top: .15rem;
+    line-height: 1.25;
+}
+.af-cmt {
+    line-height: 1.45;
+    font-size: .82rem;
+    color: currentColor;
+}
+.af-cmt--muted {
+    opacity: .35;
+    font-style: italic;
+}
+/* The system note is a deliberate, attention-worthy line — readable orange on
+   white rather than the faint wash it used to be. */
+.af-sys {
+    margin-top: .4rem;
+    padding: .4rem .6rem;
+    border-radius: .45rem;
+    background: rgba(234, 88, 12, .12);
+    border: 1px solid rgba(234, 88, 12, .38);
+    font-size: .77rem;
+    color: #9a3412;
+    line-height: 1.4;
+}
+.af-sys b {
+    color: #7c2d12;
+}
+.dark .af-sys {
+    background: rgba(251, 146, 60, .14);
+    border-color: rgba(251, 146, 60, .3);
+    color: #fdba74;
+}
+.dark .af-sys b {
+    color: #fed7aa;
+}
+.af-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .2rem .55rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 650;
+    white-space: nowrap;
+}
+.af-badge > i {
+    width: .42rem;
+    height: .42rem;
+    border-radius: 50%;
+    display: block;
+    flex-shrink: 0;
+}
+.af-date--over {
+    color: #b91c1c;
+    font-weight: 650;
+}
+.dark .af-date--over {
+    color: #fca5a5;
+}
+.af-date-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: .2rem;
+    margin-top: .25rem;
+    font-size: .68rem;
+    font-weight: 650;
+    color: #dc2626;
+    white-space: nowrap;
+}
+.af-date-flag > svg {
+    flex-shrink: 0;
+}
+.af-date {
+    font-size: .78rem;
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.af-date small {
+    display: block;
+    opacity: .55;
+    font-size: .7rem;
+    margin-top: .1rem;
+}
+.af-date--muted {
+    opacity: .35;
+}
+.af-empty {
+    font-size: .85rem;
+    color: currentColor;
+    opacity: .55;
+    padding: 1rem 0;
+    text-align: center;
+}
