@@ -30,7 +30,7 @@ beforeEach(function () {
 function chainOf(int $count = 3): array
 {
     $responsible = User::factory()->create();
-    $approvers = User::factory()->count($count)->create();
+    $approvers = asApprover(User::factory()->count($count)->create());
 
     $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,

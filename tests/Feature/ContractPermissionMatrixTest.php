@@ -22,7 +22,7 @@ beforeEach(function () {
 function permissionContext(ContractStatus $status, bool $withDocument = true): array
 {
     $responsible = User::factory()->create(['status' => User::STATUS_ACTIVE]);
-    $approver = User::factory()->create(['status' => User::STATUS_ACTIVE]);
+    $approver = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE]));
     $contract = Contract::factory()
         ->when($withDocument, fn ($f) => $f->withDocument())
         ->create([
@@ -115,6 +115,19 @@ it('denies approval on a draft contract', function () {
 it('denies approval on a rejected contract', function () {
     [$contract, , $approver] = permissionContext(Contract::STATUS_REJECTED);
     expect($contract->canBeApprovedBy($approver))->toBeFalse();
+});
+
+it('requires the approve_contracts permission on top of being the current approver', function () {
+    [$contract, , $approver] = permissionContext(Contract::STATUS_IN_REVIEW);
+
+    // permissionContext grants the capability — strip it to model a current
+    // approver whose role is not allowed to act on approvals.
+    $approver->revokePermissionTo('approve_contracts');
+    expect($contract->canBeApprovedBy($approver->fresh()))->toBeFalse();
+
+    // Granting it back lets the very same current approver act.
+    asApprover($approver);
+    expect($contract->canBeApprovedBy($approver->fresh()))->toBeTrue();
 });
 
 // ── canBeSentToDirectorBy ─────────────────────────────────────────

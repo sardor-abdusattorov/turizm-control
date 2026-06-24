@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Services\OnlyOffice\JwtSigner;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
@@ -60,6 +61,28 @@ function userWithPermission(string ...$permissions): User
     }
 
     return $user->fresh();
+}
+
+/**
+ * Grant the `approve_contracts` capability to a user (or every user in a
+ * collection) and return it unchanged. Mirrors the permission the role seeder
+ * hands real approvers (legal, accounting, director) in production, so workflow
+ * tests can drive the approve/reject path through canBeApprovedBy().
+ *
+ * @template TUsers of User|Collection<int, User>
+ *
+ * @param  TUsers  $users
+ * @return TUsers
+ */
+function asApprover(User|Collection $users): User|Collection
+{
+    Permission::findOrCreate('approve_contracts', 'web');
+
+    Collection::wrap($users)->each(
+        fn (User $user) => $user->givePermissionTo('approve_contracts'),
+    );
+
+    return $users;
 }
 
 /**

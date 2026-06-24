@@ -18,7 +18,7 @@ beforeEach(function () {
 function createContractWithChain(int $approverCount = 3): array
 {
     $responsible = User::factory()->create();
-    $approvers = User::factory()->count($approverCount)->create();
+    $approvers = asApprover(User::factory()->count($approverCount)->create());
 
     $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,

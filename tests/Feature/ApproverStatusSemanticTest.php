@@ -19,7 +19,7 @@ beforeEach(function () {
 function chainForSubmit(int $approverCount = 2): array
 {
     $responsible = User::factory()->create();
-    $approvers = User::factory()->count($approverCount)->create();
+    $approvers = asApprover(User::factory()->count($approverCount)->create());
 
     $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,

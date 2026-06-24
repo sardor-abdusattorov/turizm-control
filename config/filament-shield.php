@@ -250,6 +250,13 @@ return [
         // where they are an approver.
         'view_all_contracts',
 
+        // Contract-scoped: lets a role act on an approval step — approve or
+        // reject the contract whose turn it is for them. Required on top of
+        // actually sitting in the approval chain, so an admin can centrally
+        // decide which roles (legal, accounting, director, a department head,
+        // …) may participate in approvals without touching code.
+        'approve_contracts',
+
         // Contract-scoped: gates the PDF download / export action so that
         // someone who can view a contract isn't automatically able to leak
         // the rendered PDF.

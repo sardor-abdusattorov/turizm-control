@@ -22,6 +22,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // settings, reference data or template management.
         $this->syncRole('director', [
             'view_all_contracts',
+            'approve_contracts',
             'export_contract',
             'export_payment',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
@@ -45,6 +46,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $this->syncRole('legal_officer', [
             'view_all_contracts',
+            'approve_contracts',
             'export_contract',
             'export_contact',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
@@ -54,6 +56,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $this->syncRole('accountant', [
             'view_all_contracts',
+            'approve_contracts',
             'export_contract',
             'export_contact',
             'export_payment',

@@ -45,7 +45,7 @@ it('skips inactive approvers when the contract is submitted', function () {
 
 it('jumps past an inactive approver when the previous one approves', function () {
     $responsible = User::factory()->create();
-    $lawyer = User::factory()->create(['status' => true]);
+    $lawyer = asApprover(User::factory()->create(['status' => true]));
     $inactiveAccountant = User::factory()->create(['status' => false]);
     $director = User::factory()->create(['status' => true]);
 

@@ -21,7 +21,7 @@ beforeEach(function () {
 
 it('notifies the manager AND the next approver when a step is approved', function () {
     $manager = User::factory()->create();
-    $lawyer = User::factory()->create(['status' => User::STATUS_ACTIVE]);
+    $lawyer = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE]));
     $accountant = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
     $contract = Contract::factory()->withDocument()->create([
@@ -51,7 +51,7 @@ it('notifies the manager AND the next approver when a step is approved', functio
 
 it('includes the approver, their decision time and comment in the step-approved notification', function () {
     $manager = User::factory()->create();
-    $lawyer = User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Alisher Yuldoshev']);
+    $lawyer = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Alisher Yuldoshev']));
     $accountant = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
     $contract = Contract::factory()->withDocument()->create([
@@ -81,7 +81,7 @@ it('includes the approver, their decision time and comment in the step-approved 
 
 it('names the final approver and time in the fully-approved notification', function () {
     $manager = User::factory()->create();
-    $approver = User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Madina Saidova']);
+    $approver = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Madina Saidova']));
 
     $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $manager->id,
@@ -108,7 +108,7 @@ it('sends the Telegram step-approved message in the recipient locale, not the se
     Http::fake(['api.telegram.org/*' => Http::response(['ok' => true])]);
 
     $manager = User::factory()->withTelegram('600', 'ru')->create();
-    $lawyer = User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Alisher Yuldoshev']);
+    $lawyer = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Alisher Yuldoshev']));
     $accountant = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
     $contract = Contract::factory()->withDocument()->create([

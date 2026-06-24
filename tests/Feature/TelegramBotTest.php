@@ -57,7 +57,7 @@ it('rejects the webhook with a wrong secret and accepts the right one', function
 });
 
 it('opens a comment step on approve and stores the typed comment', function () {
-    $approver = User::factory()->withTelegram('555')->create();
+    $approver = asApprover(User::factory()->withTelegram('555')->create());
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
     ContractApprover::factory()->create([
         'contract_id' => $contract->id,
@@ -92,7 +92,7 @@ it('opens a comment step on approve and stores the typed comment', function () {
 });
 
 it('approves without a comment via the shortcut button', function () {
-    $approver = User::factory()->withTelegram('556')->create();
+    $approver = asApprover(User::factory()->withTelegram('556')->create());
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
     ContractApprover::factory()->create([
         'contract_id' => $contract->id,

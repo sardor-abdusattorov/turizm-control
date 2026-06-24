@@ -25,7 +25,7 @@ beforeEach(function () {
 function slaChain(int $count = 2): array
 {
     $responsible = User::factory()->create();
-    $approvers = User::factory()->count($count)->create();
+    $approvers = asApprover(User::factory()->count($count)->create());
 
     $contract = Contract::factory()->withDocument()->create([
         'responsible_id' => $responsible->id,

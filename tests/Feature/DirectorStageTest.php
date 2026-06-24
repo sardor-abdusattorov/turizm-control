@@ -18,6 +18,7 @@ function makeDirector(): User
 
     $director = User::factory()->create(['status' => User::STATUS_ACTIVE]);
     $director->assignRole(Contract::DIRECTOR_ROLE);
+    asApprover($director);
 
     return $director;
 }
@@ -32,6 +33,8 @@ function inReviewWithLawyerAccountant(): array
     $responsible = User::factory()->create();
     $lawyer = User::factory()->create(['status' => User::STATUS_ACTIVE]);
     $accountant = User::factory()->create(['status' => User::STATUS_ACTIVE]);
+    asApprover($lawyer);
+    asApprover($accountant);
 
     $contract = Contract::factory()->create([
         'responsible_id' => $responsible->id,

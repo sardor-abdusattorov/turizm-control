@@ -405,6 +405,7 @@ class Contract extends Model
         $user ??= auth()->user();
 
         return $user
+            && $user->can('approve_contracts')
             && in_array($this->status, [self::STATUS_IN_REVIEW, self::STATUS_IN_REVIEW_DIRECTOR], true)
             && $this->isCurrentApprover($user);
     }

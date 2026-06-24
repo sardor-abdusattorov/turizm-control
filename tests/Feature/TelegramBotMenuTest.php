@@ -67,7 +67,7 @@ it('persists the chosen locale on the telegram_users row', function () {
 });
 
 it('starts the reject conversation and stores state for the next text message', function () {
-    $approver = User::factory()->withTelegram('333')->create();
+    $approver = asApprover(User::factory()->withTelegram('333')->create());
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
     ContractApprover::factory()->create([
         'contract_id' => $contract->id, 'user_id' => $approver->id, 'order' => 1,
@@ -92,7 +92,7 @@ it('starts the reject conversation and stores state for the next text message', 
 });
 
 it('rejects the contract with the text reply and clears the conversation state', function () {
-    $approver = User::factory()->withTelegram('444')->create();
+    $approver = asApprover(User::factory()->withTelegram('444')->create());
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
     ContractApprover::factory()->create([
         'contract_id' => $contract->id, 'user_id' => $approver->id, 'order' => 1,
