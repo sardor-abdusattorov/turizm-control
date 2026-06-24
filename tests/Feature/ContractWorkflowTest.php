@@ -52,6 +52,29 @@ it('submits a contract for approval and notifies the first approver', function (
     ]);
 });
 
+it('does not submit a contract when no approver can act on it', function () {
+    [$contract, $responsible, $approvers] = createContractWithChain();
+
+    // Every approver in the chain is a deactivated user — nobody can review.
+    User::whereIn('id', $approvers->pluck('id'))->update(['status' => User::STATUS_DISABLED]);
+
+    actingAs($responsible);
+
+    $result = app(ContractWorkflow::class)->submit($contract);
+
+    expect($result)->toBeFalse()
+        ->and($contract->fresh()->status)->toBe(Contract::STATUS_DRAFT);
+
+    // The failed attempt rolled back, so the chain is untouched and the
+    // author can reactivate the users (or pick others) and retry.
+    expect($contract->activeApprovers()->count())->toBe($approvers->count());
+
+    $this->assertDatabaseMissing('notifications', [
+        'notifiable_id' => $approvers->first()->id,
+        'notifiable_type' => User::class,
+    ]);
+});
+
 it('moves to the next approver when the current one approves', function () {
     [$contract, , $approvers] = createContractWithChain();
     $contract->update(['status' => Contract::STATUS_IN_REVIEW]);

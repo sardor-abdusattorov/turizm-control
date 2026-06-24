@@ -11,6 +11,7 @@ use App\Models\Currency;
 use App\Models\Department;
 use App\Models\OrderType;
 use App\Models\User;
+use App\Services\Contracts\ApprovalChain;
 use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -222,25 +223,9 @@ class ContractForm
     {
         $user = Auth::user();
 
-        if (! $user) {
-            return [];
-        }
-
-        $ids = $user->defaultRecipients()
-            ->where('users.status', User::STATUS_ACTIVE)
-            ->pluck('users.id')
-            ->all();
-
-        if (empty($ids)) {
-            $ids = collect(Department::approvalFlow())
-                ->map(fn (string $code) => Department::findByCode($code)?->approverUser()?->id)
-                ->filter()
-                ->unique()
-                ->values()
-                ->all();
-        }
-
-        return array_map('intval', $ids);
+        return $user
+            ? app(ApprovalChain::class)->defaultUserIdsFor($user)
+            : [];
     }
 
     protected static function approvalChainPreview(mixed $ids): string

@@ -20,29 +20,44 @@ class ContractWorkflow
             return false;
         }
 
-        DB::transaction(function () use ($contract, $user): void {
+        DB::beginTransaction();
+
+        try {
             if (! $contract->activeApprovers()->exists()) {
                 $contract->buildApprovalChainFromFlow();
             }
 
-            $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
-
             $current = $this->advanceToActiveApprover($contract);
 
-            if ($current) {
-                $current->startReview($this->slaDays());
-                $this->notifier->notifyApprovalRequested($current);
+            // No one can actually review this — an empty chain, or every
+            // approver is a deactivated user. Don't strand the contract in
+            // review with no current approver: roll back so the attempt
+            // changes nothing and the author can fix the chain first.
+            if (! $current) {
+                DB::rollBack();
+
+                return false;
             }
+
+            $contract->update(['status' => Contract::STATUS_IN_REVIEW]);
+            $current->startReview($this->slaDays());
+            $this->notifier->notifyApprovalRequested($current);
 
             $this->logWorkflowEvent(
                 event: 'Contract Submitted',
                 contract: $contract,
                 user: $user,
-                properties: ['next_approver_id' => $current?->user_id],
+                properties: ['next_approver_id' => $current->user_id],
             );
-        });
 
-        return true;
+            DB::commit();
+
+            return true;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            throw $e;
+        }
     }
 
     private function advanceToActiveApprover(Contract $contract): ?ContractApprover

@@ -65,6 +65,7 @@ class EditContract extends EditRecord
                 : __('app.message.save_warning_draft'))
             ->modalSubmitActionLabel(__('app.action.save_anyway'))
             ->modalCancelActionLabel(__('app.action.keep_editing'))
+            ->modalWidth('xl')
             ->action(fn () => $this->{$this->getSubmitFormLivewireMethodName()}());
     }
 
