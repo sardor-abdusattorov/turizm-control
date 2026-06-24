@@ -123,9 +123,11 @@ class ContractSeeder extends Seeder
     }
 
     /**
-     * The approver rows that match a contract's status: an in-review chain has
-     * a live pending approver ahead of queued ones; a fully approved chain has
-     * every step signed off; a rejected one carries the verdict that bounced it.
+     * The approver rows that match a contract's status: a draft already carries
+     * its queued chain (legal → accounting), just like one created through the
+     * form; an in-review chain has a live pending approver ahead of queued ones;
+     * a fully approved chain has every step signed off; a rejected one carries
+     * the verdict that bounced it.
      *
      * @param  array{legal: ?User, accounting: ?User, director: ?User}  $chain
      */
@@ -139,7 +141,7 @@ class ContractSeeder extends Seeder
         $queued = ContractApprover::STATUS_QUEUED;
 
         $steps = match ($status) {
-            ContractStatus::Draft => [],
+            ContractStatus::Draft => [[$legal, $queued], [$accounting, $queued]],
             ContractStatus::InReview => [[$legal, $pending], [$accounting, $queued]],
             ContractStatus::PendingDirector => [[$legal, $approved], [$accounting, $approved]],
             ContractStatus::InReviewDirector => [[$legal, $approved], [$accounting, $approved], [$director, $pending]],
