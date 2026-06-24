@@ -47,6 +47,7 @@ class MyContractsInReviewWidget extends TableWidget
             ->queryStringIdentifier('myContractsInReview')
             ->paginated([5, 10, 25])
             ->defaultPaginationPageOption(5)
+            ->poll('60s')
             ->defaultSort('updated_at', 'asc')
             ->columns([
                 TextColumn::make('number')

@@ -99,13 +99,6 @@ class Settings extends Page implements HasForms
         return $options;
     }
 
-    protected function getForms(): array
-    {
-        return [
-            'form',
-        ];
-    }
-
     protected function getSettingsData(): array
     {
         $data = [];

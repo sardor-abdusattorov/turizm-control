@@ -201,14 +201,6 @@ class ProfileSettings extends Page implements HasActions, HasForms
             ->statePath('passwordData');
     }
 
-    protected function getForms(): array
-    {
-        return [
-            'profileForm',
-            'passwordForm',
-        ];
-    }
-
     public function updateProfile(): void
     {
         try {
