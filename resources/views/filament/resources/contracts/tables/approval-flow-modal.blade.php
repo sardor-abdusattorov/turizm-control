@@ -43,12 +43,13 @@
     }
     .af-wrap {
         max-height: 65vh;
+        /* The table scrolls sideways INSIDE this wrapper. min-width:0 +
+           max-width:100% keep the wrapper at the modal's width (in a grid/flex
+           parent) so it's the TABLE that scrolls, never the modal. */
         overflow: auto;
-        /* width:100% + min-width:0 keep the wrapper at the modal's width so the
-           wide table scrolls INSIDE it, instead of the wrapper growing to the
-           table width and pushing the whole modal off-screen. */
         width: 100%;
         min-width: 0;
+        max-width: 100%;
     }
     .af {
         width: 100%;
@@ -56,10 +57,6 @@
         font-size: .82rem;
     }
     .af thead th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        background: #fff;
         text-align: left;
         font-size: .7rem;
         font-weight: 600;
@@ -70,9 +67,6 @@
         padding: .6rem .6rem;
         border-bottom: 1px solid rgba(127,127,127,.2);
         white-space: nowrap;
-    }
-    .dark .af thead th {
-        background: #18181b;
     }
     .af tbody td {
         padding: .75rem .9rem .75rem .6rem;
@@ -197,13 +191,6 @@
         opacity: .35;
     }
 
-    /* Mobile: keep the table as a table and let the wrapper scroll sideways
-       (the index data tables behave the same way) instead of stacking rows. */
-    @media (max-width: 720px) {
-        .af {
-            min-width: 52rem;
-        }
-    }
 </style>
 
 @if ($rows->isEmpty())
@@ -218,7 +205,6 @@
                 <th>{{ __('app.label.status') }}</th>
                 <th>{{ __('app.label.due') }}</th>
                 <th>{{ __('app.label.acted_at') }}</th>
-                <th>{{ __('app.label.updated_at') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -249,7 +235,7 @@
                             <div class="af-cmt af-cmt--muted">—</div>
                         @endif
                         @if ($a->system_comment)
-                            <div class="af-sys"><b>{{ __('app.label.system_note') }}:</b> {{ $a->system_comment }}</div>
+                            <div class="af-sys"><b>{{ __('app.label.system_note') }}:</b> {{ $a->systemNoteLabel() }}</div>
                         @endif
                     </td>
                     <td>
@@ -280,16 +266,6 @@
                             <div class="af-date">
                                 {{ $a->acted_at->translatedFormat('d.m.Y') }}
                                 <small>{{ $a->acted_at->format('H:i') }}</small>
-                            </div>
-                        @else
-                            <div class="af-date af-date--muted">—</div>
-                        @endif
-                    </td>
-                    <td>
-                        @if ($a->updated_at)
-                            <div class="af-date">
-                                {{ $a->updated_at->translatedFormat('d.m.Y') }}
-                                <small>{{ $a->updated_at->format('H:i') }}</small>
                             </div>
                         @else
                             <div class="af-date af-date--muted">—</div>

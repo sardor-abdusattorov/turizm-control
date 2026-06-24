@@ -82,11 +82,11 @@ class Payment extends Model
             return $query->whereRaw('0 = 1');
         }
 
+        // Same rule as contracts: oversight roles and anyone granted the
+        // `view_all_contracts` permission see every payment. Everyone else —
+        // managers included — only the payments on contracts they are
+        // responsible for. Access is permission-driven, not tied to a role.
         if ($user->hasAnyRole(Contract::OVERSIGHT_ROLES) || $user->can('view_all_contracts')) {
-            return $query;
-        }
-
-        if ($user->hasRole('accountant')) {
             return $query;
         }
 

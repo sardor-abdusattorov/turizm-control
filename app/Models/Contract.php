@@ -126,7 +126,7 @@ class Contract extends Model
             ->pluck('user_id')
             ->all();
 
-        $this->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
+        $this->invalidateAllApprovers('invalidated_on_edit');
 
         if ($previousUserIds === []) {
             $this->buildApprovalChainFromFlow();
@@ -138,23 +138,16 @@ class Contract extends Model
     }
 
     /**
-     * Called from the OnlyOffice save-callback after the editor finalises a
-     * save (status 2). When an author changes the document mid-flow the
-     * version on disk no longer matches what previous approvers signed off
-     * on — so reset to Draft and cancel every approval (the chain is kept
-     * queued so the author can resubmit to the same people).
-     *
-     * The current approver, however, is *expected* to tweak the document as
-     * part of their review (OnlyOffice fires a save even when they just open
-     * and close it), so their save must NOT bounce the contract back to
-     * Draft — otherwise the Approve / Reject buttons vanish.
-     */
-    /**
      * Bounce the contract back to Draft after its document was edited, unless
      * the *only* person who edited was the current approver tweaking the doc
      * before their verdict (we keep their Approve / Reject buttons alive).
      * Any other editor — the author, a different approver, or the approver
      * co-editing alongside someone else — means approvals are now stale.
+     *
+     * Runs from the OnlyOffice save-callback on both the session-end save
+     * (status 2) and a mid-session forcesave (status 6): either way the bytes
+     * on disk have already changed, so the chain must not stay live. It is
+     * idempotent — once the contract is a Draft, repeated saves are no-ops.
      *
      * @param  list<int>  $editorIds  user ids OnlyOffice reported as editors
      */
@@ -182,7 +175,7 @@ class Contract extends Model
             'signed_at' => null,
         ])->saveQuietly();
 
-        $this->invalidateAllApprovers(__('app.message.invalidated_on_document_save'));
+        $this->invalidateAllApprovers('invalidated_on_document_save');
 
         $this->approvalChain()->requeue($this, $previousUserIds);
     }

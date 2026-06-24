@@ -62,14 +62,14 @@ class ApprovalChain
                 'signed_at' => null,
             ])->saveQuietly();
 
-            $contract->invalidateAllApprovers(__('app.message.invalidated_on_edit'));
+            $contract->invalidateAllApprovers('invalidated_on_edit');
         }
 
         $contract->approvers()
             ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
             ->update([
                 'status' => ContractApprover::STATUS_INVALIDATED,
-                'system_comment' => __('app.message.invalidated_on_edit'),
+                'system_comment' => 'invalidated_on_edit',
                 'acted_at' => now(),
             ]);
 

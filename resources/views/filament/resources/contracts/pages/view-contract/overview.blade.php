@@ -93,7 +93,7 @@
                                             @endif
                                         </div>
                                         @if ($ap->comment)<div class="cw-cmt">{{ $ap->comment }}</div>@endif
-                                        @if ($ap->system_comment)<div class="cw-cmt" style="background:rgba(251,146,60,.10);border-color:rgba(251,146,60,.32);color:#c2410c;font-weight:550;">{{ $ap->system_comment }}</div>@endif
+                                        @if ($ap->system_comment)<div class="cw-cmt" style="background:rgba(251,146,60,.10);border-color:rgba(251,146,60,.32);color:#c2410c;font-weight:550;">{{ $ap->systemNoteLabel() }}</div>@endif
                                     </div>
                                     <button type="button" class="cw-eye" title="{{ __('app.label.view_history') }}" @click="approver = {{ $ap->user_id }}">{!! $ic('heroicon-o-eye', 16) !!}</button>
                                 </div>
