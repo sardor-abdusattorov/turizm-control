@@ -43,31 +43,20 @@
     }
     .af-wrap {
         max-height: 65vh;
+        /* The table scrolls sideways INSIDE this wrapper. min-width:0 +
+           max-width:100% keep the wrapper at the modal's width (in a grid/flex
+           parent) so it's the TABLE that scrolls, never the modal. */
         overflow: auto;
-        /* width:100% + min-width:0 keep the wrapper at the modal's width so the
-           wide table scrolls INSIDE it, instead of the wrapper growing to the
-           table width and pushing the whole modal off-screen. */
         width: 100%;
         min-width: 0;
+        max-width: 100%;
     }
     .af {
         width: 100%;
-        /* A real minimum so the columns never collapse — when the modal is
-           narrower than this (tablet / phone) the WRAPPER scrolls sideways and
-           the table keeps its shape, instead of squeezing the comment column
-           until the text wraps one word per line. */
-        min-width: 46rem;
         border-collapse: collapse;
         font-size: .82rem;
     }
-    .af-col-cmt {
-        min-width: 14rem;
-    }
     .af thead th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        background: #fff;
         text-align: left;
         font-size: .7rem;
         font-weight: 600;
@@ -78,9 +67,6 @@
         padding: .6rem .6rem;
         border-bottom: 1px solid rgba(127,127,127,.2);
         white-space: nowrap;
-    }
-    .dark .af thead th {
-        background: #18181b;
     }
     .af tbody td {
         padding: .75rem .9rem .75rem .6rem;
@@ -242,7 +228,7 @@
                             </div>
                         </div>
                     </td>
-                    <td class="af-col-cmt">
+                    <td>
                         @if ($a->comment)
                             <div class="af-cmt">{{ $a->comment }}</div>
                         @else

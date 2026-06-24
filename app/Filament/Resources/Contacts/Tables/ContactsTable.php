@@ -62,7 +62,7 @@ class ContactsTable
                                 ['rows' => $record->contractTotalsByCurrency()],
                             ))
                             ->modalSubmitAction(false)
-                            ->modalCancelActionLabel(__('app.action.close'))
+                            ->modalCancelAction(false)
                             ->extraModalFooterActions([
                                 Action::make('viewContracts')
                                     ->label(__('app.action.details'))
