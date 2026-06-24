@@ -75,7 +75,7 @@ class MyContractsInReviewWidget extends TableWidget
                     ->label(__('app.label.due'))
                     ->view('filament.components.sla-countdown')
                     ->state(fn (Contract $record) => $this->currentPending($record)?->due_at)
-                    ->disableClick(),
+                    ->disabledClick(),
             ])
             ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))
             ->recordActions([

@@ -78,15 +78,15 @@ class ContractsTable
                 ViewColumn::make('approvers_chain')
                     ->label(__('app.label.approvers'))
                     ->view('filament.resources.contracts.tables.approvers-column')
-                    ->disableClick()
-                    ->extraHeaderAttributes(['style' => 'min-width:14rem;'])
-                    ->extraAttributes(['style' => 'min-width:14rem;vertical-align:middle;']),
+                    ->disabledClick()
+                    ->extraHeaderAttributes(['class' => 'ca-table-column'])
+                    ->extraAttributes(['class' => 'ca-table-column']),
 
                 ViewColumn::make('sla')
                     ->label(__('app.label.due'))
                     ->view('filament.components.sla-countdown')
                     ->state(fn (Contract $record) => $record->currentApprover()?->due_at)
-                    ->disableClick(),
+                    ->disabledClick(),
 
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))

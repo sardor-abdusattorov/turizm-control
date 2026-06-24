@@ -45,6 +45,10 @@
 
 @once
     <style>
+        .ca-table-column {
+            min-width: 14rem;
+            vertical-align: middle;
+        }
         .ca {
             display: flex;
             flex-direction: column;
