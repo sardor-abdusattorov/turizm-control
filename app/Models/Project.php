@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
 use App\Models\Concerns\HasActiveStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -57,6 +58,13 @@ class Project extends Model
     public function participants(): HasMany
     {
         return $this->hasMany(ProjectParticipant::class)->orderBy('sort');
+    }
+
+    public function sponsors(): HasMany
+    {
+        return $this->hasMany(ProjectParticipant::class)
+            ->where('role', ParticipantRole::Sponsor)
+            ->orderBy('sort');
     }
 
     public function order(): BelongsTo

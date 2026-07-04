@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
@@ -52,8 +53,9 @@ it('creates a project with participants and stamps the author', function () {
             'area_cost' => 17000,
             'stand_cost' => 50000,
             'participants' => [
-                ['name' => 'OOO "ZAMIN DMC"', 'amount' => 40000000],
-                ['name' => 'ORIENT STAR GROUP MCHJ', 'amount' => 35000000],
+                ['role' => ParticipantRole::Participant->value, 'name' => 'OOO "ZAMIN DMC"', 'amount' => 40000000],
+                ['role' => ParticipantRole::Participant->value, 'name' => 'ORIENT STAR GROUP MCHJ', 'amount' => 35000000],
+                ['role' => ParticipantRole::Sponsor->value, 'name' => 'UZBEKISTAN AIRWAYS AJ', 'amount' => 100000000],
             ],
         ])
         ->call('create')
@@ -63,8 +65,10 @@ it('creates a project with participants and stamps the author', function () {
 
     expect($project->type)->toBe(ProjectType::International)
         ->and($project->created_by)->toBe($user->id)
-        ->and($project->participants)->toHaveCount(2)
-        ->and($project->feesTotal())->toBe(75000000.0);
+        ->and($project->participants)->toHaveCount(3)
+        ->and($project->sponsors)->toHaveCount(1)
+        ->and($project->sponsors->first()->name)->toBe('UZBEKISTAN AIRWAYS AJ')
+        ->and($project->feesTotal())->toBe(175000000.0);
 });
 
 it('validates that the project name and type are required', function () {

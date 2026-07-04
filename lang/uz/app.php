@@ -169,6 +169,8 @@ return [
         'participants' => 'Ishtirokchilar',
         'participant_name' => 'Ishtirokchi',
         'participant_amount' => 'Badal',
+        'participant_role' => 'Rol',
+        'sponsors' => 'Homiylar',
         'fees_total' => 'Badallar summasi',
         'user' => 'Foydalanuvchi',
         'attached_document' => 'Biriktirilgan hujjat',
@@ -410,6 +412,7 @@ return [
     'message' => [
         'loading_editor' => 'Muharrir yuklanmoqda…',
         'no_participants' => 'Ishtirokchilar hali qo\'shilmagan.',
+        'no_sponsors' => 'Homiylar hali qo\'shilmagan.',
         'no_gallery' => 'Rasmlar hali yuklanmagan.',
         'hero_draft' => 'Qoralama — hali kelishuvga yuborilmagan.',
         'hero_in_review' => ':name tomonidan kelishuvni kutmoqda.',
@@ -668,6 +671,10 @@ return [
         'type' => [
             'internal' => 'Ichki',
             'international' => 'Xalqaro',
+        ],
+        'participant_role' => [
+            'participant' => 'Ishtirokchi',
+            'sponsor' => 'Homiy',
         ],
     ],
     'tab' => [

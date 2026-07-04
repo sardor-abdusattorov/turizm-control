@@ -169,6 +169,8 @@ return [
         'participants' => 'Участники',
         'participant_name' => 'Участник',
         'participant_amount' => 'Взнос',
+        'participant_role' => 'Роль',
+        'sponsors' => 'Спонсоры',
         'fees_total' => 'Сумма взносов',
         'user' => 'Пользователь',
         'attached_document' => 'Прикреплённый документ',
@@ -410,6 +412,7 @@ return [
     'message' => [
         'loading_editor' => 'Загрузка редактора…',
         'no_participants' => 'Участники ещё не добавлены.',
+        'no_sponsors' => 'Спонсоры ещё не добавлены.',
         'no_gallery' => 'Фотографии ещё не загружены.',
         'hero_draft' => 'Черновик — ещё не отправлен на согласование.',
         'hero_in_review' => 'Ожидает согласования от :name.',
@@ -668,6 +671,10 @@ return [
         'type' => [
             'internal' => 'Внутренний',
             'international' => 'Международный',
+        ],
+        'participant_role' => [
+            'participant' => 'Участник',
+            'sponsor' => 'Спонсор',
         ],
     ],
     'tab' => [

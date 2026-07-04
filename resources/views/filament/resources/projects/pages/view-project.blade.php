@@ -17,7 +17,8 @@
         ? __('app.label.area_is_free')
         : $money($record->area_cost, $record->areaCurrency?->short_name);
 
-    $feesTotal = $record->feesTotal();
+    $members = $record->participants->where('role', \App\Enums\ParticipantRole::Participant)->values();
+    $sponsors = $record->participants->where('role', \App\Enums\ParticipantRole::Sponsor)->values();
     $galleryUrls = $record->galleryUrls();
 
     $details = [
@@ -91,10 +92,10 @@
         <header class="ow-hd">
             <span class="ow-hd__ic">{!! $ic('heroicon-o-user-group', 18) !!}</span>
             <h2 class="ow-hd__t">{{ __('app.label.participants') }}</h2>
-            <span class="pj-count">{{ $record->participants->count() }}</span>
+            <span class="pj-count">{{ $members->count() }}</span>
         </header>
 
-        @if ($record->participants->isEmpty())
+        @if ($members->isEmpty())
             <p class="pj-empty">{{ __('app.message.no_participants') }}</p>
         @else
             <div class="pj-table-wrap">
@@ -107,7 +108,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach ($record->participants as $participant)
+                    @foreach ($members as $participant)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>
@@ -126,7 +127,55 @@
                     <tfoot>
                     <tr>
                         <td colspan="2">{{ __('app.label.fees_total') }}</td>
-                        <td class="pj-table__num">{{ number_format($feesTotal, 0, ',', ' ') }}</td>
+                        <td class="pj-table__num">{{ number_format((float) $members->sum('amount'), 0, ',', ' ') }}</td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        @endif
+    </section>
+
+    {{-- ============ SPONSORS ============ --}}
+    <section class="ow-card">
+        <header class="ow-hd">
+            <span class="ow-hd__ic">{!! $ic('heroicon-o-star', 18) !!}</span>
+            <h2 class="ow-hd__t">{{ __('app.label.sponsors') }}</h2>
+            <span class="pj-count">{{ $sponsors->count() }}</span>
+        </header>
+
+        @if ($sponsors->isEmpty())
+            <p class="pj-empty">{{ __('app.message.no_sponsors') }}</p>
+        @else
+            <div class="pj-table-wrap">
+                <table class="pj-table">
+                    <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>{{ __('app.label.participant_name') }}</th>
+                        <th class="pj-table__num">{{ __('app.label.participant_amount') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ($sponsors as $sponsor)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>
+                                {{ $sponsor->name }}
+                                @if ($sponsor->contact)
+                                    <span class="pj-pill pj-pill--info">{{ __('app.label.contact_single') }}</span>
+                                @endif
+                            </td>
+                            <td class="pj-table__num">
+                                {{ number_format((float) $sponsor->amount, 0, ',', ' ') }}
+                                {{ $sponsor->currency?->short_name }}
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="2">{{ __('app.label.fees_total') }}</td>
+                        <td class="pj-table__num">{{ number_format((float) $sponsors->sum('amount'), 0, ',', ' ') }}</td>
                     </tr>
                     </tfoot>
                 </table>

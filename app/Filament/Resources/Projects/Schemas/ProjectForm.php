@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Projects\Schemas;
 
+use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
 use App\Filament\Support\ImageGalleryUpload;
 use App\Models\Contact;
@@ -126,8 +127,14 @@ class ProjectForm
                             ->orderColumn('sort')
                             ->defaultItems(0)
                             ->addActionLabel(__('app.action.add_participant'))
-                            ->columns(['default' => 1, 'md' => 4])
+                            ->columns(['default' => 1, 'md' => 5])
                             ->schema([
+                                Select::make('role')
+                                    ->label(__('app.label.participant_role'))
+                                    ->options(ParticipantRole::options())
+                                    ->default(ParticipantRole::Participant->value)
+                                    ->required(),
+
                                 Select::make('contact_id')
                                     ->label(__('app.label.contact_single'))
                                     ->options(fn () => Contact::getActive())

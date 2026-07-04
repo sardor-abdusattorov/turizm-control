@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ParticipantRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,7 @@ class ProjectParticipant extends Model
     protected $fillable = [
         'project_id',
         'contact_id',
+        'role',
         'name',
         'amount',
         'currency_id',
@@ -20,6 +22,7 @@ class ProjectParticipant extends Model
     ];
 
     protected $casts = [
+        'role' => ParticipantRole::class,
         'amount' => 'decimal:2',
     ];
 

@@ -169,6 +169,8 @@ return [
         'participants' => 'Participants',
         'participant_name' => 'Participant',
         'participant_amount' => 'Fee',
+        'participant_role' => 'Role',
+        'sponsors' => 'Sponsors',
         'fees_total' => 'Total fees',
         'user' => 'User',
         'attached_document' => 'Attached document',
@@ -415,6 +417,7 @@ return [
     'message' => [
         'loading_editor' => 'Loading editor…',
         'no_participants' => 'No participants yet.',
+        'no_sponsors' => 'No sponsors yet.',
         'no_gallery' => 'No photos uploaded yet.',
         'hero_draft' => 'Draft — not submitted for approval yet.',
         'hero_in_review' => 'Awaiting approval from :name.',
@@ -673,6 +676,10 @@ return [
         'type' => [
             'internal' => 'Internal',
             'international' => 'International',
+        ],
+        'participant_role' => [
+            'participant' => 'Participant',
+            'sponsor' => 'Sponsor',
         ],
     ],
     'tab' => [
