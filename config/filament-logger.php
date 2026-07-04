@@ -13,6 +13,8 @@ use App\Models\Department;
 use App\Models\Order;
 use App\Models\OrderType;
 use App\Models\Position;
+use App\Models\Project;
+use App\Models\ProjectParticipant;
 use App\Models\User;
 use MrAdder\FilamentLogger\Loggers\AccessLogger;
 use MrAdder\FilamentLogger\Loggers\ModelLogger;
@@ -300,6 +302,8 @@ return [
             OrderType::class,
             Currency::class,
             Order::class,
+            Project::class,
+            ProjectParticipant::class,
         ],
     ],
 

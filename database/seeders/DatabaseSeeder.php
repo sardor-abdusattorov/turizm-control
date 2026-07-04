@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             OrdersSeeder::class,
             ContractTemplateSeeder::class,
             ContractSeeder::class,
+            Exhibitions2025Seeder::class,
         ]);
     }
 }

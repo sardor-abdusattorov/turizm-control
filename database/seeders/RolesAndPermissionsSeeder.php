@@ -29,6 +29,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('order', ['view_any', 'view']),
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
+            ...$this->resourcePermissions('project', ['view_any', 'view']),
             // Dashboard widgets the director oversees.
             'view_contracts_trend_chart_widget',
             'view_payment_stats_widget',
@@ -51,6 +52,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('position', ['view_any']),
             ...$this->resourcePermissions('order_type', ['view_any']),
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
+            ...$this->resourcePermissions('project', ['view_any', 'view', 'create', 'update']),
             // Dashboard widgets for the contract author.
             'view_contract_stats_widget',
             'view_my_contracts_in_review_widget',

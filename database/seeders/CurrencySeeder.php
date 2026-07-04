@@ -50,6 +50,16 @@ class CurrencySeeder extends Seeder
                 'value' => 135,
                 'sort' => 4,
             ],
+            [
+                'short_name' => 'GBP',
+                'name' => [
+                    'ru' => 'Фунт стерлингов',
+                    'uz' => 'Funt sterling',
+                    'en' => 'Pound Sterling',
+                ],
+                'value' => 16500,
+                'sort' => 5,
+            ],
         ];
 
         foreach ($currencies as $data) {
