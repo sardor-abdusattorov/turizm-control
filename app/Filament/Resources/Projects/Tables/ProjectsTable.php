@@ -24,7 +24,7 @@ class ProjectsTable
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query
-                ->with('order')
+                ->with(['order', 'creator'])
                 ->withCount('participants')
                 ->withSum('participants', 'amount'))
             ->defaultSort('starts_on', 'desc')
@@ -74,6 +74,11 @@ class ProjectsTable
 
                 TextColumn::make('order.number')
                     ->label(__('app.label.order_single'))
+                    ->placeholder('—')
+                    ->toggleable(),
+
+                TextColumn::make('creator.name')
+                    ->label(__('app.label.created_by'))
                     ->placeholder('—')
                     ->toggleable(),
 

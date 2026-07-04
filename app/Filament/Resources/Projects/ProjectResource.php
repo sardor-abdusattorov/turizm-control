@@ -55,14 +55,17 @@ class ProjectResource extends Resource
 
     private static function navigationItemFor(ProjectType $type, Heroicon $icon, int $sort): NavigationItem
     {
+        // ListRecords binds its $activeTab to the URL as `?tab=` (#[Url(as: 'tab')]),
+        // so the sidebar links must use that exact query key to land on a
+        // pre-filtered tab.
         return NavigationItem::make("projects-{$type->value}")
             ->label(fn (): string => __('app.label.projects_'.$type->value))
             ->icon($icon)
             ->group(static::getNavigationGroup())
             ->sort($sort)
-            ->url(static::getUrl('index', ['activeTab' => $type->value]))
+            ->url(static::getUrl('index', ['tab' => $type->value]))
             ->isActiveWhen(fn (): bool => request()->routeIs(static::getRouteBaseName().'.*')
-                && request()->query('activeTab') === $type->value)
+                && request()->query('tab') === $type->value)
             ->badge(fn (): ?string => ($count = Project::query()->where('type', $type)->count()) > 0
                 ? (string) $count
                 : null)

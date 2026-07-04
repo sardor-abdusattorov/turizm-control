@@ -5,6 +5,7 @@ use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
+use App\Filament\Resources\Projects\ProjectResource;
 use App\Models\Project;
 use App\Models\ProjectParticipant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,6 +38,28 @@ it('lists projects with type tabs', function () {
         ->set('activeTab', ProjectType::International->value)
         ->assertCanSeeTableRecords(Project::where('type', ProjectType::International)->get())
         ->assertCanNotSeeTableRecords(Project::where('type', ProjectType::Internal)->get());
+});
+
+it('opens the list pre-filtered from the sidebar tab query parameter', function () {
+    $internal = Project::factory()->internal()->create(['name' => 'INTERNAL-EXPO-2025']);
+    $international = Project::factory()->international()->create(['name' => 'WORLD-EXPO-2025']);
+
+    actingAs(userWithPermission('view_any_project'));
+
+    // ListRecords binds $activeTab to `?tab=` — the sidebar items rely on it.
+    Livewire::withQueryParams(['tab' => ProjectType::Internal->value])
+        ->test(ListProjects::class)
+        ->assertSuccessful()
+        ->assertCanSeeTableRecords(collect([$internal]))
+        ->assertCanNotSeeTableRecords(collect([$international]));
+
+    $urls = array_map(
+        fn ($item): string => $item->getUrl(),
+        ProjectResource::getNavigationItems(),
+    );
+
+    expect($urls[0])->toContain('tab=internal')
+        ->and($urls[1])->toContain('tab=international');
 });
 
 it('creates a project with participants and stamps the author', function () {
