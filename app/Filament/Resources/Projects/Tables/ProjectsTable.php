@@ -26,7 +26,8 @@ class ProjectsTable
             ->modifyQueryUsing(fn (Builder $query): Builder => $query
                 ->with(['order', 'creator'])
                 ->withCount('participants')
-                ->withSum('participants', 'amount'))
+                ->withSum('participants', 'amount')
+                ->withSum('participants', 'paid_amount'))
             ->defaultSort('starts_on', 'desc')
             ->columns([
                 TextColumn::make('name')
@@ -57,6 +58,7 @@ class ProjectsTable
                     ->label(__('app.label.area_sqm'))
                     ->formatStateUsing(fn (?string $state): string => number_format((float) $state, 2, ',', ' ').' м²')
                     ->placeholder('—')
+                    ->alignEnd()
                     ->sortable()
                     ->toggleable(),
 
@@ -64,13 +66,23 @@ class ProjectsTable
                     ->label(__('app.label.participants'))
                     ->badge()
                     ->color('gray')
+                    ->alignCenter()
                     ->sortable(),
 
                 TextColumn::make('participants_sum_amount')
                     ->label(__('app.label.fees_total'))
                     ->formatStateUsing(fn (?string $state): string => number_format((float) $state, 0, ',', ' '))
                     ->placeholder('0')
+                    ->alignEnd()
                     ->sortable(),
+
+                TextColumn::make('participants_sum_paid_amount')
+                    ->label(__('app.label.paid'))
+                    ->formatStateUsing(fn (?string $state): string => number_format((float) $state, 0, ',', ' '))
+                    ->placeholder('0')
+                    ->color('success')
+                    ->alignEnd()
+                    ->toggleable(),
 
                 TextColumn::make('order.number')
                     ->label(__('app.label.order_single'))

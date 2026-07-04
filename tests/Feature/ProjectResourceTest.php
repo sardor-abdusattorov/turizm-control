@@ -5,10 +5,13 @@ use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
+use App\Filament\Resources\Projects\Pages\ViewProject;
 use App\Filament\Resources\Projects\ProjectResource;
 use App\Models\Project;
 use App\Models\ProjectParticipant;
+use App\Models\ProjectPayment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
@@ -126,4 +129,27 @@ it('deletes participant rows together with the project', function () {
     $project->delete();
 
     expect(ProjectParticipant::count())->toBe(0);
+});
+
+it('records a project payment through the view page action', function () {
+    $project = Project::factory()->create();
+    $participant = ProjectParticipant::factory()->create([
+        'project_id' => $project->id,
+        'amount' => 25_000_000,
+        'paid_amount' => 0,
+    ]);
+
+    actingAs(userWithPermission('view_any_project', 'view_project', 'record_project_payment'));
+
+    Livewire::test(ViewProject::class, ['record' => $project->id])
+        ->callAction('recordPayment', [
+            'project_participant_id' => $participant->id,
+            'amount' => 25_000_000,
+            'paid_at' => now()->toDateString(),
+            'screenshot' => UploadedFile::fake()->image('proof.jpg'),
+        ])
+        ->assertHasNoActionErrors();
+
+    expect((float) $participant->fresh()->paid_amount)->toBe(25_000_000.0)
+        ->and(ProjectPayment::where('project_participant_id', $participant->id)->count())->toBe(1);
 });

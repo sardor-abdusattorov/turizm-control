@@ -1,70 +1,122 @@
 @php
+    use App\Enums\ParticipantRole;
+    use App\Enums\PaymentStatus;
+
     /** @var \App\Models\Project $record */
     $record = $this->record;
-    $record->loadMissing(['participants.contact', 'participants.currency', 'order', 'areaCurrency', 'standCurrency', 'creator']);
+    $record->loadMissing([
+        'participants.contact', 'participants.currency', 'participants.payments',
+        'order', 'areaCurrency', 'standCurrency', 'creator',
+    ]);
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
-
-    $money = fn ($amount, ?string $currency) => $amount === null
-        ? '—'
-        : number_format((float) $amount, 2, ',', ' ').($currency ? ' '.$currency : '');
+    $fmt = fn ($n) => number_format((float) $n, 0, ',', ' ');
+    $money = fn ($amount, ?string $cur) => $amount === null ? '—' : $fmt($amount).($cur ? ' '.$cur : '');
 
     $period = $record->starts_on
         ? $record->starts_on->format('d.m.Y').($record->ends_on ? ' — '.$record->ends_on->format('d.m.Y') : '')
         : '—';
 
-    $areaCost = $record->area_is_free
-        ? __('app.label.area_is_free')
-        : $money($record->area_cost, $record->areaCurrency?->short_name);
+    $members = $record->participants->where('role', ParticipantRole::Participant)->values();
+    $sponsors = $record->participants->where('role', ParticipantRole::Sponsor)->values();
 
-    $members = $record->participants->where('role', \App\Enums\ParticipantRole::Participant)->values();
-    $sponsors = $record->participants->where('role', \App\Enums\ParticipantRole::Sponsor)->values();
+    $feesTotal = $record->feesTotal();
+    $paidTotal = $record->paidTotal();
+
+    // A single fee currency is shown only when every participant shares it;
+    // mixed-currency projects drop the suffix rather than mislead.
+    $currencies = $record->participants->map(fn ($p) => $p->currency?->short_name)->filter()->unique()->values();
+    $feeCurrency = $currencies->count() === 1 ? $currencies->first() : '';
+
+    $projectPaidStatus = PaymentStatus::fromPercent($feesTotal > 0 ? $paidTotal / $feesTotal * 100 : 0);
+    $paidTint = match ($projectPaidStatus) {
+        PaymentStatus::FullyPaid => 'success',
+        PaymentStatus::PartiallyPaid => 'warning',
+        default => '',
+    };
+    $paidPercent = $feesTotal > 0 ? round($paidTotal / $feesTotal * 100) : 0;
+
     $galleryUrls = $record->galleryUrls();
 
-    $details = [
-        ['heroicon-o-calendar-days', __('app.label.project_period'), $period],
-        ['heroicon-o-square-3-stack-3d', __('app.label.area_sqm'), $record->area_sqm !== null ? number_format((float) $record->area_sqm, 2, ',', ' ').' м²' : '—'],
-        ['heroicon-o-banknotes', __('app.label.area_cost'), $areaCost],
-        ['heroicon-o-building-storefront', __('app.label.stand_cost'), $money($record->stand_cost, $record->standCurrency?->short_name)],
-        ['heroicon-o-user', __('app.label.created_by'), $record->creator?->name ?? '—'],
-        ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i')],
+    $payments = $record->participants
+        ->flatMap(fn ($p) => $p->payments->map(fn ($pay) => (object) [
+            'name' => $p->name,
+            'amount' => $pay->amount,
+            'currency' => $p->currency?->short_name,
+            'paid_at' => $pay->paid_at,
+            'shot' => $pay->screenshotUrl(),
+        ]))
+        ->sortByDesc('paid_at')
+        ->values();
+
+    $heroVariant = $record->status ? 'success' : 'gray';
+    $typeIcon = $record->type === \App\Enums\ProjectType::International ? 'heroicon-o-globe-alt' : 'heroicon-o-building-office-2';
+
+    $participantBlocks = [
+        ['title' => __('app.label.participants'), 'rows' => $members, 'pill' => 'info', 'icon' => 'heroicon-o-user-group', 'empty' => __('app.message.no_participants')],
+        ['title' => __('app.label.sponsors'), 'rows' => $sponsors, 'pill' => 'warning', 'icon' => 'heroicon-o-star', 'empty' => __('app.message.no_sponsors')],
     ];
 @endphp
 
 <x-filament-panels::page>
-<div class="ow">
+<div class="pj" x-data="{ lightbox: false, src: '' }" @keydown.escape.window="lightbox = false">
+
+    {{-- ============ HERO ============ --}}
+    <section class="pj-hero pj-hero--{{ $heroVariant }}">
+        <div class="pj-hero__l">
+            <div class="pj-hero__meta">
+                <span class="pj-chip">{!! $ic($typeIcon, 14) !!} {{ $record->type->label() }}</span>
+                <span class="pj-pill pj-pill--{{ $record->status ? 'success' : 'gray' }}">
+                    {{ $record->status ? __('app.status.active') : __('app.status.inactive') }}
+                </span>
+            </div>
+            <div class="pj-hero__title">{{ $record->name }}</div>
+            <div class="pj-hero__dates">{!! $ic('heroicon-o-calendar-days', 14) !!} {{ $period }}</div>
+        </div>
+        <div class="pj-hero__r">
+            <span class="pj-hero__metric">{{ $fmt($feesTotal) }}</span>
+            <span class="pj-hero__metric-lb">{{ __('app.label.fees_total') }}{{ $feeCurrency ? ', '.$feeCurrency : '' }}</span>
+        </div>
+    </section>
+
+    {{-- ============ METRIC TILES ============ --}}
+    <section class="pj-stats">
+        <div class="pj-stat">
+            <span class="pj-stat__lb">{!! $ic('heroicon-o-square-3-stack-3d', 13) !!} {{ __('app.label.area_sqm') }}</span>
+            <div class="pj-stat__vl">{{ $record->area_sqm !== null ? $fmt($record->area_sqm).' м²' : '—' }}</div>
+            <div class="pj-stat__sub">
+                {{ $record->area_is_free ? __('app.label.area_is_free') : $money($record->area_cost, $record->areaCurrency?->short_name) }}
+            </div>
+        </div>
+        <div class="pj-stat">
+            <span class="pj-stat__lb">{!! $ic('heroicon-o-banknotes', 13) !!} {{ __('app.label.fees_total') }}</span>
+            <div class="pj-stat__vl">{{ $money($feesTotal, $feeCurrency ?: null) }}</div>
+            <div class="pj-stat__sub">{{ __('app.label.stand_cost') }}: {{ $money($record->stand_cost, $record->standCurrency?->short_name) }}</div>
+        </div>
+        <div class="pj-stat {{ $paidTint ? 'pj-stat--'.$paidTint : '' }}">
+            <span class="pj-stat__lb">{!! $ic('heroicon-o-check-circle', 13) !!} {{ __('app.label.paid') }}</span>
+            <div class="pj-stat__vl">{{ $money($paidTotal, $feeCurrency ?: null) }}</div>
+            <div class="pj-stat__sub">{{ $paidPercent }}% · {{ __('app.label.remaining') }} {{ $fmt(max(0, $feesTotal - $paidTotal)) }}</div>
+        </div>
+        <div class="pj-stat">
+            <span class="pj-stat__lb">{!! $ic('heroicon-o-user-group', 13) !!} {{ __('app.label.participants') }}</span>
+            <div class="pj-stat__vl">{{ $members->count() }}</div>
+            <div class="pj-stat__sub">{{ __('app.label.sponsors') }}: {{ $sponsors->count() }}</div>
+        </div>
+    </section>
+
     {{-- ============ BASIC INFORMATION ============ --}}
     <section class="ow-card">
         <header class="ow-hd">
             <span class="ow-hd__ic">{!! $ic('heroicon-o-information-circle', 18) !!}</span>
             <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
-            <span class="pj-pill pj-pill--{{ $record->type->color() }}">{{ $record->type->label() }}</span>
-            <span class="pj-pill pj-pill--{{ $record->status ? 'success' : 'gray' }}">
-                {{ $record->status ? __('app.status.active') : __('app.status.inactive') }}
-            </span>
         </header>
         <div class="ow-dets">
-            @foreach ($details as [$icon, $label, $value])
-                <div class="ow-row">
-                    <div class="ow-row__k">
-                        <span class="ow-row__ic">{!! $ic($icon) !!}</span>
-                        <span class="ow-row__lb">{{ $label }}</span>
-                    </div>
-                    <div class="ow-row__v">
-                        <span class="ow-row__vl">{{ $value ?? '—' }}</span>
-                    </div>
-                </div>
-            @endforeach
-
             <div class="ow-row">
-                <div class="ow-row__k">
-                    <span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span>
-                    <span class="ow-row__lb">{{ __('app.label.order_single') }}</span>
-                </div>
+                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_single') }}</span></div>
                 <div class="ow-row__v">
                     @if ($record->order)
-                        <a class="ow-row__vl pj-link"
-                           href="{{ \App\Filament\Resources\Orders\OrderResource::getUrl('view', ['record' => $record->order]) }}">
+                        <a class="ow-row__vl pj-link" href="{{ \App\Filament\Resources\Orders\OrderResource::getUrl('view', ['record' => $record->order]) }}">
                             {{ trim(($record->order->number ? $record->order->number.' · ' : '').$record->order->title) }}
                         </a>
                     @else
@@ -72,116 +124,121 @@
                     @endif
                 </div>
             </div>
-
+            <div class="ow-row">
+                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-user') !!}</span><span class="ow-row__lb">{{ __('app.label.created_by') }}</span></div>
+                <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator?->name ?? '—' }}</span></div>
+            </div>
             @if ($record->description)
                 <div class="ow-row">
-                    <div class="ow-row__k">
-                        <span class="ow-row__ic">{!! $ic('heroicon-o-bars-3-bottom-left') !!}</span>
-                        <span class="ow-row__lb">{{ __('app.label.description') }}</span>
-                    </div>
-                    <div class="ow-row__v">
-                        <span class="ow-row__vl pj-wrap">{{ $record->description }}</span>
-                    </div>
+                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-bars-3-bottom-left') !!}</span><span class="ow-row__lb">{{ __('app.label.description') }}</span></div>
+                    <div class="ow-row__v"><span class="ow-row__vl pj-wrap">{{ $record->description }}</span></div>
                 </div>
             @endif
+            <div class="ow-row">
+                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clock') !!}</span><span class="ow-row__lb">{{ __('app.label.created_at') }}</span></div>
+                <div class="ow-row__v"><span class="ow-row__vl">{{ $record->created_at?->format('d.m.Y H:i') }}</span></div>
+            </div>
         </div>
     </section>
 
-    {{-- ============ PARTICIPANTS ============ --}}
-    <section class="ow-card">
-        <header class="ow-hd">
-            <span class="ow-hd__ic">{!! $ic('heroicon-o-user-group', 18) !!}</span>
-            <h2 class="ow-hd__t">{{ __('app.label.participants') }}</h2>
-            <span class="pj-count">{{ $members->count() }}</span>
-        </header>
+    {{-- ============ PARTICIPANTS & SPONSORS ============ --}}
+    @foreach ($participantBlocks as $block)
+        <section class="ow-card">
+            <header class="ow-hd">
+                <span class="ow-hd__ic">{!! $ic($block['icon'], 18) !!}</span>
+                <h2 class="ow-hd__t">{{ $block['title'] }}</h2>
+                <span class="pj-count">{{ $block['rows']->count() }}</span>
+            </header>
 
-        @if ($members->isEmpty())
-            <p class="pj-empty">{{ __('app.message.no_participants') }}</p>
-        @else
+            @if ($block['rows']->isEmpty())
+                <p class="pj-empty">{{ $block['empty'] }}</p>
+            @else
+                <div class="pj-table-wrap">
+                    <table class="pj-table">
+                        <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>{{ __('app.label.participant_name') }}</th>
+                            <th class="pj-table__num">{{ __('app.label.participant_amount') }}</th>
+                            <th class="pj-table__num">{{ __('app.label.paid') }}</th>
+                            <th>{{ __('app.label.status') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach ($block['rows'] as $p)
+                            @php $status = $p->paymentStatus(); @endphp
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>
+                                    {{ $p->name }}
+                                    @if ($p->contact)
+                                        <span class="pj-pill pj-pill--{{ $block['pill'] }}">{{ __('app.label.contact_single') }}</span>
+                                    @endif
+                                </td>
+                                <td class="pj-table__num">{{ $fmt($p->amount) }} {{ $p->currency?->short_name }}</td>
+                                <td class="pj-table__num">{{ $fmt($p->paid_amount) }} {{ $p->currency?->short_name }}</td>
+                                <td>
+                                    @if ((float) $p->amount > 0)
+                                        <span class="pj-pill pj-pill--{{ $status->color() }}">{{ $status->label() }}</span>
+                                    @else
+                                        <span class="pj-pill pj-pill--gray">—</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="2">{{ __('app.label.fees_total') }}</td>
+                            <td class="pj-table__num">{{ $fmt($block['rows']->sum('amount')) }}</td>
+                            <td class="pj-table__num">{{ $fmt($block['rows']->sum('paid_amount')) }}</td>
+                            <td></td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            @endif
+        </section>
+    @endforeach
+
+    {{-- ============ PAYMENTS HISTORY ============ --}}
+    @if ($payments->isNotEmpty())
+        <section class="ow-card">
+            <header class="ow-hd">
+                <span class="ow-hd__ic">{!! $ic('heroicon-o-credit-card', 18) !!}</span>
+                <h2 class="ow-hd__t">{{ __('app.label.payments') }}</h2>
+                <span class="pj-count">{{ $payments->count() }}</span>
+            </header>
             <div class="pj-table-wrap">
                 <table class="pj-table">
                     <thead>
                     <tr>
-                        <th>№</th>
                         <th>{{ __('app.label.participant_name') }}</th>
-                        <th class="pj-table__num">{{ __('app.label.participant_amount') }}</th>
+                        <th class="pj-table__num">{{ __('app.label.payment_amount') }}</th>
+                        <th>{{ __('app.label.paid_at') }}</th>
+                        <th>{{ __('app.label.screenshot') }}</th>
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach ($members as $participant)
+                    @foreach ($payments as $pay)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $pay->name }}</td>
+                            <td class="pj-table__num">{{ $fmt($pay->amount) }} {{ $pay->currency }}</td>
+                            <td>{{ $pay->paid_at?->format('d.m.Y') }}</td>
                             <td>
-                                {{ $participant->name }}
-                                @if ($participant->contact)
-                                    <span class="pj-pill pj-pill--info">{{ __('app.label.contact_single') }}</span>
+                                @if ($pay->shot)
+                                    <img class="pj-shot" src="{{ $pay->shot }}" alt="" @click="lightbox = true; src = '{{ $pay->shot }}'">
+                                @else
+                                    —
                                 @endif
-                            </td>
-                            <td class="pj-table__num">
-                                {{ number_format((float) $participant->amount, 0, ',', ' ') }}
-                                {{ $participant->currency?->short_name }}
                             </td>
                         </tr>
                     @endforeach
                     </tbody>
-                    <tfoot>
-                    <tr>
-                        <td colspan="2">{{ __('app.label.fees_total') }}</td>
-                        <td class="pj-table__num">{{ number_format((float) $members->sum('amount'), 0, ',', ' ') }}</td>
-                    </tr>
-                    </tfoot>
                 </table>
             </div>
-        @endif
-    </section>
-
-    {{-- ============ SPONSORS ============ --}}
-    <section class="ow-card">
-        <header class="ow-hd">
-            <span class="ow-hd__ic">{!! $ic('heroicon-o-star', 18) !!}</span>
-            <h2 class="ow-hd__t">{{ __('app.label.sponsors') }}</h2>
-            <span class="pj-count">{{ $sponsors->count() }}</span>
-        </header>
-
-        @if ($sponsors->isEmpty())
-            <p class="pj-empty">{{ __('app.message.no_sponsors') }}</p>
-        @else
-            <div class="pj-table-wrap">
-                <table class="pj-table">
-                    <thead>
-                    <tr>
-                        <th>№</th>
-                        <th>{{ __('app.label.participant_name') }}</th>
-                        <th class="pj-table__num">{{ __('app.label.participant_amount') }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach ($sponsors as $sponsor)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>
-                                {{ $sponsor->name }}
-                                @if ($sponsor->contact)
-                                    <span class="pj-pill pj-pill--info">{{ __('app.label.contact_single') }}</span>
-                                @endif
-                            </td>
-                            <td class="pj-table__num">
-                                {{ number_format((float) $sponsor->amount, 0, ',', ' ') }}
-                                {{ $sponsor->currency?->short_name }}
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <td colspan="2">{{ __('app.label.fees_total') }}</td>
-                        <td class="pj-table__num">{{ number_format((float) $sponsors->sum('amount'), 0, ',', ' ') }}</td>
-                    </tr>
-                    </tfoot>
-                </table>
-            </div>
-        @endif
-    </section>
+        </section>
+    @endif
 
     {{-- ============ GALLERY ============ --}}
     <section class="ow-card">
@@ -196,12 +253,17 @@
         @else
             <div class="pj-gallery">
                 @foreach ($galleryUrls as $url)
-                    <a href="{{ $url }}" target="_blank" rel="noopener">
+                    <a href="{{ $url }}" @click.prevent="lightbox = true; src = '{{ $url }}'">
                         <img src="{{ $url }}" alt="{{ $record->name }} — {{ $loop->iteration }}" loading="lazy">
                     </a>
                 @endforeach
             </div>
         @endif
     </section>
+
+    {{-- ============ LIGHTBOX ============ --}}
+    <div class="pj-lightbox" x-show="lightbox" x-cloak x-transition @click="lightbox = false">
+        <img :src="src" alt="">
+    </div>
 </div>
 </x-filament-panels::page>

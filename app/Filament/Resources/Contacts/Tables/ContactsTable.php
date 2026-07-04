@@ -30,6 +30,7 @@ class ContactsTable
             ->defaultSort('id', 'desc')
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount([
                 'contracts' => fn (Builder $contracts) => $contracts->visibleTo(),
+                'projectParticipations',
             ]))
             ->columns([
                 TextColumn::make('type')
@@ -73,6 +74,31 @@ class ContactsTable
                                     ->visible(fn (Contact $record): bool => (int) ($record->contracts_count ?? 0) > 0),
                             ]),
                     ),
+
+                TextColumn::make('project_participations_count')
+                    ->label(__('app.label.projects'))
+                    ->badge()
+                    ->alignCenter()
+                    ->state(fn (Contact $record): int => (int) ($record->project_participations_count ?? 0))
+                    ->color(fn (Contact $record): string => ($record->project_participations_count ?? 0) > 0 ? 'warning' : 'gray')
+                    ->tooltip(fn (Contact $record): ?string => ($record->project_participations_count ?? 0) > 0
+                        ? __('app.label.projects_breakdown_hint')
+                        : null)
+                    ->action(
+                        Action::make('projectsBreakdown')
+                            ->modalHeading(fn (Contact $record): string => $record->name)
+                            ->modalIcon('heroicon-o-presentation-chart-bar')
+                            ->modalContent(fn (Contact $record) => view(
+                                'filament.resources.contacts.projects-breakdown',
+                                [
+                                    'participations' => $record->projectParticipations()->with(['project', 'currency'])->get(),
+                                    'totals' => $record->projectTotalsByCurrency(),
+                                ],
+                            ))
+                            ->modalSubmitAction(false)
+                            ->modalCancelAction(false),
+                    )
+                    ->toggleable(),
 
                 TextColumn::make('inn')
                     ->label(__('app.label.inn'))

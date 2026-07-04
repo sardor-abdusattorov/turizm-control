@@ -4,6 +4,7 @@ use App\Enums\PaymentStatus;
 use App\Models\Project;
 use App\Models\ProjectParticipant;
 use App\Models\ProjectPayment;
+use App\Rules\ProjectPaymentWithinPledge;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 
@@ -86,4 +87,25 @@ it('deletes installments when the participant is removed', function () {
     $participant->delete();
 
     expect(ProjectPayment::count())->toBe(0);
+});
+
+it('rejects an installment above the remaining pledge', function () {
+    $participant = participantWithPledge(10_000_000);
+    ProjectPayment::factory()->create(['project_participant_id' => $participant->id, 'amount' => 4_000_000]);
+    $participant->refresh(); // remaining = 6M
+
+    $rule = new ProjectPaymentWithinPledge($participant);
+
+    $overFailed = false;
+    $rule->validate('amount', 8_000_000, function () use (&$overFailed) {
+        $overFailed = true;
+    });
+
+    $withinFailed = false;
+    $rule->validate('amount', 6_000_000, function () use (&$withinFailed) {
+        $withinFailed = true;
+    });
+
+    expect($overFailed)->toBeTrue()
+        ->and($withinFailed)->toBeFalse();
 });

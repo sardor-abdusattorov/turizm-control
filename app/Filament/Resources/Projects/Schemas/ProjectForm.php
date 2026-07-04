@@ -88,18 +88,22 @@ class ProjectForm
                                 TextInput::make('area_sqm')
                                     ->label(__('app.label.area_sqm'))
                                     ->numeric()
+                                    ->step(0.01)
                                     ->minValue(0)
                                     ->suffix('м²'),
 
                                 TextInput::make('area_cost')
                                     ->label(__('app.label.area_cost'))
                                     ->numeric()
+                                    ->step(0.01)
                                     ->minValue(0)
+                                    ->prefix(fn (Get $get): ?string => Currency::find($get('area_currency_id'))?->short_name)
                                     ->visible(fn (Get $get): bool => ! $get('area_is_free')),
 
                                 Select::make('area_currency_id')
                                     ->label(__('app.label.area_currency'))
                                     ->options(fn () => Currency::getActive())
+                                    ->live()
                                     ->visible(fn (Get $get): bool => ! $get('area_is_free')),
 
                                 Toggle::make('area_is_free')
@@ -110,11 +114,14 @@ class ProjectForm
                                 TextInput::make('stand_cost')
                                     ->label(__('app.label.stand_cost'))
                                     ->numeric()
-                                    ->minValue(0),
+                                    ->step(0.01)
+                                    ->minValue(0)
+                                    ->prefix(fn (Get $get): ?string => Currency::find($get('stand_currency_id'))?->short_name),
 
                                 Select::make('stand_currency_id')
                                     ->label(__('app.label.stand_currency'))
-                                    ->options(fn () => Currency::getActive()),
+                                    ->options(fn () => Currency::getActive())
+                                    ->live(),
                             ]),
                     ]),
 
@@ -126,8 +133,14 @@ class ProjectForm
                             ->relationship()
                             ->orderColumn('sort')
                             ->defaultItems(0)
+                            ->collapsible()
+                            ->collapsed()
+                            ->cloneable()
                             ->addActionLabel(__('app.action.add_participant'))
-                            ->columns(['default' => 1, 'md' => 5])
+                            ->itemLabel(fn (array $state): ?string => filled($state['name'] ?? null)
+                                ? $state['name'].(filled($state['amount'] ?? null) ? ' · '.number_format((float) $state['amount'], 0, ',', ' ') : '')
+                                : null)
+                            ->columns(['default' => 1, 'md' => 2])
                             ->schema([
                                 Select::make('role')
                                     ->label(__('app.label.participant_role'))
@@ -150,18 +163,22 @@ class ProjectForm
                                 TextInput::make('name')
                                     ->label(__('app.label.participant_name'))
                                     ->required()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
 
                                 TextInput::make('amount')
                                     ->label(__('app.label.participant_amount'))
                                     ->numeric()
+                                    ->step(0.01)
                                     ->minValue(0)
                                     ->default(0)
-                                    ->required(),
+                                    ->required()
+                                    ->prefix(fn (Get $get): ?string => Currency::find($get('currency_id'))?->short_name),
 
                                 Select::make('currency_id')
                                     ->label(__('app.label.currency_single'))
                                     ->options(fn () => Currency::getActive())
+                                    ->live()
                                     ->default(fn () => Currency::query()->where('short_name', 'UZS')->value('id')),
                             ]),
                     ]),

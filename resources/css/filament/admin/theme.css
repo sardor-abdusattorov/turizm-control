@@ -11,7 +11,8 @@
    needs a different accent. */
 .cw,
 .ow,
-.pv {
+.pv,
+.pj {
     --s: #fff;
     --t: #0f1419;
     --m: #57606a;
@@ -26,7 +27,8 @@
 
 .dark .cw,
 .dark .ow,
-.dark .pv {
+.dark .pv,
+.dark .pj {
     --s: #18181b;
     --t: #f0f6fc;
     --m: #9aa4b2;
@@ -651,4 +653,239 @@
 }
 .pj-gallery a:hover img {
     transform: scale(1.04);
+}
+
+/* ─── Projects: hero, metric tiles, pill variants, lightbox ─────────────────
+   Mirrors the .pv-hero / .cw-stat look but lives in the global .pj block so
+   the projects view page reuses it by class name (the contract .cw hero is
+   page-scoped and not reusable). */
+[x-cloak] {
+    display: none !important;
+}
+.pj {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.pj-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    background: var(--s);
+    border: 1px solid var(--d);
+    border-radius: 1rem;
+    padding: 1.35rem 1.5rem 1.35rem 1.65rem;
+    overflow: hidden;
+}
+.pj-hero::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+.pj-hero--success::before {
+    background: #10b981;
+}
+.pj-hero--info::before {
+    background: var(--accent);
+}
+.pj-hero--gray::before {
+    background: #94a3b8;
+}
+.pj-hero__l {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    min-width: 0;
+    flex: 1;
+}
+.pj-hero__meta {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+.pj-hero__title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--t);
+    letter-spacing: -.01em;
+}
+.pj-hero__dates {
+    font-size: .8rem;
+    color: var(--m);
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+.pj-hero__r {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .1rem;
+    margin-left: auto;
+}
+.pj-hero__metric {
+    font-size: 1.5rem;
+    font-weight: 750;
+    color: var(--t);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+}
+.pj-hero__metric-lb {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--m2);
+    font-weight: 600;
+}
+.pj-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--m);
+    background: var(--soft);
+    padding: .2rem .6rem;
+    border-radius: 999px;
+}
+
+/* metric tiles */
+.pj-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: .6rem;
+}
+.pj-stat {
+    border: 1px solid var(--d);
+    border-radius: .75rem;
+    padding: .75rem .9rem;
+    background: var(--s);
+}
+.pj-stat__lb {
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--m2);
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+.pj-stat__vl {
+    margin-top: .35rem;
+    font-size: 1.15rem;
+    font-weight: 650;
+    color: var(--t);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+.pj-stat__sub {
+    margin-top: .15rem;
+    font-size: .75rem;
+    color: var(--m);
+}
+.pj-stat--success {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+.pj-stat--success .pj-stat__vl {
+    color: #047857;
+}
+.dark .pj-stat--success {
+    background: rgba(16, 185, 129, .10);
+    border-color: rgba(16, 185, 129, .30);
+}
+.dark .pj-stat--success .pj-stat__vl {
+    color: #6ee7b7;
+}
+.pj-stat--warning {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+.pj-stat--warning .pj-stat__vl {
+    color: #c2410c;
+}
+.dark .pj-stat--warning {
+    background: rgba(251, 146, 60, .10);
+    border-color: rgba(251, 146, 60, .30);
+}
+.dark .pj-stat--warning .pj-stat__vl {
+    color: #fdba74;
+}
+.pj-stat--primary {
+    background: var(--accent-softer);
+    border-color: var(--accent-soft);
+}
+.pj-stat--primary .pj-stat__vl {
+    color: var(--accent-strong);
+}
+.dark .pj-stat--primary .pj-stat__vl {
+    color: var(--accent);
+}
+
+/* pill variants missing from the base .pj-pill set */
+.pj-pill--warning {
+    background: #ffedd5;
+    color: #c2410c;
+}
+.dark .pj-pill--warning {
+    background: rgba(251, 146, 60, .16);
+    color: #fdba74;
+}
+.pj-pill--danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+.dark .pj-pill--danger {
+    background: rgba(239, 68, 68, .16);
+    color: #fca5a5;
+}
+.pj-pill--primary {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+}
+.dark .pj-pill--primary {
+    background: var(--accent-softer);
+    color: var(--accent);
+}
+
+/* screenshot thumbnail inside the payments card */
+.pj-shot {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: .4rem;
+    object-fit: cover;
+    cursor: zoom-in;
+    box-shadow: 0 0 0 1px var(--d);
+    display: block;
+}
+
+/* gallery / screenshot lightbox — mirrors .cw-modal__bg */
+.pj-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(15, 23, 42, .75);
+    backdrop-filter: blur(4px);
+    cursor: zoom-out;
+}
+.pj-lightbox img {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: .5rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .4);
+    object-fit: contain;
+}
+.pj-gallery a {
+    cursor: zoom-in;
 }
