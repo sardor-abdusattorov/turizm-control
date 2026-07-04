@@ -103,6 +103,19 @@ class Project extends Model
     }
 
     /**
+     * Total actually collected across all participants (sum of their cached
+     * paid_amount, maintained by ProjectPaymentObserver).
+     */
+    public function paidTotal(): float
+    {
+        if ($this->relationLoaded('participants')) {
+            return (float) $this->participants->sum('paid_amount');
+        }
+
+        return (float) $this->participants()->sum('paid_amount');
+    }
+
+    /**
      * Signed temporary URLs for the gallery images, mirroring
      * Payment::screenshotUrl() — the private disk serves files only through
      * expiring links.

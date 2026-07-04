@@ -15,6 +15,7 @@ use App\Models\OrderType;
 use App\Models\Position;
 use App\Models\Project;
 use App\Models\ProjectParticipant;
+use App\Models\ProjectPayment;
 use App\Models\User;
 use MrAdder\FilamentLogger\Loggers\AccessLogger;
 use MrAdder\FilamentLogger\Loggers\ModelLogger;
@@ -304,6 +305,7 @@ return [
             Order::class,
             Project::class,
             ProjectParticipant::class,
+            ProjectPayment::class,
         ],
     ],
 
