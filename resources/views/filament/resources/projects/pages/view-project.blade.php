@@ -59,7 +59,7 @@
 @endphp
 
 <x-filament-panels::page>
-<div class="pj" x-data="{ lightbox: false, src: '' }" @keydown.escape.window="lightbox = false">
+<div class="pj">
 
     {{-- ============ HERO ============ --}}
     <section class="pj-hero pj-hero--{{ $heroVariant }}">
@@ -209,7 +209,10 @@
                 <h2 class="ow-hd__t">{{ __('app.label.payments') }}</h2>
                 <span class="pj-count">{{ $payments->count() }}</span>
             </header>
-            <div class="pj-table-wrap">
+            {{-- data-viewer-gallery: the plugin's Viewer.js picks up every
+                 screenshot inside, so one click opens a navigable viewer
+                 across all payment proofs. --}}
+            <div class="pj-table-wrap" data-viewer-gallery>
                 <table class="pj-table">
                     <thead>
                     <tr>
@@ -227,7 +230,7 @@
                             <td>{{ $pay->paid_at?->format('d.m.Y') }}</td>
                             <td>
                                 @if ($pay->shot)
-                                    <img class="pj-shot" src="{{ $pay->shot }}" alt="" @click="lightbox = true; src = '{{ $pay->shot }}'">
+                                    <img class="pj-shot" src="{{ $pay->shot }}" alt="{{ $pay->name }}">
                                 @else
                                     —
                                 @endif
@@ -251,19 +254,15 @@
         @if ($galleryUrls === [])
             <p class="pj-empty">{{ __('app.message.no_gallery') }}</p>
         @else
-            <div class="pj-gallery">
-                @foreach ($galleryUrls as $url)
-                    <a href="{{ $url }}" @click.prevent="lightbox = true; src = '{{ $url }}'">
-                        <img src="{{ $url }}" alt="{{ $record->name }} — {{ $loop->iteration }}" loading="lazy">
-                    </a>
-                @endforeach
+            <div class="pj-gallery-pad">
+                <x-image-gallery::image-gallery
+                    :images="$galleryUrls"
+                    :thumb-width="160"
+                    :thumb-height="120"
+                    rounded="rounded-xl"
+                />
             </div>
         @endif
     </section>
-
-    {{-- ============ LIGHTBOX ============ --}}
-    <div class="pj-lightbox" x-show="lightbox" x-cloak x-transition @click="lightbox = false">
-        <img :src="src" alt="">
-    </div>
 </div>
 </x-filament-panels::page>

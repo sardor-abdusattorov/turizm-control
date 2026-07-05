@@ -131,6 +131,20 @@ it('deletes participant rows together with the project', function () {
     expect(ProjectParticipant::count())->toBe(0);
 });
 
+it('renders the gallery through the image-gallery component', function () {
+    Storage::disk('local')->put('uploads/images/projects/2025/01/a.jpg', 'stub');
+
+    $project = Project::factory()->create([
+        'gallery' => ['uploads/images/projects/2025/01/a.jpg'],
+    ]);
+
+    actingAs(userWithPermission('view_any_project', 'view_project'));
+
+    Livewire::test(ViewProject::class, ['record' => $project->id])
+        ->assertSuccessful()
+        ->assertSee('data-viewer-gallery', false);
+});
+
 it('records a project payment through the view page action', function () {
     $project = Project::factory()->create();
     $participant = ProjectParticipant::factory()->create([

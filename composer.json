@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.3",
         "abdulmajeed-jamaan/filament-translatable-tabs": "^5.0",
+        "al-saloul/filament-image-gallery": "*",
         "bezhansalleh/filament-language-switch": "^4.3",
         "bezhansalleh/filament-shield": "^4.2",
         "caresome/filament-auth-designer": "^3.1",

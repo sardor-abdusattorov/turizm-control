@@ -630,38 +630,16 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
-.pj-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
-    gap: .75rem;
-    padding: 1.25rem;
-}
-.pj-gallery a {
-    display: block;
-    border-radius: .7rem;
-    overflow: hidden;
-    box-shadow: 0 0 0 1px var(--d);
-    aspect-ratio: 4 / 3;
-    background: var(--soft);
-}
-.pj-gallery img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform .15s ease;
-}
-.pj-gallery a:hover img {
-    transform: scale(1.04);
+/* Horizontal filmstrip rendered by the image-gallery plugin component —
+   the card supplies the side padding the component itself lacks. */
+.pj-gallery-pad {
+    padding: .25rem 1.25rem 1rem;
 }
 
-/* ─── Projects: hero, metric tiles, pill variants, lightbox ─────────────────
+/* ─── Projects: hero, metric tiles, pill variants ───────────────────────────
    Mirrors the .pv-hero / .cw-stat look but lives in the global .pj block so
    the projects view page reuses it by class name (the contract .cw hero is
    page-scoped and not reusable). */
-[x-cloak] {
-    display: none !important;
-}
 .pj {
     display: flex;
     flex-direction: column;
@@ -866,26 +844,3 @@
     display: block;
 }
 
-/* gallery / screenshot lightbox — mirrors .cw-modal__bg */
-.pj-lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-    background: rgba(15, 23, 42, .75);
-    backdrop-filter: blur(4px);
-    cursor: zoom-out;
-}
-.pj-lightbox img {
-    max-width: 100%;
-    max-height: 92vh;
-    border-radius: .5rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, .4);
-    object-fit: contain;
-}
-.pj-gallery a {
-    cursor: zoom-in;
-}
