@@ -5,7 +5,7 @@
     /** @var \App\Models\Project $record */
     $record = $this->record;
     $record->loadMissing([
-        'participants.contact', 'participants.currency', 'participants.payments',
+        'participants.contact', 'participants.sponsor', 'participants.currency', 'participants.payments',
         'order', 'areaCurrency', 'standCurrency', 'creator',
     ]);
 
@@ -173,6 +173,8 @@
                                     {{ $p->name }}
                                     @if ($p->contact)
                                         <span class="pj-pill pj-pill--{{ $block['pill'] }}">{{ __('app.label.contact_single') }}</span>
+                                    @elseif ($p->sponsor)
+                                        <span class="pj-pill pj-pill--{{ $block['pill'] }}">{{ __('app.label.sponsor_single') }}</span>
                                     @endif
                                 </td>
                                 <td class="pj-table__num">{{ $fmt($p->amount) }} {{ $p->currency?->short_name }}</td>

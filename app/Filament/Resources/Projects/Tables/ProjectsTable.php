@@ -2,8 +2,7 @@
 
 namespace App\Filament\Resources\Projects\Tables;
 
-use App\Enums\ProjectType;
-use App\Filament\Resources\Projects\ProjectResource;
+use App\Filament\Resources\Projects\BaseProjectResource;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Project;
@@ -34,13 +33,6 @@ class ProjectsTable
                     ->label(__('app.label.project_name'))
                     ->weight('semibold')
                     ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('type')
-                    ->label(__('app.label.project_type'))
-                    ->badge()
-                    ->formatStateUsing(fn (ProjectType $state): string => $state->label())
-                    ->color(fn (ProjectType $state): string => $state->color())
                     ->sortable(),
 
                 TextColumn::make('starts_on')
@@ -101,15 +93,11 @@ class ProjectsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('type')
-                    ->label(__('app.label.project_type'))
-                    ->options(ProjectType::options()),
-
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
                     ->options(Project::getStatuses()),
             ])
-            ->recordUrl(fn (Project $record) => ProjectResource::getUrl('view', ['record' => $record]))
+            ->recordUrl(fn (Project $record) => BaseProjectResource::resourceFor($record)::getUrl('view', ['record' => $record]))
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->color('gray'),

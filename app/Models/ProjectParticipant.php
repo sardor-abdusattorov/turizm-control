@@ -16,6 +16,7 @@ class ProjectParticipant extends Model
     protected $fillable = [
         'project_id',
         'contact_id',
+        'sponsor_id',
         'role',
         'name',
         'amount',
@@ -38,6 +39,11 @@ class ProjectParticipant extends Model
     public function contact(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
+    }
+
+    public function sponsor(): BelongsTo
+    {
+        return $this->belongsTo(Sponsor::class);
     }
 
     public function currency(): BelongsTo

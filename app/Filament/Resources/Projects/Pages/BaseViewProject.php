@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Projects\Pages;
 
-use App\Filament\Resources\Projects\ProjectResource;
 use App\Filament\Support\ImageUpload;
 use App\Models\ProjectParticipant;
 use App\Models\ProjectPayment;
@@ -17,10 +16,8 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 
-class ViewProject extends ViewRecord
+abstract class BaseViewProject extends ViewRecord
 {
-    protected static string $resource = ProjectResource::class;
-
     protected string $view = 'filament.resources.projects.pages.view-project';
 
     public function getHeading(): string

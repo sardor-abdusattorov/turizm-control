@@ -2,14 +2,17 @@
 
 use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
-use App\Filament\Resources\Projects\Pages\CreateProject;
-use App\Filament\Resources\Projects\Pages\EditProject;
-use App\Filament\Resources\Projects\Pages\ListProjects;
-use App\Filament\Resources\Projects\Pages\ViewProject;
-use App\Filament\Resources\Projects\ProjectResource;
+use App\Filament\Resources\Projects\InternalProjectResource;
+use App\Filament\Resources\Projects\InternationalProjectResource;
+use App\Filament\Resources\Projects\Pages\CreateInternationalProject;
+use App\Filament\Resources\Projects\Pages\EditInternalProject;
+use App\Filament\Resources\Projects\Pages\ListInternalProjects;
+use App\Filament\Resources\Projects\Pages\ListInternationalProjects;
+use App\Filament\Resources\Projects\Pages\ViewInternationalProject;
 use App\Models\Project;
 use App\Models\ProjectParticipant;
 use App\Models\ProjectPayment;
+use App\Models\Sponsor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -23,55 +26,40 @@ beforeEach(function () {
     Storage::fake('local');
 });
 
-it('forbids the project list without permission', function () {
+it('forbids the project lists without permission', function () {
     actingAs(userWithPermission('view_profile_settings'));
 
-    Livewire::test(ListProjects::class)->assertForbidden();
+    Livewire::test(ListInternationalProjects::class)->assertForbidden();
+    Livewire::test(ListInternalProjects::class)->assertForbidden();
 });
 
-it('lists projects with type tabs', function () {
-    Project::factory()->internal()->create(['name' => 'INTERNAL-EXPO-2025']);
-    Project::factory()->international()->create(['name' => 'WORLD-EXPO-2025']);
-
-    actingAs(userWithPermission('view_any_project'));
-
-    Livewire::test(ListProjects::class)
-        ->assertSuccessful()
-        ->assertCanSeeTableRecords(Project::all())
-        ->set('activeTab', ProjectType::International->value)
-        ->assertCanSeeTableRecords(Project::where('type', ProjectType::International)->get())
-        ->assertCanNotSeeTableRecords(Project::where('type', ProjectType::Internal)->get());
-});
-
-it('opens the list pre-filtered from the sidebar tab query parameter', function () {
+it('scopes each resource to its own project type', function () {
     $internal = Project::factory()->internal()->create(['name' => 'INTERNAL-EXPO-2025']);
     $international = Project::factory()->international()->create(['name' => 'WORLD-EXPO-2025']);
 
     actingAs(userWithPermission('view_any_project'));
 
-    // ListRecords binds $activeTab to `?tab=` — the sidebar items rely on it.
-    Livewire::withQueryParams(['tab' => ProjectType::Internal->value])
-        ->test(ListProjects::class)
+    Livewire::test(ListInternationalProjects::class)
+        ->assertSuccessful()
+        ->assertCanSeeTableRecords(collect([$international]))
+        ->assertCanNotSeeTableRecords(collect([$internal]));
+
+    Livewire::test(ListInternalProjects::class)
         ->assertSuccessful()
         ->assertCanSeeTableRecords(collect([$internal]))
         ->assertCanNotSeeTableRecords(collect([$international]));
 
-    $urls = array_map(
-        fn ($item): string => $item->getUrl(),
-        ProjectResource::getNavigationItems(),
-    );
-
-    expect($urls[0])->toContain('tab=internal')
-        ->and($urls[1])->toContain('tab=international');
+    expect(InternalProjectResource::getUrl('index'))->toContain('internal-projects')
+        ->and(InternationalProjectResource::getUrl('index'))->toContain('international-projects');
 });
 
-it('creates a project with participants and stamps the author', function () {
+it('creates a project stamping the resource type, author, participants and sponsor', function () {
+    $sponsor = Sponsor::factory()->create(['name' => 'UZBEKISTAN AIRWAYS AJ']);
     $user = userWithPermission('view_any_project', 'create_project');
     actingAs($user);
 
-    Livewire::test(CreateProject::class)
+    Livewire::test(CreateInternationalProject::class)
         ->fillForm([
-            'type' => ProjectType::International->value,
             'name' => 'FITUR-2026',
             'starts_on' => '2026-01-21',
             'ends_on' => '2026-01-25',
@@ -80,8 +68,7 @@ it('creates a project with participants and stamps the author', function () {
             'stand_cost' => 50000,
             'participants' => [
                 ['role' => ParticipantRole::Participant->value, 'name' => 'OOO "ZAMIN DMC"', 'amount' => 40000000],
-                ['role' => ParticipantRole::Participant->value, 'name' => 'ORIENT STAR GROUP MCHJ', 'amount' => 35000000],
-                ['role' => ParticipantRole::Sponsor->value, 'name' => 'UZBEKISTAN AIRWAYS AJ', 'amount' => 100000000],
+                ['role' => ParticipantRole::Sponsor->value, 'sponsor_id' => $sponsor->id, 'name' => $sponsor->name, 'amount' => 100000000],
             ],
         ])
         ->call('create')
@@ -91,30 +78,27 @@ it('creates a project with participants and stamps the author', function () {
 
     expect($project->type)->toBe(ProjectType::International)
         ->and($project->created_by)->toBe($user->id)
-        ->and($project->participants)->toHaveCount(3)
+        ->and($project->participants)->toHaveCount(2)
         ->and($project->sponsors)->toHaveCount(1)
-        ->and($project->sponsors->first()->name)->toBe('UZBEKISTAN AIRWAYS AJ')
-        ->and($project->feesTotal())->toBe(175000000.0);
+        ->and($project->sponsors->first()->sponsor_id)->toBe($sponsor->id)
+        ->and($project->feesTotal())->toBe(140000000.0);
 });
 
-it('validates that the project name and type are required', function () {
+it('validates that the project name is required', function () {
     actingAs(userWithPermission('view_any_project', 'create_project'));
 
-    Livewire::test(CreateProject::class)
-        ->fillForm([
-            'type' => null,
-            'name' => null,
-        ])
+    Livewire::test(CreateInternationalProject::class)
+        ->fillForm(['name' => null])
         ->call('create')
-        ->assertHasFormErrors(['type', 'name']);
+        ->assertHasFormErrors(['name']);
 });
 
-it('updates a project', function () {
+it('updates a project through its typed resource', function () {
     $project = Project::factory()->internal()->create(['name' => 'OLD-NAME']);
 
     actingAs(userWithPermission('view_any_project', 'view_project', 'update_project'));
 
-    Livewire::test(EditProject::class, ['record' => $project->id])
+    Livewire::test(EditInternalProject::class, ['record' => $project->id])
         ->fillForm(['name' => 'NEW-NAME'])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -134,19 +118,19 @@ it('deletes participant rows together with the project', function () {
 it('renders the gallery through the image-gallery component', function () {
     Storage::disk('local')->put('uploads/images/projects/2025/01/a.jpg', 'stub');
 
-    $project = Project::factory()->create([
+    $project = Project::factory()->international()->create([
         'gallery' => ['uploads/images/projects/2025/01/a.jpg'],
     ]);
 
     actingAs(userWithPermission('view_any_project', 'view_project'));
 
-    Livewire::test(ViewProject::class, ['record' => $project->id])
+    Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
         ->assertSuccessful()
         ->assertSee('data-viewer-gallery', false);
 });
 
 it('records a project payment through the view page action', function () {
-    $project = Project::factory()->create();
+    $project = Project::factory()->international()->create();
     $participant = ProjectParticipant::factory()->create([
         'project_id' => $project->id,
         'amount' => 25_000_000,
@@ -155,7 +139,7 @@ it('records a project payment through the view page action', function () {
 
     actingAs(userWithPermission('view_any_project', 'view_project', 'record_project_payment'));
 
-    Livewire::test(ViewProject::class, ['record' => $project->id])
+    Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
         ->callAction('recordPayment', [
             'project_participant_id' => $participant->id,
             'amount' => 25_000_000,

@@ -3,11 +3,12 @@
 namespace App\Filament\Resources\Projects\Schemas;
 
 use App\Enums\ParticipantRole;
-use App\Enums\ProjectType;
+use App\Filament\Resources\Sponsors\Schemas\SponsorForm;
 use App\Filament\Support\ImageGalleryUpload;
 use App\Models\Contact;
 use App\Models\Currency;
 use App\Models\Order;
+use App\Models\Sponsor;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -32,12 +33,6 @@ class ProjectForm
                     ->schema([
                         Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
-                                Select::make('type')
-                                    ->label(__('app.label.project_type'))
-                                    ->options(ProjectType::options())
-                                    ->default(ProjectType::International->value)
-                                    ->required(),
-
                                 TextInput::make('name')
                                     ->label(__('app.label.project_name'))
                                     ->required()
@@ -146,6 +141,7 @@ class ProjectForm
                                     ->label(__('app.label.participant_role'))
                                     ->options(ParticipantRole::options())
                                     ->default(ParticipantRole::Participant->value)
+                                    ->live()
                                     ->required(),
 
                                 Select::make('contact_id')
@@ -154,9 +150,25 @@ class ProjectForm
                                     ->searchable()
                                     ->nullable()
                                     ->live()
+                                    ->visible(fn (Get $get): bool => $get('role') !== ParticipantRole::Sponsor->value)
                                     ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
                                         if ($state && blank($get('name'))) {
                                             $set('name', Contact::find($state)?->getTranslation('name', app()->getLocale()));
+                                        }
+                                    }),
+
+                                Select::make('sponsor_id')
+                                    ->label(__('app.label.sponsor_single'))
+                                    ->options(fn () => Sponsor::getActive())
+                                    ->searchable()
+                                    ->nullable()
+                                    ->live()
+                                    ->visible(fn (Get $get): bool => $get('role') === ParticipantRole::Sponsor->value)
+                                    ->createOptionForm(fn (Schema $schema) => SponsorForm::configure($schema))
+                                    ->createOptionUsing(fn (array $data) => Sponsor::create($data)->getKey())
+                                    ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
+                                        if ($state && blank($get('name'))) {
+                                            $set('name', Sponsor::find($state)?->name);
                                         }
                                     }),
 

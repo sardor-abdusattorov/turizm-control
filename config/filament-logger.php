@@ -16,6 +16,7 @@ use App\Models\Position;
 use App\Models\Project;
 use App\Models\ProjectParticipant;
 use App\Models\ProjectPayment;
+use App\Models\Sponsor;
 use App\Models\User;
 use MrAdder\FilamentLogger\Loggers\AccessLogger;
 use MrAdder\FilamentLogger\Loggers\ModelLogger;
@@ -306,6 +307,7 @@ return [
             Project::class,
             ProjectParticipant::class,
             ProjectPayment::class,
+            Sponsor::class,
         ],
     ],
 
