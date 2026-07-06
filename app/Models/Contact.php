@@ -27,6 +27,7 @@ class Contact extends Model
         'address',
         'phone',
         'email',
+        'website',
         'contact_person',
         'director_name',
         'bank_account',

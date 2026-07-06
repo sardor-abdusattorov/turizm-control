@@ -1,0 +1,253 @@
+<?php
+
+namespace App\Exports;
+
+use App\Enums\ProjectType;
+use App\Models\Project;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+
+/**
+ * Reproduces the PR Centre's hand-made yearly registry sheet one-to-one:
+ * a merged title banner, the 12-column header, one merged block per project
+ * (participants listed row by row in columns I/J) and an «Итог» separator
+ * after each block — so the export replaces the copied-by-hand template.
+ */
+class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents, WithTitle
+{
+    use Exportable;
+
+    /** Row-index spans (0-based within the data array) per project block. */
+    private array $blocks = [];
+
+    /** 0-based data-array indexes of the «Итог» separator rows. */
+    private array $totalRows = [];
+
+    private array $rows = [];
+
+    private string $registryTitle = '';
+
+    /**
+     * Month names in the genitive case, as the registry writes its date
+     * ranges («22-26-января», «28-апреля-1-мая»).
+     */
+    private const MONTHS = [
+        1 => 'января', 2 => 'февраля', 3 => 'марта', 4 => 'апреля',
+        5 => 'мая', 6 => 'июня', 7 => 'июля', 8 => 'августа',
+        9 => 'сентября', 10 => 'октября', 11 => 'ноября', 12 => 'декабря',
+    ];
+
+    /** The registry's own currency spellings. */
+    private const CURRENCY_LABELS = [
+        'EUR' => 'EURO',
+        'GBP' => 'Фунт ст',
+        'UZS' => 'Сум',
+    ];
+
+    /** @param  Builder<Project>  $query */
+    public function __construct(
+        private readonly Builder $query,
+        private readonly ProjectType $type,
+    ) {}
+
+    /** @return array<int, array<int, mixed>> */
+    public function array(): array
+    {
+        $projects = (clone $this->query)
+            ->with(['participants.currency', 'areaCurrency', 'standCurrency'])
+            ->reorder('starts_on')
+            ->get();
+
+        $this->registryTitle = $this->buildTitle($projects);
+
+        $this->rows = [[
+            '№',
+            __('app.export.registry_col_name'),
+            __('app.export.registry_col_dates'),
+            __('app.export.registry_col_area'),
+            __('app.export.registry_col_area_cost'),
+            __('app.export.registry_col_currency'),
+            __('app.export.registry_col_stand_cost'),
+            __('app.export.registry_col_currency'),
+            __('app.export.registry_col_participants'),
+            __('app.export.registry_col_amount'),
+            __('app.export.registry_col_currency'),
+            __('app.export.registry_col_profit'),
+        ]];
+
+        foreach ($projects as $index => $project) {
+            $participants = $project->participants;
+            $span = max(1, $participants->count());
+            $start = count($this->rows) - 1; // 0-based data index of the block's first row
+
+            for ($i = 0; $i < $span; $i++) {
+                $participant = $participants[$i] ?? null;
+
+                $this->rows[] = $i === 0
+                    ? [
+                        $index + 1,
+                        $project->name,
+                        $this->formatDates($project),
+                        $this->formatArea($project),
+                        $project->area_is_free ? __('app.export.registry_free') : ($project->area_cost !== null ? (float) $project->area_cost : null),
+                        $project->area_is_free ? null : $this->currencyLabel($project->areaCurrency?->short_name),
+                        $project->stand_cost !== null ? (float) $project->stand_cost : null,
+                        $this->currencyLabel($project->standCurrency?->short_name),
+                        $participant?->name,
+                        $participant !== null ? (float) $participant->amount : null,
+                        $this->currencyLabel($participants->first()?->currency?->short_name ?? 'UZS'),
+                        $project->feesTotal(),
+                    ]
+                    : [
+                        null, null, null, null, null, null, null, null,
+                        $participant?->name,
+                        $participant !== null ? (float) $participant->amount : null,
+                        null, null,
+                    ];
+            }
+
+            $this->blocks[] = ['start' => $start, 'span' => $span];
+
+            $this->rows[] = [__('app.export.registry_total'), null, null, null, null, null, null, null, null, null, null, null];
+            $this->totalRows[] = count($this->rows) - 2; // 0-based data index of the «Итог» row
+        }
+
+        return $this->rows;
+    }
+
+    public function title(): string
+    {
+        return __('app.label.projects');
+    }
+
+    /** @return array<string, float> */
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 5, 'B' => 27.6, 'C' => 16.9, 'D' => 15.7, 'E' => 17.4, 'F' => 10.1,
+            'G' => 16.7, 'H' => 11.3, 'I' => 28.3, 'J' => 17.7, 'K' => 10.4, 'L' => 15.6,
+        ];
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event): void {
+                $sheet = $event->sheet->getDelegate();
+                $lastRow = $sheet->getHighestRow();
+
+                // Title banner above everything (shifts all rows down by one).
+                $sheet->insertNewRowBefore(1, 1);
+                $sheet->mergeCells('A1:L1');
+                $sheet->setCellValue('A1', $this->registryTitle);
+                $sheet->getStyle('A1:L1')->applyFromArray([
+                    'font' => ['bold' => true, 'name' => 'Times New Roman', 'size' => 14],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+                ]);
+                $sheet->getRowDimension(1)->setRowHeight(28);
+
+                $tableRange = 'A2:L'.($lastRow + 1);
+                $sheet->getStyle($tableRange)->getFont()->setName('Times New Roman')->setSize(11);
+                $sheet->getStyle($tableRange)->applyFromArray([
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']]],
+                    'alignment' => ['vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true],
+                ]);
+
+                $sheet->getStyle('A2:L2')->applyFromArray([
+                    'font' => ['bold' => true, 'name' => 'Times New Roman', 'size' => 12],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D9E1F2']],
+                ]);
+
+                $sheet->getStyle('E3:L'.($lastRow + 1))->getNumberFormat()->setFormatCode('#,##0');
+
+                // Data index i sits on sheet row i + 3 (title + header offset).
+                foreach ($this->blocks as $block) {
+                    $top = $block['start'] + 3;
+                    $bottom = $top + $block['span'] - 1;
+
+                    if ($bottom > $top) {
+                        foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K', 'L'] as $column) {
+                            $sheet->mergeCells("{$column}{$top}:{$column}{$bottom}");
+                        }
+                    }
+                }
+
+                foreach ($this->totalRows as $index) {
+                    $row = $index + 3;
+                    $sheet->mergeCells("A{$row}:C{$row}");
+                    $sheet->mergeCells("D{$row}:E{$row}");
+                    $sheet->mergeCells("K{$row}:L{$row}");
+                    $sheet->getStyle("A{$row}")->getFont()->setBold(true);
+                }
+
+                $sheet->freezePane('A3');
+            },
+        ];
+    }
+
+    /** @param  Collection<int, Project>  $projects */
+    private function buildTitle(Collection $projects): string
+    {
+        $years = $projects->pluck('starts_on')->filter()->map(fn ($date) => $date->year)->unique()->sort()->values();
+        $year = $years->isEmpty() ? (string) now()->year : $years->implode('–');
+
+        return $this->type === ProjectType::International
+            ? __('app.export.registry_title_international', ['year' => $year])
+            : __('app.export.registry_title_internal', ['year' => $year]);
+    }
+
+    /**
+     * «22-26-января» when the range stays inside one month,
+     * «28-апреля-1-мая» when it crosses one — exactly as the registry writes.
+     */
+    private function formatDates(Project $project): ?string
+    {
+        if (! $project->starts_on) {
+            return null;
+        }
+
+        $start = $project->starts_on;
+        $end = $project->ends_on;
+
+        if (! $end || $start->isSameDay($end)) {
+            return $start->day.'-'.self::MONTHS[$start->month];
+        }
+
+        if ($start->month === $end->month) {
+            return $start->day.'-'.$end->day.'-'.self::MONTHS[$start->month];
+        }
+
+        return $start->day.'-'.self::MONTHS[$start->month].'-'.$end->day.'-'.self::MONTHS[$end->month];
+    }
+
+    /** «76,5м2» — decimal comma, trailing zeros trimmed. */
+    private function formatArea(Project $project): ?string
+    {
+        if ($project->area_sqm === null) {
+            return null;
+        }
+
+        $value = rtrim(rtrim(number_format((float) $project->area_sqm, 2, ',', ''), '0'), ',');
+
+        return $value.'м2';
+    }
+
+    private function currencyLabel(?string $shortName): ?string
+    {
+        if ($shortName === null) {
+            return null;
+        }
+
+        return self::CURRENCY_LABELS[$shortName] ?? $shortName;
+    }
+}

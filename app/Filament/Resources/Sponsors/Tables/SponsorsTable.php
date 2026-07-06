@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\Sponsors\Tables;
 
+use App\Exports\SponsorsExport;
 use App\Filament\Support\CreatedAtColumn;
+use App\Filament\Support\ExportPermission;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Sponsor;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -15,6 +18,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SponsorsTable
 {
@@ -36,6 +40,15 @@ class SponsorsTable
                     ->alignCenter()
                     ->color(fn (Sponsor $record): string => ($record->participations_count ?? 0) > 0 ? 'warning' : 'gray')
                     ->sortable(),
+
+                TextColumn::make('inn')
+                    ->label(__('app.label.inn'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('contact_person')
+                    ->label(__('app.label.contact_person'))
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('phone')
                     ->label(__('app.label.phone'))
@@ -60,6 +73,17 @@ class SponsorsTable
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
                     ->options(Sponsor::getStatuses()),
+            ])
+            ->headerActions([
+                Action::make('exportXlsx')
+                    ->label(__('app.action.export_xlsx'))
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('gray')
+                    ->visible(fn (): bool => ExportPermission::allows('export_sponsor'))
+                    ->action(fn ($livewire) => Excel::download(
+                        new SponsorsExport($livewire->getFilteredTableQuery()),
+                        'sponsors-'.now()->format('Y-m-d').'.xlsx',
+                    )),
             ])
             ->recordActions([
                 ActionGroup::make([

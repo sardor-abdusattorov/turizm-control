@@ -14,9 +14,12 @@ class Sponsor extends Model
 
     protected $fillable = [
         'name',
+        'inn',
+        'contact_person',
         'phone',
         'email',
         'website',
+        'address',
         'description',
         'status',
     ];

@@ -123,6 +123,11 @@ class ContactsTable
                     ->label(__('app.label.email'))
                     ->toggleable(),
 
+                TextColumn::make('website')
+                    ->label(__('app.label.website'))
+                    ->url(fn (Contact $record): ?string => $record->website, shouldOpenInNewTab: true)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 StatusToggleColumn::make(),
 
                 CreatedAtColumn::make()

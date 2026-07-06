@@ -23,7 +23,7 @@ class InternalProjectResource extends BaseProjectResource
 
     public static function getNavigationLabel(): string
     {
-        return __('app.label.projects_internal');
+        return __('app.label.internal_project_plural');
     }
 
     public static function getModelLabel(): string

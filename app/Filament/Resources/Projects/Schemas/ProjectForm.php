@@ -8,6 +8,7 @@ use App\Filament\Support\ImageGalleryUpload;
 use App\Models\Contact;
 use App\Models\Currency;
 use App\Models\Order;
+use App\Models\Project;
 use App\Models\Sponsor;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -34,93 +35,124 @@ class ProjectForm
                         Tabs\Tab::make(__('app.label.basic_information'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
+                                TextInput::make('name')
+                                    ->label(__('app.label.project_name'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
+
                                 Grid::make(['default' => 1, 'md' => 2])
                                     ->schema([
-                                        TextInput::make('name')
-                                            ->label(__('app.label.project_name'))
-                                            ->required()
-                                            ->maxLength(255),
-
                                         DatePicker::make('starts_on')
                                             ->label(__('app.label.starts_on'))
                                             ->native(false)
-                                            ->displayFormat('d.m.Y'),
+                                            ->displayFormat('d.m.Y')
+                                            ->prefixIcon('heroicon-o-calendar-days')
+                                            ->closeOnDateSelection(),
 
                                         DatePicker::make('ends_on')
                                             ->label(__('app.label.ends_on'))
                                             ->native(false)
                                             ->displayFormat('d.m.Y')
+                                            ->prefixIcon('heroicon-o-calendar-days')
+                                            ->closeOnDateSelection()
                                             ->afterOrEqual('starts_on'),
-
-                                        Select::make('order_id')
-                                            ->label(__('app.label.order_single'))
-                                            ->relationship(
-                                                'order',
-                                                'title',
-                                                fn (Builder $query): Builder => $query->active(),
-                                            )
-                                            ->getOptionLabelFromRecordUsing(fn (Order $record): string => trim(
-                                                ($record->number ? $record->number.' · ' : '').$record->title,
-                                            ))
-                                            ->searchable(['number', 'title'])
-                                            ->preload()
-                                            ->nullable(),
-
-                                        Toggle::make('status')
-                                            ->label(__('app.label.status'))
-                                            ->default(true)
-                                            ->inline(false),
                                     ]),
+
+                                Select::make('order_id')
+                                    ->label(__('app.label.order_single'))
+                                    ->relationship(
+                                        'order',
+                                        'title',
+                                        fn (Builder $query): Builder => $query->active(),
+                                    )
+                                    ->getOptionLabelFromRecordUsing(fn (Order $record): string => trim(
+                                        ($record->number ? $record->number.' · ' : '').$record->title,
+                                    ))
+                                    ->searchable(['number', 'title'])
+                                    ->preload()
+                                    ->nullable()
+                                    ->columnSpanFull(),
 
                                 Textarea::make('description')
                                     ->label(__('app.label.description'))
                                     ->rows(3)
                                     ->columnSpanFull(),
+
+                                Toggle::make('status')
+                                    ->label(__('app.label.status'))
+                                    ->default(true),
                             ]),
 
                         Tabs\Tab::make(__('app.label.project_costs'))
                             ->icon('heroicon-o-banknotes')
                             ->schema([
-                                Grid::make(['default' => 1, 'md' => 3])
-                                    ->schema([
-                                        TextInput::make('area_sqm')
-                                            ->label(__('app.label.area_sqm'))
-                                            ->numeric()
-                                            ->step(0.01)
-                                            ->minValue(0)
-                                            ->suffix('м²'),
+                                TextInput::make('area_sqm')
+                                    ->label(__('app.label.area_sqm'))
+                                    ->numeric()
+                                    ->step(0.01)
+                                    ->minValue(0)
+                                    ->suffix('м²')
+                                    ->columnSpanFull(),
 
-                                        TextInput::make('area_cost')
-                                            ->label(__('app.label.area_cost'))
-                                            ->numeric()
-                                            ->step(0.01)
-                                            ->minValue(0)
-                                            ->prefix(fn (Get $get): ?string => Currency::find($get('area_currency_id'))?->short_name)
-                                            ->visible(fn (Get $get): bool => ! $get('area_is_free')),
+                                Toggle::make('area_is_free')
+                                    ->label(__('app.label.area_is_free'))
+                                    ->live(),
 
-                                        Select::make('area_currency_id')
-                                            ->label(__('app.label.area_currency'))
-                                            ->options(fn () => Currency::getActive())
-                                            ->live()
-                                            ->visible(fn (Get $get): bool => ! $get('area_is_free')),
+                                // One currency drives both cost fields; the stand
+                                // gets its own only when it genuinely differs
+                                // (e.g. ITB-2025: area in EUR, stand in USD).
+                                Select::make('area_currency_id')
+                                    ->label(__('app.label.currency_single'))
+                                    ->options(fn () => Currency::getActive())
+                                    ->live()
+                                    ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
+                                        if (! $get('stand_currency_differs')) {
+                                            $set('stand_currency_id', $state);
+                                        }
+                                    })
+                                    ->columnSpanFull(),
 
-                                        Toggle::make('area_is_free')
-                                            ->label(__('app.label.area_is_free'))
-                                            ->live()
-                                            ->inline(false),
+                                TextInput::make('area_cost')
+                                    ->label(__('app.label.area_cost'))
+                                    ->numeric()
+                                    ->step(0.01)
+                                    ->minValue(0)
+                                    ->prefix(fn (Get $get): ?string => Currency::find($get('area_currency_id'))?->short_name)
+                                    ->visible(fn (Get $get): bool => ! $get('area_is_free'))
+                                    ->columnSpanFull(),
 
-                                        TextInput::make('stand_cost')
-                                            ->label(__('app.label.stand_cost'))
-                                            ->numeric()
-                                            ->step(0.01)
-                                            ->minValue(0)
-                                            ->prefix(fn (Get $get): ?string => Currency::find($get('stand_currency_id'))?->short_name),
+                                TextInput::make('stand_cost')
+                                    ->label(__('app.label.stand_cost'))
+                                    ->numeric()
+                                    ->step(0.01)
+                                    ->minValue(0)
+                                    ->prefix(fn (Get $get): ?string => Currency::find($get('stand_currency_id') ?? $get('area_currency_id'))?->short_name)
+                                    ->columnSpanFull(),
 
-                                        Select::make('stand_currency_id')
-                                            ->label(__('app.label.stand_currency'))
-                                            ->options(fn () => Currency::getActive())
-                                            ->live(),
-                                    ]),
+                                Toggle::make('stand_currency_differs')
+                                    ->label(__('app.label.stand_currency_differs'))
+                                    ->dehydrated(false)
+                                    ->live()
+                                    ->afterStateHydrated(function (Toggle $component, ?Project $record): void {
+                                        $component->state(
+                                            $record !== null
+                                            && $record->stand_currency_id !== null
+                                            && $record->stand_currency_id !== $record->area_currency_id,
+                                        );
+                                    })
+                                    ->afterStateUpdated(function (Set $set, Get $get, bool $state): void {
+                                        if (! $state) {
+                                            $set('stand_currency_id', $get('area_currency_id'));
+                                        }
+                                    }),
+
+                                Select::make('stand_currency_id')
+                                    ->label(__('app.label.stand_currency'))
+                                    ->options(fn () => Currency::getActive())
+                                    ->live()
+                                    ->visible(fn (Get $get): bool => (bool) $get('stand_currency_differs'))
+                                    ->columnSpanFull(),
                             ]),
 
                         Tabs\Tab::make(__('app.label.participants'))
@@ -138,7 +170,6 @@ class ProjectForm
                                     ->itemLabel(fn (array $state): ?string => filled($state['name'] ?? null)
                                         ? $state['name'].(filled($state['amount'] ?? null) ? ' · '.number_format((float) $state['amount'], 0, ',', ' ') : '')
                                         : null)
-                                    ->columns(['default' => 1, 'md' => 2])
                                     ->schema([
                                         Select::make('role')
                                             ->label(__('app.label.participant_role'))
@@ -178,8 +209,7 @@ class ProjectForm
                                         TextInput::make('name')
                                             ->label(__('app.label.participant_name'))
                                             ->required()
-                                            ->maxLength(255)
-                                            ->columnSpanFull(),
+                                            ->maxLength(255),
 
                                         TextInput::make('amount')
                                             ->label(__('app.label.participant_amount'))

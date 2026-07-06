@@ -23,7 +23,7 @@ class InternationalProjectResource extends BaseProjectResource
 
     public static function getNavigationLabel(): string
     {
-        return __('app.label.projects_international');
+        return __('app.label.international_project_plural');
     }
 
     public static function getModelLabel(): string

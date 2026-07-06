@@ -23,8 +23,16 @@ class SponsorForm
                             ->required()
                             ->maxLength(255),
 
-                        Grid::make(['default' => 1, 'md' => 3])
+                        Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
+                                TextInput::make('inn')
+                                    ->label(__('app.label.inn'))
+                                    ->maxLength(30),
+
+                                TextInput::make('contact_person')
+                                    ->label(__('app.label.contact_person'))
+                                    ->maxLength(255),
+
                                 TextInput::make('phone')
                                     ->label(__('app.label.phone'))
                                     ->tel()
@@ -38,6 +46,10 @@ class SponsorForm
                                 TextInput::make('website')
                                     ->label(__('app.label.website'))
                                     ->url()
+                                    ->maxLength(255),
+
+                                TextInput::make('address')
+                                    ->label(__('app.label.address'))
                                     ->maxLength(255),
                             ]),
 

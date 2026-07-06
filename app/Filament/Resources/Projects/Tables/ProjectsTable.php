@@ -2,10 +2,13 @@
 
 namespace App\Filament\Resources\Projects\Tables;
 
+use App\Exports\ProjectsRegistryExport;
 use App\Filament\Resources\Projects\BaseProjectResource;
 use App\Filament\Support\CreatedAtColumn;
+use App\Filament\Support\ExportPermission;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Project;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -16,6 +19,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectsTable
 {
@@ -98,6 +102,20 @@ class ProjectsTable
                     ->options(Project::getStatuses()),
             ])
             ->recordUrl(fn (Project $record) => BaseProjectResource::resourceFor($record)::getUrl('view', ['record' => $record]))
+            ->headerActions([
+                Action::make('exportXlsx')
+                    ->label(__('app.action.export_xlsx'))
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('gray')
+                    ->visible(fn (): bool => ExportPermission::allows('export_project'))
+                    ->action(fn ($livewire) => Excel::download(
+                        new ProjectsRegistryExport(
+                            $livewire->getFilteredTableQuery(),
+                            $livewire::getResource()::projectType(),
+                        ),
+                        $livewire::getResource()::projectType()->value.'-projects-'.now()->format('Y-m-d').'.xlsx',
+                    )),
+            ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->color('gray'),
