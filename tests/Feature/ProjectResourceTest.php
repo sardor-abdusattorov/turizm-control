@@ -13,6 +13,7 @@ use App\Models\Project;
 use App\Models\ProjectParticipant;
 use App\Models\ProjectPayment;
 use App\Models\Sponsor;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -127,6 +128,27 @@ it('renders the gallery through the image-gallery component', function () {
     Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
         ->assertSuccessful()
         ->assertSee('data-viewer-gallery', false);
+});
+
+it('opens the quick-view modal from the list', function () {
+    $project = Project::factory()->international()->create(['name' => 'PREVIEW-EXPO-2025']);
+    $participant = ProjectParticipant::factory()->create([
+        'project_id' => $project->id,
+        'name' => 'OOO "PREVIEW TRAVEL"',
+        'amount' => 12_000_000,
+    ]);
+
+    actingAs(userWithPermission('view_any_project'));
+
+    Livewire::test(ListInternationalProjects::class)
+        ->assertSuccessful()
+        ->mountAction(TestAction::make('projectPreview')->table($project))
+        ->assertSuccessful();
+
+    $html = view('filament.resources.projects.tables.preview-modal', ['project' => $project])->render();
+
+    expect($html)->toContain('OOO &quot;PREVIEW TRAVEL&quot;')
+        ->toContain('12 000 000');
 });
 
 it('records a project payment through the view page action', function () {

@@ -340,6 +340,8 @@ return [
     'action' => [
         'update' => 'Update',
         'add_participant' => 'Add participant',
+        'quick_view' => 'Quick view',
+        'open_project' => 'Open project',
         'confirm' => 'Confirm',
         'cancel' => 'Cancel',
         'save_anyway' => 'Save anyway',

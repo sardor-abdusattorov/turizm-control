@@ -335,6 +335,8 @@ return [
     'action' => [
         'update' => 'Yangilash',
         'add_participant' => 'Ishtirokchi qo\'shish',
+        'quick_view' => 'Tezkor ko\'rish',
+        'open_project' => 'Loyihani ochish',
         'confirm' => 'Tasdiqlash',
         'cancel' => 'Bekor qilish',
         'save_anyway' => 'Baribir saqlash',

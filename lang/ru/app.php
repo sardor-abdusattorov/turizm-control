@@ -335,6 +335,8 @@ return [
     'action' => [
         'update' => 'Обновить',
         'add_participant' => 'Добавить участника',
+        'quick_view' => 'Быстрый просмотр',
+        'open_project' => 'Открыть проект',
         'confirm' => 'Подтвердить',
         'cancel' => 'Отмена',
         'save_anyway' => 'Всё равно сохранить',

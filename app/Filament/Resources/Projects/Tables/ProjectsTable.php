@@ -61,8 +61,10 @@ class ProjectsTable
                 TextColumn::make('participants_count')
                     ->label(__('app.label.participants'))
                     ->badge()
-                    ->color('gray')
+                    ->color(fn (Project $record): string => ($record->participants_count ?? 0) > 0 ? 'info' : 'gray')
                     ->alignCenter()
+                    ->tooltip(__('app.action.quick_view'))
+                    ->action(self::previewAction('projectPreviewFromCount'))
                     ->sortable(),
 
                 TextColumn::make('participants_sum_amount')
@@ -117,6 +119,12 @@ class ProjectsTable
                     )),
             ])
             ->recordActions([
+                self::previewAction('projectPreview')
+                    ->hiddenLabel()
+                    ->icon('heroicon-o-eye')
+                    ->color('gray')
+                    ->tooltip(__('app.action.quick_view')),
+
                 ActionGroup::make([
                     ViewAction::make()->color('gray'),
 
@@ -131,6 +139,31 @@ class ProjectsTable
                     DeleteBulkAction::make()
                         ->visible(fn (): bool => auth()->user()?->can('delete_project') ?? false),
                 ]),
+            ]);
+    }
+
+    /**
+     * Quick-view modal shared by the row eye button and the participants
+     * badge — key facts, participants with payment pills and the gallery,
+     * without leaving the list (the pattern the contracts list set).
+     */
+    private static function previewAction(string $name): Action
+    {
+        return Action::make($name)
+            ->label(__('app.action.quick_view'))
+            ->modalHeading(fn (Project $record): string => $record->name)
+            ->modalContent(fn (Project $record) => view(
+                'filament.resources.projects.tables.preview-modal',
+                ['project' => $record],
+            ))
+            ->modalWidth('3xl')
+            ->modalSubmitAction(false)
+            ->modalCancelAction(false)
+            ->extraModalFooterActions([
+                Action::make($name.'Open')
+                    ->label(__('app.action.open_project'))
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->url(fn (Project $record): string => BaseProjectResource::resourceFor($record)::getUrl('view', ['record' => $record])),
             ]);
     }
 }
