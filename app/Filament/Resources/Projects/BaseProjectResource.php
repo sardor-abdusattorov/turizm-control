@@ -37,9 +37,7 @@ abstract class BaseProjectResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Project::query()->where('type', static::projectType())->count();
-
-        return $count > 0 ? (string) $count : null;
+        return (string) Project::query()->where('type', static::projectType())->count();
     }
 
     /**

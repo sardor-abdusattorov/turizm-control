@@ -79,11 +79,15 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label(fn () => __('app.label.projects')),
 
+                // Daily-work groups above stay open; the reference registry
+                // and admin sections start collapsed to keep the sidebar short.
                 NavigationGroup::make()
-                    ->label(fn () => __('app.label.resources')),
+                    ->label(fn () => __('app.label.resources'))
+                    ->collapsed(),
 
                 NavigationGroup::make()
-                    ->label(fn () => __('app.label.administration')),
+                    ->label(fn () => __('app.label.administration'))
+                    ->collapsed(),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->maxContentWidth(Width::Full)
