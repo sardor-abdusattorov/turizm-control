@@ -168,6 +168,7 @@ return [
         'project_type' => 'Тип проекта',
         'project_name' => 'Название проекта',
         'project_period' => 'Период проведения',
+        'venue' => 'Место проведения',
         'project_costs' => 'Затраты',
         'starts_on' => 'Дата начала',
         'ends_on' => 'Дата окончания',

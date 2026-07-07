@@ -31,7 +31,8 @@ class FeaturedProjectWidget extends Widget
             ->where('status', true)
             ->whereNotNull('starts_on')
             ->with(['participants.currency'])
-            ->withCount('contracts');
+            // Contract count honours the viewer's contract visibility.
+            ->withCount(['contracts' => fn ($query) => $query->visibleTo()]);
 
         // Running now → soonest upcoming → most recently finished.
         return $base()

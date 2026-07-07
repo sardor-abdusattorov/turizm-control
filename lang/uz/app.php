@@ -168,6 +168,7 @@ return [
         'project_type' => 'Loyiha turi',
         'project_name' => 'Loyiha nomi',
         'project_period' => 'O\'tkazish davri',
+        'venue' => 'O\'tkazish joyi',
         'project_costs' => 'Xarajatlar',
         'starts_on' => 'Boshlanish sanasi',
         'ends_on' => 'Tugash sanasi',

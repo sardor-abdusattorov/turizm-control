@@ -41,6 +41,12 @@ class ProjectForm
                                     ->maxLength(255)
                                     ->columnSpanFull(),
 
+                                TextInput::make('venue')
+                                    ->label(__('app.label.venue'))
+                                    ->placeholder('Madrid, Spain')
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
+
                                 Grid::make(['default' => 1, 'md' => 2])
                                     ->schema([
                                         DatePicker::make('starts_on')

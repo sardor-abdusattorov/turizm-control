@@ -6,9 +6,16 @@
     $record = $this->record;
     $record->loadMissing([
         'participants.contact', 'participants.sponsor', 'participants.currency', 'participants.payments',
-        'contracts.currency', 'contracts.contact',
         'order', 'areaCurrency', 'standCurrency', 'creator',
     ]);
+
+    // Same visibility rule as the contracts list: a manager without
+    // view_all_contracts only sees the project contracts they are
+    // responsible for.
+    $visibleContracts = $record->contracts()
+        ->visibleTo()
+        ->with(['currency', 'contact'])
+        ->get();
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
     $fmt = fn ($n) => number_format((float) $n, 0, ',', ' ');
@@ -72,7 +79,12 @@
                 </span>
             </div>
             <div class="pj-hero__title">{{ $record->name }}</div>
-            <div class="pj-hero__dates">{!! $ic('heroicon-o-calendar-days', 14) !!} {{ $period }}</div>
+            <div class="pj-hero__dates">
+                {!! $ic('heroicon-o-calendar-days', 14) !!} {{ $period }}
+                @if ($record->venue)
+                    <span style="margin-left:.5rem;">{!! $ic('heroicon-o-map-pin', 14) !!} {{ $record->venue }}</span>
+                @endif
+            </div>
         </div>
         <div class="pj-hero__r">
             <span class="pj-hero__metric">{{ $fmt($feesTotal) }}</span>
@@ -203,13 +215,13 @@
         </section>
     @endforeach
 
-    {{-- ============ CONTRACTS ============ --}}
-    @if ($record->contracts->isNotEmpty())
+    {{-- ============ CONTRACTS (visibility-scoped) ============ --}}
+    @if ($visibleContracts->isNotEmpty())
         <section class="ow-card">
             <header class="ow-hd">
                 <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text', 18) !!}</span>
                 <h2 class="ow-hd__t">{{ __('app.label.contracts') }}</h2>
-                <span class="pj-count">{{ $record->contracts->count() }}</span>
+                <span class="pj-count">{{ $visibleContracts->count() }}</span>
             </header>
             <div class="pj-table-wrap">
                 <table class="pj-table">
@@ -223,7 +235,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach ($record->contracts as $contract)
+                    @foreach ($visibleContracts as $contract)
                         <tr>
                             <td>
                                 <a class="pj-link" href="{{ \App\Filament\Resources\Contracts\ContractResource::getUrl('view', ['record' => $contract]) }}">

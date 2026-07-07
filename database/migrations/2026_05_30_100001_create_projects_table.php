@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('type', 20)->default('international');
             $table->string('name');
+            $table->string('venue')->nullable();
             $table->date('starts_on')->nullable();
             $table->date('ends_on')->nullable();
             $table->decimal('area_sqm', 8, 2)->nullable();

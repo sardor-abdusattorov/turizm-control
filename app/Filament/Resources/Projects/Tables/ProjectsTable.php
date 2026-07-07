@@ -45,6 +45,12 @@ class ProjectsTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('venue')
+                    ->label(__('app.label.venue'))
+                    ->limit(24)
+                    ->placeholder('—')
+                    ->toggleable(),
+
                 TextColumn::make('starts_on')
                     ->label(__('app.label.starts_on'))
                     ->date('d.m.Y')
@@ -124,6 +130,19 @@ class ProjectsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('year')
+                    ->label(__('app.label.year'))
+                    ->options(fn (): array => Project::query()
+                        ->whereNotNull('starts_on')
+                        ->pluck('starts_on')
+                        ->map(fn ($date) => $date->year)
+                        ->unique()
+                        ->sortDesc()
+                        ->mapWithKeys(fn (int $year): array => [$year => (string) $year])
+                        ->all())
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when($data['value'] ?? null, fn (Builder $q, $year) => $q->whereYear('starts_on', $year))),
+
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
                     ->options(Project::getStatuses()),

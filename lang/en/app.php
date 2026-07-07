@@ -168,6 +168,7 @@ return [
         'project_type' => 'Project type',
         'project_name' => 'Project name',
         'project_period' => 'Period',
+        'venue' => 'Venue',
         'project_costs' => 'Costs',
         'starts_on' => 'Start date',
         'ends_on' => 'End date',

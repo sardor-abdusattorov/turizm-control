@@ -9,10 +9,12 @@ use App\Filament\Resources\Projects\Pages\EditInternalProject;
 use App\Filament\Resources\Projects\Pages\ListInternalProjects;
 use App\Filament\Resources\Projects\Pages\ListInternationalProjects;
 use App\Filament\Resources\Projects\Pages\ViewInternationalProject;
+use App\Models\Contract;
 use App\Models\Project;
 use App\Models\ProjectParticipant;
 use App\Models\ProjectPayment;
 use App\Models\Sponsor;
+use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -149,6 +151,43 @@ it('opens the quick-view modal from the list', function () {
 
     expect($html)->toContain('OOO &quot;PREVIEW TRAVEL&quot;')
         ->toContain('12 000 000');
+});
+
+it('filters the project list by year', function () {
+    $expo2025 = Project::factory()->international()->create(['name' => 'EXPO-2025', 'starts_on' => '2025-03-10', 'ends_on' => '2025-03-12']);
+    $expo2026 = Project::factory()->international()->create(['name' => 'EXPO-2026', 'starts_on' => '2026-01-21', 'ends_on' => '2026-01-25']);
+
+    actingAs(userWithPermission('view_any_project'));
+
+    Livewire::test(ListInternationalProjects::class)
+        ->assertSuccessful()
+        ->filterTable('year', 2026)
+        ->assertCanSeeTableRecords(collect([$expo2026]))
+        ->assertCanNotSeeTableRecords(collect([$expo2025]));
+});
+
+it('shows a manager only their own contracts on the project page', function () {
+    $project = Project::factory()->international()->create();
+
+    $manager = userWithPermission('view_any_project', 'view_project');
+
+    Contract::factory()->create([
+        'project_id' => $project->id,
+        'responsible_id' => $manager->id,
+        'number' => 'OWN-2026-001',
+    ]);
+    Contract::factory()->inReview()->create([
+        'project_id' => $project->id,
+        'responsible_id' => User::factory()->create()->id,
+        'number' => 'FOREIGN-2026-002',
+    ]);
+
+    actingAs($manager);
+
+    Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
+        ->assertSuccessful()
+        ->assertSee('OWN-2026-001')
+        ->assertDontSee('FOREIGN-2026-002');
 });
 
 it('records a project payment through the view page action', function () {

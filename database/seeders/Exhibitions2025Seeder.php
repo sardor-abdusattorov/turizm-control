@@ -5,13 +5,16 @@ namespace Database\Seeders;
 use App\Enums\ProjectType;
 use App\Models\Currency;
 use App\Models\Project;
+use Database\Seeders\Concerns\LinksProjectParticipants;
 use Illuminate\Database\Seeder;
 
 /**
  * One-off import of the "Реестр Международных выставок 2025 года" registry
  * (16 international exhibitions with their participant fees). Idempotent:
  * a project that already exists by (type, name) is left untouched, so
- * re-seeding never duplicates participants.
+ * re-seeding never duplicates participants. Airways rows are sponsor
+ * contributions; participants link to the Contacts directory where the
+ * registry spelling matches.
  *
  * The registry's "profit" column is intentionally NOT imported: it always
  * equals the sum of participant fees (verified for all 16 rows), so the app
@@ -19,6 +22,8 @@ use Illuminate\Database\Seeder;
  */
 class Exhibitions2025Seeder extends Seeder
 {
+    use LinksProjectParticipants;
+
     public function run(): void
     {
         $currencyIds = Currency::query()->pluck('id', 'short_name');
@@ -53,6 +58,9 @@ class Exhibitions2025Seeder extends Seeder
                     'amount' => $row[1],
                     'currency_id' => $uzsId,
                     'sort' => $index,
+                    'role' => $this->participantRole($row[0]),
+                    'sponsor_id' => $this->sponsorIdFor($row[0]),
+                    'contact_id' => $this->contactIdFor($row[0]),
                 ])
                 ->all());
         }

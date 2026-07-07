@@ -39,6 +39,9 @@
             {{ $project->status ? __('app.status.active') : __('app.status.inactive') }}
         </span>
         <span class="pj-hero__dates">{{ $period }}</span>
+        @if ($project->venue)
+            <span class="pj-hero__dates">· {{ $project->venue }}</span>
+        @endif
         @if ($project->order)
             <span class="pj-chip">{{ trim(($project->order->number ? $project->order->number.' · ' : '').$project->order->title) }}</span>
         @endif

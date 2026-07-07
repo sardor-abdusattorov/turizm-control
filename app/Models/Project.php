@@ -19,6 +19,7 @@ class Project extends Model
     protected $fillable = [
         'type',
         'name',
+        'venue',
         'starts_on',
         'ends_on',
         'area_sqm',
