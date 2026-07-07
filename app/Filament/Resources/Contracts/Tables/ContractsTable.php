@@ -41,6 +41,7 @@ class ContractsTable
             // keeps it to a flat handful.
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
                 'contact',
+                'project',
                 'currency',
                 'responsible',
                 'activeApprovers.user.department',
@@ -68,6 +69,12 @@ class ContractsTable
                     ->label(__('app.label.contact_single'))
                     ->searchable()
                     ->limit(40)
+                    ->toggleable(),
+
+                TextColumn::make('project.name')
+                    ->label(__('app.label.project_single'))
+                    ->limit(30)
+                    ->placeholder('—')
                     ->toggleable(),
 
                 TextColumn::make('amount')
@@ -121,6 +128,11 @@ class ContractsTable
                 SelectFilter::make('contact_id')
                     ->label(__('app.label.contact_single'))
                     ->options(fn () => Contact::getActive())
+                    ->searchable(),
+
+                SelectFilter::make('project_id')
+                    ->label(__('app.label.project_single'))
+                    ->relationship('project', 'name')
                     ->searchable(),
 
                 SelectFilter::make('order_type_id')

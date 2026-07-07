@@ -6,6 +6,7 @@
     $record = $this->record;
     $record->loadMissing([
         'participants.contact', 'participants.sponsor', 'participants.currency', 'participants.payments',
+        'contracts.currency', 'contracts.contact',
         'order', 'areaCurrency', 'standCurrency', 'creator',
     ]);
 
@@ -89,14 +90,13 @@
             </div>
         </div>
         <div class="pj-stat">
-            <span class="pj-stat__lb">{!! $ic('heroicon-o-banknotes', 13) !!} {{ __('app.label.fees_total') }}</span>
-            <div class="pj-stat__vl">{{ $money($feesTotal, $feeCurrency ?: null) }}</div>
-            <div class="pj-stat__sub">{{ __('app.label.stand_cost') }}: {{ $money($record->stand_cost, $record->standCurrency?->short_name) }}</div>
+            <span class="pj-stat__lb">{!! $ic('heroicon-o-building-storefront', 13) !!} {{ __('app.label.stand_cost') }}</span>
+            <div class="pj-stat__vl">{{ $money($record->stand_cost, $record->standCurrency?->short_name) }}</div>
         </div>
         <div class="pj-stat {{ $paidTint ? 'pj-stat--'.$paidTint : '' }}">
             <span class="pj-stat__lb">{!! $ic('heroicon-o-check-circle', 13) !!} {{ __('app.label.paid') }}</span>
             <div class="pj-stat__vl">{{ $money($paidTotal, $feeCurrency ?: null) }}</div>
-            <div class="pj-stat__sub">{{ $paidPercent }}% · {{ __('app.label.remaining') }} {{ $fmt(max(0, $feesTotal - $paidTotal)) }}</div>
+            <div class="pj-stat__sub">{{ $paidPercent }}% · {{ __('app.label.remaining') }}: {{ $fmt(max(0, $feesTotal - $paidTotal)) }}</div>
         </div>
         <div class="pj-stat">
             <span class="pj-stat__lb">{!! $ic('heroicon-o-user-group', 13) !!} {{ __('app.label.participants') }}</span>
@@ -112,22 +112,22 @@
             <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
         </header>
         <div class="ow-dets">
-            <div class="ow-row">
-                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_single') }}</span></div>
-                <div class="ow-row__v">
-                    @if ($record->order)
-                        <a class="ow-row__vl pj-link" href="{{ \App\Filament\Resources\Orders\OrderResource::getUrl('view', ['record' => $record->order]) }}">
+            @if ($record->order)
+                <div class="ow-row">
+                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_single') }}</span></div>
+                    <div class="ow-row__v">
+                        <a class="ow-row__vl pj-link" href="{{ \App\Filament\Resources\Orders\BaseOrderResource::resourceFor($record->order)::getUrl('view', ['record' => $record->order]) }}">
                             {{ trim(($record->order->number ? $record->order->number.' · ' : '').$record->order->title) }}
                         </a>
-                    @else
-                        <span class="ow-row__vl">—</span>
-                    @endif
+                    </div>
                 </div>
-            </div>
-            <div class="ow-row">
-                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-user') !!}</span><span class="ow-row__lb">{{ __('app.label.created_by') }}</span></div>
-                <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator?->name ?? '—' }}</span></div>
-            </div>
+            @endif
+            @if ($record->creator)
+                <div class="ow-row">
+                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-user') !!}</span><span class="ow-row__lb">{{ __('app.label.created_by') }}</span></div>
+                    <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator->name }}</span></div>
+                </div>
+            @endif
             @if ($record->description)
                 <div class="ow-row">
                     <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-bars-3-bottom-left') !!}</span><span class="ow-row__lb">{{ __('app.label.description') }}</span></div>
@@ -202,6 +202,45 @@
             @endif
         </section>
     @endforeach
+
+    {{-- ============ CONTRACTS ============ --}}
+    @if ($record->contracts->isNotEmpty())
+        <section class="ow-card">
+            <header class="ow-hd">
+                <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text', 18) !!}</span>
+                <h2 class="ow-hd__t">{{ __('app.label.contracts') }}</h2>
+                <span class="pj-count">{{ $record->contracts->count() }}</span>
+            </header>
+            <div class="pj-table-wrap">
+                <table class="pj-table">
+                    <thead>
+                    <tr>
+                        <th>{{ __('app.label.contract_number') }}</th>
+                        <th>{{ __('app.label.contact_single') }}</th>
+                        <th class="pj-table__num">{{ __('app.label.amount') }}</th>
+                        <th>{{ __('app.label.status') }}</th>
+                        <th class="pj-table__num">{{ __('app.label.paid') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ($record->contracts as $contract)
+                        <tr>
+                            <td>
+                                <a class="pj-link" href="{{ \App\Filament\Resources\Contracts\ContractResource::getUrl('view', ['record' => $contract]) }}">
+                                    {{ $contract->number }}
+                                </a>
+                            </td>
+                            <td>{{ $contract->contact?->name }}</td>
+                            <td class="pj-table__num">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</td>
+                            <td><span class="pj-pill pj-pill--{{ $contract->status->color() === 'primary' ? 'primary' : $contract->status->color() }}">{{ $contract->status->label() }}</span></td>
+                            <td class="pj-table__num">{{ number_format((float) $contract->paid_percent, 0) }}%</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    @endif
 
     {{-- ============ PAYMENTS HISTORY ============ --}}
     @if ($payments->isNotEmpty())

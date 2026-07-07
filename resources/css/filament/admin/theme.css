@@ -496,6 +496,65 @@
     text-align: center;
 }
 
+/* ─── Approval-flow modal on a phone: rows become labelled cards ────────────
+   The five-column table cannot shrink onto a phone screen; below 640px the
+   header is dropped and every row renders as a card — the approver block on
+   top, then label/value lines fed by the cells' data-label attributes. */
+@media (max-width: 640px) {
+    .af,
+    .af tbody {
+        display: block;
+    }
+    .af thead {
+        display: none;
+    }
+    .af tbody tr {
+        display: block;
+        border: 1px solid rgba(127, 127, 127, .22);
+        border-radius: .75rem;
+        padding: .4rem .85rem;
+        margin-bottom: .65rem;
+    }
+    .af tbody tr:last-child {
+        margin-bottom: 0;
+    }
+    .af tbody td {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .5rem 0;
+        border-bottom: 1px dashed rgba(127, 127, 127, .15);
+    }
+    .af tbody td:last-child,
+    .af tbody tr:last-child td {
+        border-bottom: 0;
+    }
+    .af tbody td::before {
+        content: attr(data-label);
+        font-size: .66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        opacity: .55;
+        flex-shrink: 0;
+    }
+    .af tbody td:first-child {
+        display: block;
+        border-bottom: 1px solid rgba(127, 127, 127, .15);
+    }
+    .af tbody td:first-child::before {
+        content: none;
+    }
+    .af-date small {
+        display: inline;
+        margin-left: .3rem;
+    }
+    .af-cmt {
+        text-align: right;
+    }
+}
+
 /* ─── Styling pulled out of PHP Filament config ─────────────────────────────
    These were raw style="" strings set on columns/fields/actions inside the
    resource & widget classes. Moved here so visual styling lives in the
@@ -634,6 +693,13 @@
    the card supplies the side padding the component itself lacks. */
 .pj-gallery-pad {
     padding: .25rem 1.25rem 1rem;
+}
+
+/* Scrollable body inside the quick-view modal — every participant stays
+   reachable without the modal itself growing past the screen. */
+.pj-scroll {
+    max-height: 45vh;
+    overflow-y: auto;
 }
 
 /* ─── Projects: hero, metric tiles, pill variants ───────────────────────────

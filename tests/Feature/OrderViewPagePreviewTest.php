@@ -1,6 +1,6 @@
 <?php
 
-use App\Filament\Resources\Orders\Pages\ViewOrder;
+use App\Filament\Resources\Orders\Pages\ViewInternalOrder;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,7 +34,7 @@ it('renders the file card with a PDF-open link for PDF orders', function () {
     ]);
     Storage::disk('local')->put($order->file_path, '%PDF-fake');
 
-    $html = Livewire::test(ViewOrder::class, ['record' => $order->id])->html();
+    $html = Livewire::test(ViewInternalOrder::class, ['record' => $order->id])->html();
 
     expect($html)->toContain('sample.pdf')
         ->toContain('PDF')
@@ -51,7 +51,7 @@ it('renders the file card with an OnlyOffice viewer link for docx orders', funct
     ]);
     Storage::disk('local')->put($order->file_path, 'fake-docx');
 
-    $html = Livewire::test(ViewOrder::class, ['record' => $order->id])->html();
+    $html = Livewire::test(ViewInternalOrder::class, ['record' => $order->id])->html();
 
     // The file card now carries a single primary action — for an editable
     // docx that's the OnlyOffice editor (mode=edit).
@@ -69,7 +69,7 @@ it('hides the preview card when the order has no file on disk', function () {
         'file_path' => 'uploads/files/orders/2026/06/missing.pdf',
     ]);
 
-    $html = Livewire::test(ViewOrder::class, ['record' => $order->id])->html();
+    $html = Livewire::test(ViewInternalOrder::class, ['record' => $order->id])->html();
 
     // No file -> the file-preview component is gated behind fileExists()
     // on the infolist, so the OnlyOffice viewer URL never appears.

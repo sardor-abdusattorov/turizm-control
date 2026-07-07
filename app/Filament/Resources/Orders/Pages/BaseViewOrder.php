@@ -2,15 +2,12 @@
 
 namespace App\Filament\Resources\Orders\Pages;
 
-use App\Filament\Resources\Orders\OrderResource;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewOrder extends ViewRecord
+abstract class BaseViewOrder extends ViewRecord
 {
-    protected static string $resource = OrderResource::class;
-
     protected string $view = 'filament.resources.orders.pages.view-order';
 
     public function getHeading(): string

@@ -158,6 +158,10 @@ return [
         'internal_project_plural' => 'Internal projects',
         'international_project_single' => 'International project',
         'international_project_plural' => 'International projects',
+        'internal_order_single' => 'Internal order',
+        'internal_order_plural' => 'Internal orders',
+        'external_order_single' => 'External order',
+        'external_order_plural' => 'External orders',
         'sponsor_single' => 'Sponsor',
         'website' => 'Website',
         'stand_currency_differs' => 'Stand currency differs',
@@ -180,6 +184,7 @@ return [
         'sponsors' => 'Sponsors',
         'fees_total' => 'Total fees',
         'paid' => 'Paid',
+        'remaining' => 'Remaining',
         'payments' => 'Payments',
         'payment_amount' => 'Payment amount',
         'projects_breakdown_hint' => 'Show project participations',
@@ -702,6 +707,12 @@ return [
         'events' => 'Events',
         'trend_dataset' => 'Activity',
     ],
+    'order' => [
+        'scope' => [
+            'internal' => 'Internal',
+            'external' => 'External',
+        ],
+    ],
     'project' => [
         'type' => [
             'internal' => 'Internal',
@@ -720,6 +731,8 @@ return [
         'involving_me' => 'Approvals involving me',
     ],
     'dashboard' => [
+        'upcoming_projects' => 'Upcoming events',
+        'upcoming_projects_empty' => 'No upcoming events.',
         'greeting' => 'Welcome back',
         'greeting_named' => 'Welcome back, :name',
         'summary_overdue' => ':count of :total contracts waiting on you are overdue.',
@@ -744,6 +757,9 @@ return [
         'recent_activity' => 'Recent activity',
     ],
     'stats' => [
+        'projects_total' => 'total: :count',
+        'projects_fees' => ':year fees',
+        'projects_fees_paid' => 'paid: :paid',
         'overdue_count' => ':count overdue',
         'stalled_count' => ':count stalled',
         'on_track' => 'On track',

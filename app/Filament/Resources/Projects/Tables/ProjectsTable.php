@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Projects\Tables;
 
+use App\Enums\ParticipantRole;
 use App\Exports\ProjectsRegistryExport;
 use App\Filament\Resources\Projects\BaseProjectResource;
 use App\Filament\Support\CreatedAtColumn;
@@ -15,6 +16,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -28,7 +30,11 @@ class ProjectsTable
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query
                 ->with(['order', 'creator'])
-                ->withCount('participants')
+                ->withCount([
+                    'participants',
+                    'participants as sponsors_count' => fn (Builder $participants) => $participants
+                        ->where('role', ParticipantRole::Sponsor),
+                ])
                 ->withSum('participants', 'amount')
                 ->withSum('participants', 'paid_amount'))
             ->defaultSort('starts_on', 'desc')
@@ -66,6 +72,25 @@ class ProjectsTable
                     ->tooltip(__('app.action.quick_view'))
                     ->action(self::previewAction('projectPreviewFromCount'))
                     ->sortable(),
+
+                TextColumn::make('sponsors_count')
+                    ->label(__('app.label.sponsors'))
+                    ->badge()
+                    ->color(fn (Project $record): string => ($record->sponsors_count ?? 0) > 0 ? 'warning' : 'gray')
+                    ->alignCenter()
+                    ->tooltip(__('app.action.quick_view'))
+                    ->action(self::previewAction('projectPreviewFromSponsors'))
+                    ->toggleable(),
+
+                ImageColumn::make('gallery')
+                    ->label(__('app.label.gallery'))
+                    ->disk('local')
+                    ->imageGallery()
+                    ->imageHeight(36)
+                    ->stacked()
+                    ->limit(3)
+                    ->remainingTextBadge()
+                    ->toggleable(),
 
                 TextColumn::make('participants_sum_amount')
                     ->label(__('app.label.fees_total'))

@@ -70,10 +70,10 @@
         @if ($block['rows']->isNotEmpty())
             <div>
                 <div class="pj-hero__metric-lb" style="margin-bottom:.4rem;">{{ $block['title'] }} · {{ $block['rows']->count() }}</div>
-                <div class="pj-table-wrap" style="border:1px solid var(--d);border-radius:.6rem;">
+                <div class="pj-table-wrap pj-scroll" style="border:1px solid var(--d);border-radius:.6rem;">
                     <table class="pj-table">
                         <tbody>
-                        @foreach ($block['rows']->take(8) as $p)
+                        @foreach ($block['rows'] as $p)
                             @php $status = $p->paymentStatus(); @endphp
                             <tr>
                                 <td>{{ $p->name }}</td>
@@ -85,11 +85,6 @@
                                 </td>
                             </tr>
                         @endforeach
-                        @if ($block['rows']->count() > 8)
-                            <tr>
-                                <td colspan="3" style="color:var(--m2);">+ {{ $block['rows']->count() - 8 }}</td>
-                            </tr>
-                        @endif
                         </tbody>
                     </table>
                 </div>

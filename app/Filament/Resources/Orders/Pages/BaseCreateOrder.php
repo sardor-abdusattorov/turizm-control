@@ -2,16 +2,14 @@
 
 namespace App\Filament\Resources\Orders\Pages;
 
-use App\Filament\Resources\Orders\OrderResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
-class CreateOrder extends CreateRecord
+abstract class BaseCreateOrder extends CreateRecord
 {
-    protected static string $resource = OrderResource::class;
-
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        $data['scope'] = static::getResource()::orderScope()->value;
         $data['created_by'] = Auth::id();
 
         return $data;

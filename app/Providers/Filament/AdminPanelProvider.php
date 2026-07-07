@@ -12,8 +12,10 @@ use App\Filament\Widgets\Dashboard\MyApprovalQueueWidget;
 use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
 use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
 use App\Filament\Widgets\Dashboard\RecentActivityWidget;
+use App\Filament\Widgets\Dashboard\UpcomingProjectsWidget;
 use App\Filament\Widgets\LatestPaymentsWidget;
 use App\Filament\Widgets\PaymentStatsWidget;
+use App\Filament\Widgets\ProjectStatsWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
@@ -108,6 +110,8 @@ class AdminPanelProvider extends PanelProvider
                 OutstandingPaymentsWidget::class,
                 LatestPaymentsWidget::class,
                 ApprovalHealthWidget::class,
+                ProjectStatsWidget::class,
+                UpcomingProjectsWidget::class,
                 ContractsTrendChartWidget::class,
                 RecentActivityWidget::class,
             ])

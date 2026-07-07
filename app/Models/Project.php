@@ -72,6 +72,11 @@ class Project extends Model
         return $this->belongsTo(Order::class);
     }
 
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class)->orderByDesc('created_at');
+    }
+
     public function areaCurrency(): BelongsTo
     {
         return $this->belongsTo(Currency::class, 'area_currency_id');

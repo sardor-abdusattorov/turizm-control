@@ -158,6 +158,10 @@ return [
         'internal_project_plural' => 'Ichki loyihalar',
         'international_project_single' => 'Xalqaro loyiha',
         'international_project_plural' => 'Xalqaro loyihalar',
+        'internal_order_single' => 'Ichki buyruq',
+        'internal_order_plural' => 'Ichki buyruqlar',
+        'external_order_single' => 'Tashqi buyruq',
+        'external_order_plural' => 'Tashqi buyruqlar',
         'sponsor_single' => 'Homiy',
         'website' => 'Veb-sayt',
         'stand_currency_differs' => 'Stend valyutasi boshqa',
@@ -180,6 +184,7 @@ return [
         'sponsors' => 'Homiylar',
         'fees_total' => 'Badallar summasi',
         'paid' => 'To\'langan',
+        'remaining' => 'Qoldiq',
         'payments' => 'To\'lovlar',
         'payment_amount' => 'To\'lov summasi',
         'projects_breakdown_hint' => 'Loyihalardagi ishtiroklarni ko\'rish',
@@ -697,6 +702,12 @@ return [
         'events' => 'Hodisalar',
         'trend_dataset' => 'Faollik',
     ],
+    'order' => [
+        'scope' => [
+            'internal' => 'Ichki',
+            'external' => 'Tashqi',
+        ],
+    ],
     'project' => [
         'type' => [
             'internal' => 'Ichki',
@@ -715,6 +726,8 @@ return [
         'involving_me' => 'Men ishtirok etgan kelishuvlar',
     ],
     'dashboard' => [
+        'upcoming_projects' => 'Yaqinlashayotgan tadbirlar',
+        'upcoming_projects_empty' => 'Yaqinlashayotgan tadbirlar yo‘q.',
         'greeting' => 'Xush kelibsiz',
         'greeting_named' => 'Xush kelibsiz, :name',
         'summary_overdue' => 'Sizni kutayotgan shartnomalarning :total tadan :count tasi muddati o‘tgan.',
@@ -739,6 +752,9 @@ return [
         'recent_activity' => 'So‘nggi faollik',
     ],
     'stats' => [
+        'projects_total' => 'jami: :count',
+        'projects_fees' => ':year yil badallari',
+        'projects_fees_paid' => 'to‘langan: :paid',
         'overdue_count' => ':count muddati o‘tgan',
         'stalled_count' => ':count to‘xtab qolgan',
         'on_track' => 'Jadval bo‘yicha',

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderScope;
 use App\Models\Concerns\HasActiveStatus;
 use App\Models\Concerns\HasDocumentKey;
 use App\Observers\OrderObserver;
@@ -22,6 +23,7 @@ class Order extends Model
     protected $fillable = [
         'number',
         'order_type_id',
+        'scope',
         'title',
         'description',
         'file_path',
@@ -32,6 +34,7 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'scope' => OrderScope::class,
         'status' => 'boolean',
         'issued_at' => 'date',
     ];

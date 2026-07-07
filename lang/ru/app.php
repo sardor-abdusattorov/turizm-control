@@ -158,6 +158,10 @@ return [
         'internal_project_plural' => 'Внутренние проекты',
         'international_project_single' => 'Международный проект',
         'international_project_plural' => 'Международные проекты',
+        'internal_order_single' => 'Внутренний приказ',
+        'internal_order_plural' => 'Внутренние приказы',
+        'external_order_single' => 'Внешний приказ',
+        'external_order_plural' => 'Внешние приказы',
         'sponsor_single' => 'Спонсор',
         'website' => 'Сайт',
         'stand_currency_differs' => 'Валюта стенда отличается',
@@ -180,6 +184,7 @@ return [
         'sponsors' => 'Спонсоры',
         'fees_total' => 'Сумма взносов',
         'paid' => 'Оплачено',
+        'remaining' => 'Остаток',
         'payments' => 'Платежи',
         'payment_amount' => 'Сумма платежа',
         'projects_breakdown_hint' => 'Показать участия в проектах',
@@ -697,6 +702,12 @@ return [
         'events' => 'События',
         'trend_dataset' => 'Активность',
     ],
+    'order' => [
+        'scope' => [
+            'internal' => 'Внутренний',
+            'external' => 'Внешний',
+        ],
+    ],
     'project' => [
         'type' => [
             'internal' => 'Внутренний',
@@ -715,6 +726,8 @@ return [
         'involving_me' => 'Согласования с моим участием',
     ],
     'dashboard' => [
+        'upcoming_projects' => 'Ближайшие мероприятия',
+        'upcoming_projects_empty' => 'Предстоящих мероприятий нет.',
         'greeting' => 'С возвращением',
         'greeting_named' => 'С возвращением, :name',
         'summary_overdue' => 'Просрочено :count из :total договоров, ожидающих вашего решения.',
@@ -739,6 +752,9 @@ return [
         'recent_activity' => 'Недавняя активность',
     ],
     'stats' => [
+        'projects_total' => 'всего: :count',
+        'projects_fees' => 'Взносы за :year год',
+        'projects_fees_paid' => 'оплачено: :paid',
         'overdue_count' => 'просрочено: :count',
         'stalled_count' => 'застряло: :count',
         'on_track' => 'В графике',
