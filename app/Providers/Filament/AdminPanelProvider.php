@@ -2,12 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use Anish\ResizableModal\ResizableModalPlugin;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\ContractStatsWidget;
 use App\Filament\Widgets\ContractsTrendChartWidget;
 use App\Filament\Widgets\Dashboard\ApprovalHealthWidget;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
+use App\Filament\Widgets\Dashboard\FeaturedProjectWidget;
 use App\Filament\Widgets\Dashboard\MyApprovalQueueWidget;
 use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
 use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
@@ -103,6 +105,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->widgets([
                 DashboardHeaderWidget::class,
+                FeaturedProjectWidget::class,
                 MyApprovalQueueWidget::class,
                 MyContractsInReviewWidget::class,
                 ContractStatsWidget::class,
@@ -119,6 +122,11 @@ class AdminPanelProvider extends PanelProvider
 
             ])
             ->plugins([
+
+                // Drag-to-resize handles on every action modal (quick-view,
+                // approval chain, record payment...) with the width persisted
+                // per action — snaps to Filament's native breakpoints.
+                ResizableModalPlugin::make(),
 
                 FilamentShieldPlugin::make()
                     ->navigationGroup(fn () => __('app.label.administration'))

@@ -728,6 +728,10 @@ return [
     'dashboard' => [
         'upcoming_projects' => 'Ближайшие мероприятия',
         'upcoming_projects_empty' => 'Предстоящих мероприятий нет.',
+        'featured_project' => 'Текущий проект',
+        'featured_running' => 'Идёт сейчас · до :date',
+        'featured_upcoming' => 'Старт через :days дн. · :date',
+        'featured_past' => 'Завершился :date',
         'greeting' => 'С возвращением',
         'greeting_named' => 'С возвращением, :name',
         'summary_overdue' => 'Просрочено :count из :total договоров, ожидающих вашего решения.',

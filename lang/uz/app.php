@@ -728,6 +728,10 @@ return [
     'dashboard' => [
         'upcoming_projects' => 'Yaqinlashayotgan tadbirlar',
         'upcoming_projects_empty' => 'Yaqinlashayotgan tadbirlar yo‘q.',
+        'featured_project' => 'Joriy loyiha',
+        'featured_running' => 'Hozir davom etmoqda · :date gacha',
+        'featured_upcoming' => ':days kundan keyin boshlanadi · :date',
+        'featured_past' => ':date da yakunlandi',
         'greeting' => 'Xush kelibsiz',
         'greeting_named' => 'Xush kelibsiz, :name',
         'summary_overdue' => 'Sizni kutayotgan shartnomalarning :total tadan :count tasi muddati o‘tgan.',

@@ -733,6 +733,10 @@ return [
     'dashboard' => [
         'upcoming_projects' => 'Upcoming events',
         'upcoming_projects_empty' => 'No upcoming events.',
+        'featured_project' => 'Current project',
+        'featured_running' => 'Running now · until :date',
+        'featured_upcoming' => 'Starts in :days days · :date',
+        'featured_past' => 'Finished :date',
         'greeting' => 'Welcome back',
         'greeting_named' => 'Welcome back, :name',
         'summary_overdue' => ':count of :total contracts waiting on you are overdue.',

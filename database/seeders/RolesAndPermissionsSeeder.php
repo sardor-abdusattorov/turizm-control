@@ -40,6 +40,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_my_approval_queue_widget',
             'view_project_stats_widget',
             'view_upcoming_projects_widget',
+            'view_featured_project_widget',
         ]);
 
         $this->syncRole('manager', [
@@ -65,6 +66,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_my_contracts_in_review_widget',
             'view_project_stats_widget',
             'view_upcoming_projects_widget',
+            'view_featured_project_widget',
         ]);
 
         // Legal + accounting review and approve contracts; they do not author

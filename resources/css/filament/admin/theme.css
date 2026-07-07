@@ -702,6 +702,27 @@
     overflow-y: auto;
 }
 
+/* Fees-collection progress bar (featured-project widget). */
+.pj-progress {
+    height: .5rem;
+    border-radius: 999px;
+    background: var(--soft);
+    box-shadow: inset 0 0 0 1px var(--d);
+    overflow: hidden;
+}
+.pj-progress__fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    transition: width .3s ease;
+}
+.pj-progress__fill--success {
+    background: #10b981;
+}
+.pj-progress__fill--warning {
+    background: #fb923c;
+}
+
 /* ─── Projects: hero, metric tiles, pill variants ───────────────────────────
    Mirrors the .pv-hero / .cw-stat look but lives in the global .pj block so
    the projects view page reuses it by class name (the contract .cw hero is
