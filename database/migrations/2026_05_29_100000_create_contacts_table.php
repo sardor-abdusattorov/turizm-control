@@ -19,6 +19,7 @@ return new class extends Migration
             $table->json('address')->nullable();
             $table->string('phone', 50)->nullable();
             $table->string('email')->nullable();
+            $table->string('website')->nullable();
             $table->string('contact_person')->nullable();
             $table->string('director_name')->nullable();
             $table->string('bank_account', 50)->nullable();

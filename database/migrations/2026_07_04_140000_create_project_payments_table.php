@@ -19,20 +19,10 @@ return new class extends Migration
 
             $table->index('paid_at');
         });
-
-        // Cached aggregate of the participant's installments, kept in sync by
-        // ProjectPaymentObserver — the direct analogue of contracts.paid_percent.
-        Schema::table('project_participants', function (Blueprint $table) {
-            $table->decimal('paid_amount', 15, 2)->default(0)->after('amount');
-        });
     }
 
     public function down(): void
     {
-        Schema::table('project_participants', function (Blueprint $table) {
-            $table->dropColumn('paid_amount');
-        });
-
         Schema::dropIfExists('project_payments');
     }
 };
