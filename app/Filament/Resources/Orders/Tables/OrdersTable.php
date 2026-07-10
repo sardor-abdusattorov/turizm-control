@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
-use App\Filament\Resources\Orders\OrderResource;
+use App\Filament\Resources\Orders\BaseOrderResource;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Order;
@@ -106,7 +106,7 @@ class OrdersTable
                         ->pluck('name', 'id'))
                     ->searchable(),
             ])
-            ->recordUrl(fn (Order $record) => OrderResource::getUrl('view', ['record' => $record]))
+            ->recordUrl(fn (Order $record): string => BaseOrderResource::resourceFor($record)::getUrl('view', ['record' => $record]))
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make(),

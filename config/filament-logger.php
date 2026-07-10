@@ -3,7 +3,10 @@
 use App\Filament\Resources\ActivityResource;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\ContractTemplates\ContractTemplateResource;
-use App\Filament\Resources\Orders\OrderResource;
+use App\Filament\Resources\Orders\ExternalOrderResource;
+use App\Filament\Resources\Orders\InternalOrderResource;
+use App\Filament\Resources\Projects\InternalProjectResource;
+use App\Filament\Resources\Projects\InternationalProjectResource;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
@@ -217,13 +220,16 @@ return [
         'color' => 'success',
 
         'exclude' => [
-            // Contracts, Templates and Orders are already tracked by the
-            // ModelLogger via Eloquent events; logging the Filament UI
+            // Contracts, Templates, Orders and Projects are already tracked
+            // by the ModelLogger via Eloquent events; logging the Filament UI
             // actions on top of that produced duplicate Created / Updated
             // entries in the Execution history.
             ContractResource::class,
             ContractTemplateResource::class,
-            OrderResource::class,
+            InternalOrderResource::class,
+            ExternalOrderResource::class,
+            InternalProjectResource::class,
+            InternationalProjectResource::class,
         ],
         'ignore' => [
             'updated_at',
