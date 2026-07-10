@@ -31,16 +31,6 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('order', ['view_any', 'view']),
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
             ...$this->resourcePermissions('project', ['view_any', 'view']),
-            // Dashboard widgets the director oversees.
-            'view_contracts_trend_chart_widget',
-            'view_payment_stats_widget',
-            'view_outstanding_payments_widget',
-            'view_latest_payments_widget',
-            'view_approval_health_widget',
-            'view_my_approval_queue_widget',
-            'view_project_stats_widget',
-            'view_upcoming_projects_widget',
-            'view_featured_project_widget',
         ]);
 
         $this->syncRole('manager', [
@@ -61,12 +51,6 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('project', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('sponsor', ['view_any', 'view', 'create', 'update']),
             'record_project_payment',
-            // Dashboard widgets for the contract author.
-            'view_contract_stats_widget',
-            'view_my_contracts_in_review_widget',
-            'view_project_stats_widget',
-            'view_upcoming_projects_widget',
-            'view_featured_project_widget',
         ]);
 
         // Legal + accounting review and approve contracts; they do not author
@@ -80,9 +64,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_profile_settings',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),
-            // Dashboard widgets visible to legal.
-            'view_contracts_trend_chart_widget',
-            'view_my_approval_queue_widget',
         ]);
 
         $this->syncRole('accountant', [
@@ -98,12 +79,6 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('payment', ['view_any', 'view', 'create']),
             ...$this->resourcePermissions('project', ['view_any', 'view']),
             'record_project_payment',
-            // Dashboard widgets visible to accounting.
-            'view_contracts_trend_chart_widget',
-            'view_payment_stats_widget',
-            'view_outstanding_payments_widget',
-            'view_latest_payments_widget',
-            'view_my_approval_queue_widget',
         ]);
     }
 

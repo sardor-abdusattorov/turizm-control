@@ -199,9 +199,10 @@ return [
     */
 
     // Only the dashboard is excluded: it is the panel home that every user who
-    // can reach the panel lands on, so it has no `view_dashboard` gate (the
-    // widgets on it are gated individually). Every other page generates a
-    // `view_<page>` permission that its HasPageShield trait enforces.
+    // can reach the panel lands on, so it has no `view_dashboard` gate (its
+    // only widget is the header card, excluded below). Every other page
+    // generates a `view_<page>` permission that its HasPageShield trait
+    // enforces.
     'pages' => [
         'subject' => 'class',
         'prefix' => 'view',

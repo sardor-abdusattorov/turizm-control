@@ -5,19 +5,7 @@ namespace App\Providers\Filament;
 use Anish\ResizableModal\ResizableModalPlugin;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ProfileSettings;
-use App\Filament\Widgets\ContractStatsWidget;
-use App\Filament\Widgets\ContractsTrendChartWidget;
-use App\Filament\Widgets\Dashboard\ApprovalHealthWidget;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
-use App\Filament\Widgets\Dashboard\FeaturedProjectWidget;
-use App\Filament\Widgets\Dashboard\MyApprovalQueueWidget;
-use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
-use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
-use App\Filament\Widgets\Dashboard\RecentActivityWidget;
-use App\Filament\Widgets\Dashboard\UpcomingProjectsWidget;
-use App\Filament\Widgets\LatestPaymentsWidget;
-use App\Filament\Widgets\PaymentStatsWidget;
-use App\Filament\Widgets\ProjectStatsWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
@@ -104,19 +92,10 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
+                // The dashboard is deliberately down to the header card
+                // (greeting + Telegram prompt); the data widgets were removed
+                // and live only in git history until they earn their way back.
                 DashboardHeaderWidget::class,
-                FeaturedProjectWidget::class,
-                MyApprovalQueueWidget::class,
-                MyContractsInReviewWidget::class,
-                ContractStatsWidget::class,
-                PaymentStatsWidget::class,
-                OutstandingPaymentsWidget::class,
-                LatestPaymentsWidget::class,
-                ApprovalHealthWidget::class,
-                ProjectStatsWidget::class,
-                UpcomingProjectsWidget::class,
-                ContractsTrendChartWidget::class,
-                RecentActivityWidget::class,
             ])
             ->resources([
 

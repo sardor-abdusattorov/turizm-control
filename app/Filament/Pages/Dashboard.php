@@ -12,12 +12,11 @@ use Filament\Pages\Dashboard as BaseDashboard;
 class Dashboard extends BaseDashboard
 {
     /**
-     * Two columns on wide screens so the short, always-paired finance tables
-     * (outstanding + latest payments) can sit side by side; every other widget
-     * spans the full width. A single column on phones and tablets.
+     * The header card is the only widget left, so a single full-width column
+     * is all the grid the page needs.
      */
     public function getColumns(): int|array
     {
-        return ['default' => 1, 'xl' => 2];
+        return 1;
     }
 }

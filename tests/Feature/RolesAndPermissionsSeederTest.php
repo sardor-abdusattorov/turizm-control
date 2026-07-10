@@ -14,11 +14,6 @@ beforeEach(function () {
         'approve_contracts',
         'view_all_contracts',
         'view_profile_settings',
-        'view_my_approval_queue_widget',
-        'view_contracts_trend_chart_widget',
-        'view_payment_stats_widget',
-        'view_contract_stats_widget',
-        'view_my_contracts_in_review_widget',
         'view_any_contract',
         'view_contract',
         'view_any_contract_template',
@@ -42,7 +37,6 @@ it('lets legal and accounting approve contracts but not browse templates', funct
 
         expect($role->hasPermissionTo('approve_contracts'))->toBeTrue()
             ->and($role->hasPermissionTo('view_any_contract'))->toBeTrue()
-            ->and($role->hasPermissionTo('view_my_approval_queue_widget'))->toBeTrue()
             // They review contracts, they do not author them.
             ->and($role->hasPermissionTo('view_any_contract_template'))->toBeFalse()
             ->and($role->hasPermissionTo('view_contract_template'))->toBeFalse();
@@ -53,8 +47,6 @@ it('keeps contract-template access with the manager who builds contracts', funct
     $manager = Role::findByName('manager', 'web');
 
     expect($manager->hasPermissionTo('view_any_contract_template'))->toBeTrue()
-        ->and($manager->hasPermissionTo('view_contract_stats_widget'))->toBeTrue()
-        ->and($manager->hasPermissionTo('view_my_contracts_in_review_widget'))->toBeTrue()
         // The manager submits but never approves.
         ->and($manager->hasPermissionTo('approve_contracts'))->toBeFalse();
 });
