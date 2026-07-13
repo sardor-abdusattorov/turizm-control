@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('number', 50)->nullable()->unique();
             $table->foreignId('order_type_id')->constrained()->restrictOnDelete();
+            $table->string('scope', 20)->default('internal');
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('file_path');
@@ -23,6 +24,7 @@ return new class extends Migration
 
             $table->index('status');
             $table->index('issued_at');
+            $table->index('scope');
         });
     }
 

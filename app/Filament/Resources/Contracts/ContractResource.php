@@ -39,7 +39,7 @@ class ContractResource extends Resource
 
     public static function getNavigationSort(): int
     {
-        return 2;
+        return 3;
     }
 
     public static function getNavigationBadge(): ?string

@@ -2,18 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use Anish\ResizableModal\ResizableModalPlugin;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ProfileSettings;
-use App\Filament\Widgets\ContractStatsWidget;
-use App\Filament\Widgets\ContractsTrendChartWidget;
-use App\Filament\Widgets\Dashboard\ApprovalHealthWidget;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
-use App\Filament\Widgets\Dashboard\MyApprovalQueueWidget;
-use App\Filament\Widgets\Dashboard\MyContractsInReviewWidget;
-use App\Filament\Widgets\Dashboard\OutstandingPaymentsWidget;
-use App\Filament\Widgets\Dashboard\RecentActivityWidget;
-use App\Filament\Widgets\LatestPaymentsWidget;
-use App\Filament\Widgets\PaymentStatsWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
@@ -77,10 +69,17 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn () => __('app.label.documents')),
 
                 NavigationGroup::make()
-                    ->label(fn () => __('app.label.resources')),
+                    ->label(fn () => __('app.label.projects')),
+
+                // Daily-work groups above stay open; the reference registry
+                // and admin sections start collapsed to keep the sidebar short.
+                NavigationGroup::make()
+                    ->label(fn () => __('app.label.resources'))
+                    ->collapsed(),
 
                 NavigationGroup::make()
-                    ->label(fn () => __('app.label.administration')),
+                    ->label(fn () => __('app.label.administration'))
+                    ->collapsed(),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->maxContentWidth(Width::Full)
@@ -93,21 +92,20 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
+                // The dashboard is deliberately down to the header card
+                // (greeting + Telegram prompt); the data widgets were removed
+                // and live only in git history until they earn their way back.
                 DashboardHeaderWidget::class,
-                MyApprovalQueueWidget::class,
-                MyContractsInReviewWidget::class,
-                ContractStatsWidget::class,
-                PaymentStatsWidget::class,
-                OutstandingPaymentsWidget::class,
-                LatestPaymentsWidget::class,
-                ApprovalHealthWidget::class,
-                ContractsTrendChartWidget::class,
-                RecentActivityWidget::class,
             ])
             ->resources([
 
             ])
             ->plugins([
+
+                // Drag-to-resize handles on every action modal (quick-view,
+                // approval chain, record payment...) with the width persisted
+                // per action — snaps to Filament's native breakpoints.
+                ResizableModalPlugin::make(),
 
                 FilamentShieldPlugin::make()
                     ->navigationGroup(fn () => __('app.label.administration'))

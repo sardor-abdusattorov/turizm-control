@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
             CurrencySeeder::class,
             OrderTypeSeeder::class,
             ContactSeeder::class,
+            // Real directories the registry importers link participants to.
+            RealTourAgentsSeeder::class,
+            SponsorsSeeder::class,
             // Roles must exist before the user seeders assign them.
             RolesAndPermissionsSeeder::class,
             UserSeeder::class,
@@ -22,6 +25,8 @@ class DatabaseSeeder extends Seeder
             OrdersSeeder::class,
             ContractTemplateSeeder::class,
             ContractSeeder::class,
+            Exhibitions2025Seeder::class,
+            InternationalProjects2026Seeder::class,
         ]);
     }
 }

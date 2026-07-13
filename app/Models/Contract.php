@@ -28,6 +28,7 @@ class Contract extends Model
         'contract_template_id',
         'order_type_id',
         'contact_id',
+        'project_id',
         'currency_id',
         'responsible_id',
         'title',
@@ -239,6 +240,11 @@ class Contract extends Model
     public function contact(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
     }
 
     public function currency(): BelongsTo

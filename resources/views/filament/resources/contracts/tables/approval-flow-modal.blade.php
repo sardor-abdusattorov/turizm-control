@@ -69,7 +69,7 @@
                             </div>
                         </div>
                     </td>
-                    <td>
+                    <td data-label="{{ __('app.label.comment') }}">
                         @if ($a->comment)
                             <div class="af-cmt">{{ $a->comment }}</div>
                         @else
@@ -79,13 +79,13 @@
                             <div class="af-sys"><b>{{ __('app.label.system_note') }}:</b> {{ $a->systemNoteLabel() }}</div>
                         @endif
                     </td>
-                    <td>
+                    <td data-label="{{ __('app.label.status') }}">
                         <span class="af-badge" style="background:{{ $c['bg'] }};color:{{ $c['fg'] }};">
                             <i style="background:{{ $c['dot'] }};"></i>
                             {{ $labelFor($a) }}
                         </span>
                     </td>
-                    <td>
+                    <td data-label="{{ __('app.label.due') }}">
                         @if ($a->status === ContractApprover::STATUS_PENDING && $a->due_at)
                             @php $overdue = $a->isOverdue(); @endphp
                             <div @class(['af-date', 'af-date--over' => $overdue])>
@@ -102,7 +102,7 @@
                             <div class="af-date af-date--muted">—</div>
                         @endif
                     </td>
-                    <td>
+                    <td data-label="{{ __('app.label.acted_at') }}">
                         @if ($a->acted_at)
                             <div class="af-date">
                                 {{ $a->acted_at->translatedFormat('d.m.Y') }}

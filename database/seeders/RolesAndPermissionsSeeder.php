@@ -25,22 +25,19 @@ class RolesAndPermissionsSeeder extends Seeder
             'approve_contracts',
             'export_contract',
             'export_payment',
+            'export_project',
             'view_profile_settings',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('order', ['view_any', 'view']),
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
-            // Dashboard widgets the director oversees.
-            'view_contracts_trend_chart_widget',
-            'view_payment_stats_widget',
-            'view_outstanding_payments_widget',
-            'view_latest_payments_widget',
-            'view_approval_health_widget',
-            'view_my_approval_queue_widget',
+            ...$this->resourcePermissions('project', ['view_any', 'view']),
         ]);
 
         $this->syncRole('manager', [
             'export_contract',
             'export_contact',
+            'export_project',
+            'export_sponsor',
             'view_profile_settings',
             ...$this->resourcePermissions('contract', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
@@ -51,9 +48,9 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('position', ['view_any']),
             ...$this->resourcePermissions('order_type', ['view_any']),
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
-            // Dashboard widgets for the contract author.
-            'view_contract_stats_widget',
-            'view_my_contracts_in_review_widget',
+            ...$this->resourcePermissions('project', ['view_any', 'view', 'create', 'update']),
+            ...$this->resourcePermissions('sponsor', ['view_any', 'view', 'create', 'update']),
+            'record_project_payment',
         ]);
 
         // Legal + accounting review and approve contracts; they do not author
@@ -67,9 +64,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_profile_settings',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),
-            // Dashboard widgets visible to legal.
-            'view_contracts_trend_chart_widget',
-            'view_my_approval_queue_widget',
         ]);
 
         $this->syncRole('accountant', [
@@ -78,16 +72,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'export_contract',
             'export_contact',
             'export_payment',
+            'export_project',
             'view_profile_settings',
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),
             ...$this->resourcePermissions('payment', ['view_any', 'view', 'create']),
-            // Dashboard widgets visible to accounting.
-            'view_contracts_trend_chart_widget',
-            'view_payment_stats_widget',
-            'view_outstanding_payments_widget',
-            'view_latest_payments_widget',
-            'view_my_approval_queue_widget',
+            ...$this->resourcePermissions('project', ['view_any', 'view']),
+            'record_project_payment',
         ]);
     }
 

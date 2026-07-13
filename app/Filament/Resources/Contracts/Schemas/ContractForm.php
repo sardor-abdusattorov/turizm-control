@@ -10,6 +10,7 @@ use App\Models\ContractTemplate;
 use App\Models\Currency;
 use App\Models\Department;
 use App\Models\OrderType;
+use App\Models\Project;
 use App\Models\User;
 use App\Services\Contracts\ApprovalChain;
 use Closure;
@@ -103,6 +104,15 @@ class ContractForm
                                     ->preload()
                                     ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema))
                                     ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey())
+                                    ->columnSpanFull(),
+
+                                Select::make('project_id')
+                                    ->label(__('app.label.project_single'))
+                                    ->relationship('project', 'name')
+                                    ->getOptionLabelFromRecordUsing(fn (Project $record): string => $record->name.' · '.$record->type->label())
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable()
                                     ->columnSpanFull(),
 
                                 TextInput::make('title')

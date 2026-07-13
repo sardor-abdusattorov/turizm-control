@@ -50,6 +50,16 @@ class CurrencySeeder extends Seeder
                 'value' => 135,
                 'sort' => 4,
             ],
+            [
+                'short_name' => 'GBP',
+                'name' => [
+                    'ru' => 'Фунт стерлингов',
+                    'uz' => 'Funt sterling',
+                    'en' => 'Pound Sterling',
+                ],
+                'value' => 16500,
+                'sort' => 5,
+            ],
         ];
 
         foreach ($currencies as $data) {
@@ -63,5 +73,34 @@ class CurrencySeeder extends Seeder
                 ]
             );
         }
+
+        $this->pruneRetiredCurrencies();
+    }
+
+    /**
+     * An earlier revision seeded ten extra exhibition-geography currencies;
+     * the registry only needs the core five. Remove the retired codes from
+     * existing installs — but never a currency that is already referenced by
+     * a contract, project or participant row.
+     */
+    private function pruneRetiredCurrencies(): void
+    {
+        $retired = ['CNY', 'AED', 'JPY', 'KRW', 'INR', 'MYR', 'PLN', 'TRY', 'KZT', 'AZN'];
+
+        Currency::query()
+            ->whereIn('short_name', $retired)
+            ->whereNotIn('id', fn ($query) => $query->select('currency_id')
+                ->from('contracts')
+                ->whereNotNull('currency_id'))
+            ->whereNotIn('id', fn ($query) => $query->select('currency_id')
+                ->from('project_participants')
+                ->whereNotNull('currency_id'))
+            ->whereNotIn('id', fn ($query) => $query->select('area_currency_id')
+                ->from('projects')
+                ->whereNotNull('area_currency_id'))
+            ->whereNotIn('id', fn ($query) => $query->select('stand_currency_id')
+                ->from('projects')
+                ->whereNotNull('stand_currency_id'))
+            ->delete();
     }
 }

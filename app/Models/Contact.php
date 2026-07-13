@@ -27,6 +27,7 @@ class Contact extends Model
         'address',
         'phone',
         'email',
+        'website',
         'contact_person',
         'director_name',
         'bank_account',
@@ -106,6 +107,40 @@ class Contact extends Model
                 'currency' => $currencies->get($row->currency_id) ?? '—',
                 'count' => (int) $row->contracts_count,
                 'total' => (float) $row->total_amount,
+            ])
+            ->sortByDesc('count')
+            ->values();
+    }
+
+    public function projectParticipations(): HasMany
+    {
+        return $this->hasMany(ProjectParticipant::class);
+    }
+
+    /**
+     * Per-currency totals of this counterparty's project participations: one
+     * row per currency with the count, pledged and paid sums, ordered by
+     * count. Powers the "projects" badge breakdown on the contacts list.
+     *
+     * @return Collection<int, array{currency: string, count: int, total: float, paid: float}>
+     */
+    public function projectTotalsByCurrency(): Collection
+    {
+        $rows = $this->projectParticipations()
+            ->selectRaw('currency_id, COUNT(*) as participations_count, SUM(amount) as total_amount, SUM(paid_amount) as total_paid')
+            ->groupBy('currency_id')
+            ->get();
+
+        $currencies = Currency::query()
+            ->whereIn('id', $rows->pluck('currency_id')->filter())
+            ->pluck('short_name', 'id');
+
+        return $rows
+            ->map(fn (ProjectParticipant $row): array => [
+                'currency' => $currencies->get($row->currency_id) ?? '—',
+                'count' => (int) $row->participations_count,
+                'total' => (float) $row->total_amount,
+                'paid' => (float) $row->total_paid,
             ])
             ->sortByDesc('count')
             ->values();

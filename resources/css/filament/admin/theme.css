@@ -11,7 +11,8 @@
    needs a different accent. */
 .cw,
 .ow,
-.pv {
+.pv,
+.pj {
     --s: #fff;
     --t: #0f1419;
     --m: #57606a;
@@ -26,7 +27,8 @@
 
 .dark .cw,
 .dark .ow,
-.dark .pv {
+.dark .pv,
+.dark .pj {
     --s: #18181b;
     --t: #f0f6fc;
     --m: #9aa4b2;
@@ -494,6 +496,65 @@
     text-align: center;
 }
 
+/* ─── Approval-flow modal on a phone: rows become labelled cards ────────────
+   The five-column table cannot shrink onto a phone screen; below 640px the
+   header is dropped and every row renders as a card — the approver block on
+   top, then label/value lines fed by the cells' data-label attributes. */
+@media (max-width: 640px) {
+    .af,
+    .af tbody {
+        display: block;
+    }
+    .af thead {
+        display: none;
+    }
+    .af tbody tr {
+        display: block;
+        border: 1px solid rgba(127, 127, 127, .22);
+        border-radius: .75rem;
+        padding: .4rem .85rem;
+        margin-bottom: .65rem;
+    }
+    .af tbody tr:last-child {
+        margin-bottom: 0;
+    }
+    .af tbody td {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .5rem 0;
+        border-bottom: 1px dashed rgba(127, 127, 127, .15);
+    }
+    .af tbody td:last-child,
+    .af tbody tr:last-child td {
+        border-bottom: 0;
+    }
+    .af tbody td::before {
+        content: attr(data-label);
+        font-size: .66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        opacity: .55;
+        flex-shrink: 0;
+    }
+    .af tbody td:first-child {
+        display: block;
+        border-bottom: 1px solid rgba(127, 127, 127, .15);
+    }
+    .af tbody td:first-child::before {
+        content: none;
+    }
+    .af-date small {
+        display: inline;
+        margin-left: .3rem;
+    }
+    .af-cmt {
+        text-align: right;
+    }
+}
+
 /* ─── Styling pulled out of PHP Filament config ─────────────────────────────
    These were raw style="" strings set on columns/fields/actions inside the
    resource & widget classes. Moved here so visual styling lives in the
@@ -517,3 +578,356 @@
 .profile-avatar-uploader {
     max-width: 9rem;
 }
+
+/* ─── Projects (pj) view page ───────────────────────────────────────────────
+   Built on the shared ow- card/row primitives above; pj- adds only what
+   projects need: type/status pills, the participants table and the photo
+   grid (images come off the private disk via signed temporary URLs). */
+.pj-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: .24rem .62rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 650;
+    line-height: 1;
+    white-space: nowrap;
+}
+.pj-pill--success {
+    background: #d1fae5;
+    color: #047857;
+}
+.dark .pj-pill--success {
+    background: rgba(16, 185, 129, .16);
+    color: #6ee7b7;
+}
+.pj-pill--info {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+.dark .pj-pill--info {
+    background: rgba(59, 130, 246, .16);
+    color: #93c5fd;
+}
+.pj-pill--gray {
+    background: #f1f5f9;
+    color: #64748b;
+}
+.dark .pj-pill--gray {
+    background: rgba(255, 255, 255, .07);
+    color: #cbd5e1;
+}
+.pj-count {
+    margin-left: auto;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--m);
+    background: var(--soft);
+    padding: .18rem .6rem;
+    border-radius: 999px;
+}
+.ow-hd .pj-pill + .pj-pill {
+    margin-left: .4rem;
+}
+.ow-hd .pj-pill:first-of-type {
+    margin-left: auto;
+}
+.ow-hd .pj-pill:first-of-type ~ .pj-count {
+    margin-left: .4rem;
+}
+.pj-link {
+    color: var(--accent);
+    text-decoration: none;
+}
+.pj-link:hover {
+    text-decoration: underline;
+}
+.pj-wrap {
+    white-space: normal;
+}
+.pj-empty {
+    padding: 1.5rem 1.25rem;
+    font-size: .85rem;
+    color: var(--m2);
+    text-align: center;
+}
+.pj-table-wrap {
+    overflow-x: auto;
+}
+.pj-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .84rem;
+}
+.pj-table thead th {
+    text-align: left;
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--m2);
+    padding: .6rem 1.25rem;
+    border-bottom: 1px solid var(--d);
+    white-space: nowrap;
+}
+.pj-table tbody td {
+    padding: .65rem 1.25rem;
+    border-bottom: 1px solid var(--d);
+    color: var(--t);
+}
+.pj-table tbody td .pj-pill {
+    margin-left: .4rem;
+}
+.pj-table tfoot td {
+    padding: .7rem 1.25rem;
+    font-weight: 700;
+    color: var(--t);
+    background: var(--soft);
+}
+.pj-table__num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+/* Horizontal filmstrip rendered by the image-gallery plugin component —
+   the card supplies the side padding the component itself lacks. */
+.pj-gallery-pad {
+    padding: .25rem 1.25rem 1rem;
+}
+
+/* Scrollable body inside the quick-view modal — every participant stays
+   reachable without the modal itself growing past the screen. */
+.pj-scroll {
+    max-height: 45vh;
+    overflow-y: auto;
+}
+
+/* Fees-collection progress bar (featured-project widget). */
+.pj-progress {
+    height: .5rem;
+    border-radius: 999px;
+    background: var(--soft);
+    box-shadow: inset 0 0 0 1px var(--d);
+    overflow: hidden;
+}
+.pj-progress__fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    transition: width .3s ease;
+}
+.pj-progress__fill--success {
+    background: #10b981;
+}
+.pj-progress__fill--warning {
+    background: #fb923c;
+}
+
+/* ─── Projects: hero, metric tiles, pill variants ───────────────────────────
+   Mirrors the .pv-hero / .cw-stat look but lives in the global .pj block so
+   the projects view page reuses it by class name (the contract .cw hero is
+   page-scoped and not reusable). */
+.pj {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.pj-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    background: var(--s);
+    border: 1px solid var(--d);
+    border-radius: 1rem;
+    padding: 1.35rem 1.5rem 1.35rem 1.65rem;
+    overflow: hidden;
+}
+.pj-hero::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+.pj-hero--success::before {
+    background: #10b981;
+}
+.pj-hero--info::before {
+    background: var(--accent);
+}
+.pj-hero--gray::before {
+    background: #94a3b8;
+}
+.pj-hero__l {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    min-width: 0;
+    flex: 1;
+}
+.pj-hero__meta {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+.pj-hero__title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--t);
+    letter-spacing: -.01em;
+}
+.pj-hero__dates {
+    font-size: .8rem;
+    color: var(--m);
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+.pj-hero__r {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .1rem;
+    margin-left: auto;
+}
+.pj-hero__metric {
+    font-size: 1.5rem;
+    font-weight: 750;
+    color: var(--t);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+}
+.pj-hero__metric-lb {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--m2);
+    font-weight: 600;
+}
+.pj-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--m);
+    background: var(--soft);
+    padding: .2rem .6rem;
+    border-radius: 999px;
+}
+
+/* metric tiles */
+.pj-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: .6rem;
+}
+.pj-stat {
+    border: 1px solid var(--d);
+    border-radius: .75rem;
+    padding: .75rem .9rem;
+    background: var(--s);
+}
+.pj-stat__lb {
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--m2);
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+.pj-stat__vl {
+    margin-top: .35rem;
+    font-size: 1.15rem;
+    font-weight: 650;
+    color: var(--t);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+.pj-stat__sub {
+    margin-top: .15rem;
+    font-size: .75rem;
+    color: var(--m);
+}
+.pj-stat--success {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+.pj-stat--success .pj-stat__vl {
+    color: #047857;
+}
+.dark .pj-stat--success {
+    background: rgba(16, 185, 129, .10);
+    border-color: rgba(16, 185, 129, .30);
+}
+.dark .pj-stat--success .pj-stat__vl {
+    color: #6ee7b7;
+}
+.pj-stat--warning {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+.pj-stat--warning .pj-stat__vl {
+    color: #c2410c;
+}
+.dark .pj-stat--warning {
+    background: rgba(251, 146, 60, .10);
+    border-color: rgba(251, 146, 60, .30);
+}
+.dark .pj-stat--warning .pj-stat__vl {
+    color: #fdba74;
+}
+.pj-stat--primary {
+    background: var(--accent-softer);
+    border-color: var(--accent-soft);
+}
+.pj-stat--primary .pj-stat__vl {
+    color: var(--accent-strong);
+}
+.dark .pj-stat--primary .pj-stat__vl {
+    color: var(--accent);
+}
+
+/* pill variants missing from the base .pj-pill set */
+.pj-pill--warning {
+    background: #ffedd5;
+    color: #c2410c;
+}
+.dark .pj-pill--warning {
+    background: rgba(251, 146, 60, .16);
+    color: #fdba74;
+}
+.pj-pill--danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+.dark .pj-pill--danger {
+    background: rgba(239, 68, 68, .16);
+    color: #fca5a5;
+}
+.pj-pill--primary {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+}
+.dark .pj-pill--primary {
+    background: var(--accent-softer);
+    color: var(--accent);
+}
+
+/* screenshot thumbnail inside the payments card */
+.pj-shot {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: .4rem;
+    object-fit: cover;
+    cursor: zoom-in;
+    box-shadow: 0 0 0 1px var(--d);
+    display: block;
+}
+

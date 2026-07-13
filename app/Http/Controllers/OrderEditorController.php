@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Filament\Resources\Orders\OrderResource;
+use App\Filament\Resources\Orders\BaseOrderResource;
 use App\Models\Order;
 use App\Services\OnlyOffice\OnlyOfficeService;
 use Illuminate\Http\Request;
@@ -24,7 +24,7 @@ class OrderEditorController extends Controller
                 'order' => $order,
                 'apiScriptUrl' => $service->apiScriptUrl(),
                 'config' => $service->orderEditorConfig($order, auth()->user(), $request->query('mode')),
-                'backUrl' => OrderResource::getUrl('index'),
+                'backUrl' => BaseOrderResource::resourceFor($order)::getUrl('index'),
             ])
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache')

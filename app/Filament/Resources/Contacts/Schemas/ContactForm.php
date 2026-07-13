@@ -99,6 +99,11 @@ class ContactForm
                                     ->label(__('app.label.email'))
                                     ->email()
                                     ->maxLength(255),
+
+                                TextInput::make('website')
+                                    ->label(__('app.label.website'))
+                                    ->url()
+                                    ->maxLength(255),
                             ]),
 
                         Toggle::make('status')

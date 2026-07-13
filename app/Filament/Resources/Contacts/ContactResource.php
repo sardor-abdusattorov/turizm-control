@@ -38,7 +38,7 @@ class ContactResource extends Resource
 
     public static function getNavigationSort(): int
     {
-        return 5;
+        return 1;
     }
 
     public static function getNavigationBadge(): ?string

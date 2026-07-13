@@ -38,7 +38,7 @@ class PositionResource extends Resource
 
     public static function getNavigationSort(): int
     {
-        return 2;
+        return 7;
     }
 
     public static function getNavigationBadge(): ?string

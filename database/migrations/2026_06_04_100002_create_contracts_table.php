@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('contract_template_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('order_type_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('contact_id')->constrained()->restrictOnDelete();
+            $table->foreignId('project_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('currency_id')->constrained()->restrictOnDelete();
             $table->foreignId('responsible_id')->constrained('users')->cascadeOnDelete();
             $table->string('title');

@@ -61,6 +61,7 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
                 __('app.label.address'),
                 __('app.label.phone'),
                 __('app.label.email'),
+                __('app.label.website'),
                 __('app.label.contact_person'),
                 __('app.label.director_name'),
                 __('app.label.bank_account'),
@@ -78,6 +79,7 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
             __('app.label.address'),
             __('app.label.phone'),
             __('app.label.email'),
+            __('app.label.website'),
             __('app.label.status'),
             __('app.label.created_at'),
         ];
@@ -100,6 +102,7 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
                 self::localized($row->address),
                 $row->phone,
                 $row->email,
+                $row->website,
                 $row->contact_person,
                 $row->director_name,
                 $row->bank_account,
@@ -117,6 +120,7 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
             self::localized($row->address),
             $row->phone,
             $row->email,
+            $row->website,
             $status,
             $createdAt,
         ];
@@ -150,7 +154,7 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
     private function textColumns(): array
     {
         return $this->isLegal()
-            ? ['D', 'E', 'G', 'K', 'M'] // INN, OKED, phone, account number, MFO
+            ? ['D', 'E', 'G', 'L', 'N'] // INN, OKED, phone, account number, MFO
             : ['C', 'E'];               // PINFL, phone
     }
 
