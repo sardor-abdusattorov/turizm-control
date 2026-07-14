@@ -1,7 +1,9 @@
 <?php
 
 use App\Enums\ContractDirection;
+use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\Pages\CreateInternalProject;
+use App\Filament\Resources\Projects\Pages\ViewInternalProject;
 use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Currency;
@@ -53,6 +55,41 @@ it('collects the basis orders of its contracts without duplicates', function () 
 
     expect($project->ordersViaContracts()->pluck('id')->sort()->values()->all())
         ->toBe([$annual->id, $delegation->id]);
+});
+
+it('shows visible-contract expense totals and the photo report on the view page', function () {
+    $user = User::factory()->create(['status' => User::STATUS_ACTIVE]);
+
+    foreach (['view_any_project', 'view_project'] as $ability) {
+        Permission::findOrCreate($ability, 'web');
+        $user->givePermissionTo($ability);
+    }
+
+    $project = Project::factory()->create([
+        'type' => ProjectType::Internal,
+        'photo_report_url' => 'https://clck.ru/3UYYzh',
+        'attendees_count' => 165,
+    ]);
+
+    $expense = ContractType::factory()->create();
+    $uzs = Currency::factory()->create(['short_name' => 'UZS']);
+
+    // The viewer is responsible for this contract, so visibleTo() keeps it.
+    Contract::factory()->create([
+        'project_id' => $project->id,
+        'contract_type_id' => $expense->id,
+        'currency_id' => $uzs->id,
+        'amount' => 1500000,
+        'responsible_id' => $user->id,
+    ]);
+
+    actingAs($user->fresh());
+
+    Livewire::test(ViewInternalProject::class, ['record' => $project->id])
+        ->assertOk()
+        ->assertSee('https://clck.ru/3UYYzh')
+        ->assertSee('1 500 000')
+        ->assertSee('165');
 });
 
 it('saves the local-event fields through the internal project form', function () {

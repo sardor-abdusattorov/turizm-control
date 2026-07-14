@@ -14,12 +14,26 @@
     // responsible for.
     $visibleContracts = $record->contracts()
         ->visibleTo()
-        ->with(['currency', 'contact'])
+        ->with(['currency', 'contact', 'contractType'])
         ->get();
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
     $fmt = fn ($n) => number_format((float) $n, 0, ',', ' ');
     $money = fn ($amount, ?string $cur) => $amount === null ? '—' : $fmt($amount).($cur ? ' '.$cur : '');
+
+    // Money the viewer is allowed to see, split by direction and currency —
+    // deliberately built from the visibleTo() set so a manager's tiles never
+    // leak sums of contracts hidden from them.
+    $sumByDirection = fn (\App\Enums\ContractDirection $direction) => $visibleContracts
+        ->filter(fn ($c) => $c->contractType?->direction === $direction
+            && $c->status !== \App\Models\Contract::STATUS_REJECTED)
+        ->groupBy(fn ($c) => $c->currency?->short_name ?? '')
+        ->map(fn ($group) => $group->sum('amount'));
+    $expenseTotals = $sumByDirection(\App\Enums\ContractDirection::Expense);
+    $incomeTotals = $sumByDirection(\App\Enums\ContractDirection::Income);
+    $moneyLines = fn ($totals) => $totals->map(fn ($v, $c) => $fmt($v).($c ? ' '.$c : ''))->implode(' · ');
+
+    $isInternalProject = $record->type === \App\Enums\ProjectType::Internal;
 
     $period = $record->starts_on
         ? $record->starts_on->format('d.m.Y').($record->ends_on ? ' — '.$record->ends_on->format('d.m.Y') : '')
@@ -94,16 +108,35 @@
 
     {{-- ============ METRIC TILES ============ --}}
     <section class="pj-stats">
-        <div class="pj-stat">
-            <span class="pj-stat__lb">{!! $ic('heroicon-o-square-3-stack-3d', 13) !!} {{ __('app.label.area_sqm') }}</span>
-            <div class="pj-stat__vl">{{ $record->area_sqm !== null ? $fmt($record->area_sqm).' м²' : '—' }}</div>
-            <div class="pj-stat__sub">
-                {{ $record->area_is_free ? __('app.label.area_is_free') : $money($record->area_cost, $record->areaCurrency?->short_name) }}
+        @if ($isInternalProject)
+            {{-- Local events budget: plan vs fact from the registry columns. --}}
+            <div class="pj-stat">
+                <span class="pj-stat__lb">{!! $ic('heroicon-o-calculator', 13) !!} {{ __('app.label.estimate_amount') }}</span>
+                <div class="pj-stat__vl">{{ $record->estimate_amount !== null ? $fmt($record->estimate_amount).' UZS' : '—' }}</div>
             </div>
-        </div>
+            <div class="pj-stat">
+                <span class="pj-stat__lb">{!! $ic('heroicon-o-banknotes', 13) !!} {{ __('app.label.final_amount') }}</span>
+                <div class="pj-stat__vl">{{ $record->final_amount !== null ? $fmt($record->final_amount).' UZS' : '—' }}</div>
+            </div>
+        @else
+            <div class="pj-stat">
+                <span class="pj-stat__lb">{!! $ic('heroicon-o-square-3-stack-3d', 13) !!} {{ __('app.label.area_sqm') }}</span>
+                <div class="pj-stat__vl">{{ $record->area_sqm !== null ? $fmt($record->area_sqm).' м²' : '—' }}</div>
+                <div class="pj-stat__sub">
+                    {{ $record->area_is_free ? __('app.label.area_is_free') : $money($record->area_cost, $record->areaCurrency?->short_name) }}
+                </div>
+            </div>
+            <div class="pj-stat">
+                <span class="pj-stat__lb">{!! $ic('heroicon-o-building-storefront', 13) !!} {{ __('app.label.stand_cost') }}</span>
+                <div class="pj-stat__vl">{{ $money($record->stand_cost, $record->standCurrency?->short_name) }}</div>
+            </div>
+        @endif
         <div class="pj-stat">
-            <span class="pj-stat__lb">{!! $ic('heroicon-o-building-storefront', 13) !!} {{ __('app.label.stand_cost') }}</span>
-            <div class="pj-stat__vl">{{ $money($record->stand_cost, $record->standCurrency?->short_name) }}</div>
+            <span class="pj-stat__lb">{!! $ic('heroicon-o-arrow-trending-down', 13) !!} {{ __('app.contract.direction.expense') }} · {{ __('app.label.contracts') }}</span>
+            <div class="pj-stat__vl" @if ($expenseTotals->count() > 1) style="font-size:1rem;" @endif>{{ $expenseTotals->isNotEmpty() ? $moneyLines($expenseTotals) : '—' }}</div>
+            @if ($incomeTotals->isNotEmpty())
+                <div class="pj-stat__sub">{{ __('app.contract.direction.income') }}: {{ $moneyLines($incomeTotals) }}</div>
+            @endif
         </div>
         <div class="pj-stat {{ $paidTint ? 'pj-stat--'.$paidTint : '' }}">
             <span class="pj-stat__lb">{!! $ic('heroicon-o-check-circle', 13) !!} {{ __('app.label.paid') }}</span>
@@ -112,7 +145,7 @@
         </div>
         <div class="pj-stat">
             <span class="pj-stat__lb">{!! $ic('heroicon-o-user-group', 13) !!} {{ __('app.label.participants') }}</span>
-            <div class="pj-stat__vl">{{ $members->count() }}</div>
+            <div class="pj-stat__vl">{{ $isInternalProject && $record->attendees_count !== null ? $record->attendees_count : $members->count() }}</div>
             <div class="pj-stat__sub">{{ __('app.label.sponsors') }}: {{ $sponsors->count() }}</div>
         </div>
     </section>
@@ -134,6 +167,14 @@
                                 {{ trim(($basisOrder->number ? $basisOrder->number.' · ' : '').$basisOrder->title) }}
                             </a>@if (! $loop->last) · @endif
                         @endforeach
+                    </div>
+                </div>
+            @endif
+            @if ($record->photo_report_url)
+                <div class="ow-row">
+                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-photo') !!}</span><span class="ow-row__lb">{{ __('app.label.photo_report_url') }}</span></div>
+                    <div class="ow-row__v">
+                        <a class="ow-row__vl pj-link" href="{{ $record->photo_report_url }}" target="_blank" rel="noopener">{{ $record->photo_report_url }}</a>
                     </div>
                 </div>
             @endif

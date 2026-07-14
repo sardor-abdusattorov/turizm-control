@@ -25,6 +25,13 @@
 
     $galleryUrls = $project->galleryUrls();
 
+    // Same visibility rule as everywhere: a manager only previews the
+    // project contracts they are allowed to see.
+    $previewContracts = $project->contracts()
+        ->visibleTo()
+        ->with(['currency', 'contractType'])
+        ->get();
+
     // A single fee currency is shown only when every participant shares it;
     // mixed-currency projects drop the suffix rather than mislead.
     $feeCodes = $project->participants->map(fn ($p) => $p->currency?->short_name)->filter()->unique()->values();
@@ -101,6 +108,33 @@
             <p class="pj-empty" style="padding:.5rem 0;text-align:left;">{{ $block['empty'] }}</p>
         @endif
     @endforeach
+
+    {{-- contracts (scoped by visibleTo) --}}
+    @if ($previewContracts->isNotEmpty())
+        <div>
+            <div class="pj-hero__metric-lb" style="margin-bottom:.4rem;">{{ __('app.label.contracts') }} · {{ $previewContracts->count() }}</div>
+            <div class="pj-table-wrap pj-scroll" style="border:1px solid var(--d);border-radius:.6rem;">
+                <table class="pj-table">
+                    <tbody>
+                    @foreach ($previewContracts as $contract)
+                        <tr>
+                            <td style="white-space:nowrap;font-weight:600;">{{ $contract->number }}</td>
+                            <td>
+                                @if ($contract->contractType)
+                                    <span class="pj-pill pj-pill--{{ $contract->contractType->direction?->color() ?? 'gray' }}">{{ $contract->contractType->title }}</span>
+                                @endif
+                            </td>
+                            <td class="pj-table__num">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</td>
+                            <td style="width:1%;">
+                                <span class="pj-pill pj-pill--{{ $contract->status->color() }}">{{ $contract->status->label() }}</span>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
 
     {{-- gallery --}}
     @if ($galleryUrls !== [])
