@@ -9,7 +9,6 @@ use App\Models\Currency;
 use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 
@@ -17,10 +16,11 @@ use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
+// No manual cache bust here on purpose: Settings::set() must invalidate the
+// settings cache itself, otherwise the admin toggle takes an hour to apply.
 function setApprovalEnabled(bool $enabled): void
 {
     Settings::set('approval.enabled', $enabled);
-    Cache::forget('settings.approval.enabled');
 }
 
 function contractAuthor(): User
