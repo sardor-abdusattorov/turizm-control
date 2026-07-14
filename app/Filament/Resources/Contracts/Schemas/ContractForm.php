@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\Contracts\ApprovalChain;
+use App\Services\Contracts\ContractWorkflow;
 use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -157,6 +158,7 @@ class ContractForm
 
                         Tab::make(__('app.label.approval_chain'))
                             ->icon('heroicon-o-users')
+                            ->visible(fn (): bool => ContractWorkflow::approvalEnabled())
                             ->badge(fn (Get $get): ?int => ($n = count(array_filter((array) $get('approver_chain')))) ? $n : null)
                             ->schema([
                                 Select::make('approver_chain')
@@ -168,7 +170,7 @@ class ContractForm
                                     ->searchable()
                                     ->preload()
                                     ->live()
-                                    ->required()
+                                    ->required(fn (): bool => ContractWorkflow::approvalEnabled())
                                     ->rules([
                                         fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
                                             self::validateRequiredApproverDepartments($value, $fail);

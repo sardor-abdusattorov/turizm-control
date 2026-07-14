@@ -12,6 +12,16 @@ class ContractWorkflow
 {
     public function __construct(public ContractNotifier $notifier) {}
 
+    /**
+     * The admin switch (Settings → Согласование): when off, contracts skip
+     * the digital approval chain entirely — they are filed as already signed
+     * paper and the whole submit/approve machinery stays dormant.
+     */
+    public static function approvalEnabled(): bool
+    {
+        return (bool) settings('approval.enabled', true);
+    }
+
     public function submit(Contract $contract, ?User $user = null): bool
     {
         $user ??= auth()->user();

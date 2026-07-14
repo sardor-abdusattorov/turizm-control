@@ -38,6 +38,7 @@ return [
         'items_agreement_ref' => 'Shartnoma № / sana',
         'approval_flow' => 'Kelishuv tartibi',
         'approval_sla_days' => 'Ko‘rib chiqish muddati (kun)',
+        'approval_enabled' => 'Shartnomalarni kelishishni talab qilish',
         'due_at' => 'Muddat',
         'department_legal' => 'Yuridik bo‘lim',
         'department_financial' => 'Moliya bo‘limi',
@@ -346,6 +347,7 @@ return [
         'no_other_sessions' => 'Boshqa faol seanslar yo‘q',
     ],
     'action' => [
+        'mark_signed' => 'Imzolangan deb belgilash',
         'upload_files' => 'Fayllarni yuklash',
         'download' => 'Yuklab olish',
         'delete' => "O'chirish",
@@ -453,6 +455,8 @@ return [
         ],
     ],
     'message' => [
+        'mark_signed_confirm' => 'Shartnoma tizimdan tashqarida imzolangan deb belgilanadi.',
+        'marked_signed' => 'Shartnoma imzolangan deb belgilandi.',
         'no_attachments' => 'Hozircha fayllar yo‘q — hujjatlar paketi skanlarini yuklang.',
         'attachments_uploaded' => 'Fayllar yuklandi.',
         'attachment_deleted' => 'Fayl o‘chirildi.',
@@ -515,6 +519,7 @@ return [
     'helper' => [
         'template_optional' => 'Majburiy emas — faqat shablondan hujjat yaratish uchun kerak.',
         'attachment_type_optional' => 'Majburiy emas — turini keyin ham belgilash mumkin.',
+        'approval_enabled' => "O'chirilgan — shartnomalar kelishuv zanjirisiz, imzolangan holda kiritiladi.",
         'inn' => 'Yuridik shaxslar uchun 9 raqam',
         'pinfl' => '14 raqam',
         'oked' => '5 raqam',

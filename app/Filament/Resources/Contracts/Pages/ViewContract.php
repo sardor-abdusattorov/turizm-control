@@ -169,6 +169,33 @@ class ViewContract extends ViewRecord
                     $this->record->refresh();
                 }),
 
+            Action::make('markSigned')
+                ->label(__('app.action.mark_signed'))
+                ->icon('heroicon-o-check-badge')
+                ->color('success')
+                ->requiresConfirmation()
+                ->modalHeading(__('app.action.mark_signed'))
+                ->modalDescription(__('app.message.mark_signed_confirm'))
+                ->schema([
+                    DatePicker::make('signed_at')
+                        ->label(__('app.label.signing_date'))
+                        ->default(today())
+                        ->required(),
+                ])
+                // Only offered when the approval flow is switched off: the
+                // paper was signed outside the system, filing it is enough.
+                ->visible(fn (): bool => ! ContractWorkflow::approvalEnabled()
+                    && $this->record->status === Contract::STATUS_DRAFT
+                    && $this->canManageAttachments())
+                ->action(function (array $data): void {
+                    $this->record->update([
+                        'status' => Contract::STATUS_APPROVED,
+                        'signed_at' => $data['signed_at'],
+                    ]);
+
+                    Notification::make()->title(__('app.message.marked_signed'))->success()->send();
+                }),
+
             EditAction::make()
                 ->icon('heroicon-o-pencil-square')
                 ->visible(fn () => $this->record?->canBeEditedBy()),

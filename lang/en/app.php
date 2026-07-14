@@ -38,6 +38,7 @@ return [
         'items_agreement_ref' => 'Agreement no. / date',
         'approval_flow' => 'Approval Flow',
         'approval_sla_days' => 'Review deadline (days)',
+        'approval_enabled' => 'Require contract approval',
         'due_at' => 'Due',
         'department_legal' => 'Legal Department',
         'department_financial' => 'Financial Department',
@@ -351,6 +352,7 @@ return [
         'no_other_sessions' => 'No other active sessions',
     ],
     'action' => [
+        'mark_signed' => 'Mark as signed',
         'upload_files' => 'Upload files',
         'download' => 'Download',
         'delete' => 'Delete',
@@ -458,6 +460,8 @@ return [
         ],
     ],
     'message' => [
+        'mark_signed_confirm' => 'The contract will be marked as signed outside the system.',
+        'marked_signed' => 'Contract marked as signed.',
         'no_attachments' => 'No files yet — upload the dossier scans.',
         'attachments_uploaded' => 'Files uploaded.',
         'attachment_deleted' => 'File deleted.',
@@ -520,6 +524,7 @@ return [
     'helper' => [
         'template_optional' => 'Optional — only needed to generate the document from a template.',
         'attachment_type_optional' => 'Optional — the type can be set later.',
+        'approval_enabled' => 'Off — contracts are filed as already signed, no approval chain.',
         'inn' => '9 digits for legal entities',
         'pinfl' => '14 digits',
         'oked' => '5 digits',

@@ -178,6 +178,14 @@ class Settings extends Page implements HasForms
 
                         Tabs\Tab::make(__('app.label.tab_approval_flow'))
                             ->schema([
+                                // The master switch: off — contracts are filed
+                                // as already-signed paper, no chain, no SLA.
+                                Toggle::make('approval.enabled')
+                                    ->label(__('app.label.approval_enabled'))
+                                    ->helperText(__('app.helper.approval_enabled'))
+                                    ->default(true)
+                                    ->live(),
+
                                 Repeater::make('approval.flow')
                                     ->label(__('app.label.approval_flow'))
                                     ->helperText(__('app.helper.approval_flow'))

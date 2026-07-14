@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Services\Contracts\ApprovalChain;
+use App\Services\Contracts\ContractWorkflow;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
 use Filament\Resources\Pages\CreateRecord;
@@ -32,6 +33,12 @@ class CreateContract extends CreateRecord
             app(TemplateFiller::class),
             app(ContractPlaceholderValues::class),
         );
+
+        // With approval switched off (Settings → Согласование) the contract
+        // is just filed — no chain to build, nothing to submit.
+        if (! ContractWorkflow::approvalEnabled()) {
+            return;
+        }
 
         app(ApprovalChain::class)->requeue($this->record, $this->approverChain);
 

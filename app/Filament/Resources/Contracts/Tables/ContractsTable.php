@@ -94,6 +94,7 @@ class ContractsTable
                     ->label(__('app.label.approvers'))
                     ->view('filament.resources.contracts.tables.approvers-column')
                     ->disabledClick()
+                    ->visible(fn (): bool => ContractWorkflow::approvalEnabled())
                     ->extraHeaderAttributes(['class' => 'contracts-col-approvers'])
                     ->extraAttributes(['class' => 'contracts-col-approvers']),
 
@@ -101,6 +102,7 @@ class ContractsTable
                     ->label(__('app.label.due'))
                     ->view('filament.components.sla-countdown')
                     ->state(fn (Contract $record) => $record->currentApprover()?->due_at)
+                    ->visible(fn (): bool => ContractWorkflow::approvalEnabled())
                     ->disabledClick(),
 
                 TextColumn::make('responsible.name')
@@ -166,6 +168,7 @@ class ContractsTable
             ->recordActions([
                 Action::make('contractFlow')
                     ->hiddenLabel()
+                    ->visible(fn (): bool => ContractWorkflow::approvalEnabled())
                     ->modalSubmitAction(false)
                     ->modalCancelAction(false)
                     ->modalWidth('4xl')

@@ -8,6 +8,7 @@ use App\Models\Concerns\HasDocumentKey;
 use App\Observers\ContractObserver;
 use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractFiles;
+use App\Services\Contracts\ContractWorkflow;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -406,7 +407,8 @@ class Contract extends Model
     {
         $user ??= auth()->user();
 
-        return $user
+        return ContractWorkflow::approvalEnabled()
+            && $user
             && $this->status === self::STATUS_DRAFT
             && ($this->responsible_id === $user->id || $user->hasRole('super_admin'))
             && $this->documentExists()
