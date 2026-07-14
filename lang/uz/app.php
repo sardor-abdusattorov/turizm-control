@@ -65,6 +65,8 @@ return [
         'select_order_type_first' => 'Avval buyruq turini tanlang',
         'contract_type_single' => 'Shartnoma turi',
         'contract_type_plural' => 'Shartnoma turlari',
+        'attachments' => 'Ilovalar',
+        'attachment_type' => 'Hujjat turi',
         'select_contract_type_first' => 'Avval shartnoma turini tanlang',
         'direction' => "Yo'nalish",
         'order_basis' => 'Asos buyruq',
@@ -344,6 +346,9 @@ return [
         'no_other_sessions' => 'Boshqa faol seanslar yo‘q',
     ],
     'action' => [
+        'upload_files' => 'Fayllarni yuklash',
+        'download' => 'Yuklab olish',
+        'delete' => "O'chirish",
         'update' => 'Yangilash',
         'add_participant' => 'Ishtirokchi qo\'shish',
         'quick_view' => 'Tezkor ko\'rish',
@@ -448,6 +453,9 @@ return [
         ],
     ],
     'message' => [
+        'no_attachments' => 'Hozircha fayllar yo‘q — hujjatlar paketi skanlarini yuklang.',
+        'attachments_uploaded' => 'Fayllar yuklandi.',
+        'attachment_deleted' => 'Fayl o‘chirildi.',
         'loading_editor' => 'Muharrir yuklanmoqda…',
         'no_participants' => 'Ishtirokchilar hali qo\'shilmagan.',
         'no_sponsors' => 'Homiylar hali qo\'shilmagan.',
@@ -506,6 +514,7 @@ return [
     ],
     'helper' => [
         'template_optional' => 'Majburiy emas — faqat shablondan hujjat yaratish uchun kerak.',
+        'attachment_type_optional' => 'Majburiy emas — turini keyin ham belgilash mumkin.',
         'inn' => 'Yuridik shaxslar uchun 9 raqam',
         'pinfl' => '14 raqam',
         'oked' => '5 raqam',
@@ -591,6 +600,17 @@ return [
         'direction' => [
             'expense' => 'Xarajat',
             'income' => 'Daromad',
+        ],
+        'attachment' => [
+            'contract_scan' => 'Shartnoma skani',
+            'order_copy' => 'Buyruq',
+            'proposal' => 'Tijorat taklifi',
+            'sketch' => 'Eskiz',
+            'invoice' => 'Invoys',
+            'swift' => 'SWIFT',
+            'act' => 'Dalolatnoma',
+            'bank_fees' => 'Bank komissiyalari',
+            'other' => 'Boshqa',
         ],
     ],
     'payment_status' => [

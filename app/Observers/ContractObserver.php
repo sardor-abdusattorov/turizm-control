@@ -24,5 +24,9 @@ class ContractObserver
     public function deleting(Contract $contract): void
     {
         $this->files->purge($contract);
+
+        // The DB cascade would drop the rows without firing model events, so
+        // delete through Eloquent to let each attachment remove its file.
+        $contract->attachments()->get()->each->delete();
     }
 }

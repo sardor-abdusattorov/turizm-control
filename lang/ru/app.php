@@ -68,6 +68,8 @@ return [
         'order_type_plural' => 'Типы приказов',
         'contract_type_single' => 'Вид договора',
         'contract_type_plural' => 'Виды договоров',
+        'attachments' => 'Вложения',
+        'attachment_type' => 'Тип документа',
         'select_contract_type_first' => 'Сначала выберите вид договора',
         'direction' => 'Направление',
         'order_basis' => 'Приказ-основание',
@@ -344,6 +346,9 @@ return [
         'no_other_sessions' => 'Других активных сессий нет',
     ],
     'action' => [
+        'upload_files' => 'Загрузить файлы',
+        'download' => 'Скачать',
+        'delete' => 'Удалить',
         'update' => 'Обновить',
         'add_participant' => 'Добавить участника',
         'quick_view' => 'Быстрый просмотр',
@@ -448,6 +453,9 @@ return [
         ],
     ],
     'message' => [
+        'no_attachments' => 'Файлов пока нет — загрузите сканы пакета документов.',
+        'attachments_uploaded' => 'Файлы загружены.',
+        'attachment_deleted' => 'Файл удалён.',
         'loading_editor' => 'Загрузка редактора…',
         'no_participants' => 'Участники ещё не добавлены.',
         'no_sponsors' => 'Спонсоры ещё не добавлены.',
@@ -506,6 +514,7 @@ return [
     ],
     'helper' => [
         'template_optional' => 'Необязательно — нужен только для генерации документа из шаблона.',
+        'attachment_type_optional' => 'Необязательно — тип можно указать позже.',
         'inn' => '9 цифр для юридических лиц',
         'pinfl' => '14 цифр',
         'oked' => '5 цифр',
@@ -591,6 +600,17 @@ return [
         'direction' => [
             'expense' => 'Расход',
             'income' => 'Доход',
+        ],
+        'attachment' => [
+            'contract_scan' => 'Скан договора',
+            'order_copy' => 'Приказ',
+            'proposal' => 'КП',
+            'sketch' => 'Эскиз',
+            'invoice' => 'Инвойс',
+            'swift' => 'SWIFT',
+            'act' => 'Акт',
+            'bank_fees' => 'Комиссии банка',
+            'other' => 'Прочее',
         ],
     ],
     'payment_status' => [

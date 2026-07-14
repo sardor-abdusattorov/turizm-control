@@ -65,6 +65,8 @@ return [
         'select_order_type_first' => 'Select an order type first',
         'contract_type_single' => 'Contract type',
         'contract_type_plural' => 'Contract types',
+        'attachments' => 'Attachments',
+        'attachment_type' => 'Document type',
         'select_contract_type_first' => 'Select a contract type first',
         'direction' => 'Direction',
         'order_basis' => 'Basis order',
@@ -349,6 +351,9 @@ return [
         'no_other_sessions' => 'No other active sessions',
     ],
     'action' => [
+        'upload_files' => 'Upload files',
+        'download' => 'Download',
+        'delete' => 'Delete',
         'update' => 'Update',
         'add_participant' => 'Add participant',
         'quick_view' => 'Quick view',
@@ -453,6 +458,9 @@ return [
         ],
     ],
     'message' => [
+        'no_attachments' => 'No files yet — upload the dossier scans.',
+        'attachments_uploaded' => 'Files uploaded.',
+        'attachment_deleted' => 'File deleted.',
         'loading_editor' => 'Loading editor…',
         'no_participants' => 'No participants yet.',
         'no_sponsors' => 'No sponsors yet.',
@@ -511,6 +519,7 @@ return [
     ],
     'helper' => [
         'template_optional' => 'Optional — only needed to generate the document from a template.',
+        'attachment_type_optional' => 'Optional — the type can be set later.',
         'inn' => '9 digits for legal entities',
         'pinfl' => '14 digits',
         'oked' => '5 digits',
@@ -596,6 +605,17 @@ return [
         'direction' => [
             'expense' => 'Expense',
             'income' => 'Income',
+        ],
+        'attachment' => [
+            'contract_scan' => 'Contract scan',
+            'order_copy' => 'Order',
+            'proposal' => 'Proposal',
+            'sketch' => 'Sketch',
+            'invoice' => 'Invoice',
+            'swift' => 'SWIFT',
+            'act' => 'Act',
+            'bank_fees' => 'Bank fees',
+            'other' => 'Other',
         ],
     ],
     'payment_status' => [

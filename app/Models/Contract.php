@@ -266,6 +266,11 @@ class Contract extends Model
         return $this->belongsTo(User::class, 'responsible_id');
     }
 
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(ContractAttachment::class)->orderBy('sort')->orderBy('id');
+    }
+
     public function approvers(): HasMany
     {
         return $this->hasMany(ContractApprover::class)->orderBy('order');
