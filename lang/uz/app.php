@@ -459,6 +459,7 @@ return [
         ],
     ],
     'message' => [
+        'no_contracts' => 'Loyiha bo‘yicha shartnomalar hali yo‘q.',
         'mark_signed_confirm' => 'Shartnoma tizimdan tashqarida imzolangan deb belgilanadi.',
         'marked_signed' => 'Shartnoma imzolangan deb belgilandi.',
         'no_attachments' => 'Hozircha fayllar yo‘q — hujjatlar paketi skanlarini yuklang.',

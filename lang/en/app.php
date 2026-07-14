@@ -464,6 +464,7 @@ return [
         ],
     ],
     'message' => [
+        'no_contracts' => 'No contracts for this project yet.',
         'mark_signed_confirm' => 'The contract will be marked as signed outside the system.',
         'marked_signed' => 'Contract marked as signed.',
         'no_attachments' => 'No files yet — upload the dossier scans.',

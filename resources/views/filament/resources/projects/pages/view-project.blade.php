@@ -41,6 +41,7 @@
 
     $members = $record->participants->where('role', ParticipantRole::Participant)->values();
     $sponsors = $record->participants->where('role', ParticipantRole::Sponsor)->values();
+    $participantCount = $members->count() + $sponsors->count();
 
     $feesTotal = $record->feesTotal();
     $paidTotal = $record->paidTotal();
@@ -150,216 +151,249 @@
         </div>
     </section>
 
-    {{-- ============ BASIC INFORMATION ============ --}}
-    <section class="ow-card">
-        <header class="ow-hd">
-            <span class="ow-hd__ic">{!! $ic('heroicon-o-information-circle', 18) !!}</span>
-            <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
-        </header>
-        <div class="ow-dets">
-            @php $basisOrders = $record->ordersViaContracts(); @endphp
-            @if ($basisOrders->isNotEmpty())
-                <div class="ow-row">
-                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_plural') }}</span></div>
-                    <div class="ow-row__v">
-                        @foreach ($basisOrders as $basisOrder)
-                            <a class="ow-row__vl pj-link" href="{{ \App\Filament\Resources\Orders\BaseOrderResource::resourceFor($basisOrder)::getUrl('view', ['record' => $basisOrder]) }}">
-                                {{ trim(($basisOrder->number ? $basisOrder->number.' · ' : '').$basisOrder->title) }}
-                            </a>@if (! $loop->last) · @endif
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-            @if ($record->photo_report_url)
-                <div class="ow-row">
-                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-photo') !!}</span><span class="ow-row__lb">{{ __('app.label.photo_report_url') }}</span></div>
-                    <div class="ow-row__v">
-                        <a class="ow-row__vl pj-link" href="{{ $record->photo_report_url }}" target="_blank" rel="noopener">{{ $record->photo_report_url }}</a>
-                    </div>
-                </div>
-            @endif
-            @if ($record->creator)
-                <div class="ow-row">
-                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-user') !!}</span><span class="ow-row__lb">{{ __('app.label.created_by') }}</span></div>
-                    <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator->name }}</span></div>
-                </div>
-            @endif
-            @if ($record->description)
-                <div class="ow-row">
-                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-bars-3-bottom-left') !!}</span><span class="ow-row__lb">{{ __('app.label.description') }}</span></div>
-                    <div class="ow-row__v"><span class="ow-row__vl pj-wrap">{{ $record->description }}</span></div>
-                </div>
-            @endif
-            <div class="ow-row">
-                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clock') !!}</span><span class="ow-row__lb">{{ __('app.label.created_at') }}</span></div>
-                <div class="ow-row__v"><span class="ow-row__vl">{{ $record->created_at?->format('d.m.Y H:i') }}</span></div>
-            </div>
+    {{-- ============ TABS ============ --}}
+    <div class="pj-tabwrap" x-data="{ tab: 'overview' }">
+        <div class="pj-tabs" role="tablist">
+            <button type="button" class="pj-tab" :class="tab === 'overview' ? 'pj-tab--active' : ''" @click="tab = 'overview'">
+                {!! $ic('heroicon-o-rectangle-group', 15) !!} {{ __('app.label.overview') }}
+            </button>
+            <button type="button" class="pj-tab" :class="tab === 'contracts' ? 'pj-tab--active' : ''" @click="tab = 'contracts'">
+                {!! $ic('heroicon-o-document-text', 15) !!} {{ __('app.label.contracts') }}@if ($visibleContracts->isNotEmpty())<span class="pj-tab__c">{{ $visibleContracts->count() }}</span>@endif
+            </button>
+            <button type="button" class="pj-tab" :class="tab === 'participants' ? 'pj-tab--active' : ''" @click="tab = 'participants'">
+                {!! $ic('heroicon-o-user-group', 15) !!} {{ __('app.label.participants') }}@if ($participantCount)<span class="pj-tab__c">{{ $participantCount }}</span>@endif
+            </button>
+            <button type="button" class="pj-tab" :class="tab === 'gallery' ? 'pj-tab--active' : ''" @click="tab = 'gallery'">
+                {!! $ic('heroicon-o-photo', 15) !!} {{ __('app.label.gallery') }}@if (count($galleryUrls))<span class="pj-tab__c">{{ count($galleryUrls) }}</span>@endif
+            </button>
         </div>
-    </section>
 
-    {{-- ============ PARTICIPANTS & SPONSORS ============ --}}
-    @foreach ($participantBlocks as $block)
-        <section class="ow-card">
-            <header class="ow-hd">
-                <span class="ow-hd__ic">{!! $ic($block['icon'], 18) !!}</span>
-                <h2 class="ow-hd__t">{{ $block['title'] }}</h2>
-                <span class="pj-count">{{ $block['rows']->count() }}</span>
-            </header>
-
-            @if ($block['rows']->isEmpty())
-                <p class="pj-empty">{{ $block['empty'] }}</p>
-            @else
-                <div class="pj-table-wrap">
-                    <table class="pj-table">
-                        <thead>
-                        <tr>
-                            <th>№</th>
-                            <th>{{ __('app.label.participant_name') }}</th>
-                            <th class="pj-table__num">{{ __('app.label.participant_amount') }}</th>
-                            <th class="pj-table__num">{{ __('app.label.paid') }}</th>
-                            <th>{{ __('app.label.status') }}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach ($block['rows'] as $p)
-                            @php $status = $p->paymentStatus(); @endphp
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>
-                                    {{ $p->name }}
-                                    @if ($p->contact)
-                                        <span class="pj-pill pj-pill--{{ $block['pill'] }}">{{ __('app.label.contact_single') }}</span>
-                                    @elseif ($p->sponsor)
-                                        <span class="pj-pill pj-pill--{{ $block['pill'] }}">{{ __('app.label.sponsor_single') }}</span>
-                                    @endif
-                                </td>
-                                <td class="pj-table__num">{{ $fmt($p->amount) }} {{ $p->currency?->short_name }}</td>
-                                <td class="pj-table__num">{{ $fmt($p->paid_amount) }} {{ $p->currency?->short_name }}</td>
-                                <td>
-                                    @if ((float) $p->amount > 0)
-                                        <span class="pj-pill pj-pill--{{ $status->color() }}">{{ $status->label() }}</span>
-                                    @else
-                                        <span class="pj-pill pj-pill--gray">—</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <td colspan="2">{{ __('app.label.fees_total') }}</td>
-                            <td class="pj-table__num">{{ $fmt($block['rows']->sum('amount')) }}</td>
-                            <td class="pj-table__num">{{ $fmt($block['rows']->sum('paid_amount')) }}</td>
-                            <td></td>
-                        </tr>
-                        </tfoot>
-                    </table>
+        {{-- ---------- OVERVIEW ---------- --}}
+        <div x-show="tab === 'overview'" x-cloak class="pj-panel">
+            <section class="ow-card">
+                <header class="ow-hd">
+                    <span class="ow-hd__ic">{!! $ic('heroicon-o-information-circle', 18) !!}</span>
+                    <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
+                </header>
+                <div class="ow-dets">
+                    @php $basisOrders = $record->ordersViaContracts(); @endphp
+                    @if ($basisOrders->isNotEmpty())
+                        <div class="ow-row">
+                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_plural') }}</span></div>
+                            <div class="ow-row__v">
+                                @foreach ($basisOrders as $basisOrder)
+                                    <a class="ow-row__vl pj-link" href="{{ \App\Filament\Resources\Orders\BaseOrderResource::resourceFor($basisOrder)::getUrl('view', ['record' => $basisOrder]) }}">
+                                        {{ trim(($basisOrder->number ? $basisOrder->number.' · ' : '').$basisOrder->title) }}
+                                    </a>@if (! $loop->last) · @endif
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                    @if ($record->photo_report_url)
+                        <div class="ow-row">
+                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-photo') !!}</span><span class="ow-row__lb">{{ __('app.label.photo_report_url') }}</span></div>
+                            <div class="ow-row__v">
+                                <a class="ow-row__vl pj-link" href="{{ $record->photo_report_url }}" target="_blank" rel="noopener">{{ $record->photo_report_url }}</a>
+                            </div>
+                        </div>
+                    @endif
+                    @if ($record->creator)
+                        <div class="ow-row">
+                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-user') !!}</span><span class="ow-row__lb">{{ __('app.label.created_by') }}</span></div>
+                            <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator->name }}</span></div>
+                        </div>
+                    @endif
+                    @if ($record->description)
+                        <div class="ow-row">
+                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-bars-3-bottom-left') !!}</span><span class="ow-row__lb">{{ __('app.label.description') }}</span></div>
+                            <div class="ow-row__v"><span class="ow-row__vl pj-wrap">{{ $record->description }}</span></div>
+                        </div>
+                    @endif
+                    <div class="ow-row">
+                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clock') !!}</span><span class="ow-row__lb">{{ __('app.label.created_at') }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->created_at?->format('d.m.Y H:i') }}</span></div>
+                    </div>
                 </div>
+            </section>
+        </div>
+
+        {{-- ---------- CONTRACTS (visibility-scoped) ---------- --}}
+        <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
+            <section class="ow-card">
+                <header class="ow-hd">
+                    <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text', 18) !!}</span>
+                    <h2 class="ow-hd__t">{{ __('app.label.contracts') }}</h2>
+                    <span class="pj-count">{{ $visibleContracts->count() }}</span>
+                </header>
+                @if ($visibleContracts->isEmpty())
+                    <p class="pj-empty">{{ __('app.message.no_contracts') }}</p>
+                @else
+                    <div class="pj-table-wrap">
+                        <table class="pj-table">
+                            <thead>
+                            <tr>
+                                <th>{{ __('app.label.contract_number') }}</th>
+                                <th>{{ __('app.label.contract_type_single') }}</th>
+                                <th>{{ __('app.label.contact_single') }}</th>
+                                <th class="pj-table__num">{{ __('app.label.amount') }}</th>
+                                <th>{{ __('app.label.status') }}</th>
+                                <th class="pj-table__num">{{ __('app.label.paid') }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach ($visibleContracts as $contract)
+                                <tr>
+                                    <td>
+                                        <a class="pj-link" href="{{ \App\Filament\Resources\Contracts\ContractResource::getUrl('view', ['record' => $contract]) }}">
+                                            {{ $contract->number }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @if ($contract->contractType)
+                                            <span class="pj-pill pj-pill--{{ $contract->contractType->direction?->color() ?? 'gray' }}">{{ $contract->contractType->title }}</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $contract->contact?->name }}</td>
+                                    <td class="pj-table__num">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</td>
+                                    <td><span class="pj-pill pj-pill--{{ $contract->status->color() }}">{{ $contract->status->label() }}</span></td>
+                                    <td class="pj-table__num">{{ number_format((float) $contract->paid_percent, 0) }}%</td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </section>
+        </div>
+
+        {{-- ---------- PARTICIPANTS & PAYMENTS ---------- --}}
+        <div x-show="tab === 'participants'" x-cloak class="pj-panel">
+            @foreach ($participantBlocks as $block)
+                <section class="ow-card">
+                    <header class="ow-hd">
+                        <span class="ow-hd__ic">{!! $ic($block['icon'], 18) !!}</span>
+                        <h2 class="ow-hd__t">{{ $block['title'] }}</h2>
+                        <span class="pj-count">{{ $block['rows']->count() }}</span>
+                    </header>
+
+                    @if ($block['rows']->isEmpty())
+                        <p class="pj-empty">{{ $block['empty'] }}</p>
+                    @else
+                        <div class="pj-table-wrap">
+                            <table class="pj-table">
+                                <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>{{ __('app.label.participant_name') }}</th>
+                                    <th class="pj-table__num">{{ __('app.label.participant_amount') }}</th>
+                                    <th class="pj-table__num">{{ __('app.label.paid') }}</th>
+                                    <th>{{ __('app.label.status') }}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach ($block['rows'] as $p)
+                                    @php $status = $p->paymentStatus(); @endphp
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            {{ $p->name }}
+                                            @if ($p->contact)
+                                                <span class="pj-pill pj-pill--{{ $block['pill'] }}">{{ __('app.label.contact_single') }}</span>
+                                            @elseif ($p->sponsor)
+                                                <span class="pj-pill pj-pill--{{ $block['pill'] }}">{{ __('app.label.sponsor_single') }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="pj-table__num">{{ $fmt($p->amount) }} {{ $p->currency?->short_name }}</td>
+                                        <td class="pj-table__num">{{ $fmt($p->paid_amount) }} {{ $p->currency?->short_name }}</td>
+                                        <td>
+                                            @if ((float) $p->amount > 0)
+                                                <span class="pj-pill pj-pill--{{ $status->color() }}">{{ $status->label() }}</span>
+                                            @else
+                                                <span class="pj-pill pj-pill--gray">—</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="2">{{ __('app.label.fees_total') }}</td>
+                                    <td class="pj-table__num">{{ $fmt($block['rows']->sum('amount')) }}</td>
+                                    <td class="pj-table__num">{{ $fmt($block['rows']->sum('paid_amount')) }}</td>
+                                    <td></td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    @endif
+                </section>
+            @endforeach
+
+            @if ($payments->isNotEmpty())
+                <section class="ow-card">
+                    <header class="ow-hd">
+                        <span class="ow-hd__ic">{!! $ic('heroicon-o-credit-card', 18) !!}</span>
+                        <h2 class="ow-hd__t">{{ __('app.label.payments') }}</h2>
+                        <span class="pj-count">{{ $payments->count() }}</span>
+                    </header>
+                    {{-- data-viewer-gallery: the plugin's Viewer.js picks up every
+                         screenshot inside, so one click opens a navigable viewer
+                         across all payment proofs. --}}
+                    <div class="pj-table-wrap" data-viewer-gallery>
+                        <table class="pj-table">
+                            <thead>
+                            <tr>
+                                <th>{{ __('app.label.participant_name') }}</th>
+                                <th class="pj-table__num">{{ __('app.label.payment_amount') }}</th>
+                                <th>{{ __('app.label.paid_at') }}</th>
+                                <th>{{ __('app.label.screenshot') }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach ($payments as $pay)
+                                <tr>
+                                    <td>{{ $pay->name }}</td>
+                                    <td class="pj-table__num">{{ $fmt($pay->amount) }} {{ $pay->currency }}</td>
+                                    <td>{{ $pay->paid_at?->format('d.m.Y') }}</td>
+                                    <td>
+                                        @if ($pay->shot)
+                                            <img class="pj-shot" src="{{ $pay->shot }}" alt="{{ $pay->name }}">
+                                        @else
+                                            —
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
             @endif
-        </section>
-    @endforeach
+        </div>
 
-    {{-- ============ CONTRACTS (visibility-scoped) ============ --}}
-    @if ($visibleContracts->isNotEmpty())
-        <section class="ow-card">
-            <header class="ow-hd">
-                <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text', 18) !!}</span>
-                <h2 class="ow-hd__t">{{ __('app.label.contracts') }}</h2>
-                <span class="pj-count">{{ $visibleContracts->count() }}</span>
-            </header>
-            <div class="pj-table-wrap">
-                <table class="pj-table">
-                    <thead>
-                    <tr>
-                        <th>{{ __('app.label.contract_number') }}</th>
-                        <th>{{ __('app.label.contact_single') }}</th>
-                        <th class="pj-table__num">{{ __('app.label.amount') }}</th>
-                        <th>{{ __('app.label.status') }}</th>
-                        <th class="pj-table__num">{{ __('app.label.paid') }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach ($visibleContracts as $contract)
-                        <tr>
-                            <td>
-                                <a class="pj-link" href="{{ \App\Filament\Resources\Contracts\ContractResource::getUrl('view', ['record' => $contract]) }}">
-                                    {{ $contract->number }}
-                                </a>
-                            </td>
-                            <td>{{ $contract->contact?->name }}</td>
-                            <td class="pj-table__num">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</td>
-                            <td><span class="pj-pill pj-pill--{{ $contract->status->color() === 'primary' ? 'primary' : $contract->status->color() }}">{{ $contract->status->label() }}</span></td>
-                            <td class="pj-table__num">{{ number_format((float) $contract->paid_percent, 0) }}%</td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    @endif
+        {{-- ---------- GALLERY ---------- --}}
+        <div x-show="tab === 'gallery'" x-cloak class="pj-panel">
+            <section class="ow-card">
+                <header class="ow-hd">
+                    <span class="ow-hd__ic">{!! $ic('heroicon-o-photo', 18) !!}</span>
+                    <h2 class="ow-hd__t">{{ __('app.label.gallery') }}</h2>
+                    <span class="pj-count">{{ count($galleryUrls) }}</span>
+                </header>
 
-    {{-- ============ PAYMENTS HISTORY ============ --}}
-    @if ($payments->isNotEmpty())
-        <section class="ow-card">
-            <header class="ow-hd">
-                <span class="ow-hd__ic">{!! $ic('heroicon-o-credit-card', 18) !!}</span>
-                <h2 class="ow-hd__t">{{ __('app.label.payments') }}</h2>
-                <span class="pj-count">{{ $payments->count() }}</span>
-            </header>
-            {{-- data-viewer-gallery: the plugin's Viewer.js picks up every
-                 screenshot inside, so one click opens a navigable viewer
-                 across all payment proofs. --}}
-            <div class="pj-table-wrap" data-viewer-gallery>
-                <table class="pj-table">
-                    <thead>
-                    <tr>
-                        <th>{{ __('app.label.participant_name') }}</th>
-                        <th class="pj-table__num">{{ __('app.label.payment_amount') }}</th>
-                        <th>{{ __('app.label.paid_at') }}</th>
-                        <th>{{ __('app.label.screenshot') }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach ($payments as $pay)
-                        <tr>
-                            <td>{{ $pay->name }}</td>
-                            <td class="pj-table__num">{{ $fmt($pay->amount) }} {{ $pay->currency }}</td>
-                            <td>{{ $pay->paid_at?->format('d.m.Y') }}</td>
-                            <td>
-                                @if ($pay->shot)
-                                    <img class="pj-shot" src="{{ $pay->shot }}" alt="{{ $pay->name }}">
-                                @else
-                                    —
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    @endif
-
-    {{-- ============ GALLERY ============ --}}
-    <section class="ow-card">
-        <header class="ow-hd">
-            <span class="ow-hd__ic">{!! $ic('heroicon-o-photo', 18) !!}</span>
-            <h2 class="ow-hd__t">{{ __('app.label.gallery') }}</h2>
-            <span class="pj-count">{{ count($galleryUrls) }}</span>
-        </header>
-
-        @if ($galleryUrls === [])
-            <p class="pj-empty">{{ __('app.message.no_gallery') }}</p>
-        @else
-            <div class="pj-gallery-pad">
-                <x-image-gallery::image-gallery
-                    :images="$galleryUrls"
-                    :thumb-width="160"
-                    :thumb-height="120"
-                    rounded="rounded-xl"
-                />
-            </div>
-        @endif
-    </section>
+                @if ($galleryUrls === [])
+                    <p class="pj-empty">{{ __('app.message.no_gallery') }}</p>
+                @else
+                    <div class="pj-gallery-pad">
+                        <x-image-gallery::image-gallery
+                            :images="$galleryUrls"
+                            :thumb-width="160"
+                            :thumb-height="120"
+                            rounded="rounded-xl"
+                        />
+                    </div>
+                @endif
+            </section>
+        </div>
+    </div>
 </div>
 </x-filament-panels::page>
