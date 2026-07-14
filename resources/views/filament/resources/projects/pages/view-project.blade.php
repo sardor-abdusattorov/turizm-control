@@ -6,7 +6,7 @@
     $record = $this->record;
     $record->loadMissing([
         'participants.contact', 'participants.sponsor', 'participants.currency', 'participants.payments',
-        'order', 'areaCurrency', 'standCurrency', 'creator',
+        'areaCurrency', 'standCurrency', 'creator',
     ]);
 
     // Same visibility rule as the contracts list: a manager without
@@ -124,13 +124,16 @@
             <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
         </header>
         <div class="ow-dets">
-            @if ($record->order)
+            @php $basisOrders = $record->ordersViaContracts(); @endphp
+            @if ($basisOrders->isNotEmpty())
                 <div class="ow-row">
-                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_single') }}</span></div>
+                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_plural') }}</span></div>
                     <div class="ow-row__v">
-                        <a class="ow-row__vl pj-link" href="{{ \App\Filament\Resources\Orders\BaseOrderResource::resourceFor($record->order)::getUrl('view', ['record' => $record->order]) }}">
-                            {{ trim(($record->order->number ? $record->order->number.' · ' : '').$record->order->title) }}
-                        </a>
+                        @foreach ($basisOrders as $basisOrder)
+                            <a class="ow-row__vl pj-link" href="{{ \App\Filament\Resources\Orders\BaseOrderResource::resourceFor($basisOrder)::getUrl('view', ['record' => $basisOrder]) }}">
+                                {{ trim(($basisOrder->number ? $basisOrder->number.' · ' : '').$basisOrder->title) }}
+                            </a>@if (! $loop->last) · @endif
+                        @endforeach
                     </div>
                 </div>
             @endif

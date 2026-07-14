@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ContractDirection;
 use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
 use App\Models\Concerns\HasActiveStatus;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
 class Project extends Model
@@ -28,7 +30,10 @@ class Project extends Model
         'area_currency_id',
         'stand_cost',
         'stand_currency_id',
-        'order_id',
+        'estimate_amount',
+        'final_amount',
+        'attendees_count',
+        'photo_report_url',
         'gallery',
         'description',
         'status',
@@ -43,6 +48,9 @@ class Project extends Model
         'area_cost' => 'decimal:2',
         'area_is_free' => 'boolean',
         'stand_cost' => 'decimal:2',
+        'estimate_amount' => 'decimal:2',
+        'final_amount' => 'decimal:2',
+        'attendees_count' => 'integer',
         'gallery' => 'array',
         'status' => 'boolean',
     ];
@@ -68,14 +76,48 @@ class Project extends Model
             ->orderBy('sort');
     }
 
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(Order::class);
-    }
-
     public function contracts(): HasMany
     {
         return $this->hasMany(Contract::class)->orderByDesc('created_at');
+    }
+
+    /**
+     * Buyruqs this project rests on, collected through its contracts (each
+     * contract names its basis order) — a project may span several: the
+     * annual 74-АФ plus the per-exhibition delegation order.
+     *
+     * @return Collection<int, Order>
+     */
+    public function ordersViaContracts(): Collection
+    {
+        return $this->contracts()
+            ->whereNotNull('order_id')
+            ->with('order')
+            ->get()
+            ->pluck('order')
+            ->filter()
+            ->unique('id')
+            ->values();
+    }
+
+    /**
+     * Sums of non-rejected contracts of the given direction, keyed by
+     * currency code — the project's expense (rental + stand + services) or
+     * income (fees, sponsorship) side, kept per currency because dossiers
+     * mix EUR/USD/GBP and сум.
+     *
+     * @return array<string, float>
+     */
+    public function contractTotalsByCurrency(ContractDirection $direction): array
+    {
+        return $this->contracts()
+            ->where('status', '!=', Contract::STATUS_REJECTED->value)
+            ->whereHas('contractType', fn ($query) => $query->where('direction', $direction->value))
+            ->with('currency')
+            ->get()
+            ->groupBy(fn (Contract $contract): string => $contract->currency?->short_name ?? '')
+            ->map(fn ($group): float => (float) $group->sum('amount'))
+            ->toArray();
     }
 
     public function areaCurrency(): BelongsTo

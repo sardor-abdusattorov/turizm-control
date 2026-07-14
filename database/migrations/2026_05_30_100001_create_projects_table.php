@@ -21,7 +21,13 @@ return new class extends Migration
             $table->foreignId('area_currency_id')->nullable()->constrained('currencies')->restrictOnDelete();
             $table->decimal('stand_cost', 15, 2)->nullable();
             $table->foreignId('stand_currency_id')->nullable()->constrained('currencies')->restrictOnDelete();
-            $table->foreignId('order_id')->nullable()->constrained('orders')->restrictOnDelete();
+            // Local events (реестр локальных мероприятий): plan-vs-fact money,
+            // a plain headcount and a photo-report link. Exhibitions leave
+            // these empty; their orders are reachable through the contracts.
+            $table->decimal('estimate_amount', 18, 2)->nullable();
+            $table->decimal('final_amount', 18, 2)->nullable();
+            $table->unsignedInteger('attendees_count')->nullable();
+            $table->string('photo_report_url')->nullable();
             $table->json('gallery')->nullable();
             $table->text('description')->nullable();
             $table->boolean('status')->default(true);

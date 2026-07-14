@@ -3,7 +3,7 @@
     use App\Enums\PaymentStatus;
 
     /** @var \App\Models\Project $project */
-    $project->loadMissing(['participants.currency', 'participants.contact', 'participants.sponsor', 'order', 'areaCurrency', 'standCurrency']);
+    $project->loadMissing(['participants.currency', 'participants.contact', 'participants.sponsor', 'areaCurrency', 'standCurrency']);
 
     $fmt = fn ($n) => number_format((float) $n, 0, ',', ' ');
 
@@ -25,6 +25,11 @@
 
     $galleryUrls = $project->galleryUrls();
 
+    // A single fee currency is shown only when every participant shares it;
+    // mixed-currency projects drop the suffix rather than mislead.
+    $feeCodes = $project->participants->map(fn ($p) => $p->currency?->short_name)->filter()->unique()->values();
+    $feeCurrency = $feeCodes->count() === 1 ? ' '.$feeCodes->first() : '';
+
     $blocks = [
         ['title' => __('app.label.participants'), 'rows' => $members, 'empty' => __('app.message.no_participants')],
         ['title' => __('app.label.sponsors'), 'rows' => $sponsors, 'empty' => null],
@@ -42,20 +47,20 @@
         @if ($project->venue)
             <span class="pj-hero__dates">· {{ $project->venue }}</span>
         @endif
-        @if ($project->order)
-            <span class="pj-chip">{{ trim(($project->order->number ? $project->order->number.' · ' : '').$project->order->title) }}</span>
-        @endif
+        @foreach ($project->ordersViaContracts()->take(2) as $basisOrder)
+            <span class="pj-chip">{{ trim(($basisOrder->number ? $basisOrder->number.' · ' : '').$basisOrder->title) }}</span>
+        @endforeach
     </div>
 
     {{-- mini stats --}}
     <div class="pj-stats" style="grid-template-columns:repeat(auto-fit, minmax(8rem, 1fr));">
         <div class="pj-stat">
             <span class="pj-stat__lb">{{ __('app.label.fees_total') }}</span>
-            <div class="pj-stat__vl">{{ $fmt($feesTotal) }}</div>
+            <div class="pj-stat__vl">{{ $fmt($feesTotal) }}{{ $feeCurrency }}</div>
         </div>
         <div class="pj-stat {{ $paidTint ? 'pj-stat--'.$paidTint : '' }}">
             <span class="pj-stat__lb">{{ __('app.label.paid') }}</span>
-            <div class="pj-stat__vl">{{ $fmt($paidTotal) }}</div>
+            <div class="pj-stat__vl">{{ $fmt($paidTotal) }}{{ $feeCurrency }}</div>
         </div>
         <div class="pj-stat">
             <span class="pj-stat__lb">{{ __('app.label.participants') }}</span>

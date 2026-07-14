@@ -3,11 +3,11 @@
 namespace App\Filament\Resources\Projects\Schemas;
 
 use App\Enums\ParticipantRole;
+use App\Enums\ProjectType;
 use App\Filament\Resources\Sponsors\Schemas\SponsorForm;
 use App\Filament\Support\ImageGalleryUpload;
 use App\Models\Contact;
 use App\Models\Currency;
-use App\Models\Order;
 use App\Models\Project;
 use App\Models\Sponsor;
 use Filament\Forms\Components\DatePicker;
@@ -21,10 +21,19 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
 
 class ProjectForm
 {
+    /**
+     * The form is shared by both typed resources; the page's resource pins
+     * the type (BaseProjectResource::projectType), so visibility of the
+     * local-event vs exhibition fields keys off the hosting Livewire page.
+     */
+    protected static function isInternal($livewire): bool
+    {
+        return $livewire::getResource()::projectType() === ProjectType::Internal;
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -65,20 +74,43 @@ class ProjectForm
                                             ->afterOrEqual('starts_on'),
                                     ]),
 
-                                Select::make('order_id')
-                                    ->label(__('app.label.order_single'))
-                                    ->relationship(
-                                        'order',
-                                        'title',
-                                        fn (Builder $query): Builder => $query->active(),
-                                    )
-                                    ->getOptionLabelFromRecordUsing(fn (Order $record): string => trim(
-                                        ($record->number ? $record->number.' · ' : '').$record->title,
-                                    ))
-                                    ->searchable(['number', 'title'])
-                                    ->preload()
-                                    ->nullable()
-                                    ->columnSpanFull(),
+                                // Local events (реестр локальных мероприятий):
+                                // plan/fact money, headcount and a photo-report
+                                // link. Exhibitions never fill these; their
+                                // buyruqs are linked on the contracts instead.
+                                Grid::make(['default' => 1, 'md' => 2])
+                                    ->visible(self::isInternal(...))
+                                    ->schema([
+                                        TextInput::make('estimate_amount')
+                                            ->label(__('app.label.estimate_amount'))
+                                            ->numeric()
+                                            ->step(0.01)
+                                            ->minValue(0)
+                                            ->prefix('UZS'),
+
+                                        TextInput::make('final_amount')
+                                            ->label(__('app.label.final_amount'))
+                                            ->numeric()
+                                            ->step(0.01)
+                                            ->minValue(0)
+                                            ->prefix('UZS'),
+                                    ]),
+
+                                Grid::make(['default' => 1, 'md' => 2])
+                                    ->visible(self::isInternal(...))
+                                    ->schema([
+                                        TextInput::make('attendees_count')
+                                            ->label(__('app.label.attendees_count'))
+                                            ->numeric()
+                                            ->step(1)
+                                            ->minValue(0),
+
+                                        TextInput::make('photo_report_url')
+                                            ->label(__('app.label.photo_report_url'))
+                                            ->url()
+                                            ->maxLength(255)
+                                            ->placeholder('https://clck.ru/…'),
+                                    ]),
 
                                 Textarea::make('description')
                                     ->label(__('app.label.description'))
@@ -92,6 +124,9 @@ class ProjectForm
 
                         Tabs\Tab::make(__('app.label.project_costs'))
                             ->icon('heroicon-o-banknotes')
+                            // Area and stand money belong to exhibitions; a
+                            // local event's money lives in estimate/final.
+                            ->visible(fn ($livewire): bool => ! self::isInternal($livewire))
                             ->schema([
                                 TextInput::make('area_sqm')
                                     ->label(__('app.label.area_sqm'))

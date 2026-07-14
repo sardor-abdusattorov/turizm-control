@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Projects\Tables;
 
 use App\Enums\ParticipantRole;
+use App\Enums\ProjectType;
 use App\Exports\ProjectsRegistryExport;
 use App\Filament\Resources\Projects\BaseProjectResource;
 use App\Filament\Support\CreatedAtColumn;
@@ -25,11 +26,34 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectsTable
 {
+    /**
+     * Currency suffix for the fee columns — participants of one project pay
+     * in a single currency in practice (the registry), so the first row's
+     * code labels the total; a mixed project gets no (misleading) suffix.
+     */
+    protected static function feeCurrencySuffix(Project $record): string
+    {
+        $codes = $record->participants->pluck('currency.short_name')->filter()->unique();
+
+        return $codes->count() === 1 ? ' '.$codes->first() : '';
+    }
+
+    /**
+     * The table is shared by both typed list pages; local-event columns
+     * (смета/итог/чел) only make sense on the internal listing.
+     */
+    protected static function isInternalList($livewire): bool
+    {
+        return $livewire::getResource()::projectType() === ProjectType::Internal;
+    }
+
     public static function configure(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query
-                ->with(['order', 'creator'])
+                // participants.currency backs the currency suffix on the two
+                // money columns — one eager load instead of a per-row query.
+                ->with(['creator', 'participants.currency'])
                 ->withCount([
                     'participants',
                     'participants as sponsors_count' => fn (Builder $participants) => $participants
@@ -100,22 +124,40 @@ class ProjectsTable
 
                 TextColumn::make('participants_sum_amount')
                     ->label(__('app.label.fees_total'))
-                    ->formatStateUsing(fn (?string $state): string => number_format((float) $state, 0, ',', ' '))
+                    ->formatStateUsing(fn (?string $state, Project $record): string => number_format((float) $state, 0, ',', ' ').self::feeCurrencySuffix($record))
                     ->placeholder('0')
                     ->alignEnd()
                     ->sortable(),
 
                 TextColumn::make('participants_sum_paid_amount')
                     ->label(__('app.label.paid'))
-                    ->formatStateUsing(fn (?string $state): string => number_format((float) $state, 0, ',', ' '))
+                    ->formatStateUsing(fn (?string $state, Project $record): string => number_format((float) $state, 0, ',', ' ').self::feeCurrencySuffix($record))
                     ->placeholder('0')
                     ->color('success')
                     ->alignEnd()
                     ->toggleable(),
 
-                TextColumn::make('order.number')
-                    ->label(__('app.label.order_single'))
+                TextColumn::make('estimate_amount')
+                    ->label(__('app.label.estimate_amount'))
+                    ->formatStateUsing(fn (?string $state): string => number_format((float) $state, 0, ',', ' ').' UZS')
                     ->placeholder('—')
+                    ->alignEnd()
+                    ->visible(self::isInternalList(...))
+                    ->toggleable(),
+
+                TextColumn::make('final_amount')
+                    ->label(__('app.label.final_amount'))
+                    ->formatStateUsing(fn (?string $state): string => number_format((float) $state, 0, ',', ' ').' UZS')
+                    ->placeholder('—')
+                    ->alignEnd()
+                    ->visible(self::isInternalList(...))
+                    ->toggleable(),
+
+                TextColumn::make('attendees_count')
+                    ->label(__('app.label.attendees_count'))
+                    ->placeholder('—')
+                    ->alignCenter()
+                    ->visible(self::isInternalList(...))
                     ->toggleable(),
 
                 TextColumn::make('creator.name')
