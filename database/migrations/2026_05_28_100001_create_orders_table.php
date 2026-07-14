@@ -15,7 +15,9 @@ return new class extends Migration
             $table->string('scope', 20)->default('internal');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('file_path');
+            // Nullable: real buyruqs sometimes reach the registry before their
+            // scan does (the annual 74-АФ exists only as copies inside dossiers).
+            $table->string('file_path')->nullable();
             $table->string('document_key')->nullable();
             $table->date('issued_at')->nullable();
             $table->boolean('status')->default(true);
