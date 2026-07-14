@@ -63,6 +63,11 @@ return [
         'order_type_single' => 'Order Type',
         'no_category' => 'No category',
         'select_order_type_first' => 'Select an order type first',
+        'contract_type_single' => 'Contract type',
+        'contract_type_plural' => 'Contract types',
+        'select_contract_type_first' => 'Select a contract type first',
+        'direction' => 'Direction',
+        'order_basis' => 'Basis order',
         'select_currency_first' => 'Select a currency first',
         'select_option' => 'Select an option',
         'order_type_plural' => 'Order Types',
@@ -505,6 +510,7 @@ return [
         'click_to_copy' => 'Click to copy',
     ],
     'helper' => [
+        'template_optional' => 'Optional — only needed to generate the document from a template.',
         'inn' => '9 digits for legal entities',
         'pinfl' => '14 digits',
         'oked' => '5 digits',
@@ -586,6 +592,10 @@ return [
             'in_review_director' => 'With the director',
             'approved' => 'Approved',
             'rejected' => 'Rejected',
+        ],
+        'direction' => [
+            'expense' => 'Expense',
+            'income' => 'Income',
         ],
     ],
     'payment_status' => [

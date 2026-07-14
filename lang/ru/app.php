@@ -66,6 +66,11 @@ return [
         'select_currency_first' => 'Сначала выберите валюту',
         'select_option' => 'Выберите вариант',
         'order_type_plural' => 'Типы приказов',
+        'contract_type_single' => 'Вид договора',
+        'contract_type_plural' => 'Виды договоров',
+        'select_contract_type_first' => 'Сначала выберите вид договора',
+        'direction' => 'Направление',
+        'order_basis' => 'Приказ-основание',
         'order_file' => 'Файл приказа',
 
         // Contacts (counterparties — legal entities and individuals)
@@ -500,6 +505,7 @@ return [
         'click_to_copy' => 'Нажмите, чтобы скопировать',
     ],
     'helper' => [
+        'template_optional' => 'Необязательно — нужен только для генерации документа из шаблона.',
         'inn' => '9 цифр для юридических лиц',
         'pinfl' => '14 цифр',
         'oked' => '5 цифр',
@@ -581,6 +587,10 @@ return [
             'in_review_director' => 'У директора',
             'approved' => 'Согласован',
             'rejected' => 'Отклонён',
+        ],
+        'direction' => [
+            'expense' => 'Расход',
+            'income' => 'Доход',
         ],
     ],
     'payment_status' => [

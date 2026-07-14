@@ -92,7 +92,7 @@ class ContractSeeder extends Seeder
             [
                 'title' => $spec['title'],
                 'contract_template_id' => $spec['template']->id,
-                'order_type_id' => $spec['template']->order_type_id,
+                'contract_type_id' => $spec['template']->contract_type_id,
                 'contact_id' => $spec['contact']->id,
                 'currency_id' => $spec['currency']->id,
                 'responsible_id' => $manager->id,

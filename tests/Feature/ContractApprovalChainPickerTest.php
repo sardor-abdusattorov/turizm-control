@@ -4,9 +4,9 @@ use App\Filament\Resources\Contracts\Pages\CreateContract;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractTemplate;
+use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
-use App\Models\OrderType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -70,9 +70,9 @@ it('creates approvers in the order they were picked', function () {
     $first = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legalDept->id]);
     $second = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $accountingDept->id]);
 
-    $orderType = OrderType::factory()->create();
+    $contractType = ContractType::factory()->create();
     $template = ContractTemplate::factory()->create([
-        'order_type_id' => $orderType->id,
+        'contract_type_id' => $contractType->id,
         'status' => true,
     ]);
     Storage::disk('local')->put($template->template_file, file_get_contents(fillableDocx()));
@@ -86,7 +86,7 @@ it('creates approvers in the order they were picked', function () {
     Livewire::test(CreateContract::class)
         ->fillForm([
             'number' => 'C-900',
-            'order_type_id' => $orderType->id,
+            'contract_type_id' => $contractType->id,
             'contract_template_id' => $template->id,
             'contact_id' => $contact->id,
             'title' => 'Picker order test',
@@ -113,9 +113,9 @@ it('rejects creating a contract whose chain has no accounting approver', functio
     $legalDept = Department::factory()->create(['code' => 'legal']);
     $lawyer = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legalDept->id]);
 
-    $orderType = OrderType::factory()->create();
+    $contractType = ContractType::factory()->create();
     $template = ContractTemplate::factory()->create([
-        'order_type_id' => $orderType->id, 'status' => true,
+        'contract_type_id' => $contractType->id, 'status' => true,
     ]);
     Storage::disk('local')->put($template->template_file, file_get_contents(fillableDocx()));
     $contact = Contact::factory()->create(['status' => true]);
@@ -126,7 +126,7 @@ it('rejects creating a contract whose chain has no accounting approver', functio
     Livewire::test(CreateContract::class)
         ->fillForm([
             'number' => 'C-901',
-            'order_type_id' => $orderType->id,
+            'contract_type_id' => $contractType->id,
             'contract_template_id' => $template->id,
             'contact_id' => $contact->id,
             'title' => 'Missing accountant',

@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             CurrencySeeder::class,
             OrderTypeSeeder::class,
+            ContractTypeSeeder::class,
             ContactSeeder::class,
             // Real directories the registry importers link participants to.
             RealTourAgentsSeeder::class,

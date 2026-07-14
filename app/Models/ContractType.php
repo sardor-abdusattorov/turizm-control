@@ -2,13 +2,20 @@
 
 namespace App\Models;
 
+use App\Enums\ContractDirection;
 use App\Models\Concerns\HasActiveStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
-class OrderType extends Model
+/**
+ * Kind of a contract — the hard nomenclature the registry is built from
+ * (space rental, stand construction, services… vs participant fees,
+ * sponsorship). Carries the money direction so project income/expense
+ * aggregates fall out of the classification for free.
+ */
+class ContractType extends Model
 {
     use HasActiveStatus;
     use HasFactory;
@@ -19,16 +26,18 @@ class OrderType extends Model
     protected $fillable = [
         'title',
         'description',
+        'direction',
         'sort',
         'status',
     ];
 
     protected $casts = [
+        'direction' => ContractDirection::class,
         'status' => 'boolean',
     ];
 
     /**
-     * Active order types as id => localized title pairs (for Select::options).
+     * Active contract types as id => localized title pairs (for Select::options).
      *
      * @return array<int, string>
      */
@@ -44,8 +53,13 @@ class OrderType extends Model
             ->toArray();
     }
 
-    public function orders(): HasMany
+    public function contracts(): HasMany
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Contract::class);
+    }
+
+    public function contractTemplates(): HasMany
+    {
+        return $this->hasMany(ContractTemplate::class);
     }
 }

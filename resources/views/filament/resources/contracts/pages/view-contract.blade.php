@@ -82,7 +82,8 @@
         ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number, null, false],
         ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name, $record->contact ? 'contact' : null, false],
         ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name, null, false],
-        ['heroicon-o-tag', __('app.label.order_type_single'), $record->orderType?->title, null, false],
+        ['heroicon-o-tag', __('app.label.contract_type_single'), $record->contractType?->title, null, false],
+        ['heroicon-o-document-text', __('app.label.order_basis'), $record->order ? trim(($record->order->number ? $record->order->number.' · ' : '').$record->order->title) : null, null, false],
         ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name, null, false],
         ['heroicon-o-banknotes', __('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? ''), null, false],
 

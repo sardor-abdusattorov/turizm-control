@@ -4,7 +4,7 @@ namespace App\Filament\Resources\ContractTemplates\Schemas;
 
 use App\Filament\Support\DocumentUpload;
 use App\Models\ContractTemplate;
-use App\Models\OrderType;
+use App\Models\ContractType;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -34,9 +34,9 @@ class ContractTemplateForm
                             ->columnSpanFull(),
 
                         Grid::make(3)->schema([
-                            Select::make('order_type_id')
-                                ->label(__('app.label.order_type_single'))
-                                ->options(OrderType::getActive())
+                            Select::make('contract_type_id')
+                                ->label(__('app.label.contract_type_single'))
+                                ->options(ContractType::getActive())
                                 ->searchable()
                                 ->preload()
                                 ->placeholder(__('app.label.no_category'))

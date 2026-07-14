@@ -8,8 +8,8 @@ use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Contracts\Pages\ViewContract;
 use App\Models\Contact;
 use App\Models\Contract;
+use App\Models\ContractType;
 use App\Models\Currency;
-use App\Models\OrderType;
 use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
 use Filament\Actions\Action;
@@ -41,6 +41,7 @@ class ContractsTable
             // keeps it to a flat handful.
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
                 'contact',
+                'contractType',
                 'project',
                 'currency',
                 'responsible',
@@ -53,6 +54,13 @@ class ContractsTable
                     ->weight('semibold')
                     ->searchable()
                     ->sortable(),
+
+                TextColumn::make('contractType.title')
+                    ->label(__('app.label.contract_type_single'))
+                    ->badge()
+                    ->color(fn (Contract $record): string => $record->contractType?->direction?->color() ?? 'gray')
+                    ->placeholder('—')
+                    ->toggleable(),
 
                 ViewColumn::make('status')
                     ->label(__('app.label.status'))
@@ -135,9 +143,9 @@ class ContractsTable
                     ->relationship('project', 'name')
                     ->searchable(),
 
-                SelectFilter::make('order_type_id')
-                    ->label(__('app.label.order_type_single'))
-                    ->options(fn () => OrderType::getActive())
+                SelectFilter::make('contract_type_id')
+                    ->label(__('app.label.contract_type_single'))
+                    ->options(fn () => ContractType::getActive())
                     ->searchable(),
 
                 SelectFilter::make('payment_status')

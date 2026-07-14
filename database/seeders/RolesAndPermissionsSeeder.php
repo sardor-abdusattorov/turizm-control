@@ -41,6 +41,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_profile_settings',
             ...$this->resourcePermissions('contract', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
+            ...$this->resourcePermissions('contract_type', ['view_any']),
             ...$this->resourcePermissions('order', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('contact', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('currency', ['view_any']),

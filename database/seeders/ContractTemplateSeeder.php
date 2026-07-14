@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\ContractTemplate;
-use App\Models\OrderType;
+use App\Models\ContractType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,19 +21,19 @@ class ContractTemplateSeeder extends Seeder
             return;
         }
 
-        $hr = OrderType::firstWhere('title->ru', 'Кадровый');
-        $financial = OrderType::firstWhere('title->ru', 'Финансовый');
-        $admin = OrderType::firstWhere('title->ru', 'Хозяйственный');
+        $spaceRental = ContractType::firstWhere('title->ru', 'Аренда площади');
+        $services = ContractType::firstWhere('title->ru', 'Оказание услуг');
+        $participantFee = ContractType::firstWhere('title->ru', 'Взнос участника');
 
         $templates = [
-            ['name' => 'Договор аренды офисного помещения (RU)', 'order_type' => $admin, 'sort' => 1],
-            ['name' => 'Договор оказания услуг (RU)', 'order_type' => $financial, 'sort' => 2],
-            ['name' => 'Trudovoy shartnoma (UZ) — Kadrlar', 'order_type' => $hr, 'sort' => 3],
+            ['name' => 'Договор аренды выставочной площади (RU)', 'contract_type' => $spaceRental, 'sort' => 1],
+            ['name' => 'Договор оказания услуг (RU)', 'contract_type' => $services, 'sort' => 2],
+            ['name' => 'Договор взноса участника выставки (RU)', 'contract_type' => $participantFee, 'sort' => 3],
         ];
 
         foreach ($templates as $data) {
-            if (! $data['order_type']) {
-                $this->command?->warn("Skipping template {$data['name']} — order type not found.");
+            if (! $data['contract_type']) {
+                $this->command?->warn("Skipping template {$data['name']} — contract type not found.");
 
                 continue;
             }
@@ -41,7 +41,7 @@ class ContractTemplateSeeder extends Seeder
             $template = ContractTemplate::firstOrCreate(
                 ['name' => $data['name']],
                 [
-                    'order_type_id' => $data['order_type']->id,
+                    'contract_type_id' => $data['contract_type']->id,
                     'sort' => $data['sort'],
                     'status' => true,
                     'template_file' => 'uploads/files/contract-templates/pending/stub.docx',

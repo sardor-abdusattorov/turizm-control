@@ -6,6 +6,7 @@ use App\Filament\Resources\ContractTemplates\ContractTemplateResource;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\ContractTemplate;
+use App\Models\ContractType;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -41,8 +42,8 @@ class ContractTemplatesTable
                         shouldOpenInNewTab: true,
                     ),
 
-                TextColumn::make('orderType.title')
-                    ->label(__('app.label.order_type_single'))
+                TextColumn::make('contractType.title')
+                    ->label(__('app.label.contract_type_single'))
                     ->badge()
                     ->placeholder('—'),
 
@@ -56,11 +57,10 @@ class ContractTemplatesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('order_type_id')
-                    ->label(__('app.label.order_type_single'))
-                    ->relationship('orderType', 'title')
-                    ->searchable()
-                    ->preload(),
+                SelectFilter::make('contract_type_id')
+                    ->label(__('app.label.contract_type_single'))
+                    ->options(fn () => ContractType::getActive())
+                    ->searchable(),
 
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))

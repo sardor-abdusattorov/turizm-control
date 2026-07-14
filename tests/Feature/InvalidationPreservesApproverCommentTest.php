@@ -4,9 +4,9 @@ use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\ContractTemplate;
+use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
-use App\Models\OrderType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -17,13 +17,13 @@ it('preserves an approver original comment when the chain is invalidated by an e
     $legal = Department::factory()->create(['code' => 'legal']);
     $approver = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legal->id]);
 
-    $orderType = OrderType::factory()->create();
-    $template = ContractTemplate::factory()->create(['order_type_id' => $orderType->id, 'status' => true]);
+    $contractType = ContractType::factory()->create();
+    $template = ContractTemplate::factory()->create(['contract_type_id' => $contractType->id, 'status' => true]);
 
     $contract = Contract::factory()->create([
         'responsible_id' => $author->id,
         'status' => Contract::STATUS_IN_REVIEW,
-        'order_type_id' => $orderType->id,
+        'contract_type_id' => $contractType->id,
         'contract_template_id' => $template->id,
         'contact_id' => Contact::factory()->create(['status' => true])->id,
         'currency_id' => Currency::factory()->create(['status' => true])->id,
@@ -63,13 +63,13 @@ it('does not stamp a verdict onto a queued row cancelled by an edit', function (
     $author = User::factory()->create(['status' => User::STATUS_ACTIVE]);
     $approver = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
-    $orderType = OrderType::factory()->create();
-    $template = ContractTemplate::factory()->create(['order_type_id' => $orderType->id, 'status' => true]);
+    $contractType = ContractType::factory()->create();
+    $template = ContractTemplate::factory()->create(['contract_type_id' => $contractType->id, 'status' => true]);
 
     $contract = Contract::factory()->create([
         'responsible_id' => $author->id,
         'status' => Contract::STATUS_IN_REVIEW,
-        'order_type_id' => $orderType->id,
+        'contract_type_id' => $contractType->id,
         'contract_template_id' => $template->id,
         'contact_id' => Contact::factory()->create(['status' => true])->id,
         'currency_id' => Currency::factory()->create(['status' => true])->id,
@@ -100,13 +100,13 @@ it('rebuilds a fresh queued chain mirroring the previous one after an in-flow ed
     $first = User::factory()->create(['name' => 'Olim First', 'status' => User::STATUS_ACTIVE]);
     $second = User::factory()->create(['name' => 'Madina Second', 'status' => User::STATUS_ACTIVE]);
 
-    $orderType = OrderType::factory()->create();
-    $template = ContractTemplate::factory()->create(['order_type_id' => $orderType->id, 'status' => true]);
+    $contractType = ContractType::factory()->create();
+    $template = ContractTemplate::factory()->create(['contract_type_id' => $contractType->id, 'status' => true]);
 
     $contract = Contract::factory()->create([
         'responsible_id' => $author->id,
         'status' => Contract::STATUS_IN_REVIEW,
-        'order_type_id' => $orderType->id,
+        'contract_type_id' => $contractType->id,
         'contract_template_id' => $template->id,
         'contact_id' => Contact::factory()->create(['status' => true])->id,
         'currency_id' => Currency::factory()->create(['status' => true])->id,

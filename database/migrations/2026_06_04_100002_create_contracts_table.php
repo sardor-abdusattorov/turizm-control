@@ -12,7 +12,10 @@ return new class extends Migration
             $table->id();
             $table->string('number', 50)->unique();
             $table->foreignId('contract_template_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('order_type_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('contract_type_id')->nullable()->constrained()->nullOnDelete();
+            // The buyruq this contract was concluded under («на основании
+            // приказа № 74-АФ»); many contracts may share one order.
+            $table->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('contact_id')->constrained()->restrictOnDelete();
             $table->foreignId('project_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('currency_id')->constrained()->restrictOnDelete();
@@ -34,7 +37,7 @@ return new class extends Migration
 
             $table->index('status');
             $table->index('payment_status');
-            $table->index('order_type_id');
+            $table->index('contract_type_id');
         });
     }
 

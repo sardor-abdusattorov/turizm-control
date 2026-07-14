@@ -63,6 +63,11 @@ return [
         'order_type_single' => 'Buyruq turi',
         'no_category' => 'Kategoriyasiz',
         'select_order_type_first' => 'Avval buyruq turini tanlang',
+        'contract_type_single' => 'Shartnoma turi',
+        'contract_type_plural' => 'Shartnoma turlari',
+        'select_contract_type_first' => 'Avval shartnoma turini tanlang',
+        'direction' => "Yo'nalish",
+        'order_basis' => 'Asos buyruq',
         'select_currency_first' => 'Avval valyutani tanlang',
         'select_option' => 'Variantni tanlang',
         'order_type_plural' => 'Buyruq turlari',
@@ -500,6 +505,7 @@ return [
         'click_to_copy' => 'Nusxalash uchun bosing',
     ],
     'helper' => [
+        'template_optional' => 'Majburiy emas — faqat shablondan hujjat yaratish uchun kerak.',
         'inn' => 'Yuridik shaxslar uchun 9 raqam',
         'pinfl' => '14 raqam',
         'oked' => '5 raqam',
@@ -581,6 +587,10 @@ return [
             'in_review_director' => 'Direktorda',
             'approved' => 'Kelishilgan',
             'rejected' => 'Rad etilgan',
+        ],
+        'direction' => [
+            'expense' => 'Xarajat',
+            'income' => 'Daromad',
         ],
     ],
     'payment_status' => [

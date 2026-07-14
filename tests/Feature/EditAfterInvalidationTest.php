@@ -5,9 +5,9 @@ use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\ContractTemplate;
+use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
-use App\Models\OrderType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -50,14 +50,14 @@ it('keeps the invalidated chain visible and pre-fills the picker from the mirror
 
     $author = editorAuthor($profileDefault);
 
-    $orderType = OrderType::factory()->create();
-    $template = ContractTemplate::factory()->create(['order_type_id' => $orderType->id, 'status' => true]);
+    $contractType = ContractType::factory()->create();
+    $template = ContractTemplate::factory()->create(['contract_type_id' => $contractType->id, 'status' => true]);
 
     $contract = Contract::factory()->create([
         'responsible_id' => $author->id,
         'status' => Contract::STATUS_IN_REVIEW,
         'number' => 'C-INV-1',
-        'order_type_id' => $orderType->id,
+        'contract_type_id' => $contractType->id,
         'contract_template_id' => $template->id,
         'contact_id' => Contact::factory()->create(['status' => true])->id,
         'currency_id' => Currency::factory()->create(['status' => true])->id,

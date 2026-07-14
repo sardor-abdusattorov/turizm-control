@@ -7,9 +7,10 @@ use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\ContractTemplate;
+use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
-use App\Models\OrderType;
+use App\Models\Order;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\Contracts\ApprovalChain;
@@ -75,9 +76,9 @@ class ContractForm
                                     ->unique('contracts', 'number', ignoreRecord: true)
                                     ->columnSpanFull(),
 
-                                Select::make('order_type_id')
-                                    ->label(__('app.label.order_type_single'))
-                                    ->options(OrderType::getActive())
+                                Select::make('contract_type_id')
+                                    ->label(__('app.label.contract_type_single'))
+                                    ->options(ContractType::getActive())
                                     ->required()
                                     ->searchable()
                                     ->preload()
@@ -87,13 +88,21 @@ class ContractForm
 
                                 Select::make('contract_template_id')
                                     ->label(__('app.label.contract_template_single'))
-                                    ->options(fn (Get $get): array => self::templateOptions($get('order_type_id')))
-                                    ->disabled(fn (Get $get): bool => blank($get('order_type_id')))
-                                    ->placeholder(fn (Get $get): string => blank($get('order_type_id'))
-                                        ? __('app.label.select_order_type_first')
+                                    ->options(fn (Get $get): array => self::templateOptions($get('contract_type_id')))
+                                    ->disabled(fn (Get $get): bool => blank($get('contract_type_id')))
+                                    ->placeholder(fn (Get $get): string => blank($get('contract_type_id'))
+                                        ? __('app.label.select_contract_type_first')
                                         : __('app.label.select_option'))
-                                    ->required()
+                                    ->helperText(__('app.helper.template_optional'))
                                     ->searchable()
+                                    ->columnSpanFull(),
+
+                                Select::make('order_id')
+                                    ->label(__('app.label.order_basis'))
+                                    ->options(fn (): array => self::orderOptions())
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable()
                                     ->columnSpanFull(),
 
                                 Select::make('contact_id')
@@ -178,23 +187,42 @@ class ContractForm
     }
 
     /**
-     * Active templates for the chosen order type, plus untyped "general"
-     * templates that apply to any type. Empty until a type is selected so the
-     * dropdown stays gated behind the order type.
+     * Active templates for the chosen contract type, plus untyped "general"
+     * templates that apply to any kind. Empty until a kind is selected so the
+     * dropdown stays gated behind the contract type.
      *
      * @return array<int, string>
      */
-    protected static function templateOptions(?int $orderTypeId): array
+    protected static function templateOptions(?int $contractTypeId): array
     {
-        if (blank($orderTypeId)) {
+        if (blank($contractTypeId)) {
             return [];
         }
 
         return ContractTemplate::query()
-            ->forOrderType($orderTypeId)
+            ->forContractType($contractTypeId)
             ->get()
             ->mapWithKeys(fn (ContractTemplate $t): array => [
                 $t->id => $t->name,
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Active buyruqs the contract can name as its basis, newest first,
+     * labelled by number (falling back to the title for unnumbered drafts).
+     *
+     * @return array<int, string>
+     */
+    protected static function orderOptions(): array
+    {
+        return Order::query()
+            ->where('status', true)
+            ->orderByDesc('issued_at')
+            ->orderByDesc('id')
+            ->get()
+            ->mapWithKeys(fn (Order $order): array => [
+                $order->id => trim(($order->number ? $order->number.' · ' : '').$order->title),
             ])
             ->toArray();
     }

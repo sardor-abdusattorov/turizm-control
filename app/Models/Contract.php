@@ -26,7 +26,8 @@ class Contract extends Model
     protected $fillable = [
         'number',
         'contract_template_id',
-        'order_type_id',
+        'contract_type_id',
+        'order_id',
         'contact_id',
         'project_id',
         'currency_id',
@@ -82,7 +83,7 @@ class Contract extends Model
         'amount',
         'currency_id',
         'contact_id',
-        'order_type_id',
+        'contract_type_id',
         'contract_template_id',
         'document_file',
     ];
@@ -232,9 +233,17 @@ class Contract extends Model
         return $this->belongsTo(ContractTemplate::class, 'contract_template_id');
     }
 
-    public function orderType(): BelongsTo
+    public function contractType(): BelongsTo
     {
-        return $this->belongsTo(OrderType::class);
+        return $this->belongsTo(ContractType::class);
+    }
+
+    /**
+     * The buyruq (приказ) this contract was concluded under.
+     */
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     public function contact(): BelongsTo

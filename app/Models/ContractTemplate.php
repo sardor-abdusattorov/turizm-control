@@ -18,7 +18,7 @@ class ContractTemplate extends Model
     use HasFactory;
 
     protected $fillable = [
-        'order_type_id',
+        'contract_type_id',
         'name',
         'template_file',
         'document_key',
@@ -62,25 +62,25 @@ class ContractTemplate extends Model
     }
 
     /**
-     * Active templates usable for the given order type: the ones tied to that
-     * type plus untyped "general" templates, in sort order.
+     * Active templates usable for the given contract type: the ones tied to
+     * that kind plus untyped "general" templates, in sort order.
      *
      * @param  Builder<ContractTemplate>  $query
      * @return Builder<ContractTemplate>
      */
-    public function scopeForOrderType(Builder $query, int $orderTypeId): Builder
+    public function scopeForContractType(Builder $query, int $contractTypeId): Builder
     {
         return $query
             ->active()
             ->where(fn (Builder $inner) => $inner
-                ->where('order_type_id', $orderTypeId)
-                ->orWhereNull('order_type_id'))
+                ->where('contract_type_id', $contractTypeId)
+                ->orWhereNull('contract_type_id'))
             ->orderBy('sort');
     }
 
-    public function orderType(): BelongsTo
+    public function contractType(): BelongsTo
     {
-        return $this->belongsTo(OrderType::class);
+        return $this->belongsTo(ContractType::class);
     }
 
     public function contracts(): HasMany

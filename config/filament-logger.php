@@ -3,6 +3,7 @@
 use App\Filament\Resources\ActivityResource;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\ContractTemplates\ContractTemplateResource;
+use App\Filament\Resources\ContractTypes\ContractTypeResource;
 use App\Filament\Resources\Orders\ExternalOrderResource;
 use App\Filament\Resources\Orders\InternalOrderResource;
 use App\Filament\Resources\Projects\InternalProjectResource;
@@ -11,6 +12,7 @@ use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\ContractTemplate;
+use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
 use App\Models\Order;
@@ -226,6 +228,7 @@ return [
             // entries in the Execution history.
             ContractResource::class,
             ContractTemplateResource::class,
+            ContractTypeResource::class,
             InternalOrderResource::class,
             ExternalOrderResource::class,
             InternalProjectResource::class,
@@ -303,6 +306,7 @@ return [
             Contract::class,
             ContractApprover::class,
             ContractTemplate::class,
+            ContractType::class,
             User::class,
             Contact::class,
             Department::class,
