@@ -147,12 +147,50 @@ it('removes attachment files when the contract itself is deleted', function () {
     Storage::disk('local')->assertMissing($path);
 });
 
-it('offers no upload action on the view page — the dossier is managed on the form', function () {
+it('uploads dossier scans from the view page too', function () {
     Storage::fake('local');
 
     $contract = Contract::factory()->create();
     attachmentManager($contract);
 
     Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->assertActionDoesNotExist('uploadAttachments');
+        ->callAction('uploadAttachments', [
+            'files' => [UploadedFile::fake()->create('proposal.pdf', 40, 'application/pdf')],
+        ])
+        ->assertHasNoActionErrors();
+
+    expect($contract->attachments()->count())->toBe(1);
+});
+
+it('keeps uploading open after full approval — SWIFT and act arrive later', function () {
+    Storage::fake('local');
+
+    // A finalized contract can no longer be edited, yet its dossier must still
+    // accept the signed scan, SWIFT slip and act that arrive post-approval.
+    $contract = Contract::factory()->create();
+    $contract->forceFill(['status' => Contract::STATUS_APPROVED])->saveQuietly();
+
+    attachmentManager($contract);
+
+    expect($contract->fresh()->canBeEditedBy())->toBeFalse();
+
+    Livewire::test(ViewContract::class, ['record' => $contract->id])
+        ->callAction('uploadAttachments', [
+            'files' => [UploadedFile::fake()->create('SWIFT MT103.pdf', 60, 'application/pdf')],
+        ])
+        ->assertHasNoActionErrors();
+
+    // Filing the SWIFT slip must not knock the contract off Approved.
+    expect($contract->fresh()->status)->toBe(Contract::STATUS_APPROVED)
+        ->and($contract->attachments()->count())->toBe(1);
+});
+
+it('hides the upload action from users without the update permission', function () {
+    Storage::fake('local');
+
+    $contract = Contract::factory()->create();
+    attachmentManager($contract, ['view_any_contract', 'view_contract']);
+
+    Livewire::test(ViewContract::class, ['record' => $contract->id])
+        ->assertActionHidden('uploadAttachments');
 });
