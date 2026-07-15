@@ -1,35 +1,54 @@
 @php
-    /** @var \Illuminate\Support\Collection<int, array{currency: string, count: int, total: float}> $rows */
+    /** @var \Illuminate\Support\Collection<int, \App\Models\Contract> $contracts */
+    /** @var \Illuminate\Support\Collection<int, array{currency: string, count: int, total: float}> $totals */
+    $fmt = fn ($n) => number_format((float) $n, 0, ',', ' ');
 @endphp
 
 <div>
-    @if ($rows->isEmpty())
+    @if ($contracts->isEmpty())
         <p class="text-sm text-gray-500 dark:text-gray-400">
             {{ __('app.message.no_contracts_for_contact') }}
         </p>
     @else
-        {{-- Flexbox layout (not a <table>): every row is flex-direction:row with
-             a gap, the amount pushed to the right. It adapts to any width — the
-             middle column shrinks, the amount stays on one line, and the modal
-             never overflows or scrolls. --}}
+        {{-- One row per contract: number + type on the left, amount and status
+             on the right — the same record-list layout as the sponsor and
+             project breakdowns. Inline flex only, since this renders inside a
+             modal outside the .pj token scope. --}}
         <div class="overflow-hidden rounded-xl text-sm ring-1 ring-gray-950/5 dark:ring-white/10">
-            <div class="bg-gray-50 font-medium text-gray-500 dark:bg-white/5 dark:text-gray-400"
-                 style="display:flex;flex-direction:row;align-items:flex-end;gap:.75rem;padding:.55rem .9rem;">
-                <div style="flex:0 0 3.25rem;">{{ __('app.label.currency_single') }}</div>
-                <div style="flex:1 1 auto;min-width:0;">{{ __('app.label.contracts_count') }}</div>
-                <div style="flex:0 0 auto;margin-left:auto;text-align:right;">{{ __('app.label.total_amount') }}</div>
-            </div>
-
-            @foreach ($rows as $row)
-                <div class="border-t border-gray-100 text-gray-700 dark:border-white/5 dark:text-gray-200"
-                     style="display:flex;flex-direction:row;align-items:center;gap:.75rem;padding:.65rem .9rem;">
-                    <div style="flex:0 0 3.25rem;font-weight:600;">{{ $row['currency'] }}</div>
-                    <div style="flex:1 1 auto;min-width:0;">{{ $row['count'] }}</div>
-                    <div style="flex:0 0 auto;margin-left:auto;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">
-                        {{ number_format($row['total'], 2, '.', ' ') }} {{ $row['currency'] }}
+            @foreach ($contracts as $contract)
+                <div class="border-t border-gray-100 text-gray-700 first:border-t-0 dark:border-white/5 dark:text-gray-200"
+                     style="display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;">
+                    <div style="flex:1 1 auto;min-width:0;">
+                        <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            {{ $contract->number }}
+                        </div>
+                        <div class="text-gray-400" style="font-size:.72rem;margin-top:.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            {{ $contract->contractType?->title ?? $contract->title }}
+                        </div>
+                    </div>
+                    <div style="flex:0 0 auto;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">
+                        <div style="font-weight:600;">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</div>
+                        <div class="text-gray-400" style="font-size:.72rem;margin-top:.1rem;">
+                            {{ $contract->status->label() }}
+                        </div>
                     </div>
                 </div>
             @endforeach
         </div>
+
+        @if ($totals->isNotEmpty())
+            <div style="margin-top:.85rem;display:flex;flex-direction:column;gap:.35rem;">
+                @foreach ($totals as $t)
+                    <div class="text-gray-600 dark:text-gray-300"
+                         style="display:flex;align-items:center;gap:.75rem;font-size:.8rem;">
+                        <span style="font-weight:600;flex:0 0 3rem;">{{ $t['currency'] }}</span>
+                        <span style="flex:1 1 auto;min-width:0;">{{ $t['count'] }}</span>
+                        <span style="margin-left:auto;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">
+                            {{ $fmt($t['total']) }} {{ $t['currency'] }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     @endif
 </div>

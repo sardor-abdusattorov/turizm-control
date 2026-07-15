@@ -83,6 +83,23 @@ class Contact extends Model
     }
 
     /**
+     * The contracts of this counterparty the given user (defaults to the
+     * current one) is allowed to see — newest first — for the breakdown
+     * modal. Same visibility rule as the count badge and the totals, so a
+     * manager without oversight only ever sees their own.
+     *
+     * @return Collection<int, Contract>
+     */
+    public function visibleContracts(?User $user = null): Collection
+    {
+        return $this->contracts()
+            ->visibleTo($user)
+            ->with(['currency', 'contractType'])
+            ->latest('id')
+            ->get();
+    }
+
+    /**
      * Per-currency contract totals for this counterparty, limited to the
      * contracts $user is allowed to see (defaults to the current user): one row
      * per currency with the contract count and the summed amount, ordered by

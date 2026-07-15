@@ -60,7 +60,10 @@ class ContactsTable
                             ->modalIcon('heroicon-o-document-text')
                             ->modalContent(fn (Contact $record) => view(
                                 'filament.resources.contacts.contracts-breakdown',
-                                ['rows' => $record->contractTotalsByCurrency()],
+                                [
+                                    'contracts' => $record->visibleContracts(),
+                                    'totals' => $record->contractTotalsByCurrency(),
+                                ],
                             ))
                             ->modalSubmitAction(false)
                             ->modalCancelAction(false)

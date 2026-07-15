@@ -67,6 +67,60 @@ it('scopes the breakdown to the contracts the viewer is allowed to see', functio
         ->and($totals->first())->toMatchArray(['currency' => 'USD', 'count' => 1, 'total' => 1000.0]);
 });
 
+it('scopes the visible contracts list to what the viewer may see', function () {
+    $usd = Currency::factory()->create(['short_name' => 'USD']);
+    $contact = Contact::factory()->create();
+    $manager = userWithPermission('view_any_contact');
+
+    Contract::factory()->create([
+        'contact_id' => $contact->id,
+        'currency_id' => $usd->id,
+        'number' => 'MINE-001',
+        'amount' => 1000,
+        'status' => Contract::STATUS_APPROVED,
+        'responsible_id' => $manager->id,
+    ]);
+
+    // Someone else's contract with the same counterparty — must not leak.
+    Contract::factory()->create([
+        'contact_id' => $contact->id,
+        'currency_id' => $usd->id,
+        'number' => 'THEIRS-999',
+        'amount' => 9999,
+        'status' => Contract::STATUS_APPROVED,
+        'responsible_id' => User::factory()->create()->id,
+    ]);
+
+    $visible = $contact->visibleContracts($manager);
+
+    expect($visible)->toHaveCount(1)
+        ->and($visible->first()->number)->toBe('MINE-001');
+});
+
+it('renders the contracts breakdown view with number, currency and totals', function () {
+    $eur = Currency::factory()->create(['short_name' => 'EUR']);
+    $contact = Contact::factory()->create();
+    $viewer = userWithPermission('view_any_contact', 'view_all_contracts');
+
+    Contract::factory()->create([
+        'contact_id' => $contact->id,
+        'currency_id' => $eur->id,
+        'number' => 'L-01-105',
+        'amount' => 64000,
+        'status' => Contract::STATUS_APPROVED,
+    ]);
+
+    $html = view('filament.resources.contacts.contracts-breakdown', [
+        'contracts' => $contact->visibleContracts($viewer),
+        'totals' => $contact->contractTotalsByCurrency($viewer),
+    ])->render();
+
+    expect($html)
+        ->toContain('L-01-105')
+        ->toContain('EUR')
+        ->toContain('64 000');
+});
+
 it('renders the contracts-count column on the contacts list without error', function () {
     actingAs(userWithPermission('view_any_contact', 'view_all_contracts'));
 
