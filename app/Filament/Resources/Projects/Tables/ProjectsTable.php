@@ -52,15 +52,11 @@ class ProjectsTable
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query
-                // participants.currency backs the currency suffix on the two
-                // money columns — one eager load instead of a per-row query.
                 ->with(['creator', 'participants.currency'])
                 ->withCount([
                     'participants',
                     'participants as sponsors_count' => fn (Builder $participants) => $participants
                         ->where('role', ParticipantRole::Sponsor),
-                    // Same visibility rule as everywhere: the badge only counts
-                    // the contracts the viewer is allowed to see.
                     'contracts' => fn (Builder $contracts) => $contracts->visibleTo(),
                 ])
                 ->withSum('participants', 'amount')
