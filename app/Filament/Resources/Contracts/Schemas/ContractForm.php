@@ -207,7 +207,10 @@ class ContractForm
                                     ->helperText(__('app.helper.attachment_scans'))
                                     ->multiple()
                                     ->disk('local')
-                                    ->directory('uploads/files/contract-attachments')
+                                    // Same private, month-bucketed layout as
+                                    // DocumentUpload / ImageUpload use everywhere.
+                                    ->directory(fn (): string => 'uploads/files/contract-attachments/'.now()->format('Y/m'))
+                                    ->visibility('private')
                                     ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
                                     ->maxSize(25600)
                                     ->storeFileNamesIn('attachment_names')

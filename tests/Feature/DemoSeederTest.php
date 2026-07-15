@@ -1,10 +1,11 @@
 <?php
 
-use App\Enums\ContractStatus;
+use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
-use App\Models\Contact;
 use App\Models\Contract;
+use App\Models\Order;
 use App\Models\Project;
+use App\Models\ProjectParticipant;
 use App\Models\Sponsor;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,52 +13,70 @@ use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
-it('seeds the real 2025 paper trail: 26 dossier contracts under their buyruqs', function () {
+it('seeds only the project registries — no contracts or orders', function () {
     Storage::fake('local');
 
     $this->seed(DatabaseSeeder::class);
 
-    // Exactly the 26 scanned dossiers — no demo filler — all filed as signed.
-    expect(Contract::count())->toBe(26)
-        ->and(Contract::query()->where('status', ContractStatus::Approved->value)->count())->toBe(26);
+    // The main seeder is deliberately lean now: reference data, accounts and
+    // the projects. Contracts, orders and counterparties are entered by hand.
+    expect(Contract::count())->toBe(0)
+        ->and(Order::count())->toBe(0);
 
-    // Spot-check против скана: IFEMA, 16 595,41 EUR, приказ 06-АФ, FITUR.
-    $ifema = Contract::query()->firstWhere('number', '2/FITUR 2025 Space');
-
-    expect($ifema)->not->toBeNull()
-        ->and((float) $ifema->amount)->toBe(16595.41)
-        ->and($ifema->currency->short_name)->toBe('EUR')
-        ->and($ifema->order?->number)->toBe('06-АФ')
-        ->and($ifema->contact->getTranslation('name', 'ru'))->toBe('IFEMA Madrid')
-        ->and($ifema->project?->name)->toContain('FITUR');
-
-    // The annual 74-АФ really is the master order of the year.
-    expect(Contract::query()->whereHas('order', fn ($q) => $q->where('number', '74-АФ'))->count())->toBe(18);
-
-    // The five filled local events from the 2026 registry.
-    expect(Project::query()->where('type', ProjectType::Internal->value)->count())->toBe(5)
-        ->and(Project::query()->firstWhere('attendees_count', 165)?->photo_report_url)->toBe('https://clck.ru/3UYYzh');
-
-    // Re-seeding must not duplicate anything.
-    $this->seed(DatabaseSeeder::class);
-
-    expect(Contract::count())->toBe(26);
+    // 16 international exhibitions (2025) + 14 (2026) + 5 local events.
+    expect(Project::query()->where('type', ProjectType::International->value)->count())->toBe(30)
+        ->and(Project::query()->where('type', ProjectType::Internal->value)->count())->toBe(5);
 });
 
-it('seeds the real directories: contractors, tour operators and sponsors', function () {
+it('fills FITUR-2025 with its participant fees straight from the registry', function () {
     Storage::fake('local');
 
     $this->seed(DatabaseSeeder::class);
 
-    // Foreign contractors straight from the contract requisites.
-    foreach (['IFEMA Madrid', 'Think Strawberries MENA LLC', 'RX France S.A.S.', 'PTAK Warsaw Expo Sp. z o.o.'] as $name) {
-        expect(Contact::query()->where('name->ru', $name)->exists())
-            ->toBeTrue("contractor {$name} is missing");
-    }
+    $fitur = Project::query()->firstWhere('name', 'FITUR-2025');
 
-    // Tour operators from the participants registry.
-    expect(Contact::query()->where('name->ru', 'Orient Star Group')->exists())->toBeTrue();
+    expect($fitur)->not->toBeNull()
+        ->and($fitur->area_sqm)->not->toBeNull();
 
-    // Sponsors (Uzbekistan Airways contributes as a sponsor, not a participant).
+    // 11 tour operators × 38 000 000 сум = 418 000 000 (the registry «profit»).
+    $participants = $fitur->participants()->where('role', ParticipantRole::Participant->value)->get();
+
+    expect($participants->count())->toBe(11)
+        ->and((float) $fitur->feesTotal())->toBe(418_000_000.0);
+});
+
+it('files Uzbekistan Airways rows as sponsor participations', function () {
+    Storage::fake('local');
+
+    $this->seed(DatabaseSeeder::class);
+
+    // Airways rows are sponsor contributions, not participation fees — the
+    // sponsor is auto-created by the registry linker.
     expect(Sponsor::query()->where('name', 'like', '%Uzbekistan Airways%')->exists())->toBeTrue();
+
+    $sponsorParticipations = ProjectParticipant::query()
+        ->where('role', ParticipantRole::Sponsor->value)
+        ->count();
+
+    expect($sponsorParticipations)->toBeGreaterThan(0);
+});
+
+it('the five filled local events carry their estimates and photo reports', function () {
+    Storage::fake('local');
+
+    $this->seed(DatabaseSeeder::class);
+
+    expect(Project::query()->where('type', ProjectType::Internal->value)->count())->toBe(5)
+        ->and(Project::query()->firstWhere('attendees_count', 165)?->photo_report_url)->toBe('https://clck.ru/3UYYzh');
+});
+
+it('re-seeding never duplicates the projects', function () {
+    Storage::fake('local');
+
+    $this->seed(DatabaseSeeder::class);
+    $before = Project::count();
+
+    $this->seed(DatabaseSeeder::class);
+
+    expect(Project::count())->toBe($before);
 });
