@@ -4,7 +4,6 @@ namespace App\Filament\Widgets\Dashboard;
 
 use App\Models\Project;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
@@ -69,9 +68,14 @@ class ProjectPulseWidget extends Widget implements HasSchemas
     {
         return $schema
             ->components([
-                Grid::make(['default' => 1, 'md' => 12])
+                // Type + year are short, few-option refinements — compact
+                // selects (not native(false) means they stay the same styled
+                // dropdown as the project picker, not the browser's own),
+                // paired side by side even on a phone. Project gets the rest
+                // of the row: it carries the actual long names.
+                Grid::make(['default' => 12, 'md' => 12])
                     ->schema([
-                        ToggleButtons::make('type')
+                        Select::make('type')
                             ->label(__('app.label.project_type'))
                             ->options([
                                 self::ALL => __('app.label.all'),
@@ -79,19 +83,21 @@ class ProjectPulseWidget extends Widget implements HasSchemas
                                 'international' => __('app.label.projects_international'),
                             ])
                             ->default(self::ALL)
-                            ->grouped()
+                            ->native(false)
+                            ->selectablePlaceholder(false)
                             ->live()
                             ->afterStateUpdated(fn (Get $get, Set $set) => $this->rehomeSelection($get, $set))
-                            ->columnSpan(['default' => 1, 'md' => 5]),
+                            ->columnSpan(['default' => 6, 'md' => 3]),
 
-                        ToggleButtons::make('year')
+                        Select::make('year')
                             ->label(__('app.label.year'))
                             ->options(self::yearOptions())
                             ->default(self::ALL)
-                            ->grouped()
+                            ->native(false)
+                            ->selectablePlaceholder(false)
                             ->live()
                             ->afterStateUpdated(fn (Get $get, Set $set) => $this->rehomeSelection($get, $set))
-                            ->columnSpan(['default' => 1, 'md' => 3]),
+                            ->columnSpan(['default' => 6, 'md' => 2]),
 
                         Select::make('projectId')
                             ->label(__('app.label.project_single'))
@@ -103,11 +109,12 @@ class ProjectPulseWidget extends Widget implements HasSchemas
                             ->preload()
                             ->selectablePlaceholder(false)
                             // Keep the closed control one line tall — long project
-                            // names ellipsize instead of wrapping the toolbar.
+                            // names ellipsize instead of wrapping the toolbar. The
+                            // OPEN list still wraps them in full (see theme.css).
                             ->wrapOptionLabels(false)
                             ->live()
                             ->afterStateUpdated(fn (?string $state) => $this->persist($state))
-                            ->columnSpan(['default' => 1, 'md' => 4]),
+                            ->columnSpan(['default' => 12, 'md' => 7]),
                     ]),
             ])
             ->statePath('data');
