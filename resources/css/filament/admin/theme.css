@@ -1036,7 +1036,7 @@
    sits inline in the toolbar next to «Открыть проект»; the field's own chrome
    comes from the compiled Filament theme. */
 .pj-picker {
-    width: 19rem;
+    width: 30rem;
     max-width: 100%;
 }
 /* Strip the schema container's default vertical rhythm so the single field
