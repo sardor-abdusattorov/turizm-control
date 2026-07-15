@@ -96,6 +96,51 @@ it('shows a manager only their own contracts on the pulse widget', function () {
         ->assertDontSee('FOREIGN-001');
 });
 
+it('narrows and rehomes the selection when the type filter changes', function () {
+    $intl = Project::factory()->international()->create(['name' => 'GLOBAL-EXPO', 'starts_on' => now()->addWeek(), 'status' => true, 'venue' => 'Берлин']);
+    $internal = Project::factory()->internal()->create(['name' => 'LOCAL-FEST', 'starts_on' => now()->addMonths(2), 'status' => true, 'venue' => 'Самарканд']);
+
+    actingAs(userWithPermission('view_any_project'));
+
+    // Default lands on the nearest upcoming project (the international one);
+    // filtering to internal jumps the card to the only matching project.
+    Livewire::test(ProjectPulseWidget::class)
+        ->assertSet('data.projectId', $intl->id)
+        ->assertSee('Берлин')
+        ->set('data.type', 'internal')
+        ->assertSet('data.projectId', $internal->id)
+        ->assertSee('Самарканд')
+        ->assertDontSee('Берлин');
+
+    expect(session('dashboard.project_id'))->toBe($internal->id);
+});
+
+it('keeps the selection when it still matches the changed filter', function () {
+    $a = Project::factory()->international()->create(['name' => 'EXPO-A', 'starts_on' => now()->addWeek(), 'status' => true, 'venue' => 'Париж']);
+    Project::factory()->international()->create(['name' => 'EXPO-B', 'starts_on' => now()->addMonths(2), 'status' => true]);
+
+    actingAs(userWithPermission('view_any_project'));
+
+    Livewire::test(ProjectPulseWidget::class)
+        ->assertSet('data.projectId', $a->id)
+        ->set('data.type', 'international')
+        ->assertSet('data.projectId', $a->id)
+        ->assertSee('Париж');
+});
+
+it('rehomes the selection when the year filter changes', function () {
+    $past = Project::factory()->international()->create(['name' => 'EXPO-PAST', 'starts_on' => now()->subYear(), 'status' => true, 'venue' => 'Токио']);
+    $upcoming = Project::factory()->international()->create(['name' => 'EXPO-NEXT', 'starts_on' => now()->addWeek(), 'status' => true, 'venue' => 'Дубай']);
+
+    actingAs(userWithPermission('view_any_project'));
+
+    Livewire::test(ProjectPulseWidget::class)
+        ->assertSet('data.projectId', $upcoming->id)
+        ->set('data.year', (string) now()->subYear()->year)
+        ->assertSet('data.projectId', $past->id)
+        ->assertSee('Токио');
+});
+
 it('is hidden from users without the projects permission', function () {
     actingAs(User::factory()->create(['status' => User::STATUS_ACTIVE]));
 

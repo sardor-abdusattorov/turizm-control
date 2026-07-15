@@ -57,7 +57,7 @@
         @endphp
 
         <div class="pj" style="display:flex;flex-direction:column;gap:1rem;">
-            {{-- Toolbar: what this card is + the project picker --}}
+            {{-- Toolbar: what this card is, and where to open the full project --}}
             <div class="pj-bar">
                 <div class="pj-bar__l">
                     <span class="pj-bar__ic">{!! $ic('heroicon-o-presentation-chart-line', 18) !!}</span>
@@ -66,19 +66,19 @@
                         <span class="pj-bar__s">{{ __('app.dashboard.pulse_hint') }}</span>
                     </div>
                 </div>
-                <div class="pj-bar__r">
-                    <div class="pj-picker">
-                        {{ $this->form }}
-                    </div>
-                    <a href="{{ $projectUrl }}" class="pj-open" wire:navigate title="{{ __('app.action.open_project') }}">
-                        {!! $ic('heroicon-m-arrow-top-right-on-square', 15) !!}
-                        <span class="pj-open__lb">{{ __('app.action.open_project') }}</span>
-                    </a>
-                </div>
+                <a href="{{ $projectUrl }}" class="pj-open" wire:navigate title="{{ __('app.action.open_project') }}">
+                    {!! $ic('heroicon-m-arrow-top-right-on-square', 15) !!}
+                    <span class="pj-open__lb">{{ __('app.action.open_project') }}</span>
+                </a>
+            </div>
+
+            {{-- Filters: type + year narrow the project select --}}
+            <div class="pj-filters">
+                {{ $this->form }}
             </div>
 
             <div style="display:flex;flex-direction:column;gap:1rem;"
-                 wire:loading.class="pj--loading" wire:target="data.projectId">
+                 wire:loading.class="pj--loading" wire:target="data.projectId,data.type,data.year">
                 {{-- Hero: what & when, money on the right --}}
                 <section class="pj-hero pj-hero--{{ $project->status ? 'success' : 'gray' }}">
                     <div class="pj-hero__l">

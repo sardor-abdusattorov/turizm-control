@@ -6,6 +6,7 @@ use App\Enums\ContractDirection;
 use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
 use App\Models\Concerns\HasActiveStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -80,18 +81,14 @@ class Project extends Model
 
     /**
      * Active projects as «тип · год» optgroups (newest first), optionally
-     * narrowed to one year — shared by the contract form and the dashboard
-     * project picker.
+     * narrowed to one year and/or one type — shared by the contract form and
+     * the dashboard project picker.
      *
      * @return array<string, array<int, string>>
      */
-    public static function groupedOptions(?string $year = null): array
+    public static function groupedOptions(?string $year = null, ?string $type = null): array
     {
-        return static::query()
-            ->active()
-            ->when($year, fn ($query) => $query->whereYear('starts_on', $year))
-            ->orderByDesc('starts_on')
-            ->orderByDesc('id')
+        return static::pickerQuery($type, $year)
             ->get()
             ->groupBy(fn (self $project): string => trim(
                 $project->type->label().($project->starts_on ? ' · '.$project->starts_on->year : ''),
@@ -100,6 +97,54 @@ class Project extends Model
                 fn (self $project): array => [$project->id => $project->name],
             )->toArray())
             ->toArray();
+    }
+
+    /**
+     * The active project ids matching a type/year filter, newest first — used
+     * by the dashboard picker to re-home the selection when a filter changes.
+     *
+     * @return array<int, int>
+     */
+    public static function filteredIds(?string $type = null, ?string $year = null): array
+    {
+        return static::pickerQuery($type, $year)
+            ->pluck('id')
+            ->map(fn ($id): int => (int) $id)
+            ->all();
+    }
+
+    /**
+     * The distinct years that active projects start in, newest first — the
+     * option set for the dashboard year filter.
+     *
+     * @return array<int, string>
+     */
+    public static function pickerYears(): array
+    {
+        return static::query()
+            ->active()
+            ->whereNotNull('starts_on')
+            ->get()
+            ->map(fn (self $project): int => $project->starts_on->year)
+            ->unique()
+            ->sortDesc()
+            ->values()
+            ->map(fn (int $year): string => (string) $year)
+            ->all();
+    }
+
+    /**
+     * Shared base query for the picker helpers: active projects, optionally
+     * narrowed by type and/or year, ordered newest first.
+     */
+    protected static function pickerQuery(?string $type = null, ?string $year = null): Builder
+    {
+        return static::query()
+            ->active()
+            ->when($year, fn (Builder $query) => $query->whereYear('starts_on', $year))
+            ->when($type, fn (Builder $query) => $query->where('type', $type))
+            ->orderByDesc('starts_on')
+            ->orderByDesc('id');
     }
 
     public function participants(): HasMany
