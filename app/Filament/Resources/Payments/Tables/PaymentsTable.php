@@ -118,6 +118,7 @@ class PaymentsTable
                             ->when($data['until'] ?? null, fn (Builder $q, $date) => $q->whereDate('paid_at', '<=', $date));
                     }),
             ])
+            ->filtersFormColumns(2)
             ->recordUrl(fn (Payment $record) => PaymentResource::getUrl('view', ['record' => $record]))
             ->headerActions([
                 Action::make('exportXlsx')

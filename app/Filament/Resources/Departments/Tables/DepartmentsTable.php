@@ -57,6 +57,7 @@ class DepartmentsTable
                     ->searchable()
                     ->preload(),
             ])
+            ->filtersFormColumns(2)
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),

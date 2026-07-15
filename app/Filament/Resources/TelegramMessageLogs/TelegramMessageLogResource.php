@@ -123,6 +123,7 @@ class TelegramMessageLogResource extends Resource
                         'editMessageText' => __('app.label.telegram_log_edited'),
                     ]),
             ])
+            ->filtersFormColumns(2)
             ->recordActions([
                 ViewAction::make()
                     ->modalHeading(fn (TelegramMessageLog $record): string => '№ '.$record->getKey())

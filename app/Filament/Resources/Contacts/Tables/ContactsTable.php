@@ -145,6 +145,7 @@ class ContactsTable
                     ->label(__('app.label.status'))
                     ->options(Contact::getStatuses()),
             ])
+            ->filtersFormColumns(2)
             ->recordUrl(fn (Contact $record) => ContactResource::getUrl('view', ['record' => $record]))
             ->recordActions([
                 ActionGroup::make([

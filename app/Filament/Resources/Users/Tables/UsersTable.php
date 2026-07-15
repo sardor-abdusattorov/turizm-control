@@ -87,6 +87,7 @@ class UsersTable
                     ->falseLabel(__('app.label.inactive'))
                     ->placeholder(__('app.label.all')),
             ])
+            ->filtersFormColumns(2)
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),

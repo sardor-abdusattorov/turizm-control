@@ -201,6 +201,7 @@ class ProjectsTable
                     ->label(__('app.label.status'))
                     ->options(Project::getStatuses()),
             ])
+            ->filtersFormColumns(2)
             ->recordUrl(fn (Project $record) => BaseProjectResource::resourceFor($record)::getUrl('view', ['record' => $record]))
             ->headerActions([
                 Action::make('exportXlsx')

@@ -106,6 +106,7 @@ class OrdersTable
                         ->pluck('name', 'id'))
                     ->searchable(),
             ])
+            ->filtersFormColumns(2)
             ->recordUrl(fn (Order $record): string => BaseOrderResource::resourceFor($record)::getUrl('view', ['record' => $record]))
             ->recordActions([
                 ActionGroup::make([

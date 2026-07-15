@@ -66,6 +66,7 @@ class ContractTemplatesTable
                     ->label(__('app.label.status'))
                     ->options(ContractTemplate::getStatuses()),
             ])
+            ->filtersFormColumns(2)
             ->recordUrl(fn (ContractTemplate $record) => ContractTemplateResource::getUrl('view', ['record' => $record]))
             ->recordActions([
                 ActionGroup::make([

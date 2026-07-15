@@ -51,6 +51,7 @@ class PositionsTable
                     ->preload()
                     ->multiple(),
             ])
+            ->filtersFormColumns(2)
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),

@@ -58,6 +58,7 @@ class ContractTypesTable
                     ->label(__('app.label.status'))
                     ->options(ContractType::getStatuses()),
             ])
+            ->filtersFormColumns(2)
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
