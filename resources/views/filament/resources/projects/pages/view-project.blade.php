@@ -228,6 +228,10 @@
                         <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clock') !!}</span><span class="ow-row__lb">{{ __('app.label.created_at') }}</span></div>
                         <div class="ow-row__v"><span class="ow-row__vl">{{ $record->created_at?->format('d.m.Y H:i') }}</span></div>
                     </div>
+                    <div class="ow-row">
+                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-pencil') !!}</span><span class="ow-row__lb">{{ __('app.label.updated_at') }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->updated_at?->format('d.m.Y H:i') }}</span></div>
+                    </div>
                 </div>
             </section>
 

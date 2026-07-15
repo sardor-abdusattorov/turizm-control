@@ -58,10 +58,11 @@ class ContactForm
                                     ->minLength(5)
                                     ->maxLength(5),
 
+                                // Optional: 48 of the 56 real counterparties are
+                                // foreign exhibitors with no Uzbek INN at all.
                                 TextInput::make('inn')
                                     ->label(__('app.label.inn'))
                                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
-                                    ->required(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                                     ->helperText(__('app.helper.inn'))
                                     ->numeric()
                                     ->minLength(9)

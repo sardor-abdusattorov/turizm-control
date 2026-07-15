@@ -58,7 +58,7 @@ return [
         'order_single' => 'Buyruq',
         'order_plural' => 'Buyruqlar',
         'order_number' => 'Buyruq №',
-        'order_number_auto' => '(avtomatik yaratiladi)',
+        'order_number_auto' => 'Bo\'sh qoldiring — raqam avtomatik beriladi',
         'issued_at' => 'Chiqarilgan sana',
         'year' => 'Yil',
         'order_type_single' => 'Buyruq turi',
@@ -534,6 +534,7 @@ return [
         'click_to_copy' => 'Nusxalash uchun bosing',
     ],
     'helper' => [
+        'order_file_optional' => 'Majburiy emas — skanni keyinroq qo\'shish mumkin.',
         'template_optional' => 'Majburiy emas — faqat shablondan hujjat yaratish uchun kerak.',
         'already_signed' => 'Eski (qog\'oz) shartnomalar uchun: darhol «Kelishilgan» holatida saqlanadi, kelishuv zanjirisiz.',
         'attachment_scans' => 'Shartnoma va hujjatlar skanlari — PDF/JPG/PNG, bir nechta faylni birdan yuklash mumkin.',

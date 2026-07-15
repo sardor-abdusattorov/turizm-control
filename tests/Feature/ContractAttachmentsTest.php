@@ -50,7 +50,7 @@ function validEditFormFill(): array
     ];
 }
 
-it('uploads dossier files with a type through the edit form', function () {
+it('uploads dossier files through the edit form', function () {
     Storage::fake('local');
 
     $contract = Contract::factory()->create();
@@ -60,7 +60,6 @@ it('uploads dossier files with a type through the edit form', function () {
         ->fillForm([
             ...validEditFormFill(),
             'attachment_files' => [UploadedFile::fake()->create('SWIFT MT103.pdf', 120, 'application/pdf')],
-            'attachment_type' => ContractAttachmentType::Swift->value,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -70,28 +69,10 @@ it('uploads dossier files with a type through the edit form', function () {
     // The exact original name flows in through storeFileNamesIn() in the real
     // UI; the test transport only guarantees a stored .pdf with a fallback name.
     expect($attachment)->not->toBeNull()
-        ->and($attachment->type)->toBe(ContractAttachmentType::Swift)
         ->and($attachment->original_name)->toEndWith('.pdf')
         ->and($attachment->uploaded_by)->toBe($contract->responsible_id);
 
     Storage::disk('local')->assertExists($attachment->file_path);
-});
-
-it('uploads without a type — categorising is optional', function () {
-    Storage::fake('local');
-
-    $contract = Contract::factory()->create();
-    attachmentManager($contract);
-
-    Livewire::test(EditContract::class, ['record' => $contract->id])
-        ->fillForm([
-            ...validEditFormFill(),
-            'attachment_files' => [UploadedFile::fake()->create('scan.pdf', 40, 'application/pdf')],
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors();
-
-    expect($contract->attachments()->first()?->type)->toBeNull();
 });
 
 it('keeps existing attachments and appends the new upload after them', function () {

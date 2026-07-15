@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Contracts\Schemas;
 
-use App\Enums\ContractAttachmentType;
 use App\Filament\Resources\Contacts\Schemas\ContactForm;
 use App\Models\Contact;
 use App\Models\Contract;
@@ -200,8 +199,9 @@ class ContractForm
 
                                 // The dossier is managed here on the form — create
                                 // AND edit — never on the view page. New scans are
-                                // stored as attachments on save; the optional type
-                                // below applies to this batch.
+                                // stored as attachments on save; no per-batch type
+                                // question, files are just files (лёгкость выше
+                                // каталогизации).
                                 FileUpload::make('attachment_files')
                                     ->label(__('app.label.attachments'))
                                     ->helperText(__('app.helper.attachment_scans'))
@@ -211,14 +211,6 @@ class ContractForm
                                     ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
                                     ->maxSize(25600)
                                     ->storeFileNamesIn('attachment_names')
-                                    ->columnSpanFull(),
-
-                                Select::make('attachment_type')
-                                    ->label(__('app.label.attachment_type'))
-                                    ->options(ContractAttachmentType::options())
-                                    ->native(false)
-                                    ->visible(fn (Get $get): bool => filled($get('attachment_files')))
-                                    ->helperText(__('app.helper.attachment_type_optional'))
                                     ->columnSpanFull(),
                             ]),
 

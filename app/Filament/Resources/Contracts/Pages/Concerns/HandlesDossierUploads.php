@@ -19,8 +19,6 @@ trait HandlesDossierUploads
     /** @var array<int|string, string> */
     protected array $attachmentNames = [];
 
-    protected ?string $attachmentType = null;
-
     /**
      * Pull the virtual upload fields out of the form payload. Keys are kept
      * as-is: original_name lookups match on the same keys.
@@ -32,8 +30,7 @@ trait HandlesDossierUploads
     {
         $this->attachmentFiles = (array) ($data['attachment_files'] ?? []);
         $this->attachmentNames = (array) ($data['attachment_names'] ?? []);
-        $this->attachmentType = $data['attachment_type'] ?? null;
-        unset($data['attachment_files'], $data['attachment_names'], $data['attachment_type']);
+        unset($data['attachment_files'], $data['attachment_names']);
 
         return $data;
     }
@@ -44,7 +41,6 @@ trait HandlesDossierUploads
 
         foreach ($this->attachmentFiles as $key => $path) {
             $this->record->attachments()->create([
-                'type' => $this->attachmentType,
                 'file_path' => $path,
                 'original_name' => $this->attachmentNames[$key] ?? basename((string) $path),
                 'size' => Storage::disk('local')->exists($path) ? Storage::disk('local')->size($path) : 0,

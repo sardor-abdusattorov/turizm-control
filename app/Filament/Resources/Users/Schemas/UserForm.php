@@ -25,7 +25,7 @@ class UserForm
                 Section::make(__('app.label.personal_info'))
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('app.label.name'))
+                            ->label(__('app.label.full_name'))
                             ->required()
                             ->maxLength(255),
 

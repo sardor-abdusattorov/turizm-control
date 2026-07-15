@@ -58,7 +58,7 @@ return [
         'order_single' => 'Order',
         'order_plural' => 'Orders',
         'order_number' => 'Order No.',
-        'order_number_auto' => '(will be generated)',
+        'order_number_auto' => 'Leave blank — the number is assigned automatically',
         'issued_at' => 'Issued on',
         'year' => 'Year',
         'order_type_single' => 'Order Type',
@@ -539,6 +539,7 @@ return [
         'click_to_copy' => 'Click to copy',
     ],
     'helper' => [
+        'order_file_optional' => 'Optional — the scan can be added later.',
         'template_optional' => 'Optional — only needed to generate the document from a template.',
         'already_signed' => 'For legacy (paper) contracts: saved straight away as “Approved”, no approval chain.',
         'attachment_scans' => 'Contract and document scans — PDF/JPG/PNG, several files at once.',
