@@ -99,8 +99,14 @@ class ProjectsTable
                     ->badge()
                     ->color(fn (Project $record): string => ($record->participants_count ?? 0) > 0 ? 'info' : 'gray')
                     ->alignCenter()
-                    ->tooltip(__('app.action.quick_view'))
-                    ->action(self::previewAction('projectPreviewFromCount'))
+                    ->tooltip(fn (Project $record): ?string => ($record->participants_count ?? 0) > 0
+                        ? __('app.label.participants_breakdown_hint')
+                        : null)
+                    ->action(self::participantBreakdownAction(
+                        'participantsBreakdown',
+                        ParticipantRole::Participant,
+                        'heroicon-o-user-group',
+                    ))
                     ->sortable(),
 
                 TextColumn::make('sponsors_count')
@@ -108,8 +114,14 @@ class ProjectsTable
                     ->badge()
                     ->color(fn (Project $record): string => ($record->sponsors_count ?? 0) > 0 ? 'warning' : 'gray')
                     ->alignCenter()
-                    ->tooltip(__('app.action.quick_view'))
-                    ->action(self::previewAction('projectPreviewFromSponsors'))
+                    ->tooltip(fn (Project $record): ?string => ($record->sponsors_count ?? 0) > 0
+                        ? __('app.label.sponsors_breakdown_hint')
+                        : null)
+                    ->action(self::participantBreakdownAction(
+                        'sponsorsBreakdown',
+                        ParticipantRole::Sponsor,
+                        'heroicon-o-star',
+                    ))
                     ->toggleable(),
 
                 ImageColumn::make('gallery')
@@ -205,12 +217,6 @@ class ProjectsTable
                     )),
             ])
             ->recordActions([
-                self::previewAction('projectPreview')
-                    ->hiddenLabel()
-                    ->icon('heroicon-o-eye')
-                    ->color('gray')
-                    ->tooltip(__('app.action.quick_view')),
-
                 ActionGroup::make([
                     ViewAction::make()->color('gray'),
 
@@ -229,20 +235,25 @@ class ProjectsTable
     }
 
     /**
-     * Quick-view modal shared by the row eye button and the participants
-     * badge — key facts, participants with payment pills and the gallery,
-     * without leaving the list (the pattern the contracts list set).
+     * Role-scoped breakdown behind the participants / sponsors count badge —
+     * the record-list modal the sponsor and contact lists set as the
+     * pattern: one row per participation, per-currency totals at the foot.
      */
-    private static function previewAction(string $name): Action
+    private static function participantBreakdownAction(string $name, ParticipantRole $role, string $icon): Action
     {
         return Action::make($name)
-            ->label(__('app.action.quick_view'))
             ->modalHeading(fn (Project $record): string => $record->name)
+            ->modalIcon($icon)
             ->modalContent(fn (Project $record) => view(
-                'filament.resources.projects.tables.preview-modal',
-                ['project' => $record],
+                'filament.resources.projects.tables.participants-breakdown',
+                [
+                    'rows' => $record->participants->where('role', $role)->values(),
+                    'totals' => $record->participantTotalsByCurrency($role),
+                    'empty' => $role === ParticipantRole::Sponsor
+                        ? __('app.message.no_sponsors')
+                        : __('app.message.no_participants'),
+                ],
             ))
-            ->modalWidth('3xl')
             ->modalSubmitAction(false)
             ->modalCancelAction(false)
             ->extraModalFooterActions([

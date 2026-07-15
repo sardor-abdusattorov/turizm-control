@@ -46,6 +46,19 @@
     $feesTotal = $record->feesTotal();
     $paidTotal = $record->paidTotal();
 
+    // Fees per currency (members + sponsors together) for the finance card —
+    // mixed currencies stay apart, never converted.
+    $feeTotalsByCurrency = $record->participants
+        ->groupBy(fn ($p) => $p->currency?->short_name ?? '—')
+        ->map(fn ($group, $currency) => [
+            'currency' => $currency,
+            'count' => $group->count(),
+            'total' => (float) $group->sum('amount'),
+            'paid' => (float) $group->sum('paid_amount'),
+        ])
+        ->sortByDesc('count')
+        ->values();
+
     // A single fee currency is shown only when every participant shares it;
     // mixed-currency projects drop the suffix rather than mislead.
     $currencies = $record->participants->map(fn ($p) => $p->currency?->short_name)->filter()->unique()->values();
@@ -176,6 +189,14 @@
                     <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
                 </header>
                 <div class="ow-dets">
+                    <div class="ow-row">
+                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-map-pin') !!}</span><span class="ow-row__lb">{{ __('app.label.venue') }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->venue ?: '—' }}</span></div>
+                    </div>
+                    <div class="ow-row">
+                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-calendar-days') !!}</span><span class="ow-row__lb">{{ __('app.label.period') }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $period }}</span></div>
+                    </div>
                     @php $basisOrders = $record->ordersViaContracts(); @endphp
                     @if ($basisOrders->isNotEmpty())
                         <div class="ow-row">
@@ -215,6 +236,56 @@
                     </div>
                 </div>
             </section>
+
+            {{-- Money at a glance: fees per currency, payment progress and the
+                 (visibility-scoped) contract flows — so the overview answers
+                 «сколько стоит и сколько собрали» without switching tabs. --}}
+            @if ($record->participants->isNotEmpty() || $expenseTotals->isNotEmpty() || $incomeTotals->isNotEmpty())
+                <section class="ow-card">
+                    <header class="ow-hd">
+                        <span class="ow-hd__ic">{!! $ic('heroicon-o-banknotes', 18) !!}</span>
+                        <h2 class="ow-hd__t">{{ __('app.label.finance') }}</h2>
+                    </header>
+                    <div class="ow-dets">
+                        @foreach ($feeTotalsByCurrency as $t)
+                            <div class="ow-row">
+                                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-arrow-trending-up') !!}</span><span class="ow-row__lb">{{ __('app.label.fees_total') }} ({{ $t['currency'] }})</span></div>
+                                <div class="ow-row__v">
+                                    <span class="ow-row__vl" style="font-variant-numeric:tabular-nums;">
+                                        {{ $fmt($t['paid']) }} / {{ $fmt($t['total']) }} {{ $t['currency'] }}
+                                        <span style="opacity:.55;">· {{ $t['count'] }}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        @endforeach
+                        @if ($feesTotal > 0)
+                            <div class="ow-row">
+                                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-check-circle') !!}</span><span class="ow-row__lb">{{ __('app.label.paid') }}</span></div>
+                                <div class="ow-row__v" style="width:100%;">
+                                    <div style="display:flex;align-items:center;gap:.65rem;max-width:26rem;">
+                                        <div style="flex:1 1 auto;height:6px;border-radius:999px;background:var(--d);overflow:hidden;">
+                                            <div style="width:{{ min(100, $paidPercent) }}%;height:100%;border-radius:999px;background:#10b981;"></div>
+                                        </div>
+                                        <span class="ow-row__vl" style="white-space:nowrap;">{{ $paidPercent }}% · {{ __('app.label.remaining') }}: {{ $fmt(max(0, $feesTotal - $paidTotal)) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        @if ($expenseTotals->isNotEmpty())
+                            <div class="ow-row">
+                                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-arrow-trending-down') !!}</span><span class="ow-row__lb">{{ __('app.contract.direction.expense') }} · {{ __('app.label.contracts') }}</span></div>
+                                <div class="ow-row__v"><span class="ow-row__vl" style="font-variant-numeric:tabular-nums;">{{ $moneyLines($expenseTotals) }}</span></div>
+                            </div>
+                        @endif
+                        @if ($incomeTotals->isNotEmpty())
+                            <div class="ow-row">
+                                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-arrow-trending-up') !!}</span><span class="ow-row__lb">{{ __('app.contract.direction.income') }} · {{ __('app.label.contracts') }}</span></div>
+                                <div class="ow-row__v"><span class="ow-row__vl" style="font-variant-numeric:tabular-nums;">{{ $moneyLines($incomeTotals) }}</span></div>
+                            </div>
+                        @endif
+                    </div>
+                </section>
+            @endif
         </div>
 
         {{-- ---------- CONTRACTS (visibility-scoped) ---------- --}}

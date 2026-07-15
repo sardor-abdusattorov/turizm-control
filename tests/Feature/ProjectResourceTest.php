@@ -10,6 +10,7 @@ use App\Filament\Resources\Projects\Pages\ListInternalProjects;
 use App\Filament\Resources\Projects\Pages\ListInternationalProjects;
 use App\Filament\Resources\Projects\Pages\ViewInternationalProject;
 use App\Models\Contract;
+use App\Models\Currency;
 use App\Models\Project;
 use App\Models\ProjectParticipant;
 use App\Models\ProjectPayment;
@@ -132,9 +133,9 @@ it('renders the gallery through the image-gallery component', function () {
         ->assertSee('data-viewer-gallery', false);
 });
 
-it('opens the quick-view modal from the list', function () {
+it('opens the role-scoped breakdown modals from the count badges', function () {
     $project = Project::factory()->international()->create(['name' => 'PREVIEW-EXPO-2025']);
-    $participant = ProjectParticipant::factory()->create([
+    ProjectParticipant::factory()->create([
         'project_id' => $project->id,
         'name' => 'OOO "PREVIEW TRAVEL"',
         'amount' => 12_000_000,
@@ -144,13 +145,50 @@ it('opens the quick-view modal from the list', function () {
 
     Livewire::test(ListInternationalProjects::class)
         ->assertSuccessful()
-        ->mountAction(TestAction::make('projectPreview')->table($project))
+        ->mountAction(TestAction::make('participantsBreakdown')->table($project))
+        ->assertSuccessful()
+        ->unmountAction()
+        ->mountAction(TestAction::make('sponsorsBreakdown')->table($project))
         ->assertSuccessful();
+});
 
-    $html = view('filament.resources.projects.tables.preview-modal', ['project' => $project])->render();
+it('scopes the breakdown view to one role and totals it per currency', function () {
+    $uzs = Currency::factory()->create(['short_name' => 'UZS']);
+    $project = Project::factory()->international()->create();
 
-    expect($html)->toContain('OOO &quot;PREVIEW TRAVEL&quot;')
-        ->toContain('12 000 000');
+    ProjectParticipant::factory()->create([
+        'project_id' => $project->id,
+        'name' => 'OOO "MEMBER TRAVEL"',
+        'role' => ParticipantRole::Participant,
+        'currency_id' => $uzs->id,
+        'amount' => 12_000_000,
+        'paid_amount' => 12_000_000,
+    ]);
+    ProjectParticipant::factory()->create([
+        'project_id' => $project->id,
+        'name' => '"SPONSOR AIRWAYS"',
+        'role' => ParticipantRole::Sponsor,
+        'currency_id' => $uzs->id,
+        'amount' => 100_000_000,
+        'paid_amount' => 0,
+    ]);
+
+    $totals = $project->participantTotalsByCurrency(ParticipantRole::Sponsor);
+
+    expect($totals)->toHaveCount(1)
+        ->and($totals->first())->toMatchArray(['currency' => 'UZS', 'count' => 1, 'total' => 100_000_000.0, 'paid' => 0.0]);
+
+    // The sponsors modal must not leak participants — and vice versa.
+    $html = view('filament.resources.projects.tables.participants-breakdown', [
+        'rows' => $project->participants->where('role', ParticipantRole::Sponsor)->values(),
+        'totals' => $totals,
+        'empty' => __('app.message.no_sponsors'),
+    ])->render();
+
+    expect($html)
+        ->toContain('SPONSOR AIRWAYS')
+        ->toContain('100 000 000')
+        ->not->toContain('MEMBER TRAVEL');
 });
 
 it('filters the project list by year', function () {
