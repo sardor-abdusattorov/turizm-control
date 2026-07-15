@@ -13,14 +13,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('notifications', function (Blueprint $table) {
-            // Filament reads "my unread notifications" by (notifiable_id,
-            // notifiable_type) on every page render of the bell dropdown.
             $table->index(['notifiable_id', 'notifiable_type'], 'notifications_notifiable_index');
         });
 
         Schema::table('contracts', function (Blueprint $table) {
-            // Manager dashboards filter "my contracts" by responsible_id +
-            // status (e.g., "my drafts", "my in-review").
             $table->index(['responsible_id', 'status'], 'contracts_responsible_status_index');
         });
     }

@@ -2,6 +2,7 @@
 
 return [
     'label' => [
+        'swift' => 'SWIFT',
         'seo_indexing_enabled' => 'Разрешить индексацию сайта',
         'title' => 'Заголовок',
         'email' => 'Email',

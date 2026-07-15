@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('bank_account', 50)->nullable();
             $table->string('bank_name')->nullable();
             $table->string('mfo', 20)->nullable();
+            $table->string('swift', 20)->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
 
