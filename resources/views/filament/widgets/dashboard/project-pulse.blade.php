@@ -82,8 +82,9 @@
                 {{-- Hero: what & when, money on the right --}}
                 <section class="pj-hero pj-hero--{{ $project->status ? 'success' : 'gray' }}">
                     <div class="pj-hero__l">
+                        {{-- Type is already the filter row above this card — repeating it
+                             here as a chip would just echo the same fact back. --}}
                         <div class="pj-hero__meta">
-                            <span class="pj-chip">{!! $ic($project->type === ProjectType::International ? 'heroicon-o-globe-alt' : 'heroicon-o-building-office-2', 14) !!} {{ $project->type->label() }}</span>
                             <span class="pj-pill pj-pill--{{ $project->status ? 'success' : 'gray' }}">
                                 {{ $project->status ? __('app.status.active') : __('app.status.inactive') }}
                             </span>
@@ -141,10 +142,12 @@
                 {{-- Freshest contracts + top participants, side by side --}}
                 <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(20rem, 1fr));gap:1rem;">
                     <section class="ow-card">
+                        {{-- No count badge here — the stat tile above already shows this
+                             exact number; the participants header keeps its badge because
+                             that count (all roles) differs from its tile (participants only). --}}
                         <header class="ow-hd">
                             <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text', 18) !!}</span>
                             <h2 class="ow-hd__t">{{ __('app.label.contracts') }}</h2>
-                            <span class="pj-count">{{ $visibleContracts->count() }}</span>
                         </header>
                         @if ($topContracts->isEmpty())
                             <p class="pj-empty">{{ __('app.message.no_contracts') }}</p>
