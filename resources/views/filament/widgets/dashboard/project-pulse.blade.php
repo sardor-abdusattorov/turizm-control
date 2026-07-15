@@ -7,7 +7,6 @@
 
     /** @var \App\Models\Project|null $project */
     $project = $this->project();
-    $projectOptions = $this->projectOptions();
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
     $fmt = fn ($n) => \App\Support\Money::format($n);
@@ -68,19 +67,9 @@
                     </div>
                 </div>
                 <div class="pj-bar__r">
-                    <select
-                        class="pj-select"
-                        wire:model.live="projectId"
-                        aria-label="{{ __('app.label.project_single') }}"
-                    >
-                        @foreach ($projectOptions as $group => $options)
-                            <optgroup label="{{ $group }}">
-                                @foreach ($options as $id => $name)
-                                    <option value="{{ $id }}">{{ $name }}</option>
-                                @endforeach
-                            </optgroup>
-                        @endforeach
-                    </select>
+                    <div class="pj-picker">
+                        {{ $this->form }}
+                    </div>
                     <a href="{{ $projectUrl }}" class="pj-open" wire:navigate title="{{ __('app.action.open_project') }}">
                         {!! $ic('heroicon-m-arrow-top-right-on-square', 15) !!}
                         <span class="pj-open__lb">{{ __('app.action.open_project') }}</span>
@@ -89,7 +78,7 @@
             </div>
 
             <div style="display:flex;flex-direction:column;gap:1rem;"
-                 wire:loading.class="pj--loading" wire:target="projectId">
+                 wire:loading.class="pj--loading" wire:target="data.projectId">
                 {{-- Hero: what & when, money on the right --}}
                 <section class="pj-hero pj-hero--{{ $project->status ? 'success' : 'gray' }}">
                     <div class="pj-hero__l">

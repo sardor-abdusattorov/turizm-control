@@ -21,7 +21,7 @@ it('defaults to the nearest upcoming active project', function () {
     actingAs(userWithPermission('view_any_project'));
 
     Livewire::test(ProjectPulseWidget::class)
-        ->assertSet('projectId', $next->id)
+        ->assertSet('data.projectId', $next->id)
         ->assertSee('Мадрид');
 });
 
@@ -42,7 +42,7 @@ it('switches the card to the project picked in the toolbar select', function () 
 
     Livewire::test(ProjectPulseWidget::class)
         ->assertSee('Барселона')
-        ->set('projectId', $picked->id)
+        ->set('data.projectId', $picked->id)
         ->assertSee('Шанхай')
         ->assertDontSee('Барселона');
 
@@ -58,7 +58,7 @@ it('remembers the picked project across dashboard visits', function () {
     session()->put('dashboard.project_id', $remembered->id);
 
     Livewire::test(ProjectPulseWidget::class)
-        ->assertSet('projectId', $remembered->id);
+        ->assertSet('data.projectId', $remembered->id);
 });
 
 it('ignores a remembered project that no longer exists', function () {
@@ -69,7 +69,7 @@ it('ignores a remembered project that no longer exists', function () {
     session()->put('dashboard.project_id', 999_999);
 
     Livewire::test(ProjectPulseWidget::class)
-        ->assertSet('projectId', $default->id);
+        ->assertSet('data.projectId', $default->id);
 });
 
 it('shows a manager only their own contracts on the pulse widget', function () {
@@ -91,7 +91,7 @@ it('shows a manager only their own contracts on the pulse widget', function () {
     actingAs($manager);
 
     Livewire::test(ProjectPulseWidget::class)
-        ->set('projectId', $project->id)
+        ->set('data.projectId', $project->id)
         ->assertSee('MINE-001')
         ->assertDontSee('FOREIGN-001');
 });

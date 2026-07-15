@@ -1031,42 +1031,19 @@
     margin-left: auto;
     min-width: 0;
 }
-.pj-select {
-    appearance: none;
-    -webkit-appearance: none;
-    /* A fixed width: the intrinsic size of a native select is its longest
-       option, and project names get very long. The closed control ellipsizes;
-       the dropdown list still shows full names. */
+/* The project picker is a real embedded Filament Select (same Choices-style
+   dropdown as the rest of the app). This wrapper only pins its width so it
+   sits inline in the toolbar next to «Открыть проект»; the field's own chrome
+   comes from the compiled Filament theme. */
+.pj-picker {
     width: 19rem;
     max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    padding: .5rem 2.3rem .5rem .85rem;
-    border: 1px solid var(--d);
-    border-radius: .6rem;
-    background-color: var(--s);
-    color: var(--t);
-    font-size: .84rem;
-    font-weight: 600;
-    line-height: 1.25;
-    cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.2' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right .75rem center;
-    background-size: .9rem;
-    transition: border-color .12s ease, box-shadow .12s ease;
 }
-.pj-select:hover {
-    border-color: var(--accent);
-}
-.pj-select:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-}
-.dark .pj-select:focus {
-    box-shadow: 0 0 0 3px var(--accent-softer);
+/* Strip the schema container's default vertical rhythm so the single field
+   lines up with the toolbar row instead of adding a tall gap. */
+.pj-picker .fi-sc,
+.pj-picker .fi-fo-field-wrp {
+    gap: 0;
 }
 .pj-open {
     flex-shrink: 0;
