@@ -477,6 +477,7 @@ return [
         'attachments_uploaded' => 'Fayllar yuklandi.',
         'attachment_deleted' => 'Fayl o‘chirildi.',
         'loading_editor' => 'Muharrir yuklanmoqda…',
+        'no_projects_yet' => 'Hozircha loyihalar yo\'q — birinchisini yarating.',
         'no_participants' => 'Ishtirokchilar hali qo\'shilmagan.',
         'no_sponsors' => 'Homiylar hali qo\'shilmagan.',
         'no_payments' => 'To\'lovlar hali kiritilmagan.',

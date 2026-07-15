@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
+use App\Filament\Widgets\Dashboard\ProjectPulseWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
@@ -91,10 +92,11 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
-                // The dashboard is deliberately down to the header card
-                // (greeting + Telegram prompt); the data widgets were removed
-                // and live only in git history until they earn their way back.
+                // The dashboard is deliberately lean: the header card
+                // (greeting + Telegram prompt) and the director's project
+                // pulse, driven by the page's project filter.
                 DashboardHeaderWidget::class,
+                ProjectPulseWidget::class,
             ])
             ->resources([
 

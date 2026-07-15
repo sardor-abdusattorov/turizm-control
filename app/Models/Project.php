@@ -64,6 +64,44 @@ class Project extends Model
         });
     }
 
+    /**
+     * The project the dashboard opens on before the user picks one: the
+     * nearest upcoming active project, falling back to the latest past one.
+     */
+    public static function dashboardDefault(): ?self
+    {
+        return static::query()
+            ->active()
+            ->whereDate('starts_on', '>=', today())
+            ->orderBy('starts_on')
+            ->first()
+            ?? static::query()->active()->orderByDesc('starts_on')->first();
+    }
+
+    /**
+     * Active projects as «тип · год» optgroups (newest first), optionally
+     * narrowed to one year — shared by the contract form and the dashboard
+     * project picker.
+     *
+     * @return array<string, array<int, string>>
+     */
+    public static function groupedOptions(?string $year = null): array
+    {
+        return static::query()
+            ->active()
+            ->when($year, fn ($query) => $query->whereYear('starts_on', $year))
+            ->orderByDesc('starts_on')
+            ->orderByDesc('id')
+            ->get()
+            ->groupBy(fn (self $project): string => trim(
+                $project->type->label().($project->starts_on ? ' · '.$project->starts_on->year : ''),
+            ))
+            ->map(fn ($group) => $group->mapWithKeys(
+                fn (self $project): array => [$project->id => $project->name],
+            )->toArray())
+            ->toArray();
+    }
+
     public function participants(): HasMany
     {
         return $this->hasMany(ProjectParticipant::class)->orderBy('sort');

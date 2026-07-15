@@ -477,6 +477,7 @@ return [
         'attachments_uploaded' => 'Файлы загружены.',
         'attachment_deleted' => 'Файл удалён.',
         'loading_editor' => 'Загрузка редактора…',
+        'no_projects_yet' => 'Проектов пока нет — создайте первый.',
         'no_participants' => 'Участники ещё не добавлены.',
         'no_sponsors' => 'Спонсоры ещё не добавлены.',
         'no_payments' => 'Платежи ещё не внесены.',

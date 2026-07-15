@@ -288,28 +288,15 @@ class ContractForm
     }
 
     /**
-     * Active projects grouped into optgroups by «тип · год» (newest first, as
-     * the projects come ordered by start date), optionally narrowed to one
-     * year by the project_year step — so the picker reads like the sidebar
-     * instead of one flat 35-row list.
+     * Active projects grouped into optgroups by «тип · год», optionally
+     * narrowed to one year by the project_year step — the shared grouping
+     * lives on the Project model (the dashboard picker uses it too).
      *
      * @return array<string, array<int, string>>
      */
     protected static function projectOptionsGrouped(?string $year = null): array
     {
-        return Project::query()
-            ->active()
-            ->when($year, fn ($query) => $query->whereYear('starts_on', $year))
-            ->orderByDesc('starts_on')
-            ->orderByDesc('id')
-            ->get()
-            ->groupBy(fn (Project $project): string => trim(
-                $project->type->label().($project->starts_on ? ' · '.$project->starts_on->year : ''),
-            ))
-            ->map(fn ($group) => $group->mapWithKeys(
-                fn (Project $project): array => [$project->id => $project->name],
-            )->toArray())
-            ->toArray();
+        return Project::groupedOptions($year);
     }
 
     /**

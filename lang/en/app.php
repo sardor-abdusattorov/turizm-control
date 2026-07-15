@@ -482,6 +482,7 @@ return [
         'attachments_uploaded' => 'Files uploaded.',
         'attachment_deleted' => 'File deleted.',
         'loading_editor' => 'Loading editor…',
+        'no_projects_yet' => 'No projects yet — create the first one.',
         'no_participants' => 'No participants yet.',
         'no_sponsors' => 'No sponsors yet.',
         'no_payments' => 'No payments recorded yet.',
