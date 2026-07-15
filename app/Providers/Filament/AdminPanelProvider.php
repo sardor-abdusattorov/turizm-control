@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use Anish\ResizableModal\ResizableModalPlugin;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
@@ -101,11 +100,6 @@ class AdminPanelProvider extends PanelProvider
 
             ])
             ->plugins([
-
-                // Drag-to-resize handles on every action modal (quick-view,
-                // approval chain, record payment...) with the width persisted
-                // per action — snaps to Filament's native breakpoints.
-                ResizableModalPlugin::make(),
 
                 FilamentShieldPlugin::make()
                     ->navigationGroup(fn () => __('app.label.administration'))
