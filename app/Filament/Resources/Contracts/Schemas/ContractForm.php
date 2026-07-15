@@ -16,8 +16,11 @@ use App\Models\User;
 use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractWorkflow;
 use Closure;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -70,6 +73,24 @@ class ContractForm
                                     ->visible(fn (?Contract $record): bool => $record !== null && $record->documentExists())
                                     ->columnSpanFull(),
 
+                                // Legacy import switch: a signed paper contract is
+                                // filed as approved straight away — no chain, just
+                                // the signing date and the scans below.
+                                Toggle::make('already_signed')
+                                    ->label(__('app.label.already_signed'))
+                                    ->helperText(__('app.helper.already_signed'))
+                                    ->visible(fn (?Contract $record): bool => $record === null)
+                                    ->live()
+                                    ->columnSpanFull(),
+
+                                DatePicker::make('signed_at')
+                                    ->label(__('app.label.signed_date'))
+                                    ->visible(fn (Get $get, ?Contract $record): bool => $record === null && (bool) $get('already_signed'))
+                                    ->default(now())
+                                    ->maxDate(now())
+                                    ->required(fn (Get $get, ?Contract $record): bool => $record === null && (bool) $get('already_signed'))
+                                    ->columnSpanFull(),
+
                                 TextInput::make('number')
                                     ->label(__('app.label.contract_number'))
                                     ->required()
@@ -118,8 +139,7 @@ class ContractForm
 
                                 Select::make('project_id')
                                     ->label(__('app.label.project_single'))
-                                    ->relationship('project', 'name')
-                                    ->getOptionLabelFromRecordUsing(fn (Project $record): string => $record->name.' · '.$record->type->label())
+                                    ->options(fn (): array => self::projectOptionsGrouped())
                                     ->searchable()
                                     ->preload()
                                     ->nullable()
@@ -154,11 +174,27 @@ class ContractForm
                                         ? __('app.label.select_currency_first')
                                         : null)
                                     ->columnSpanFull(),
+
+                                // Scans can be dropped right at creation — no need
+                                // to save first and hunt for the upload button on
+                                // the view page. Stored as dossier attachments in
+                                // CreateContract::afterCreate.
+                                FileUpload::make('attachment_files')
+                                    ->label(__('app.label.attachments'))
+                                    ->helperText(__('app.helper.attachment_scans'))
+                                    ->visible(fn (?Contract $record): bool => $record === null)
+                                    ->multiple()
+                                    ->disk('local')
+                                    ->directory('uploads/files/contract-attachments')
+                                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
+                                    ->maxSize(25600)
+                                    ->storeFileNamesIn('attachment_names')
+                                    ->columnSpanFull(),
                             ]),
 
                         Tab::make(__('app.label.approval_chain'))
                             ->icon('heroicon-o-users')
-                            ->visible(fn (): bool => ContractWorkflow::approvalEnabled())
+                            ->visible(fn (Get $get): bool => ContractWorkflow::approvalEnabled() && ! $get('already_signed'))
                             ->badge(fn (Get $get): ?int => ($n = count(array_filter((array) $get('approver_chain')))) ? $n : null)
                             ->schema([
                                 Select::make('approver_chain')
@@ -170,7 +206,7 @@ class ContractForm
                                     ->searchable()
                                     ->preload()
                                     ->live()
-                                    ->required(fn (): bool => ContractWorkflow::approvalEnabled())
+                                    ->required(fn (Get $get): bool => ContractWorkflow::approvalEnabled() && ! $get('already_signed'))
                                     ->rules([
                                         fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
                                             self::validateRequiredApproverDepartments($value, $fail);
@@ -211,10 +247,34 @@ class ContractForm
     }
 
     /**
-     * Active buyruqs the contract can name as its basis, newest first,
-     * labelled by number (falling back to the title for unnumbered drafts).
+     * Active projects grouped into optgroups by «тип · год» (newest first, as
+     * the projects come ordered by start date) so the picker reads like the
+     * sidebar instead of one flat 35-row list.
      *
-     * @return array<int, string>
+     * @return array<string, array<int, string>>
+     */
+    protected static function projectOptionsGrouped(): array
+    {
+        return Project::query()
+            ->active()
+            ->orderByDesc('starts_on')
+            ->orderByDesc('id')
+            ->get()
+            ->groupBy(fn (Project $project): string => trim(
+                $project->type->label().($project->starts_on ? ' · '.$project->starts_on->year : ''),
+            ))
+            ->map(fn ($group) => $group->mapWithKeys(
+                fn (Project $project): array => [$project->id => $project->name],
+            )->toArray())
+            ->toArray();
+    }
+
+    /**
+     * Active buyruqs the contract can name as its basis, grouped into
+     * optgroups by issue year (newest first), labelled by number (falling
+     * back to the title for unnumbered drafts).
+     *
+     * @return array<string, array<int, string>>
      */
     protected static function orderOptions(): array
     {
@@ -223,9 +283,10 @@ class ContractForm
             ->orderByDesc('issued_at')
             ->orderByDesc('id')
             ->get()
-            ->mapWithKeys(fn (Order $order): array => [
+            ->groupBy(fn (Order $order): string => $order->issued_at?->format('Y') ?? '—')
+            ->map(fn ($group) => $group->mapWithKeys(fn (Order $order): array => [
                 $order->id => trim(($order->number ? $order->number.' · ' : '').$order->title),
-            ])
+            ])->toArray())
             ->toArray();
     }
 

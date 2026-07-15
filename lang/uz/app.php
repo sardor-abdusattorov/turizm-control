@@ -179,6 +179,8 @@ return [
         'venue' => 'O\'tkazish joyi',
         'period' => 'Davr',
         'finance' => 'Moliya',
+        'already_signed' => 'Shartnoma allaqachon imzolangan',
+        'signed_date' => 'Imzolangan sana',
         'estimate_amount' => 'Smeta bo‘yicha summa',
         'final_amount' => 'Yakuniy summa',
         'attendees_count' => 'Ishtirokchilar (kishi)',
@@ -528,6 +530,8 @@ return [
     ],
     'helper' => [
         'template_optional' => 'Majburiy emas — faqat shablondan hujjat yaratish uchun kerak.',
+        'already_signed' => 'Eski (qog\'oz) shartnomalar uchun: darhol «Kelishilgan» holatida saqlanadi, kelishuv zanjirisiz.',
+        'attachment_scans' => 'Shartnoma va hujjatlar skanlari — PDF/JPG/PNG, bir nechta faylni birdan yuklash mumkin.',
         'attachment_type_optional' => 'Majburiy emas — turini keyin ham belgilash mumkin.',
         'approval_enabled' => "O'chirilgan — shartnomalar kelishuv zanjirisiz, imzolangan holda kiritiladi.",
         'inn' => 'Yuridik shaxslar uchun 9 raqam',
