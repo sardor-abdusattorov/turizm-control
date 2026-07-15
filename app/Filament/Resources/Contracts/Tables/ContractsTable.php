@@ -12,6 +12,7 @@ use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
+use App\Support\Money;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -88,7 +89,7 @@ class ContractsTable
 
                 TextColumn::make('amount')
                     ->label(__('app.label.amount'))
-                    ->formatStateUsing(fn (?string $state, Contract $record): string => number_format((float) $state, 2, ',', ' ').' '.($record->currency?->short_name ?? ''))
+                    ->formatStateUsing(fn (?string $state, Contract $record): string => Money::format($state).' '.($record->currency?->short_name ?? ''))
                     ->sortable(),
 
                 ViewColumn::make('approvers_chain')

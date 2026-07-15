@@ -85,7 +85,7 @@
         ['heroicon-o-tag', __('app.label.contract_type_single'), $record->contractType?->title, null, false],
         ['heroicon-o-document-text', __('app.label.order_basis'), $record->order ? trim(($record->order->number ? $record->order->number.' · ' : '').$record->order->title) : null, null, false],
         ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name, null, false],
-        ['heroicon-o-banknotes', __('app.label.amount'), number_format((float) $record->amount, 2, '.', ' ').' '.($record->currency?->short_name ?? ''), null, false],
+        ['heroicon-o-banknotes', __('app.label.amount'), \App\Support\Money::format($record->amount).' '.($record->currency?->short_name ?? ''), null, false],
 
         // Extra rows — collapsed by default.
         ['heroicon-o-paper-airplane', __('app.label.submitted'), $this->submittedAt()?->format('d.m.Y H:i'), null, true],

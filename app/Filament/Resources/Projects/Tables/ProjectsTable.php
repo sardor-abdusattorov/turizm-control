@@ -10,6 +10,7 @@ use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Project;
+use App\Support\Money;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -88,7 +89,7 @@ class ProjectsTable
 
                 TextColumn::make('area_sqm')
                     ->label(__('app.label.area_sqm'))
-                    ->formatStateUsing(fn (?string $state): string => number_format((float) $state, 2, ',', ' ').' м²')
+                    ->formatStateUsing(fn (?string $state): string => Money::format($state).' м²')
                     ->placeholder('—')
                     ->alignEnd()
                     ->sortable()
@@ -136,14 +137,14 @@ class ProjectsTable
 
                 TextColumn::make('participants_sum_amount')
                     ->label(__('app.label.fees_total'))
-                    ->formatStateUsing(fn (?string $state, Project $record): string => number_format((float) $state, 0, ',', ' ').self::feeCurrencySuffix($record))
+                    ->formatStateUsing(fn (?string $state, Project $record): string => Money::format($state).self::feeCurrencySuffix($record))
                     ->placeholder('0')
                     ->alignEnd()
                     ->sortable(),
 
                 TextColumn::make('participants_sum_paid_amount')
                     ->label(__('app.label.paid'))
-                    ->formatStateUsing(fn (?string $state, Project $record): string => number_format((float) $state, 0, ',', ' ').self::feeCurrencySuffix($record))
+                    ->formatStateUsing(fn (?string $state, Project $record): string => Money::format($state).self::feeCurrencySuffix($record))
                     ->placeholder('0')
                     ->color('success')
                     ->alignEnd()
@@ -151,7 +152,7 @@ class ProjectsTable
 
                 TextColumn::make('estimate_amount')
                     ->label(__('app.label.estimate_amount'))
-                    ->formatStateUsing(fn (?string $state): string => number_format((float) $state, 0, ',', ' ').' UZS')
+                    ->formatStateUsing(fn (?string $state): string => Money::format($state).' UZS')
                     ->placeholder('—')
                     ->alignEnd()
                     ->visible(self::isInternalList(...))
@@ -159,7 +160,7 @@ class ProjectsTable
 
                 TextColumn::make('final_amount')
                     ->label(__('app.label.final_amount'))
-                    ->formatStateUsing(fn (?string $state): string => number_format((float) $state, 0, ',', ' ').' UZS')
+                    ->formatStateUsing(fn (?string $state): string => Money::format($state).' UZS')
                     ->placeholder('—')
                     ->alignEnd()
                     ->visible(self::isInternalList(...))

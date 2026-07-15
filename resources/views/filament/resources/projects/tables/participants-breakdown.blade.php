@@ -2,7 +2,7 @@
     /** @var \Illuminate\Support\Collection<int, \App\Models\ProjectParticipant> $rows */
     /** @var \Illuminate\Support\Collection<int, array{currency: string, count: int, total: float, paid: float}> $totals */
     /** @var string $empty */
-    $fmt = fn ($n) => number_format((float) $n, 0, ',', ' ');
+    $fmt = fn ($n) => \App\Support\Money::format($n);
 @endphp
 
 <div>

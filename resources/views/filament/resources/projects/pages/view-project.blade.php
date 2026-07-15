@@ -1,6 +1,5 @@
 @php
     use App\Enums\ParticipantRole;
-    use App\Enums\PaymentStatus;
 
     /** @var \App\Models\Project $record */
     $record = $this->record;
@@ -18,7 +17,7 @@
         ->get();
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
-    $fmt = fn ($n) => number_format((float) $n, 0, ',', ' ');
+    $fmt = fn ($n) => \App\Support\Money::format($n);
     $money = fn ($amount, ?string $cur) => $amount === null ? '—' : $fmt($amount).($cur ? ' '.$cur : '');
 
     // Money the viewer is allowed to see, split by direction and currency —
@@ -64,12 +63,6 @@
     $currencies = $record->participants->map(fn ($p) => $p->currency?->short_name)->filter()->unique()->values();
     $feeCurrency = $currencies->count() === 1 ? $currencies->first() : '';
 
-    $projectPaidStatus = PaymentStatus::fromPercent($feesTotal > 0 ? $paidTotal / $feesTotal * 100 : 0);
-    $paidTint = match ($projectPaidStatus) {
-        PaymentStatus::FullyPaid => 'success',
-        PaymentStatus::PartiallyPaid => 'warning',
-        default => '',
-    };
     $paidPercent = $feesTotal > 0 ? round($paidTotal / $feesTotal * 100) : 0;
 
     $galleryUrls = $record->galleryUrls();
@@ -108,15 +101,18 @@
             </div>
             <div class="pj-hero__title">{{ $record->name }}</div>
             <div class="pj-hero__dates">
-                {!! $ic('heroicon-o-calendar-days', 14) !!} {{ $period }}
+                <span style="display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;">{!! $ic('heroicon-o-calendar-days', 14) !!} {{ $period }}</span>
                 @if ($record->venue)
-                    <span style="margin-left:.5rem;">{!! $ic('heroicon-o-map-pin', 14) !!} {{ $record->venue }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;">{!! $ic('heroicon-o-map-pin', 14) !!} {{ $record->venue }}</span>
                 @endif
             </div>
         </div>
         <div class="pj-hero__r">
             <span class="pj-hero__metric">{{ $fmt($feesTotal) }}</span>
             <span class="pj-hero__metric-lb">{{ __('app.label.fees_total') }}{{ $feeCurrency ? ', '.$feeCurrency : '' }}</span>
+            @if ($feesTotal > 0)
+                <span class="pj-hero__metric-lb">{{ __('app.label.paid') }}: {{ $fmt($paidTotal) }} · {{ $paidPercent }}%</span>
+            @endif
         </div>
     </section>
 
@@ -152,11 +148,6 @@
                 <div class="pj-stat__sub">{{ __('app.contract.direction.income') }}: {{ $moneyLines($incomeTotals) }}</div>
             @endif
         </div>
-        <div class="pj-stat {{ $paidTint ? 'pj-stat--'.$paidTint : '' }}">
-            <span class="pj-stat__lb">{!! $ic('heroicon-o-check-circle', 13) !!} {{ __('app.label.paid') }}</span>
-            <div class="pj-stat__vl">{{ $money($paidTotal, $feeCurrency ?: null) }}</div>
-            <div class="pj-stat__sub">{{ $paidPercent }}% · {{ __('app.label.remaining') }}: {{ $fmt(max(0, $feesTotal - $paidTotal)) }}</div>
-        </div>
         <div class="pj-stat">
             <span class="pj-stat__lb">{!! $ic('heroicon-o-user-group', 13) !!} {{ __('app.label.participants') }}</span>
             <div class="pj-stat__vl">{{ $isInternalProject && $record->attendees_count !== null ? $record->attendees_count : $members->count() }}</div>
@@ -188,7 +179,7 @@
                     <span class="ow-hd__ic">{!! $ic('heroicon-o-information-circle', 18) !!}</span>
                     <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
                 </header>
-                <div class="ow-dets">
+                <div class="ow-dets ow-dets--cols">
                     <div class="ow-row">
                         <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-map-pin') !!}</span><span class="ow-row__lb">{{ __('app.label.venue') }}</span></div>
                         <div class="ow-row__v"><span class="ow-row__vl">{{ $record->venue ?: '—' }}</span></div>
@@ -218,12 +209,10 @@
                             </div>
                         </div>
                     @endif
-                    @if ($record->creator)
-                        <div class="ow-row">
-                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-user') !!}</span><span class="ow-row__lb">{{ __('app.label.created_by') }}</span></div>
-                            <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator->name }}</span></div>
-                        </div>
-                    @endif
+                    <div class="ow-row">
+                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-user') !!}</span><span class="ow-row__lb">{{ __('app.label.created_by') }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator?->name ?? '—' }}</span></div>
+                    </div>
                     @if ($record->description)
                         <div class="ow-row">
                             <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-bars-3-bottom-left') !!}</span><span class="ow-row__lb">{{ __('app.label.description') }}</span></div>
