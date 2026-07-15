@@ -39,6 +39,23 @@ class SponsorsTable
                     ->badge()
                     ->alignCenter()
                     ->color(fn (Sponsor $record): string => ($record->participations_count ?? 0) > 0 ? 'warning' : 'gray')
+                    ->tooltip(fn (Sponsor $record): ?string => ($record->participations_count ?? 0) > 0
+                        ? __('app.label.projects_breakdown_hint')
+                        : null)
+                    ->action(
+                        Action::make('projectsBreakdown')
+                            ->modalHeading(fn (Sponsor $record): string => $record->name)
+                            ->modalIcon('heroicon-o-presentation-chart-bar')
+                            ->modalContent(fn (Sponsor $record) => view(
+                                'filament.resources.sponsors.tables.projects-breakdown',
+                                [
+                                    'participations' => $record->participations()->with(['project', 'currency'])->get(),
+                                    'totals' => $record->projectTotalsByCurrency(),
+                                ],
+                            ))
+                            ->modalSubmitAction(false)
+                            ->modalCancelAction(false),
+                    )
                     ->sortable(),
 
                 TextColumn::make('inn')
