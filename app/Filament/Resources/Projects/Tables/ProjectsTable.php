@@ -149,13 +149,7 @@ class ProjectsTable
                                 ],
                             ))
                             ->modalSubmitAction(false)
-                            ->modalCancelAction(false)
-                            ->extraModalFooterActions([
-                                Action::make('projectContractsBreakdownOpen')
-                                    ->label(__('app.action.open_project'))
-                                    ->icon('heroicon-o-arrow-top-right-on-square')
-                                    ->url(fn (Project $record): string => BaseProjectResource::resourceFor($record)::getUrl('view', ['record' => $record])),
-                            ]),
+                            ->modalCancelAction(false),
                     )
                     ->toggleable(),
 
@@ -291,12 +285,6 @@ class ProjectsTable
                 ],
             ))
             ->modalSubmitAction(false)
-            ->modalCancelAction(false)
-            ->extraModalFooterActions([
-                Action::make($name.'Open')
-                    ->label(__('app.action.open_project'))
-                    ->icon('heroicon-o-arrow-top-right-on-square')
-                    ->url(fn (Project $record): string => BaseProjectResource::resourceFor($record)::getUrl('view', ['record' => $record])),
-            ]);
+            ->modalCancelAction(false);
     }
 }

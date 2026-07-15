@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Resources\Contracts\Pages\Concerns\HandlesDossierUploads;
 use App\Models\Contract;
 use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractWorkflow;
@@ -10,22 +11,17 @@ use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class CreateContract extends CreateRecord
 {
+    use HandlesDossierUploads;
+
     protected static string $resource = ContractResource::class;
 
     /** @var array<int, int> */
     protected array $approverChain = [];
 
     protected bool $alreadySigned = false;
-
-    /** @var array<int|string, string> */
-    protected array $attachmentFiles = [];
-
-    /** @var array<int|string, string> */
-    protected array $attachmentNames = [];
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
@@ -44,13 +40,7 @@ class CreateContract extends CreateRecord
         }
 
         // Scans uploaded on the form become dossier attachments in afterCreate.
-        // Keys are kept as-is: original_name lookups match on the same keys
-        // (the pattern ViewContract::uploadAttachmentsAction set).
-        $this->attachmentFiles = (array) ($data['attachment_files'] ?? []);
-        $this->attachmentNames = (array) ($data['attachment_names'] ?? []);
-        unset($data['attachment_files'], $data['attachment_names']);
-
-        return $data;
+        return $this->extractAttachmentUploads($data);
     }
 
     protected function afterCreate(): void
@@ -81,21 +71,6 @@ class CreateContract extends CreateRecord
 
         if (! $this->record->hasApprovers()) {
             $this->record->buildApprovalChainFromFlow();
-        }
-    }
-
-    protected function storeFormAttachments(): void
-    {
-        $sort = 0;
-
-        foreach ($this->attachmentFiles as $key => $path) {
-            $this->record->attachments()->create([
-                'file_path' => $path,
-                'original_name' => $this->attachmentNames[$key] ?? basename((string) $path),
-                'size' => Storage::disk('local')->exists($path) ? Storage::disk('local')->size($path) : 0,
-                'uploaded_by' => Auth::id(),
-                'sort' => ++$sort,
-            ]);
         }
     }
 

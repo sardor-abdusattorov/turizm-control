@@ -1,6 +1,6 @@
 {{-- Attachments — the contract dossier: signed scan, buyruq copy, proposals,
-     sketches, invoice, SWIFT slip, act, bank fees. Uploading is one action,
-     the type chip is optional. --}}
+     sketches, invoice, SWIFT slip, act, bank fees. Read-only here: new scans
+     are uploaded on the create/edit form, curating (delete) stays. --}}
 <div x-show="tab === 'attachments'" x-cloak
      x-transition:enter="transition ease-out duration-200"
      x-transition:enter-start="opacity-0 -translate-y-1"
@@ -10,12 +10,6 @@
         <div class="cw-hd">
             <span class="cw-hd__ic">{!! $ic('heroicon-o-paper-clip') !!}</span>
             <h2 class="cw-hd__t">{{ __('app.label.attachments') }}</h2>
-            @if ($this->canManageAttachments())
-                <button type="button" class="cw-btn cw-btn--primary" style="margin-left:auto"
-                    x-on:click="$wire.mountAction('uploadAttachments')">
-                    {!! $ic('heroicon-m-plus', 15) !!} {{ __('app.action.upload_files') }}
-                </button>
-            @endif
         </div>
 
         @php $attachments = $this->attachments(); @endphp

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Contracts\Pages;
 
-use App\Enums\ContractAttachmentType;
 use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Support\ExportPermission;
@@ -18,8 +17,6 @@ use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
@@ -216,9 +213,9 @@ class ViewContract extends ViewRecord
     private ?Collection $cachedAttachments = null;
 
     /**
-     * Whoever may edit contract data may also manage its dossier scans — but
-     * unlike form edits, uploads stay open after approval: the act, the SWIFT
-     * slip and the bank fees arrive when the contract is already signed.
+     * Whoever may edit contract data may also curate its dossier — deletion
+     * of a wrongly-filed scan lives here; uploads happen on the create/edit
+     * forms only, never on the view page.
      */
     public function canManageAttachments(): bool
     {
@@ -231,51 +228,6 @@ class ViewContract extends ViewRecord
     public function attachmentUrl(ContractAttachment $attachment): ?string
     {
         return $attachment->url();
-    }
-
-    public function uploadAttachmentsAction(): Action
-    {
-        return Action::make('uploadAttachments')
-            ->label(__('app.action.upload_files'))
-            ->icon('heroicon-o-paper-clip')
-            ->visible(fn (): bool => $this->canManageAttachments())
-            ->modalHeading(__('app.action.upload_files'))
-            ->schema([
-                FileUpload::make('files')
-                    ->hiddenLabel()
-                    ->multiple()
-                    ->required()
-                    ->disk('local')
-                    ->directory(fn (): string => 'uploads/files/contract-attachments/'.$this->record->id)
-                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
-                    ->maxSize(25600)
-                    ->storeFileNamesIn('original_names'),
-
-                Select::make('type')
-                    ->label(__('app.label.attachment_type'))
-                    ->options(ContractAttachmentType::options())
-                    ->native(false)
-                    ->helperText(__('app.helper.attachment_type_optional')),
-            ])
-            ->action(function (array $data): void {
-                $names = (array) ($data['original_names'] ?? []);
-                $sort = (int) $this->record->attachments()->max('sort');
-
-                foreach ((array) ($data['files'] ?? []) as $key => $path) {
-                    $this->record->attachments()->create([
-                        'type' => $data['type'] ?? null,
-                        'file_path' => $path,
-                        'original_name' => $names[$key] ?? basename((string) $path),
-                        'size' => Storage::disk('local')->exists($path) ? Storage::disk('local')->size($path) : 0,
-                        'uploaded_by' => auth()->id(),
-                        'sort' => ++$sort,
-                    ]);
-                }
-
-                $this->cachedAttachments = null;
-
-                Notification::make()->title(__('app.message.attachments_uploaded'))->success()->send();
-            });
     }
 
     public function deleteAttachmentAction(): Action

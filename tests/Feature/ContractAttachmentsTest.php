@@ -1,8 +1,11 @@
 <?php
 
 use App\Enums\ContractAttachmentType;
+use App\Filament\Resources\Contracts\Pages\EditContract;
 use App\Filament\Resources\Contracts\Pages\ViewContract;
 use App\Models\Contract;
+use App\Models\ContractType;
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -28,18 +31,39 @@ function attachmentManager(Contract $contract, array $abilities = ['view_any_con
     return $user;
 }
 
-it('uploads dossier files through the page action', function () {
+/**
+ * The edit form demands a contract type and a valid approval chain
+ * (legal + accounting) before it saves — provide both.
+ *
+ * @return array<string, mixed>
+ */
+function validEditFormFill(): array
+{
+    $legalDept = Department::factory()->create(['code' => 'legal']);
+    $accountingDept = Department::factory()->create(['code' => 'accounting']);
+    $legal = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legalDept->id]);
+    $accounting = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $accountingDept->id]);
+
+    return [
+        'contract_type_id' => ContractType::factory()->create()->id,
+        'approver_chain' => [$legal->id, $accounting->id],
+    ];
+}
+
+it('uploads dossier files with a type through the edit form', function () {
     Storage::fake('local');
 
     $contract = Contract::factory()->create();
     attachmentManager($contract);
 
-    Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->callAction('uploadAttachments', [
-            'files' => [UploadedFile::fake()->create('SWIFT MT103.pdf', 120, 'application/pdf')],
-            'type' => ContractAttachmentType::Swift->value,
+    Livewire::test(EditContract::class, ['record' => $contract->id])
+        ->fillForm([
+            ...validEditFormFill(),
+            'attachment_files' => [UploadedFile::fake()->create('SWIFT MT103.pdf', 120, 'application/pdf')],
+            'attachment_type' => ContractAttachmentType::Swift->value,
         ])
-        ->assertHasNoActionErrors();
+        ->call('save')
+        ->assertHasNoFormErrors();
 
     $attachment = $contract->attachments()->first();
 
@@ -59,13 +83,43 @@ it('uploads without a type — categorising is optional', function () {
     $contract = Contract::factory()->create();
     attachmentManager($contract);
 
-    Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->callAction('uploadAttachments', [
-            'files' => [UploadedFile::fake()->create('scan.pdf', 40, 'application/pdf')],
+    Livewire::test(EditContract::class, ['record' => $contract->id])
+        ->fillForm([
+            ...validEditFormFill(),
+            'attachment_files' => [UploadedFile::fake()->create('scan.pdf', 40, 'application/pdf')],
         ])
-        ->assertHasNoActionErrors();
+        ->call('save')
+        ->assertHasNoFormErrors();
 
     expect($contract->attachments()->first()?->type)->toBeNull();
+});
+
+it('keeps existing attachments and appends the new upload after them', function () {
+    Storage::fake('local');
+
+    $contract = Contract::factory()->create();
+    attachmentManager($contract);
+
+    $contract->attachments()->create([
+        'file_path' => 'uploads/files/contract-attachments/old.pdf',
+        'original_name' => 'old.pdf',
+        'size' => 3,
+        'sort' => 1,
+    ]);
+
+    Livewire::test(EditContract::class, ['record' => $contract->id])
+        ->fillForm([
+            ...validEditFormFill(),
+            'attachment_files' => [UploadedFile::fake()->create('new.pdf', 10, 'application/pdf')],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $attachments = $contract->attachments()->orderBy('sort')->get();
+
+    expect($attachments)->toHaveCount(2)
+        ->and($attachments->first()->original_name)->toBe('old.pdf')
+        ->and($attachments->last()->sort)->toBe(2);
 });
 
 it('deletes an attachment together with its file', function () {
@@ -112,12 +166,12 @@ it('removes attachment files when the contract itself is deleted', function () {
     Storage::disk('local')->assertMissing($path);
 });
 
-it('hides the upload action from users without the update permission', function () {
+it('offers no upload action on the view page — the dossier is managed on the form', function () {
     Storage::fake('local');
 
     $contract = Contract::factory()->create();
-    attachmentManager($contract, ['view_any_contract', 'view_contract']);
+    attachmentManager($contract);
 
     Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->assertActionHidden('uploadAttachments');
+        ->assertActionDoesNotExist('uploadAttachments');
 });

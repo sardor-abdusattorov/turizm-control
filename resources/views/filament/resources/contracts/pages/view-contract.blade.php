@@ -137,7 +137,7 @@
     @include('filament.resources.contracts.pages.view-contract.styles')
 
     <div class="cw"
-        x-data="{ approver: null, contactOpen: false, basicExpanded: false, tab: 'overview', historyShown: 8, historyFilter: 'all' }"
+        x-data="{ approver: null, contactOpen: false, basicExpanded: false, tab: 'overview', historyShown: 8, historyFilter: 'all', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }"
         @keydown.escape.window="approver = null; contactOpen = false">
         @php
             $submittedAt = $this->submittedAt();
@@ -146,9 +146,9 @@
         {{-- Tabs — overall status pill rides on the right so it stays visible
              on both tabs without a redundant full-width strip up top. --}}
         <div class="cw-tabs">
-            <button type="button" class="cw-tab" :class="tab === 'overview' ? 'cw-tab--active' : ''" @click="tab = 'overview'">{!! $ic('heroicon-o-rectangle-group', 16) !!} {{ __('app.label.overview') }}</button>
-            <button type="button" class="cw-tab" :class="tab === 'attachments' ? 'cw-tab--active' : ''" @click="tab = 'attachments'">{!! $ic('heroicon-o-paper-clip', 16) !!} {{ __('app.label.attachments') }}@if ($this->attachments()->isNotEmpty())<span class="cw-tab__c">{{ $this->attachments()->count() }}</span>@endif</button>
-            <button type="button" class="cw-tab" :class="tab === 'history' ? 'cw-tab--active' : ''" @click="tab = 'history'">{!! $ic('heroicon-o-clock', 16) !!} {{ __('app.label.history') }}@if ($activities->isNotEmpty())<span class="cw-tab__c">{{ $activities->count() }}</span>@endif</button>
+            <button type="button" class="cw-tab" :class="tab === 'overview' ? 'cw-tab--active' : ''" @click="go('overview')">{!! $ic('heroicon-o-rectangle-group', 16) !!} {{ __('app.label.overview') }}</button>
+            <button type="button" class="cw-tab" :class="tab === 'attachments' ? 'cw-tab--active' : ''" @click="go('attachments')">{!! $ic('heroicon-o-paper-clip', 16) !!} {{ __('app.label.attachments') }}@if ($this->attachments()->isNotEmpty())<span class="cw-tab__c">{{ $this->attachments()->count() }}</span>@endif</button>
+            <button type="button" class="cw-tab" :class="tab === 'history' ? 'cw-tab--active' : ''" @click="go('history')">{!! $ic('heroicon-o-clock', 16) !!} {{ __('app.label.history') }}@if ($activities->isNotEmpty())<span class="cw-tab__c">{{ $activities->count() }}</span>@endif</button>
             <span class="cw-pill cw-pill--{{ $statusColor }} cw-pill--lg cw-tabs__status">{{ $statusLabel }}</span>
         </div>
 

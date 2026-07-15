@@ -156,18 +156,22 @@
     </section>
 
     {{-- ============ TABS ============ --}}
-    <div class="pj-tabwrap" x-data="{ tab: 'overview' }">
+    {{-- go() pins the viewport to the tab strip when switching from a long
+         panel to a short one — otherwise the browser keeps the old scroll
+         offset and the page appears to jump. --}}
+    <div class="pj-tabwrap"
+         x-data="{ tab: 'overview', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }">
         <div class="pj-tabs" role="tablist">
-            <button type="button" class="pj-tab" :class="tab === 'overview' ? 'pj-tab--active' : ''" @click="tab = 'overview'">
+            <button type="button" class="pj-tab" :class="tab === 'overview' ? 'pj-tab--active' : ''" @click="go('overview')">
                 {!! $ic('heroicon-o-rectangle-group', 15) !!} {{ __('app.label.overview') }}
             </button>
-            <button type="button" class="pj-tab" :class="tab === 'contracts' ? 'pj-tab--active' : ''" @click="tab = 'contracts'">
+            <button type="button" class="pj-tab" :class="tab === 'contracts' ? 'pj-tab--active' : ''" @click="go('contracts')">
                 {!! $ic('heroicon-o-document-text', 15) !!} {{ __('app.label.contracts') }}@if ($visibleContracts->isNotEmpty())<span class="pj-tab__c">{{ $visibleContracts->count() }}</span>@endif
             </button>
-            <button type="button" class="pj-tab" :class="tab === 'participants' ? 'pj-tab--active' : ''" @click="tab = 'participants'">
+            <button type="button" class="pj-tab" :class="tab === 'participants' ? 'pj-tab--active' : ''" @click="go('participants')">
                 {!! $ic('heroicon-o-user-group', 15) !!} {{ __('app.label.participants') }}@if ($participantCount)<span class="pj-tab__c">{{ $participantCount }}</span>@endif
             </button>
-            <button type="button" class="pj-tab" :class="tab === 'gallery' ? 'pj-tab--active' : ''" @click="tab = 'gallery'">
+            <button type="button" class="pj-tab" :class="tab === 'gallery' ? 'pj-tab--active' : ''" @click="go('gallery')">
                 {!! $ic('heroicon-o-photo', 15) !!} {{ __('app.label.gallery') }}@if (count($galleryUrls))<span class="pj-tab__c">{{ count($galleryUrls) }}</span>@endif
             </button>
         </div>
@@ -179,48 +183,52 @@
                     <span class="ow-hd__ic">{!! $ic('heroicon-o-information-circle', 18) !!}</span>
                     <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
                 </header>
-                {{-- One flexible line of facts instead of a tall table; the
-                     description (long text) gets its own block below. --}}
+                {{-- The same row-per-fact table the order view uses. --}}
                 @php $basisOrders = $record->ordersViaContracts(); @endphp
-                <div class="pj-facts">
-                    <div class="pj-fact">
-                        <span class="pj-fact__lb">{!! $ic('heroicon-o-map-pin', 12) !!} {{ __('app.label.venue') }}</span>
-                        <span class="pj-fact__vl">{{ $record->venue ?: '—' }}</span>
+                <div class="ow-dets">
+                    <div class="ow-row">
+                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-map-pin') !!}</span><span class="ow-row__lb">{{ __('app.label.venue') }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->venue ?: '—' }}</span></div>
                     </div>
-                    <div class="pj-fact">
-                        <span class="pj-fact__lb">{!! $ic('heroicon-o-calendar-days', 12) !!} {{ __('app.label.period') }}</span>
-                        <span class="pj-fact__vl">{{ $period }}</span>
-                    </div>
-                    <div class="pj-fact">
-                        <span class="pj-fact__lb">{!! $ic('heroicon-o-user', 12) !!} {{ __('app.label.created_by') }}</span>
-                        <span class="pj-fact__vl">{{ $record->creator?->name ?? '—' }}</span>
-                    </div>
-                    <div class="pj-fact">
-                        <span class="pj-fact__lb">{!! $ic('heroicon-o-clock', 12) !!} {{ __('app.label.created_at') }}</span>
-                        <span class="pj-fact__vl">{{ $record->created_at?->format('d.m.Y H:i') }}</span>
+                    <div class="ow-row">
+                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-calendar-days') !!}</span><span class="ow-row__lb">{{ __('app.label.period') }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $period }}</span></div>
                     </div>
                     @if ($basisOrders->isNotEmpty())
-                        <div class="pj-fact">
-                            <span class="pj-fact__lb">{!! $ic('heroicon-o-clipboard-document-list', 12) !!} {{ __('app.label.order_plural') }}</span>
-                            <span class="pj-fact__vl">
-                                @foreach ($basisOrders as $basisOrder)
-                                    <a class="pj-link" href="{{ \App\Filament\Resources\Orders\BaseOrderResource::resourceFor($basisOrder)::getUrl('view', ['record' => $basisOrder]) }}">
-                                        {{ trim(($basisOrder->number ? $basisOrder->number.' · ' : '').$basisOrder->title) }}
-                                    </a>@if (! $loop->last) · @endif
-                                @endforeach
-                            </span>
+                        <div class="ow-row">
+                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_plural') }}</span></div>
+                            <div class="ow-row__v">
+                                <span class="ow-row__vl">
+                                    @foreach ($basisOrders as $basisOrder)
+                                        <a class="pj-link" href="{{ \App\Filament\Resources\Orders\BaseOrderResource::resourceFor($basisOrder)::getUrl('view', ['record' => $basisOrder]) }}">
+                                            {{ trim(($basisOrder->number ? $basisOrder->number.' · ' : '').$basisOrder->title) }}
+                                        </a>@if (! $loop->last) · @endif
+                                    @endforeach
+                                </span>
+                            </div>
                         </div>
                     @endif
                     @if ($record->photo_report_url)
-                        <div class="pj-fact">
-                            <span class="pj-fact__lb">{!! $ic('heroicon-o-photo', 12) !!} {{ __('app.label.photo_report_url') }}</span>
-                            <span class="pj-fact__vl"><a class="pj-link" href="{{ $record->photo_report_url }}" target="_blank" rel="noopener">{{ $record->photo_report_url }}</a></span>
+                        <div class="ow-row">
+                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-photo') !!}</span><span class="ow-row__lb">{{ __('app.label.photo_report_url') }}</span></div>
+                            <div class="ow-row__v"><span class="ow-row__vl"><a class="pj-link" href="{{ $record->photo_report_url }}" target="_blank" rel="noopener">{{ $record->photo_report_url }}</a></span></div>
                         </div>
                     @endif
+                    <div class="ow-row">
+                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-user') !!}</span><span class="ow-row__lb">{{ __('app.label.created_by') }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator?->name ?? '—' }}</span></div>
+                    </div>
+                    @if ($record->description)
+                        <div class="ow-row">
+                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-bars-3-bottom-left') !!}</span><span class="ow-row__lb">{{ __('app.label.description') }}</span></div>
+                            <div class="ow-row__v"><span class="ow-row__vl pj-wrap">{{ $record->description }}</span></div>
+                        </div>
+                    @endif
+                    <div class="ow-row">
+                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clock') !!}</span><span class="ow-row__lb">{{ __('app.label.created_at') }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->created_at?->format('d.m.Y H:i') }}</span></div>
+                    </div>
                 </div>
-                @if ($record->description)
-                    <div class="pj-facts__desc">{{ $record->description }}</div>
-                @endif
             </section>
 
             {{-- The (visibility-scoped) contract money flows. Fees and payment

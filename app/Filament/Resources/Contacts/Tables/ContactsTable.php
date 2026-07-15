@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Contacts\Tables;
 
 use App\Exports\ContactsExport;
 use App\Filament\Resources\Contacts\ContactResource;
-use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\StatusToggleColumn;
@@ -66,16 +65,7 @@ class ContactsTable
                                 ],
                             ))
                             ->modalSubmitAction(false)
-                            ->modalCancelAction(false)
-                            ->extraModalFooterActions([
-                                Action::make('viewContracts')
-                                    ->label(__('app.action.details'))
-                                    ->icon('heroicon-o-arrow-top-right-on-square')
-                                    ->url(fn (Contact $record): string => ContractResource::getUrl('index', [
-                                        'tableFilters' => ['contact_id' => ['value' => $record->id]],
-                                    ]))
-                                    ->visible(fn (Contact $record): bool => (int) ($record->contracts_count ?? 0) > 0),
-                            ]),
+                            ->modalCancelAction(false),
                     ),
 
                 TextColumn::make('project_participations_count')

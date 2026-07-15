@@ -36,18 +36,7 @@
         </div>
 
         @if ($totals->isNotEmpty())
-            <div style="margin-top:.85rem;display:flex;flex-direction:column;gap:.35rem;">
-                @foreach ($totals as $t)
-                    <div class="text-gray-600 dark:text-gray-300"
-                         style="display:flex;align-items:center;gap:.75rem;font-size:.8rem;">
-                        <span style="font-weight:600;flex:0 0 3rem;">{{ $t['currency'] }}</span>
-                        <span style="flex:1 1 auto;min-width:0;">{{ $t['count'] }}</span>
-                        <span style="margin-left:auto;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">
-                            {{ $fmt($t['paid']) }} / {{ $fmt($t['total']) }} {{ $t['currency'] }}
-                        </span>
-                    </div>
-                @endforeach
-            </div>
+            @include('filament.partials.currency-summary-table', ['totals' => $totals, 'amountHeading' => __('app.label.paid_of_total'), 'withPaid' => true])
         @endif
     @endif
 </div>

@@ -913,46 +913,6 @@
     font-size: .75rem;
     color: var(--m);
 }
-/* Single-row fact strip on the project overview: one flexible line of
-   label-over-value pairs instead of a tall key-value table. */
-.pj-facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem 2.5rem;
-    padding: 1rem 1.25rem;
-}
-.pj-fact {
-    display: flex;
-    flex-direction: column;
-    gap: .25rem;
-    min-width: 0;
-}
-.pj-fact__lb {
-    font-size: .68rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    color: var(--m2);
-    display: inline-flex;
-    align-items: center;
-    gap: .3rem;
-}
-.pj-fact__vl {
-    font-size: .85rem;
-    font-weight: 600;
-    color: var(--t);
-    min-width: 0;
-}
-.pj-facts__desc {
-    margin: 0 1.25rem 1.1rem;
-    padding-top: .85rem;
-    border-top: 1px solid var(--d);
-    font-size: .84rem;
-    line-height: 1.55;
-    color: var(--m);
-    white-space: pre-line;
-}
-
 .pj-stat--success {
     background: #ecfdf5;
     border-color: #a7f3d0;

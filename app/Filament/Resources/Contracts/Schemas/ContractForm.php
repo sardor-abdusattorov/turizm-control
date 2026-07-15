@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Contracts\Schemas;
 
+use App\Enums\ContractAttachmentType;
 use App\Filament\Resources\Contacts\Schemas\ContactForm;
 use App\Models\Contact;
 use App\Models\Contract;
@@ -197,20 +198,27 @@ class ContractForm
                                         : null)
                                     ->columnSpanFull(),
 
-                                // Scans can be dropped right at creation — no need
-                                // to save first and hunt for the upload button on
-                                // the view page. Stored as dossier attachments in
-                                // CreateContract::afterCreate.
+                                // The dossier is managed here on the form — create
+                                // AND edit — never on the view page. New scans are
+                                // stored as attachments on save; the optional type
+                                // below applies to this batch.
                                 FileUpload::make('attachment_files')
                                     ->label(__('app.label.attachments'))
                                     ->helperText(__('app.helper.attachment_scans'))
-                                    ->visible(fn (?Contract $record): bool => $record === null)
                                     ->multiple()
                                     ->disk('local')
                                     ->directory('uploads/files/contract-attachments')
                                     ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
                                     ->maxSize(25600)
                                     ->storeFileNamesIn('attachment_names')
+                                    ->columnSpanFull(),
+
+                                Select::make('attachment_type')
+                                    ->label(__('app.label.attachment_type'))
+                                    ->options(ContractAttachmentType::options())
+                                    ->native(false)
+                                    ->visible(fn (Get $get): bool => filled($get('attachment_files')))
+                                    ->helperText(__('app.helper.attachment_type_optional'))
                                     ->columnSpanFull(),
                             ]),
 

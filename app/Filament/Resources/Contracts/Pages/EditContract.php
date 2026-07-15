@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contracts\Pages;
 
 use App\Enums\ContractStatus;
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Resources\Contracts\Pages\Concerns\HandlesDossierUploads;
 use App\Filament\Resources\Contracts\Schemas\ContractForm;
 use App\Models\Contract;
 use App\Services\Contracts\ApprovalChain;
@@ -16,6 +17,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditContract extends EditRecord
 {
+    use HandlesDossierUploads;
+
     protected static string $resource = ContractResource::class;
 
     /** @var array<int, int> */
@@ -95,11 +98,14 @@ class EditContract extends EditRecord
             ->all();
         unset($data['approver_chain']);
 
-        return $data;
+        // New dossier scans picked on the edit form are filed in afterSave.
+        return $this->extractAttachmentUploads($data);
     }
 
     protected function afterSave(): void
     {
+        $this->storeFormAttachments();
+
         $startedMidFlow = $this->originalStatus !== null
             && $this->originalStatus !== Contract::STATUS_DRAFT;
 
