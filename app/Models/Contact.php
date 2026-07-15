@@ -32,6 +32,7 @@ class Contact extends Model
         'director_name',
         'bank_account',
         'bank_name',
+        'swift',
         'mfo',
         'status',
     ];

@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('role', 20)->default('participant');
             $table->string('name');
             $table->decimal('amount', 15, 2)->default(0);
-            // Cached aggregate of the participant's installments, kept in sync
-            // by ProjectPaymentObserver — the analogue of contracts.paid_percent.
             $table->decimal('paid_amount', 15, 2)->default(0);
             $table->foreignId('currency_id')->nullable()->constrained('currencies')->restrictOnDelete();
             $table->unsignedInteger('sort')->default(0);
