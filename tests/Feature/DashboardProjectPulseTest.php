@@ -13,7 +13,7 @@ uses(RefreshDatabase::class);
 
 it('defaults to the nearest upcoming active project', function () {
     Project::factory()->international()->create(['name' => 'PAST-EXPO', 'starts_on' => now()->subMonth(), 'status' => true]);
-    $next = Project::factory()->international()->create(['name' => 'NEXT-EXPO', 'starts_on' => now()->addWeek(), 'status' => true]);
+    $next = Project::factory()->international()->create(['name' => 'NEXT-EXPO', 'starts_on' => now()->addWeek(), 'status' => true, 'venue' => 'Мадрид']);
     Project::factory()->international()->create(['name' => 'LATER-EXPO', 'starts_on' => now()->addMonths(3), 'status' => true]);
 
     expect(Project::dashboardDefault()?->id)->toBe($next->id);
@@ -21,7 +21,8 @@ it('defaults to the nearest upcoming active project', function () {
     actingAs(userWithPermission('view_any_project'));
 
     Livewire::test(ProjectPulseWidget::class)
-        ->assertSee('NEXT-EXPO');
+        ->assertSet('projectId', $next->id)
+        ->assertSee('Мадрид');
 });
 
 it('falls back to the latest past project when nothing is upcoming', function () {
@@ -31,15 +32,44 @@ it('falls back to the latest past project when nothing is upcoming', function ()
     expect(Project::dashboardDefault()?->id)->toBe($recent->id);
 });
 
-it('shows the project picked in the dashboard filter', function () {
-    Project::factory()->international()->create(['name' => 'DEFAULT-EXPO', 'starts_on' => now()->addWeek(), 'status' => true]);
-    $picked = Project::factory()->international()->create(['name' => 'PICKED-EXPO', 'starts_on' => now()->addMonths(2), 'status' => true]);
+it('switches the card to the project picked in the toolbar select', function () {
+    // Every project name sits in the select options, so the card body is
+    // asserted through the venue — it renders only for the shown project.
+    Project::factory()->international()->create(['name' => 'DEFAULT-EXPO', 'starts_on' => now()->addWeek(), 'status' => true, 'venue' => 'Барселона']);
+    $picked = Project::factory()->international()->create(['name' => 'PICKED-EXPO', 'starts_on' => now()->addMonths(2), 'status' => true, 'venue' => 'Шанхай']);
 
     actingAs(userWithPermission('view_any_project'));
 
-    Livewire::test(ProjectPulseWidget::class, ['pageFilters' => ['project_id' => $picked->id]])
-        ->assertSee('PICKED-EXPO')
-        ->assertDontSee('DEFAULT-EXPO');
+    Livewire::test(ProjectPulseWidget::class)
+        ->assertSee('Барселона')
+        ->set('projectId', $picked->id)
+        ->assertSee('Шанхай')
+        ->assertDontSee('Барселона');
+
+    expect(session('dashboard.project_id'))->toBe($picked->id);
+});
+
+it('remembers the picked project across dashboard visits', function () {
+    Project::factory()->international()->create(['name' => 'DEFAULT-EXPO', 'starts_on' => now()->addWeek(), 'status' => true]);
+    $remembered = Project::factory()->international()->create(['name' => 'SAVED-EXPO', 'starts_on' => now()->addMonths(2), 'status' => true]);
+
+    actingAs(userWithPermission('view_any_project'));
+
+    session()->put('dashboard.project_id', $remembered->id);
+
+    Livewire::test(ProjectPulseWidget::class)
+        ->assertSet('projectId', $remembered->id);
+});
+
+it('ignores a remembered project that no longer exists', function () {
+    $default = Project::factory()->international()->create(['name' => 'DEFAULT-EXPO', 'starts_on' => now()->addWeek(), 'status' => true]);
+
+    actingAs(userWithPermission('view_any_project'));
+
+    session()->put('dashboard.project_id', 999_999);
+
+    Livewire::test(ProjectPulseWidget::class)
+        ->assertSet('projectId', $default->id);
 });
 
 it('shows a manager only their own contracts on the pulse widget', function () {
@@ -60,7 +90,8 @@ it('shows a manager only their own contracts on the pulse widget', function () {
 
     actingAs($manager);
 
-    Livewire::test(ProjectPulseWidget::class, ['pageFilters' => ['project_id' => $project->id]])
+    Livewire::test(ProjectPulseWidget::class)
+        ->set('projectId', $project->id)
         ->assertSee('MINE-001')
         ->assertDontSee('FOREIGN-001');
 });

@@ -790,6 +790,8 @@ return [
         'summary_awaiting' => ':count ta shartnoma sizning amalingizni kutmoqda.',
         'summary_stalled' => 'Shartnomalaringizdan :count tasi kelishuvchida to‘xtab qolgan.',
         'summary_clear' => 'Hozir hech narsa e’tiboringizni talab qilmaydi.',
+        'pulse_title' => 'Loyiha ko‘rinishi',
+        'pulse_hint' => 'Loyihani tanlang — karta yangilanadi',
     ],
     'filter' => [
         'awaiting_my_approval' => 'Mening kelishuvimni kutmoqda',

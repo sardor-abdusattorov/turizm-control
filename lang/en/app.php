@@ -795,6 +795,8 @@ return [
         'summary_awaiting' => ':count contract(s) are waiting for your action.',
         'summary_stalled' => ':count of your contracts have stalled on an approver.',
         'summary_clear' => 'Nothing needs your attention right now.',
+        'pulse_title' => 'Project overview',
+        'pulse_hint' => 'Pick a project — the card updates',
     ],
     'filter' => [
         'awaiting_my_approval' => 'Awaiting my approval',

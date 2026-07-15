@@ -978,6 +978,145 @@
     color: var(--accent);
 }
 
+/* ─── Dashboard pulse toolbar: card title + the project picker ─────────────
+   The picker is a native select (optgroups «тип · год») dressed in the pj
+   tokens — no bare Filament filters form above the page. */
+.pj-bar {
+    display: flex;
+    align-items: center;
+    gap: .75rem 1rem;
+    flex-wrap: wrap;
+}
+.pj-bar__l {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    min-width: 0;
+}
+.pj-bar__ic {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: .65rem;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+}
+.dark .pj-bar__ic {
+    background: var(--accent-softer);
+    color: var(--accent);
+}
+.pj-bar__tx {
+    display: flex;
+    flex-direction: column;
+    gap: .05rem;
+    min-width: 0;
+}
+.pj-bar__t {
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--t);
+    letter-spacing: -.01em;
+}
+.pj-bar__s {
+    font-size: .75rem;
+    color: var(--m);
+}
+.pj-bar__r {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-left: auto;
+    min-width: 0;
+}
+.pj-select {
+    appearance: none;
+    -webkit-appearance: none;
+    /* A fixed width: the intrinsic size of a native select is its longest
+       option, and project names get very long. The closed control ellipsizes;
+       the dropdown list still shows full names. */
+    width: 19rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: .5rem 2.3rem .5rem .85rem;
+    border: 1px solid var(--d);
+    border-radius: .6rem;
+    background-color: var(--s);
+    color: var(--t);
+    font-size: .84rem;
+    font-weight: 600;
+    line-height: 1.25;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.2' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: .9rem;
+    transition: border-color .12s ease, box-shadow .12s ease;
+}
+.pj-select:hover {
+    border-color: var(--accent);
+}
+.pj-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.dark .pj-select:focus {
+    box-shadow: 0 0 0 3px var(--accent-softer);
+}
+.pj-open {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .5rem .8rem;
+    border: 1px solid var(--d);
+    border-radius: .6rem;
+    background: var(--s);
+    color: var(--m);
+    font-size: .8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: color .12s ease, border-color .12s ease;
+}
+.pj-open:hover {
+    color: var(--accent-strong);
+    border-color: var(--accent);
+}
+.dark .pj-open:hover {
+    color: var(--accent);
+}
+/* Dashboard cards are narrower than a full view page — tighter cell padding
+   keeps all four contract columns (number, type, amount, status) inside. */
+.pj-table--tight thead th,
+.pj-table--tight tbody td {
+    padding-left: .9rem;
+    padding-right: .9rem;
+}
+/* Soften the card while Livewire swaps the project underneath it. */
+.pj--loading {
+    opacity: .45;
+    pointer-events: none;
+    transition: opacity .15s ease;
+}
+@media (max-width: 640px) {
+    .pj-bar__r {
+        flex: 1 0 100%;
+    }
+    .pj-select {
+        flex: 1;
+        min-width: 0;
+    }
+    .pj-open__lb {
+        display: none;
+    }
+}
+
 /* screenshot thumbnail inside the payments card */
 .pj-shot {
     width: 2.4rem;
