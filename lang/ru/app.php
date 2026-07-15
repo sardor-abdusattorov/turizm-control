@@ -181,6 +181,8 @@ return [
         'finance' => 'Финансы',
         'already_signed' => 'Договор уже подписан',
         'signed_date' => 'Дата подписания',
+        'project_year' => 'Год проекта',
+        'all_years' => 'Все годы',
         'estimate_amount' => 'Сумма по смете',
         'final_amount' => 'Итоговая сумма',
         'attendees_count' => 'Участников (чел.)',

@@ -11,7 +11,7 @@
     // Filament badge which renders at ~text-xs in the table.
     $tone = match ($status) {
         Contract::STATUS_APPROVED => ['bg' => 'rgba(16,185,129,.14)', 'fg' => '#047857', 'dot' => '#10b981'],
-        Contract::STATUS_IN_REVIEW, Contract::STATUS_IN_REVIEW_DIRECTOR => ['bg' => 'rgba(99,102,241,.14)', 'fg' => '#4338ca', 'dot' => '#6366f1'],
+        Contract::STATUS_IN_REVIEW, Contract::STATUS_IN_REVIEW_DIRECTOR => ['bg' => 'rgba(37,99,235,.14)', 'fg' => '#1d4ed8', 'dot' => '#2563eb'],
         Contract::STATUS_PENDING_DIRECTOR => ['bg' => 'rgba(251,146,60,.16)', 'fg' => '#c2410c', 'dot' => '#fb923c'],
         Contract::STATUS_REJECTED => ['bg' => 'rgba(239,68,68,.14)', 'fg' => '#b91c1c', 'dot' => '#ef4444'],
         Contract::STATUS_DRAFT => ['bg' => 'rgba(127,127,127,.14)', 'fg' => '#475569', 'dot' => '#94a3b8'],

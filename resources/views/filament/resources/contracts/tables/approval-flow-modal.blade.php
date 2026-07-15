@@ -15,7 +15,7 @@
             ContractApprover::STATUS_APPROVED => ['bg' => 'rgba(16,185,129,.12)', 'fg' => '#047857', 'dot' => '#10b981'],
             ContractApprover::STATUS_REJECTED => ['bg' => 'rgba(239,68,68,.12)', 'fg' => '#b91c1c', 'dot' => '#ef4444'],
             ContractApprover::STATUS_PENDING => ['bg' => 'rgba(251,146,60,.14)', 'fg' => '#c2410c', 'dot' => '#fb923c'],
-            ContractApprover::STATUS_QUEUED => ['bg' => 'rgba(99,102,241,.10)', 'fg' => '#4f46e5', 'dot' => '#a5b4fc'],
+            ContractApprover::STATUS_QUEUED => ['bg' => 'rgba(37,99,235,.10)', 'fg' => '#4f46e5', 'dot' => '#a5b4fc'],
             ContractApprover::STATUS_INVALIDATED => ['bg' => 'rgba(127,127,127,.10)', 'fg' => '#6b7280', 'dot' => '#9ca3af'],
             ContractApprover::STATUS_SKIPPED => ['bg' => 'rgba(127,127,127,.10)', 'fg' => '#6b7280', 'dot' => '#9ca3af'],
             default => ['bg' => 'rgba(127,127,127,.10)', 'fg' => 'currentColor', 'dot' => '#cbd5e1'],
@@ -30,7 +30,7 @@
         : $a->status->label();
 
     $avatarOf = fn (ContractApprover $a): string => $a->user?->getFilamentAvatarUrl()
-        ?? 'https://ui-avatars.com/api/?name='.urlencode($a->user?->name ?? '?').'&color=7F9CF5&background=EBF4FF';
+        ?? 'https://ui-avatars.com/api/?name='.urlencode($a->user?->name ?? '?').'&color=60A5FA&background=DBEAFE';
 @endphp
 
 {{-- Styles live in resources/css/filament/admin/theme.css (.af-* classes). --}}

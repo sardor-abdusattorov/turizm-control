@@ -8,8 +8,17 @@
              x-transition:enter-start="opacity-0 -translate-y-1"
              x-transition:enter-end="opacity-100 translate-y-0"
              class="cw-panel">
+            @php
+                // A legacy (already-signed) contract never had a chain — the
+                // empty card would only take the main column hostage. Filed
+                // approvals keep their history visible.
+                $chainCardVisible = $active->isNotEmpty()
+                    || $historical->isNotEmpty()
+                    || $record->status !== Contract::STATUS_APPROVED;
+            @endphp
             <div class="cw-cols">
                 <div class="cw-main">
+                @if ($chainCardVisible)
                 <section class="cw-card">
                     <div class="cw-hd">
                         <span class="cw-hd__ic">{!! $ic('heroicon-o-users') !!}</span>
@@ -50,7 +59,7 @@
                             </div>
                             <div class="cw-prog__legend">
                                 @if ($approvedCount > 0)<span class="cw-lg"><i style="background:#10b981;"></i>{{ $approvedCount }} {{ __('app.contract_approver.status.approved') }}</span>@endif
-                                @if ($reviewingCount > 0)<span class="cw-lg"><i style="background:#6366f1;"></i>{{ $reviewingCount }} {{ __('app.contract_approver.status.pending') }}</span>@endif
+                                @if ($reviewingCount > 0)<span class="cw-lg"><i style="background:#2563eb;"></i>{{ $reviewingCount }} {{ __('app.contract_approver.status.pending') }}</span>@endif
                                 @if ($queuedCount > 0)<span class="cw-lg"><i style="background:#cbd5e1;"></i>{{ $queuedCount }} {{ __('app.contract_approver.status.queued') }}</span>@endif
                                 @if ($rejectedCount > 0)<span class="cw-lg"><i style="background:#ef4444;"></i>{{ $rejectedCount }} {{ __('app.contract_approver.status.rejected') }}</span>@endif
                             </div>
@@ -120,6 +129,7 @@
                         </div>
                     @endif
                 </section>
+                @endif
 
                 {{-- Payments only exist once the contract is fully approved by
                      the director, so the progress block is hidden until then. --}}

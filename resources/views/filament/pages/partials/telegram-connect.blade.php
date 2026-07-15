@@ -38,12 +38,12 @@
         .tg-link {
             border-radius: .75rem;
             padding: 1rem 1.15rem;
-            background: rgba(99,102,241,.05);
-            border: 1px solid rgba(99,102,241,.18);
+            background: rgba(37,99,235,.05);
+            border: 1px solid rgba(37,99,235,.18);
         }
         .dark .tg-link {
-            background: rgba(99,102,241,.07);
-            border-color: rgba(99,102,241,.22);
+            background: rgba(37,99,235,.07);
+            border-color: rgba(37,99,235,.22);
         }
         .tg-link__row {
             display: flex;
@@ -58,8 +58,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(99,102,241,.15);
-            color: #6366f1;
+            background: rgba(37,99,235,.15);
+            color: #2563eb;
             flex-shrink: 0;
         }
         .dark .tg-link__ic {

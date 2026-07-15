@@ -111,7 +111,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             ->reduce(function (array $grouped, self $user): array {
                 $department = $user->department?->name ?? __('app.label.no_department');
                 $avatar = $user->getFilamentAvatarUrl()
-                    ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF';
+                    ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=60A5FA&background=DBEAFE';
                 $position = $user->position?->name ? ' · '.e($user->position->name) : '';
                 $grouped[$department][$user->id] = sprintf(
                     '<span style="display:inline-flex;align-items:center;gap:.4rem;font-size:14px;">'

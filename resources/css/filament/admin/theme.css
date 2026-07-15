@@ -19,10 +19,10 @@
     --m2: #8b949e;
     --d: rgba(15, 20, 25, .08);
     --soft: #f8fafc;
-    --accent: #6366f1;
-    --accent-soft: #eef2ff;
-    --accent-softer: #f5f7ff;
-    --accent-strong: #4338ca;
+    --accent: #2563eb;
+    --accent-soft: #eff6ff;
+    --accent-softer: #f5f9ff;
+    --accent-strong: #1d4ed8;
 }
 
 .dark .cw,
@@ -35,10 +35,10 @@
     --m2: #6e7681;
     --d: rgba(255, 255, 255, .08);
     --soft: rgba(255, 255, 255, .03);
-    --accent: #818cf8;
-    --accent-soft: rgba(99, 102, 241, .12);
-    --accent-softer: rgba(99, 102, 241, .07);
-    --accent-strong: #c7d2fe;
+    --accent: #60a5fa;
+    --accent-soft: rgba(37, 99, 235, .12);
+    --accent-softer: rgba(37, 99, 235, .07);
+    --accent-strong: #bfdbfe;
 }
 
 /* ────────────── Shared primitives for the view-page family ──────────────
@@ -94,23 +94,6 @@
 .pv-dets {
     display: flex;
     flex-direction: column;
-}
-
-/* Two-column key-value grid for wide detail cards (project overview). */
-@media (min-width: 1024px) {
-    .ow-dets--cols {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        column-gap: 2.25rem;
-    }
-
-    .ow-dets--cols .ow-row {
-        grid-template-columns: minmax(9rem, 12rem) 1fr;
-    }
-
-    .ow-dets--cols .ow-row:nth-last-child(-n+2) {
-        border-bottom: 0;
-    }
 }
 
 .ow-row,
@@ -338,7 +321,7 @@
 .tg-link__btn:focus-visible,
 .dh__tg-link:focus-visible,
 .dh__tg-x:focus-visible {
-    outline: 2px solid var(--accent, #6366f1);
+    outline: 2px solid var(--accent, #2563eb);
     outline-offset: 2px;
 }
 
@@ -930,6 +913,46 @@
     font-size: .75rem;
     color: var(--m);
 }
+/* Single-row fact strip on the project overview: one flexible line of
+   label-over-value pairs instead of a tall key-value table. */
+.pj-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    padding: 1rem 1.25rem;
+}
+.pj-fact {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    min-width: 0;
+}
+.pj-fact__lb {
+    font-size: .68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--m2);
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+}
+.pj-fact__vl {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--t);
+    min-width: 0;
+}
+.pj-facts__desc {
+    margin: 0 1.25rem 1.1rem;
+    padding-top: .85rem;
+    border-top: 1px solid var(--d);
+    font-size: .84rem;
+    line-height: 1.55;
+    color: var(--m);
+    white-space: pre-line;
+}
+
 .pj-stat--success {
     background: #ecfdf5;
     border-color: #a7f3d0;

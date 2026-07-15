@@ -159,6 +159,19 @@ it('groups project and order options by type and year', function () {
         ->and(collect($orderGroups['2025'])->first())->toContain('06-АФ');
 });
 
+it('narrows the project options to the picked year', function () {
+    Project::factory()->international()->create(['name' => 'EXPO-2026', 'starts_on' => '2026-03-01', 'status' => true]);
+    Project::factory()->international()->create(['name' => 'EXPO-2025', 'starts_on' => '2025-03-01', 'status' => true]);
+
+    $ref = new ReflectionMethod(ContractForm::class, 'projectOptionsGrouped');
+    $ref->setAccessible(true);
+
+    $onlY2025 = collect($ref->invoke(null, '2025'))->flatten()->values()->all();
+
+    expect($onlY2025)->toContain('EXPO-2025')
+        ->not->toContain('EXPO-2026');
+});
+
 function invokeProtectedStatic(string $class, string $method): mixed
 {
     $ref = new ReflectionMethod($class, $method);

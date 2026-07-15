@@ -59,6 +59,9 @@ class ProjectsTable
                     'participants',
                     'participants as sponsors_count' => fn (Builder $participants) => $participants
                         ->where('role', ParticipantRole::Sponsor),
+                    // Same visibility rule as everywhere: the badge only counts
+                    // the contracts the viewer is allowed to see.
+                    'contracts' => fn (Builder $contracts) => $contracts->visibleTo(),
                 ])
                 ->withSum('participants', 'amount')
                 ->withSum('participants', 'paid_amount'))
@@ -123,6 +126,37 @@ class ProjectsTable
                         ParticipantRole::Sponsor,
                         'heroicon-o-star',
                     ))
+                    ->toggleable(),
+
+                TextColumn::make('contracts_count')
+                    ->label(__('app.label.contracts'))
+                    ->badge()
+                    ->alignCenter()
+                    ->state(fn (Project $record): int => (int) ($record->contracts_count ?? 0))
+                    ->color(fn (Project $record): string => ($record->contracts_count ?? 0) > 0 ? 'primary' : 'gray')
+                    ->tooltip(fn (Project $record): ?string => ($record->contracts_count ?? 0) > 0
+                        ? __('app.label.contracts_breakdown_hint')
+                        : null)
+                    ->action(
+                        Action::make('projectContractsBreakdown')
+                            ->modalHeading(fn (Project $record): string => $record->name)
+                            ->modalIcon('heroicon-o-document-text')
+                            ->modalContent(fn (Project $record) => view(
+                                'filament.resources.projects.tables.contracts-breakdown',
+                                [
+                                    'contracts' => $record->visibleContracts(),
+                                    'totals' => $record->visibleContractTotalsByCurrency(),
+                                ],
+                            ))
+                            ->modalSubmitAction(false)
+                            ->modalCancelAction(false)
+                            ->extraModalFooterActions([
+                                Action::make('projectContractsBreakdownOpen')
+                                    ->label(__('app.action.open_project'))
+                                    ->icon('heroicon-o-arrow-top-right-on-square')
+                                    ->url(fn (Project $record): string => BaseProjectResource::resourceFor($record)::getUrl('view', ['record' => $record])),
+                            ]),
+                    )
                     ->toggleable(),
 
                 ImageColumn::make('gallery')

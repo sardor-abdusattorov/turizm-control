@@ -52,7 +52,7 @@
         'danger' => '#ef4444',
         'info' => '#3b82f6',
         'warning' => '#fb923c',
-        'primary' => '#818cf8',
+        'primary' => '#60a5fa',
         'gray' => '#cbd5e1',
     ];
 
@@ -77,17 +77,18 @@
     };
 
     // Core info visible by default; everything else lives behind "Show more".
+    // No status row — the status pill already rides on the tab strip.
     $details = [
-        ['heroicon-o-bolt', __('app.label.status'), $statusLabel, 'status', false],
         ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number, null, false],
         ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name, $record->contact ? 'contact' : null, false],
-        ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name, null, false],
         ['heroicon-o-tag', __('app.label.contract_type_single'), $record->contractType?->title, null, false],
+        ['heroicon-o-presentation-chart-bar', __('app.label.project_single'), $record->project?->name, null, false],
         ['heroicon-o-document-text', __('app.label.order_basis'), $record->order ? trim(($record->order->number ? $record->order->number.' · ' : '').$record->order->title) : null, null, false],
         ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name, null, false],
         ['heroicon-o-banknotes', __('app.label.amount'), \App\Support\Money::format($record->amount).' '.($record->currency?->short_name ?? ''), null, false],
 
         // Extra rows — collapsed by default.
+        ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name, null, true],
         ['heroicon-o-paper-airplane', __('app.label.submitted'), $this->submittedAt()?->format('d.m.Y H:i'), null, true],
         ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y'), null, true],
         ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i'), null, true],

@@ -13,9 +13,9 @@
             --r: rgba(15,20,25,.08);
             --d: rgba(15,20,25,.07);
             --track: #e6ebf1;
-            --accent-soft: rgba(99,102,241,.12);
-            --accent-softer: rgba(99,102,241,.05);
-            --accent-ring: rgba(99,102,241,.18);
+            --accent-soft: rgba(37,99,235,.12);
+            --accent-softer: rgba(37,99,235,.05);
+            --accent-ring: rgba(37,99,235,.18);
             --accent-on: #fff;
         }
         .dark .cw {
@@ -493,13 +493,13 @@
         }
         @keyframes cwPulse {
             0% {
-                box-shadow: 0 0 0 0 rgba(99,102,241,.55);
+                box-shadow: 0 0 0 0 rgba(37,99,235,.55);
             }
             70% {
-                box-shadow: 0 0 0 8px rgba(99,102,241,0);
+                box-shadow: 0 0 0 8px rgba(37,99,235,0);
             }
             100% {
-                box-shadow: 0 0 0 0 rgba(99,102,241,0);
+                box-shadow: 0 0 0 0 rgba(37,99,235,0);
             }
         }
         @media (prefers-reduced-motion: no-preference) {

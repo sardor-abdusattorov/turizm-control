@@ -153,7 +153,7 @@
 <style>
     /* Base palette tokens (--s/--t/--m/--accent/...) live in theme.css. */
     .ow {
-        --accent-ring: rgba(99, 102, 241, .18);
+        --accent-ring: rgba(37, 99, 235, .18);
         --accent-on: #fff;
         --track: #e5e7eb;
         font-size: 0.875rem;

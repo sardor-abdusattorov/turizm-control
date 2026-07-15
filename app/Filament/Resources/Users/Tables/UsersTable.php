@@ -26,7 +26,7 @@ class UsersTable
                     ->label(__('app.label.profile_image'))
                     ->disk('local')
                     ->circular()
-                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name='.urlencode($record->name).'&color=7F9CF5&background=EBF4FF'),
+                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name='.urlencode($record->name).'&color=60A5FA&background=DBEAFE'),
 
                 TextColumn::make('name')
                     ->label(__('app.label.name'))

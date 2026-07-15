@@ -179,86 +179,73 @@
                     <span class="ow-hd__ic">{!! $ic('heroicon-o-information-circle', 18) !!}</span>
                     <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
                 </header>
-                <div class="ow-dets ow-dets--cols">
-                    <div class="ow-row">
-                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-map-pin') !!}</span><span class="ow-row__lb">{{ __('app.label.venue') }}</span></div>
-                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->venue ?: '—' }}</span></div>
+                {{-- One flexible line of facts instead of a tall table; the
+                     description (long text) gets its own block below. --}}
+                @php $basisOrders = $record->ordersViaContracts(); @endphp
+                <div class="pj-facts">
+                    <div class="pj-fact">
+                        <span class="pj-fact__lb">{!! $ic('heroicon-o-map-pin', 12) !!} {{ __('app.label.venue') }}</span>
+                        <span class="pj-fact__vl">{{ $record->venue ?: '—' }}</span>
                     </div>
-                    <div class="ow-row">
-                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-calendar-days') !!}</span><span class="ow-row__lb">{{ __('app.label.period') }}</span></div>
-                        <div class="ow-row__v"><span class="ow-row__vl">{{ $period }}</span></div>
+                    <div class="pj-fact">
+                        <span class="pj-fact__lb">{!! $ic('heroicon-o-calendar-days', 12) !!} {{ __('app.label.period') }}</span>
+                        <span class="pj-fact__vl">{{ $period }}</span>
                     </div>
-                    @php $basisOrders = $record->ordersViaContracts(); @endphp
+                    <div class="pj-fact">
+                        <span class="pj-fact__lb">{!! $ic('heroicon-o-user', 12) !!} {{ __('app.label.created_by') }}</span>
+                        <span class="pj-fact__vl">{{ $record->creator?->name ?? '—' }}</span>
+                    </div>
+                    <div class="pj-fact">
+                        <span class="pj-fact__lb">{!! $ic('heroicon-o-clock', 12) !!} {{ __('app.label.created_at') }}</span>
+                        <span class="pj-fact__vl">{{ $record->created_at?->format('d.m.Y H:i') }}</span>
+                    </div>
                     @if ($basisOrders->isNotEmpty())
-                        <div class="ow-row">
-                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_plural') }}</span></div>
-                            <div class="ow-row__v">
+                        <div class="pj-fact">
+                            <span class="pj-fact__lb">{!! $ic('heroicon-o-clipboard-document-list', 12) !!} {{ __('app.label.order_plural') }}</span>
+                            <span class="pj-fact__vl">
                                 @foreach ($basisOrders as $basisOrder)
-                                    <a class="ow-row__vl pj-link" href="{{ \App\Filament\Resources\Orders\BaseOrderResource::resourceFor($basisOrder)::getUrl('view', ['record' => $basisOrder]) }}">
+                                    <a class="pj-link" href="{{ \App\Filament\Resources\Orders\BaseOrderResource::resourceFor($basisOrder)::getUrl('view', ['record' => $basisOrder]) }}">
                                         {{ trim(($basisOrder->number ? $basisOrder->number.' · ' : '').$basisOrder->title) }}
                                     </a>@if (! $loop->last) · @endif
                                 @endforeach
-                            </div>
+                            </span>
                         </div>
                     @endif
                     @if ($record->photo_report_url)
-                        <div class="ow-row">
-                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-photo') !!}</span><span class="ow-row__lb">{{ __('app.label.photo_report_url') }}</span></div>
-                            <div class="ow-row__v">
-                                <a class="ow-row__vl pj-link" href="{{ $record->photo_report_url }}" target="_blank" rel="noopener">{{ $record->photo_report_url }}</a>
-                            </div>
+                        <div class="pj-fact">
+                            <span class="pj-fact__lb">{!! $ic('heroicon-o-photo', 12) !!} {{ __('app.label.photo_report_url') }}</span>
+                            <span class="pj-fact__vl"><a class="pj-link" href="{{ $record->photo_report_url }}" target="_blank" rel="noopener">{{ $record->photo_report_url }}</a></span>
                         </div>
                     @endif
-                    <div class="ow-row">
-                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-user') !!}</span><span class="ow-row__lb">{{ __('app.label.created_by') }}</span></div>
-                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator?->name ?? '—' }}</span></div>
-                    </div>
-                    @if ($record->description)
-                        <div class="ow-row">
-                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-bars-3-bottom-left') !!}</span><span class="ow-row__lb">{{ __('app.label.description') }}</span></div>
-                            <div class="ow-row__v"><span class="ow-row__vl pj-wrap">{{ $record->description }}</span></div>
-                        </div>
-                    @endif
-                    <div class="ow-row">
-                        <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clock') !!}</span><span class="ow-row__lb">{{ __('app.label.created_at') }}</span></div>
-                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->created_at?->format('d.m.Y H:i') }}</span></div>
-                    </div>
                 </div>
+                @if ($record->description)
+                    <div class="pj-facts__desc">{{ $record->description }}</div>
+                @endif
             </section>
 
-            {{-- Money at a glance: fees per currency, payment progress and the
-                 (visibility-scoped) contract flows — so the overview answers
-                 «сколько стоит и сколько собрали» without switching tabs. --}}
-            @if ($record->participants->isNotEmpty() || $expenseTotals->isNotEmpty() || $incomeTotals->isNotEmpty())
+            {{-- The (visibility-scoped) contract money flows. Fees and payment
+                 progress already live in the hero, so this card only adds what
+                 the hero can't: expense/income by contracts and, for mixed
+                 currency projects, the honest per-currency fee split. --}}
+            @if ($expenseTotals->isNotEmpty() || $incomeTotals->isNotEmpty() || $feeTotalsByCurrency->count() > 1)
                 <section class="ow-card">
                     <header class="ow-hd">
                         <span class="ow-hd__ic">{!! $ic('heroicon-o-banknotes', 18) !!}</span>
                         <h2 class="ow-hd__t">{{ __('app.label.finance') }}</h2>
                     </header>
                     <div class="ow-dets">
-                        @foreach ($feeTotalsByCurrency as $t)
-                            <div class="ow-row">
-                                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-arrow-trending-up') !!}</span><span class="ow-row__lb">{{ __('app.label.fees_total') }} ({{ $t['currency'] }})</span></div>
-                                <div class="ow-row__v">
-                                    <span class="ow-row__vl" style="font-variant-numeric:tabular-nums;">
-                                        {{ $fmt($t['paid']) }} / {{ $fmt($t['total']) }} {{ $t['currency'] }}
-                                        <span style="opacity:.55;">· {{ $t['count'] }}</span>
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-                        @if ($feesTotal > 0)
-                            <div class="ow-row">
-                                <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-check-circle') !!}</span><span class="ow-row__lb">{{ __('app.label.paid') }}</span></div>
-                                <div class="ow-row__v" style="width:100%;">
-                                    <div style="display:flex;align-items:center;gap:.65rem;max-width:26rem;">
-                                        <div style="flex:1 1 auto;height:6px;border-radius:999px;background:var(--d);overflow:hidden;">
-                                            <div style="width:{{ min(100, $paidPercent) }}%;height:100%;border-radius:999px;background:#10b981;"></div>
-                                        </div>
-                                        <span class="ow-row__vl" style="white-space:nowrap;">{{ $paidPercent }}% · {{ __('app.label.remaining') }}: {{ $fmt(max(0, $feesTotal - $paidTotal)) }}</span>
+                        @if ($feeTotalsByCurrency->count() > 1)
+                            @foreach ($feeTotalsByCurrency as $t)
+                                <div class="ow-row">
+                                    <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-arrow-trending-up') !!}</span><span class="ow-row__lb">{{ __('app.label.fees_total') }} ({{ $t['currency'] }})</span></div>
+                                    <div class="ow-row__v">
+                                        <span class="ow-row__vl" style="font-variant-numeric:tabular-nums;">
+                                            {{ $fmt($t['paid']) }} / {{ $fmt($t['total']) }} {{ $t['currency'] }}
+                                            <span style="opacity:.55;">· {{ $t['count'] }}</span>
+                                        </span>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
                         @endif
                         @if ($expenseTotals->isNotEmpty())
                             <div class="ow-row">

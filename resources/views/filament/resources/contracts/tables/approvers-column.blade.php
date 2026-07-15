@@ -15,7 +15,7 @@
     $palette = [
         ContractApprover::STATUS_APPROVED->value => ['solid' => '#059669', 'soft' => 'rgba(5,150,105,.12)', 'icon' => 'heroicon-m-check'],
         ContractApprover::STATUS_REJECTED->value => ['solid' => '#dc2626', 'soft' => 'rgba(220,38,38,.12)', 'icon' => 'heroicon-m-x-mark'],
-        ContractApprover::STATUS_PENDING->value => ['solid' => '#6366f1', 'soft' => 'rgba(99,102,241,.14)', 'icon' => 'heroicon-m-clock'],
+        ContractApprover::STATUS_PENDING->value => ['solid' => '#2563eb', 'soft' => 'rgba(37,99,235,.14)', 'icon' => 'heroicon-m-clock'],
         ContractApprover::STATUS_QUEUED->value => ['solid' => '#cbd5e1', 'soft' => 'rgba(148,163,184,.18)', 'icon' => 'heroicon-m-ellipsis-horizontal'],
     ];
     $colorFor = fn (\App\Enums\ContractApproverStatus $s) => $palette[$s->value] ?? ['solid' => '#cbd5e1', 'soft' => 'rgba(148,163,184,.18)', 'icon' => 'heroicon-m-minus'];
@@ -30,7 +30,7 @@
         $isDraft => [__('app.label.not_submitted'), '#64748b'],
         $hasRejected => [__('app.contract_approver.status.rejected'), '#dc2626'],
         $approved === $total => [__('app.contract_approver.status.approved'), '#059669'],
-        default => ["{$approved}/{$total}", '#6366f1'],
+        default => ["{$approved}/{$total}", '#2563eb'],
     };
 
     $initials = function (?string $name): string {
@@ -129,7 +129,7 @@
             font-weight: 700;
             letter-spacing: .02em;
             background: var(--av-bg,#e0e7ff);
-            color: var(--av-fg,#4338ca);
+            color: var(--av-fg,#1d4ed8);
             object-fit: cover;
             overflow: hidden;
         }
@@ -185,7 +185,7 @@
         {{-- Header: one continuous fill bar + summary --}}
         @php
             $fillPct = $total > 0 ? round($approved / $total * 100) : 0;
-            $fillColor = $hasRejected ? '#dc2626' : ($approved === $total && $total > 0 ? '#059669' : '#6366f1');
+            $fillColor = $hasRejected ? '#dc2626' : ($approved === $total && $total > 0 ? '#059669' : '#2563eb');
         @endphp
         <div class="ca__hd">
             <div class="ca__bar">

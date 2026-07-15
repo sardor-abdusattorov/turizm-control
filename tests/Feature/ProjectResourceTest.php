@@ -152,6 +152,33 @@ it('opens the role-scoped breakdown modals from the count badges', function () {
         ->assertSuccessful();
 });
 
+it('scopes the project contracts badge totals to what the viewer may see', function () {
+    $project = Project::factory()->international()->create();
+
+    $manager = userWithPermission('view_any_project', 'view_project');
+
+    Contract::factory()->create([
+        'project_id' => $project->id,
+        'responsible_id' => $manager->id,
+        'amount' => 1000,
+    ]);
+    Contract::factory()->create([
+        'project_id' => $project->id,
+        'responsible_id' => User::factory()->create()->id,
+        'amount' => 999_999,
+    ]);
+
+    actingAs($manager);
+
+    // The manager only counts their own contract; the totals never leak the
+    // other manager's amount.
+    $totals = $project->visibleContractTotalsByCurrency();
+
+    expect($project->visibleContracts())->toHaveCount(1)
+        ->and($totals->sum('count'))->toBe(1)
+        ->and($totals->sum('total'))->toBe(1000.0);
+});
+
 it('scopes the breakdown view to one role and totals it per currency', function () {
     $uzs = Currency::factory()->create(['short_name' => 'UZS']);
     $project = Project::factory()->international()->create();

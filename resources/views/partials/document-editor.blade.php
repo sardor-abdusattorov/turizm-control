@@ -1,7 +1,7 @@
 @php
     $tones = [
         'gray' => ['bg' => '#f3f4f6', 'fg' => '#6b7280'],
-        'primary' => ['bg' => '#eef2ff', 'fg' => '#4338ca'],
+        'primary' => ['bg' => '#eff6ff', 'fg' => '#1d4ed8'],
     ];
     $pill = $tones[$statusTone ?? 'gray'] ?? $tones['gray'];
 @endphp
@@ -58,7 +58,7 @@
         .editor-topbar .close-btn:hover {
             background: #e0e7ff;
             color: #3730a3;
-            border-color: #c7d2fe;
+            border-color: #bfdbfe;
         }
         .editor-topbar .doc-meta {
             flex: 1;

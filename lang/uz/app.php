@@ -181,6 +181,8 @@ return [
         'finance' => 'Moliya',
         'already_signed' => 'Shartnoma allaqachon imzolangan',
         'signed_date' => 'Imzolangan sana',
+        'project_year' => 'Loyiha yili',
+        'all_years' => 'Barcha yillar',
         'estimate_amount' => 'Smeta bo‘yicha summa',
         'final_amount' => 'Yakuniy summa',
         'attendees_count' => 'Ishtirokchilar (kishi)',

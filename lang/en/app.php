@@ -181,6 +181,8 @@ return [
         'finance' => 'Finance',
         'already_signed' => 'Contract already signed',
         'signed_date' => 'Signing date',
+        'project_year' => 'Project year',
+        'all_years' => 'All years',
         'estimate_amount' => 'Estimated amount',
         'final_amount' => 'Final amount',
         'attendees_count' => 'Attendees (people)',

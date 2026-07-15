@@ -81,12 +81,12 @@
             gap: 1rem;
             padding: 1.1rem 1.25rem;
             border-radius: .75rem;
-            background: rgba(99,102,241,.04);
-            border: 1px solid rgba(99,102,241,.18);
+            background: rgba(37,99,235,.04);
+            border: 1px solid rgba(37,99,235,.18);
         }
         .dark .cf-file {
-            background: rgba(99,102,241,.07);
-            border-color: rgba(99,102,241,.22);
+            background: rgba(37,99,235,.07);
+            border-color: rgba(37,99,235,.22);
         }
         .cf-file__row {
             display: flex;
@@ -103,11 +103,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 1px 2px rgba(15,20,25,.06), inset 0 0 0 1px rgba(99,102,241,.10);
+            box-shadow: 0 1px 2px rgba(15,20,25,.06), inset 0 0 0 1px rgba(37,99,235,.10);
         }
         .dark .cf-file__thumb {
             background: rgba(255,255,255,.06);
-            box-shadow: inset 0 0 0 1px rgba(99,102,241,.15);
+            box-shadow: inset 0 0 0 1px rgba(37,99,235,.15);
         }
         .cf-file__thumb svg {
             width: 60%;
@@ -119,7 +119,7 @@
             bottom: .55rem;
             padding: .16rem .42rem;
             border-radius: .3rem;
-            background: #6366f1;
+            background: #2563eb;
             color: #fff;
             font-size: .6rem;
             font-weight: 700;
@@ -173,7 +173,7 @@
             transition: opacity .12s, background .12s;
         }
         .cf-btn--primary {
-            background: #6366f1;
+            background: #2563eb;
             color: #fff;
         }
         .cf-btn--primary:hover {

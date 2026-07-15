@@ -22,6 +22,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -137,13 +138,34 @@ class ContractForm
                                     ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey())
                                     ->columnSpanFull(),
 
-                                Select::make('project_id')
-                                    ->label(__('app.label.project_single'))
-                                    ->options(fn (): array => self::projectOptionsGrouped())
-                                    ->searchable()
-                                    ->preload()
-                                    ->nullable()
-                                    ->columnSpanFull(),
+                                Grid::make(['default' => 1, 'md' => 3])
+                                    ->columnSpanFull()
+                                    ->schema([
+                                        // Year first, then the (already shorter)
+                                        // project list — the two-step pick the
+                                        // registries are organised around.
+                                        Select::make('project_year')
+                                            ->label(__('app.label.project_year'))
+                                            ->options(fn (): array => self::projectYearOptions())
+                                            ->placeholder(__('app.label.all_years'))
+                                            ->live()
+                                            ->dehydrated(false)
+                                            ->afterStateHydrated(function (Set $set, ?Contract $record): void {
+                                                if ($record?->project?->starts_on) {
+                                                    $set('project_year', (string) $record->project->starts_on->year);
+                                                }
+                                            })
+                                            ->afterStateUpdated(fn (Set $set) => $set('project_id', null))
+                                            ->columnSpan(1),
+
+                                        Select::make('project_id')
+                                            ->label(__('app.label.project_single'))
+                                            ->options(fn (Get $get): array => self::projectOptionsGrouped($get('project_year')))
+                                            ->searchable()
+                                            ->preload()
+                                            ->nullable()
+                                            ->columnSpan(['default' => 1, 'md' => 2]),
+                                    ]),
 
                                 TextInput::make('title')
                                     ->label(__('app.label.contract_title'))
@@ -247,16 +269,37 @@ class ContractForm
     }
 
     /**
-     * Active projects grouped into optgroups by «тип · год» (newest first, as
-     * the projects come ordered by start date) so the picker reads like the
-     * sidebar instead of one flat 35-row list.
+     * Years that have active projects, newest first — the first step of the
+     * two-step project pick on the contract form.
      *
-     * @return array<string, array<int, string>>
+     * @return array<string, string>
      */
-    protected static function projectOptionsGrouped(): array
+    protected static function projectYearOptions(): array
     {
         return Project::query()
             ->active()
+            ->whereNotNull('starts_on')
+            ->pluck('starts_on')
+            ->map(fn ($date) => (string) $date->year)
+            ->unique()
+            ->sortDesc()
+            ->mapWithKeys(fn (string $year): array => [$year => $year])
+            ->all();
+    }
+
+    /**
+     * Active projects grouped into optgroups by «тип · год» (newest first, as
+     * the projects come ordered by start date), optionally narrowed to one
+     * year by the project_year step — so the picker reads like the sidebar
+     * instead of one flat 35-row list.
+     *
+     * @return array<string, array<int, string>>
+     */
+    protected static function projectOptionsGrouped(?string $year = null): array
+    {
+        return Project::query()
+            ->active()
+            ->when($year, fn ($query) => $query->whereYear('starts_on', $year))
             ->orderByDesc('starts_on')
             ->orderByDesc('id')
             ->get()
@@ -343,8 +386,8 @@ class ContractForm
             .'border:1px solid rgba(127,127,127,.22);border-radius:.65rem;'
             .'background:rgba(127,127,127,.05);';
         $numStyle = 'flex-shrink:0;width:1.55rem;height:1.55rem;display:flex;align-items:center;'
-            .'justify-content:center;border-radius:50%;background:rgba(99,102,241,.18);'
-            .'color:#6366f1;font-size:.78rem;font-weight:700;';
+            .'justify-content:center;border-radius:50%;background:rgba(37,99,235,.18);'
+            .'color:#2563eb;font-size:.78rem;font-weight:700;';
         $avStyle = 'width:2rem;height:2rem;border-radius:50%;object-fit:cover;flex-shrink:0;';
         $idStyle = 'min-width:0;display:flex;flex-direction:column;gap:.12rem;';
         $nmStyle = 'font-size:.92rem;font-weight:600;color:currentColor;';
@@ -361,7 +404,7 @@ class ContractForm
             }
 
             $avatar = $user->getFilamentAvatarUrl()
-                ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF';
+                ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=60A5FA&background=DBEAFE';
 
             $meta = trim(($user->department?->name ?? '').($user->position?->name ? ' · '.$user->position->name : ''), ' ·');
 

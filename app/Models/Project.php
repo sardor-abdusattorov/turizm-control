@@ -82,6 +82,51 @@ class Project extends Model
     }
 
     /**
+     * The project contracts the given user (defaults to the current one) is
+     * allowed to see — the same visibility rule as the count badge and the
+     * page tab, so a manager without oversight only ever sees their own.
+     *
+     * @return Collection<int, Contract>
+     */
+    public function visibleContracts(?User $user = null): Collection
+    {
+        return $this->contracts()
+            ->visibleTo($user)
+            ->with(['currency', 'contractType'])
+            ->latest('id')
+            ->get();
+    }
+
+    /**
+     * Per-currency contract totals of this project, limited to the contracts
+     * $user may see: one row per currency with the count and summed amount,
+     * ordered by count. Powers the contracts badge breakdown on the lists.
+     *
+     * @return Collection<int, array{currency: string, count: int, total: float}>
+     */
+    public function visibleContractTotalsByCurrency(?User $user = null): Collection
+    {
+        $rows = $this->contracts()
+            ->visibleTo($user)
+            ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount')
+            ->groupBy('currency_id')
+            ->get();
+
+        $currencies = Currency::query()
+            ->whereIn('id', $rows->pluck('currency_id')->filter())
+            ->pluck('short_name', 'id');
+
+        return $rows
+            ->map(fn (Contract $row): array => [
+                'currency' => $currencies->get($row->currency_id) ?? '—',
+                'count' => (int) $row->contracts_count,
+                'total' => (float) $row->total_amount,
+            ])
+            ->sortByDesc('count')
+            ->values();
+    }
+
+    /**
      * Buyruqs this project rests on, collected through its contracts (each
      * contract names its basis order) — a project may span several: the
      * annual 74-АФ plus the per-exhibition delegation order.

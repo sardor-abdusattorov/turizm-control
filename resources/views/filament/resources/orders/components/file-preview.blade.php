@@ -80,7 +80,7 @@
         --m2: #8b949e;
         --d: rgba(15,20,25,.07);
         --soft: #f8fafc;
-        --accent: #6366f1;
+        --accent: #2563eb;
     }
     .dark .of {
         --s: #18181b;
@@ -90,7 +90,7 @@
         --m2: #6e7681;
         --d: rgba(255,255,255,.07);
         --soft: rgba(255,255,255,.03);
-        --accent: #818cf8;
+        --accent: #60a5fa;
     }
     .of-card {
         display: flex;
@@ -110,11 +110,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(180deg,#f8fafc,#eef2ff);
+        background: linear-gradient(180deg,#f8fafc,#eff6ff);
         border-radius: .75rem;
     }
     .dark .of-thumb {
-        background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(99,102,241,.10));
+        background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(37,99,235,.10));
     }
     .of-thumb svg {
         width: 5rem;
