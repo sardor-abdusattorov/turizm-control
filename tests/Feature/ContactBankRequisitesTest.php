@@ -3,7 +3,6 @@
 use App\Filament\Resources\Contacts\Pages\CreateContact;
 use App\Filament\Resources\Contacts\Pages\EditContact;
 use App\Models\Contact;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -55,15 +54,28 @@ it('updates the bank account through the edit form', function () {
     expect($contact->fresh()->bank_account)->toBe('99988000200691007777');
 });
 
-it('rejects an account that is not exactly 20 digits', function () {
+it('rejects an account that is too short', function () {
     Livewire::test(CreateContact::class)
         ->fillForm([
             'type' => Contact::TYPE_LEGAL,
-            'name' => 'Short account co',
+            'name' => ['ru' => 'Short account co', 'uz' => 'Short account co', 'en' => 'Short account co'],
             'bank_account' => '123',
         ])
         ->call('create')
         ->assertHasFormErrors(['bank_account']);
+});
+
+it('accepts a longer foreign account up to 28 characters', function () {
+    Livewire::test(CreateContact::class)
+        ->fillForm([
+            'type' => Contact::TYPE_LEGAL,
+            'name' => ['ru' => 'Foreign Bank Co', 'uz' => 'Foreign Bank Co', 'en' => 'Foreign Bank Co'],
+            'bank_account' => '2020800020069100000012345678',
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    expect(Contact::query()->where('bank_account', '2020800020069100000012345678')->exists())->toBeTrue();
 });
 
 it('leaves the bank fields optional for a foreign counterparty', function () {

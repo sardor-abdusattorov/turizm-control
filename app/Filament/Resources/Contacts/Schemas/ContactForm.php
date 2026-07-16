@@ -116,19 +116,22 @@ class ContactForm
                     ->schema([
                         Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
+                                // No ->numeric(): with it, Laravel reads max:N as
+                                // "value <= N", so a 20-digit account (~2e19)
+                                // silently failed max and the form would not save.
+                                // Length bounds (20–28 chars) stay as string rules —
+                                // wide enough for a foreign account too.
                                 TextInput::make('bank_account')
                                     ->label(__('app.label.bank_account'))
                                     ->helperText(__('app.helper.bank_account'))
-                                    ->maxLength(20)
-                                    ->rule('digits:20')
-                                    ->extraInputAttributes(['inputmode' => 'numeric']),
+                                    ->minLength(20)
+                                    ->maxLength(28),
 
                                 TextInput::make('mfo')
                                     ->label(__('app.label.mfo'))
                                     ->helperText(__('app.helper.mfo'))
-                                    ->maxLength(5)
-                                    ->rule('digits:5')
-                                    ->extraInputAttributes(['inputmode' => 'numeric']),
+                                    ->minLength(5)
+                                    ->maxLength(5),
 
                                 TextInput::make('swift')
                                     ->label(__('app.label.swift'))
