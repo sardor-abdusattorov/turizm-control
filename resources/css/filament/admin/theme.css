@@ -52,7 +52,7 @@
 .pv-card {
     background: var(--s);
     border: 1px solid var(--d);
-    border-radius: 1rem;
+    border-radius: .75rem;
     overflow: hidden;
 }
 
@@ -812,34 +812,16 @@
     flex-direction: column;
     gap: 1.5rem;
 }
+/* Linear/Notion-style page header: no box, no coloured stripe — just a clean
+   band closed off by a single hairline. Status is carried by the pill. */
 .pj-hero {
     position: relative;
     display: flex;
-    align-items: center;
-    gap: 1.25rem;
+    align-items: flex-end;
+    gap: 1rem 2rem;
     flex-wrap: wrap;
-    background: var(--s);
-    border: 1px solid var(--d);
-    border-radius: 1rem;
-    padding: 1.35rem 1.5rem 1.35rem 1.65rem;
-    overflow: hidden;
-}
-.pj-hero::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-}
-.pj-hero--success::before {
-    background: #10b981;
-}
-.pj-hero--info::before {
-    background: var(--accent);
-}
-.pj-hero--gray::before {
-    background: #94a3b8;
+    padding: .1rem 0 1.4rem;
+    border-bottom: 1px solid var(--d);
 }
 .pj-hero__l {
     display: flex;
@@ -876,18 +858,26 @@
     margin-left: auto;
 }
 .pj-hero__metric {
-    font-size: 1.5rem;
-    font-weight: 750;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
     color: var(--t);
     font-variant-numeric: tabular-nums;
-    line-height: 1.1;
+    line-height: 1.05;
 }
 .pj-hero__metric-lb {
     font-size: .68rem;
     text-transform: uppercase;
-    letter-spacing: .05em;
+    letter-spacing: .06em;
     color: var(--m2);
     font-weight: 600;
+}
+.pj-hero__r .pj-hero__metric-lb:last-child {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: .75rem;
+    color: var(--m);
+    margin-top: .1rem;
 }
 .pj-chip {
     display: inline-flex;
@@ -909,9 +899,13 @@
 }
 .pj-stat {
     border: 1px solid var(--d);
-    border-radius: .75rem;
-    padding: .75rem .9rem;
+    border-radius: .625rem;
+    padding: .85rem 1rem;
     background: var(--s);
+    transition: border-color .15s ease;
+}
+.pj-stat:hover {
+    border-color: color-mix(in srgb, var(--t) 14%, transparent);
 }
 .pj-stat__lb {
     font-size: .7rem;

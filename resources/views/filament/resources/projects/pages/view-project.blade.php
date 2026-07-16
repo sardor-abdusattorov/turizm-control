@@ -89,7 +89,6 @@
                     {{ $record->status ? __('app.status.active') : __('app.status.inactive') }}
                 </span>
             </div>
-            <div class="pj-hero__title">{{ $record->name }}</div>
             <div class="pj-hero__dates">
                 <span style="display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;">{!! $ic('heroicon-o-calendar-days', 14) !!} {{ $period }}</span>
                 @if ($record->venue)
