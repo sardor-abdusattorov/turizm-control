@@ -1,8 +1,3 @@
-# Production stack. The database is EXTERNAL — point DB_* in .env at the managed
-# MySQL; there is no db container here. Local development layers MySQL,
-# phpMyAdmin and the Vite dev server on top via docker-compose.override.yml,
-# which `docker compose` auto-merges. On the server the deploy runs
-# `docker compose -f docker-compose.yml ...`, so the override is never applied.
 services:
   nginx:
     image: nginx:1.27-alpine
@@ -28,17 +23,12 @@ services:
       - vendor:/var/www/vendor
     env_file:
       - .env
-    # Reach services on the host — notably the production MySQL, which runs on
-    # the host rather than in a container. Set DB_HOST=host.docker.internal.
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
       - app
     restart: unless-stopped
 
-  # Daemon that runs `schedule:run` once a minute — drives every task registered
-  # in routes/console.php (CBU rate refresh, approval-reminder mailer, …). Uses
-  # the same image as the web container; no host cron needed.
   scheduler:
     build:
       context: .
@@ -50,18 +40,12 @@ services:
       - vendor:/var/www/vendor
     env_file:
       - .env
-    # Reach services on the host — notably the production MySQL, which runs on
-    # the host rather than in a container. Set DB_HOST=host.docker.internal.
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
       - app
     restart: unless-stopped
 
-  # Background queue worker — drives QUEUE_CONNECTION=database. Filament's
-  # database-notifications broadcast goes through the queue, so without this the
-  # bell drop-down would not light up in real time. --tries=3 keeps one bad job
-  # from blocking the lane.
   queue:
     build:
       context: .
@@ -73,16 +57,12 @@ services:
       - vendor:/var/www/vendor
     env_file:
       - .env
-    # Reach services on the host — notably the production MySQL, which runs on
-    # the host rather than in a container. Set DB_HOST=host.docker.internal.
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
       - app
     restart: unless-stopped
 
-  # Laravel Reverb WebSocket server — the bell drop-down listens on it for new
-  # database notifications in real time instead of polling.
   reverb:
     build:
       context: .
@@ -96,8 +76,6 @@ services:
       - vendor:/var/www/vendor
     env_file:
       - .env
-    # Reach services on the host — notably the production MySQL, which runs on
-    # the host rather than in a container. Set DB_HOST=host.docker.internal.
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -118,9 +96,6 @@ services:
       - onlyoffice_log:/var/log/onlyoffice
       - onlyoffice_cache:/var/lib/onlyoffice
       - onlyoffice_db:/var/lib/postgresql
-      # Brand the editor header with our logo. Community Edition silently
-      # ignores the JWT `customization.logo`, so we override the shared logo
-      # asset on disk instead (common/ is used by every editor).
       - ./docker/onlyoffice/header-logo.svg:/var/www/onlyoffice/documentserver/web-apps/common/main/resources/img/header/header-logo_s.svg:ro
       - ./docker/onlyoffice/header-logo.svg:/var/www/onlyoffice/documentserver/web-apps/common/main/resources/img/header/header-logo.svg:ro
     networks:

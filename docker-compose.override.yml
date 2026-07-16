@@ -1,8 +1,3 @@
-# Local development only. `docker compose` auto-merges this on top of
-# docker-compose.yml, adding a MySQL database, phpMyAdmin and the Vite dev
-# server, and making the PHP services wait for a healthy database. The
-# production deploy uses `docker compose -f docker-compose.yml ...`, so none of
-# this is ever started on the server (where MySQL is external).
 services:
   app:
     depends_on:
@@ -60,10 +55,6 @@ services:
       - app
     restart: unless-stopped
 
-  # Vite dev server for the Filament theme + app assets. Installs deps into the
-  # named node_modules volume on first run (so Linux binaries never clash with a
-  # host node_modules built on Windows/macOS), then runs `npm run dev`. For
-  # production, assets are built in CI (`npm run build`) and shipped.
   node:
     image: node:24-alpine
     container_name: turizm-node
