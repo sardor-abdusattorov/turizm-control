@@ -528,6 +528,7 @@ return [
         'action_not_allowed' => 'Bu amal shartnomaning joriy holatida ruxsat etilmagan',
         'approver_inactive' => 'O‘tkazib yuborildi — kelishuvchi akkaunti nofaol.',
         'no_contracts_for_contact' => 'Bu kontragent bilan hozircha shartnomalar yo‘q.',
+        'no_bank_accounts' => 'Bank hisoblari hali qo‘shilmagan.',
         'invalidated_on_edit' => 'Bekor qilindi — shartnoma tahrirlandi.',
         'invalidated_on_document_save' => 'Bekor qilindi — hujjat muharrirda o‘zgartirildi.',
         'save_warning_mid_flow' => 'Saqlash joriy kelishuv zanjirini bekor qiladi. Xuddi shu kelishuvchilar bilan yangi zanjir navbatga qo‘yiladi va shartnomani qayta kelishuvga yuborishingiz kerak bo‘ladi. Davom etilsinmi?',

@@ -10,6 +10,13 @@ class ViewSponsor extends ViewRecord
 {
     protected static string $resource = SponsorResource::class;
 
+    protected string $view = 'filament.resources.sponsors.pages.view-sponsor';
+
+    public function getHeading(): string
+    {
+        return $this->record->name;
+    }
+
     protected function getHeaderActions(): array
     {
         return [

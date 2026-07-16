@@ -176,6 +176,29 @@
     font-style: italic;
 }
 
+/* Multi-line detail row (descriptions/addresses) — the value wraps instead of
+   ellipsising, and the key top-aligns with it. Shared so any ow-/pv- view page
+   can use it, not just the order page that first defined it inline. */
+.ow-row--wrap .ow-row__k,
+.pv-row--wrap .pv-row__k {
+    align-items: flex-start;
+    padding-top: 1rem;
+}
+.ow-row--wrap .ow-row__v,
+.pv-row--wrap .pv-row__v {
+    align-items: flex-start;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+.ow-row__vl--wrap,
+.pv-row__vl--wrap {
+    white-space: normal;
+    line-height: 1.55;
+    overflow: visible;
+    text-overflow: clip;
+    font-weight: 500;
+}
+
 /* Thin accent scrollbars via the STANDARD properties only. We intentionally
    do NOT use ::-webkit-scrollbar: a webkit custom scrollbar is painted off the
    compositor, which forces main-thread scrolling — that's what made the page
