@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('pinfl', 30)->nullable()->unique();
             $table->string('oked', 20)->nullable();
             $table->json('address')->nullable();
-            $table->string('phone', 50)->nullable();
+            $table->string('phone', 100)->nullable();
             $table->string('email')->nullable();
             $table->string('website')->nullable();
             $table->string('contact_person')->nullable();
