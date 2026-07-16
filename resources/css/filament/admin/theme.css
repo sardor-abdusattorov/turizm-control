@@ -812,16 +812,37 @@
     flex-direction: column;
     gap: 1.5rem;
 }
-/* Linear/Notion-style page header: no box, no coloured stripe — just a clean
-   band closed off by a single hairline. Status is carried by the pill. */
+/* Base = calm minimalism, but grounded: a quiet surface (not a heavy box, no
+   colour stripe) with a hairline separating the meta from the headline metric
+   so it never reads bare. */
 .pj-hero {
     position: relative;
     display: flex;
-    align-items: flex-end;
-    gap: 1rem 2rem;
+    align-items: center;
+    gap: 1rem 1.5rem;
     flex-wrap: wrap;
-    padding: .1rem 0 1.4rem;
-    border-bottom: 1px solid var(--d);
+    background: var(--s);
+    border: 1px solid var(--d);
+    border-radius: .75rem;
+    padding: 1.2rem 1.4rem;
+}
+.pj-hero__r {
+    padding-left: 1.5rem;
+    position: relative;
+}
+.pj-hero__r::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 2.6rem;
+    width: 1px;
+    background: var(--d);
+}
+@media (max-width: 640px) {
+    .pj-hero__r { padding-left: 0; }
+    .pj-hero__r::before { display: none; }
 }
 .pj-hero__l {
     display: flex;
@@ -907,6 +928,65 @@
 .pj-stat:hover {
     border-color: color-mix(in srgb, var(--t) 14%, transparent);
 }
+
+/* ══════════ Design-direction variants (A/B/C compare) ══════════
+   Toggled by a class on the .pj wrapper so all three ship in one build.
+   Base (no class) = calm minimalism (above). */
+
+/* B · Премиум / soft — gentle tinted depth, larger scale, hover lift, no borders */
+.pj.dz-soft { gap: 1.75rem; }
+.pj.dz-soft .pj-hero {
+    border-color: transparent;
+    border-radius: 1rem;
+    padding: 1.55rem 1.75rem;
+    box-shadow: 0 1px 2px rgba(15, 20, 25, .04), 0 16px 38px -20px rgba(15, 20, 25, .18);
+}
+.dark .pj.dz-soft .pj-hero { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 38px -20px rgba(0,0,0,.55); }
+.pj.dz-soft .pj-hero__r::before { display: none; }
+.pj.dz-soft .pj-hero__metric { font-size: 2.35rem; letter-spacing: -.03em; }
+.pj.dz-soft .pj-stats { gap: 1rem; }
+.pj.dz-soft .pj-stat {
+    border-color: transparent;
+    border-radius: .9rem;
+    padding: 1.1rem 1.2rem;
+    box-shadow: 0 1px 2px rgba(15, 20, 25, .04), 0 12px 26px -18px rgba(15, 20, 25, .16);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.dark .pj.dz-soft .pj-stat { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 26px -18px rgba(0,0,0,.5); }
+.pj.dz-soft .pj-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(15, 20, 25, .05), 0 18px 34px -16px rgba(15, 20, 25, .22);
+}
+.pj.dz-soft .pj-stat__vl { font-size: 1.35rem; }
+
+/* C · Плотный дашборд — compact bar, tiles fused into one hairline-split strip */
+.pj.dz-dense { gap: .9rem; }
+.pj.dz-dense .pj-hero {
+    border-radius: .5rem;
+    padding: .85rem 1.05rem;
+    gap: .4rem 1.25rem;
+}
+.pj.dz-dense .pj-hero__r { padding-left: 1.1rem; }
+.pj.dz-dense .pj-hero__r::before { height: 2rem; }
+.pj.dz-dense .pj-hero__metric { font-size: 1.4rem; }
+.pj.dz-dense .pj-stats {
+    gap: 0;
+    border: 1px solid var(--d);
+    border-radius: .5rem;
+    overflow: hidden;
+    background: var(--s);
+}
+.pj.dz-dense .pj-stat {
+    border: 0;
+    border-right: 1px solid var(--d);
+    border-radius: 0;
+    padding: .55rem .85rem;
+}
+.pj.dz-dense .pj-stat:last-child { border-right: 0; }
+.pj.dz-dense .pj-stat:hover { background: var(--soft); }
+.pj.dz-dense .pj-stat__lb { font-size: .66rem; }
+.pj.dz-dense .pj-stat__vl { font-size: 1.02rem; margin-top: .2rem; }
+.pj.dz-dense .pj-stat__sub { font-size: .7rem; }
 .pj-stat__lb {
     font-size: .7rem;
     font-weight: 600;
