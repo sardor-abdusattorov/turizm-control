@@ -139,20 +139,27 @@ class ContactForm
                                             ->placeholder(__('app.label.bank_account_any_currency'))
                                             ->native(false),
 
-                                        // No ->numeric(): with it Laravel reads max:N
-                                        // as "value <= N", so a 20-digit account
-                                        // (~2e19) silently failed and the form would
-                                        // not save. Length is a plain string rule,
-                                        // wide enough for a foreign IBAN too.
+                                        // No ->numeric() (Laravel would read max:N
+                                        // as "value <= N" and reject a 20-digit
+                                        // account) and no strict minimum: a foreign
+                                        // account can be short (RX France: 11 digits)
+                                        // while an Uzbek one is 20.
                                         TextInput::make('account_number')
                                             ->label(__('app.label.bank_account'))
                                             ->helperText(__('app.helper.bank_account'))
                                             ->required()
-                                            ->minLength(20)
+                                            ->minLength(5) // a floor to catch typos, not a format
                                             ->maxLength(34),
 
                                         TextInput::make('bank_name')
                                             ->label(__('app.label.bank_name'))
+                                            ->columnSpanFull()
+                                            ->maxLength(255),
+
+                                        // Foreign requisites carry the bank's own
+                                        // address; Uzbek ones leave it blank.
+                                        TextInput::make('bank_address')
+                                            ->label(__('app.label.bank_address'))
                                             ->columnSpanFull()
                                             ->maxLength(255),
 

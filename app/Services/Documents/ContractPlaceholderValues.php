@@ -49,7 +49,9 @@ class ContractPlaceholderValues
             'contact.email' => (string) ($contact?->email ?? ''),
             'contact.bank_account' => (string) ($bankAccount?->account_number ?? ''),
             'contact.bank_name' => (string) ($bankAccount?->bank_name ?? ''),
+            'contact.bank_address' => (string) ($bankAccount?->bank_address ?? ''),
             'contact.mfo' => (string) ($bankAccount?->mfo ?? ''),
+            'contact.swift' => (string) ($bankAccount?->swift ?? ''),
         ];
     }
 }

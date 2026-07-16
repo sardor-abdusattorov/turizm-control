@@ -105,6 +105,33 @@ it('rejects an account that is too short', function () {
         ->assertHasFormErrors();
 });
 
+it('accepts a short foreign account with a bank address', function () {
+    // RX France: an 11-digit account (not the Uzbek 20) plus a bank address —
+    // both must go through, so the old minLength(20) is gone.
+    Livewire::test(CreateContact::class)
+        ->fillForm([
+            'type' => Contact::TYPE_LEGAL,
+            'name' => ['ru' => 'RX France', 'uz' => 'RX France', 'en' => 'RX France'],
+            'bankAccounts' => [
+                [
+                    'currency_id' => null,
+                    'account_number' => '00010067602',
+                    'bank_name' => 'CREDIT INDUSTRIEL ET COMMERCIAL',
+                    'bank_address' => '102 Boulevard Haussmann 75008 Paris - France',
+                    'mfo' => null,
+                    'swift' => null,
+                ],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $account = Contact::query()->where('name->ru', 'RX France')->first()?->bankAccounts()->first();
+
+    expect($account?->account_number)->toBe('00010067602')
+        ->and($account?->bank_address)->toBe('102 Boulevard Haussmann 75008 Paris - France');
+});
+
 it('leaves bank accounts optional for a foreign counterparty', function () {
     Livewire::test(CreateContact::class)
         ->fillForm([

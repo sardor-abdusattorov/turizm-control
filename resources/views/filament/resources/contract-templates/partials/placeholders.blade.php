@@ -12,7 +12,8 @@
             '{{contact.address}}', '{{contact.phone}}', '{{contact.email}}',
         ],
         __('app.label.placeholder_group_bank') => [
-            '{{contact.bank_account}}', '{{contact.bank_name}}', '{{contact.mfo}}',
+            '{{contact.bank_account}}', '{{contact.bank_name}}', '{{contact.bank_address}}',
+            '{{contact.mfo}}', '{{contact.swift}}',
         ],
     ];
 @endphp

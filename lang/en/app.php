@@ -93,6 +93,7 @@ return [
         'bank_account' => 'Account number',
         'bank_account_any_currency' => 'Any currency',
         'bank_name' => 'Bank name',
+        'bank_address' => 'Bank address',
         'mfo' => 'MFO',
 
         // Contracts
@@ -568,7 +569,7 @@ return [
         'pinfl' => '14 digits',
         'oked' => '5 digits',
         'mfo' => '5-digit bank code',
-        'bank_account' => '20 digits',
+        'bank_account' => '20 digits for Uzbek accounts',
         'template_file' => 'Upload the contract as a .docx with {{placeholders}} where values should be inserted. Max 10 MB.',
         'template_editor_independent' => 'Document content is edited in OnlyOffice — changes save automatically there. The "Save changes" button below only stores the metadata above (name, order type, sort, status).',
         'contract_template_choice' => 'Pick a contract template. Templates are listed by name.',

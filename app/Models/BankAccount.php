@@ -24,6 +24,7 @@ class BankAccount extends Model
         'currency_id',
         'account_number',
         'bank_name',
+        'bank_address',
         'mfo',
         'swift',
         'sort',

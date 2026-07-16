@@ -93,6 +93,7 @@ return [
         'bank_account' => 'Hisob raqami',
         'bank_account_any_currency' => 'Har qanday valyuta',
         'bank_name' => 'Bank nomi',
+        'bank_address' => 'Bank manzili',
         'mfo' => 'MFO',
 
         // Shartnomalar
@@ -563,7 +564,7 @@ return [
         'pinfl' => '14 raqam',
         'oked' => '5 raqam',
         'mfo' => '5 xonali bank kodi',
-        'bank_account' => '20 raqam',
+        'bank_account' => 'Oʻzbek hisoblari uchun 20 raqam',
         'template_file' => 'Shartnomani .docx formatida, qiymatlar qo‘yiladigan joylarda {{placeholders}} bilan yuklang. Maksimal 10 MB.',
         'template_editor_independent' => 'Hujjat matni OnlyOffice da tahrirlanadi — o‘zgarishlar u yerda avtomatik saqlanadi. Quyidagi "O‘zgarishlarni saqlash" tugmasi faqat yuqoridagi metama’lumotlarni (nomi, buyruq turi, saralash, holat) saqlaydi.',
         'contract_template_choice' => 'Shartnoma shablonini tanlang. Shablonlar nomi bo‘yicha ro‘yxatlangan.',

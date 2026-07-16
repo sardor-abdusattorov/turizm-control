@@ -127,8 +127,10 @@
 
         [__('app.label.bank_requisites'), array_values(array_filter([
             ['heroicon-o-building-library', __('app.label.bank_name'), $bankAccount?->bank_name],
+            ['heroicon-o-map-pin', __('app.label.bank_address'), $bankAccount?->bank_address],
             ['heroicon-o-banknotes', __('app.label.bank_account'), $bankAccount?->account_number],
             ['heroicon-o-hashtag', __('app.label.mfo'), $bankAccount?->mfo],
+            ['heroicon-o-globe-alt', __('app.label.swift'), $bankAccount?->swift],
         ], fn ($r) => ! empty($r[2])))],
     ] : [];
     // Drop any group that ended up empty after filtering.
