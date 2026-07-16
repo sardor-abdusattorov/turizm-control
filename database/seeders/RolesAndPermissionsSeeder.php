@@ -50,9 +50,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('order_type', ['view_any']),
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
             ...$this->resourcePermissions('project', ['view_any', 'view', 'create', 'update']),
-            ...$this->resourcePermissions('sponsor', ['view_any', 'view', 'create', 'update']),
-            'record_project_payment',
-        ]);
+            ...$this->resourcePermissions('sponsor', ['view_any', 'view', 'create', 'update']),        ]);
 
         // Legal + accounting review and approve contracts; they do not author
         // them, so contract-template access is intentionally left out (it stays
@@ -78,9 +76,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),
             ...$this->resourcePermissions('payment', ['view_any', 'view', 'create']),
-            ...$this->resourcePermissions('project', ['view_any', 'view']),
-            'record_project_payment',
-        ]);
+            ...$this->resourcePermissions('project', ['view_any', 'view']),        ]);
     }
 
     /**

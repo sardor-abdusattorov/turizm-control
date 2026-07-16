@@ -601,9 +601,8 @@ class Contract extends Model
     /**
      * Money actually collected on this contract. Contracts track a paid
      * *percent* (maintained by the payment observers), not an absolute figure,
-     * so the collected amount is derived from the total — this is the income
-     * counterpart of the old ProjectParticipant::paid_amount column, kept as a
-     * helper so every project/contact/sponsor breakdown reads it the same way.
+     * so the collected amount is derived from the total — kept as a helper so
+     * every project/contact/sponsor income breakdown reads it the same way.
      */
     public function paidAmount(): float
     {

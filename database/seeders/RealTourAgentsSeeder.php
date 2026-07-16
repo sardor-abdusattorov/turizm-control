@@ -6,10 +6,9 @@ use App\Models\Contact;
 use Illuminate\Database\Seeder;
 
 /**
- * Real tour operators from the 2025/2026 exhibition registries, under the
- * canonical names the registry import seeders link participants to (see
- * Database\Seeders\Concerns\LinksProjectParticipants::$contactAliases).
- * Websites/phones researched from official sources; unknown fields stay null.
+ * Real tour operators from the 2025/2026 exhibition registries, under their
+ * canonical names. Websites/phones researched from official sources; unknown
+ * fields stay null.
  */
 class RealTourAgentsSeeder extends Seeder
 {

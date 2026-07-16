@@ -269,11 +269,6 @@ return [
         'export_contact',
         'export_payment',
 
-        // Project-scoped: lets a role record a participant's fee installment
-        // from the project page. Separate from update_project so finance can
-        // register incoming money without being able to edit the project.
-        'record_project_payment',
-
         // Export gates for the projects registry and the sponsors list.
         'export_project',
         'export_sponsor',

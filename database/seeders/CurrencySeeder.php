@@ -91,8 +91,8 @@ class CurrencySeeder extends Seeder
      * An earlier revision seeded ten extra exhibition-geography currencies;
      * the registry keeps the core six (KZT is used by a foreign stand partner).
      * Remove the remaining retired codes from existing installs — but never a
-     * currency that is already referenced by a contract, project, participant
-     * or bank-account row.
+     * currency that is already referenced by a contract, project or
+     * bank-account row.
      */
     private function pruneRetiredCurrencies(): void
     {
@@ -102,9 +102,6 @@ class CurrencySeeder extends Seeder
             ->whereIn('short_name', $retired)
             ->whereNotIn('id', fn ($query) => $query->select('currency_id')
                 ->from('contracts')
-                ->whereNotNull('currency_id'))
-            ->whereNotIn('id', fn ($query) => $query->select('currency_id')
-                ->from('project_participants')
                 ->whereNotNull('currency_id'))
             ->whereNotIn('id', fn ($query) => $query->select('currency_id')
                 ->from('bank_accounts')

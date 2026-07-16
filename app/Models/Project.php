@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\ContractDirection;
-use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
 use App\Models\Concerns\HasActiveStatus;
 use Illuminate\Database\Eloquent\Builder;
@@ -147,18 +146,6 @@ class Project extends Model
             ->orderByDesc('id');
     }
 
-    public function participants(): HasMany
-    {
-        return $this->hasMany(ProjectParticipant::class)->orderBy('sort');
-    }
-
-    public function sponsors(): HasMany
-    {
-        return $this->hasMany(ProjectParticipant::class)
-            ->where('role', ParticipantRole::Sponsor)
-            ->orderBy('sort');
-    }
-
     public function contracts(): HasMany
     {
         return $this->hasMany(Contract::class)->orderByDesc('created_at');
@@ -291,29 +278,6 @@ class Project extends Model
             ->pluck('order')
             ->filter()
             ->unique('id')
-            ->values();
-    }
-
-    /**
-     * Per-currency totals of this project's participants of one role: one row
-     * per currency with the count, pledged and paid sums, ordered by count.
-     * Powers the participants / sponsors badge breakdowns on the project
-     * lists — mixed currencies stay apart, never converted.
-     *
-     * @return Collection<int, array{currency: string, count: int, total: float, paid: float}>
-     */
-    public function participantTotalsByCurrency(ParticipantRole $role): Collection
-    {
-        return $this->participants
-            ->where('role', $role)
-            ->groupBy(fn (ProjectParticipant $p): string => $p->currency?->short_name ?? '—')
-            ->map(fn ($group, string $currency): array => [
-                'currency' => $currency,
-                'count' => $group->count(),
-                'total' => (float) $group->sum('amount'),
-                'paid' => (float) $group->sum('paid_amount'),
-            ])
-            ->sortByDesc('count')
             ->values();
     }
 

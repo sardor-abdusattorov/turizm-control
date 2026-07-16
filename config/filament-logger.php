@@ -19,8 +19,6 @@ use App\Models\Order;
 use App\Models\OrderType;
 use App\Models\Position;
 use App\Models\Project;
-use App\Models\ProjectParticipant;
-use App\Models\ProjectPayment;
 use App\Models\Sponsor;
 use App\Models\User;
 use MrAdder\FilamentLogger\Loggers\AccessLogger;
@@ -315,8 +313,6 @@ return [
             Currency::class,
             Order::class,
             Project::class,
-            ProjectParticipant::class,
-            ProjectPayment::class,
             Sponsor::class,
         ],
     ],

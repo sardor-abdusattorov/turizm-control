@@ -13,7 +13,6 @@ use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Project;
-use App\Models\ProjectParticipant;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -97,15 +96,6 @@ it('updates a project through its typed resource', function () {
         ->assertHasNoFormErrors();
 
     expect($project->fresh()->name)->toBe('NEW-NAME');
-});
-
-it('deletes participant rows together with the project', function () {
-    $project = Project::factory()->create();
-    ProjectParticipant::factory()->count(3)->create(['project_id' => $project->id]);
-
-    $project->delete();
-
-    expect(ProjectParticipant::count())->toBe(0);
 });
 
 it('renders the gallery through the image-gallery component', function () {

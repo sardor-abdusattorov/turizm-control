@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Contract;
 use App\Models\Currency;
-use App\Models\ProjectParticipant;
 use Database\Seeders\CurrencySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -21,10 +21,10 @@ it('seeds the six core currencies', function () {
 
 it('prunes retired unreferenced currencies but keeps referenced ones', function () {
     // Simulate the earlier over-seeded install: one retired code unreferenced,
-    // one referenced by a participant row.
+    // one referenced by a contract row.
     $krw = Currency::factory()->create(['short_name' => 'KRW']);
     Currency::factory()->create(['short_name' => 'AED']);
-    ProjectParticipant::factory()->create(['currency_id' => $krw->id]);
+    Contract::factory()->create(['currency_id' => $krw->id]);
 
     $this->seed(CurrencySeeder::class);
 
