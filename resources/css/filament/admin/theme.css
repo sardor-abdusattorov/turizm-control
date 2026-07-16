@@ -9,16 +9,14 @@
    pulled into the theme so the palette + its dark-mode mirror live in one
    place. A page can still override any individual token locally if it
    needs a different accent. */
-.cw,
-.ow,
-.pv,
-.pj {
+/* Design tokens live on :root so every surface — pages, widgets and modal
+   content rendered outside the page wrappers — resolves the same palette.
+   --d is the hairline, --elev the card lift. */
+:root {
     --s: #fff;
     --t: #0f1419;
     --m: #57606a;
     --m2: #8b949e;
-    /* Hairlines were too faint. Bumped so card edges and row dividers read
-       clearly, like Filament's own sections. --elev is the card lift. */
     --d: rgba(15, 20, 25, .12);
     --elev: 0 1px 2px rgba(15, 20, 25, .06), 0 1px 3px rgba(15, 20, 25, .05);
     --soft: #f8fafc;
@@ -28,10 +26,7 @@
     --accent-strong: #1d4ed8;
 }
 
-.dark .cw,
-.dark .ow,
-.dark .pv,
-.dark .pj {
+.dark {
     --s: #1c1c20;
     --t: #f0f6fc;
     --m: #9aa4b2;
@@ -382,14 +377,14 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .04em;
-    color: var(--m, #57606a);
+    color: var(--m2);
     padding: .6rem .6rem;
-    border-bottom: 1px solid rgba(127, 127, 127, .2);
+    border-bottom: 1px solid var(--d);
     white-space: nowrap;
 }
 .af tbody td {
     padding: .75rem .9rem .75rem .6rem;
-    border-bottom: 1px solid rgba(127, 127, 127, .12);
+    border-bottom: 1px solid var(--d);
     vertical-align: top;
 }
 .af tbody tr:last-child td {
@@ -518,6 +513,97 @@
     opacity: .55;
     padding: 1rem 0;
     text-align: center;
+}
+
+/* ─── Breakdown modals (record list + per-currency summary) ─────────────────
+   Shared by the participants/sponsors/contracts badges on the lists and the
+   contact/sponsor breakdowns. Rendered inside Filament modals, so they rely on
+   the :root tokens. */
+.bkd {
+    border: 1px solid var(--d);
+    border-radius: .625rem;
+    overflow: hidden;
+    font-size: .875rem;
+}
+.bkd-row {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .6rem .9rem;
+    color: var(--t);
+}
+.bkd-row + .bkd-row {
+    border-top: 1px solid var(--d);
+}
+.bkd-row__l {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.bkd-row__nm {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.bkd-row__sub {
+    font-size: .72rem;
+    color: var(--m2);
+    margin-top: .1rem;
+}
+.bkd-row__r {
+    flex: 0 0 auto;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+.bkd-empty {
+    font-size: .875rem;
+    color: var(--m);
+}
+
+.cst {
+    margin-top: 1rem;
+    border: 1px solid var(--d);
+    border-radius: .625rem;
+    overflow: hidden;
+    font-size: .875rem;
+}
+.cst table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.cst th {
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--m2);
+    background: var(--soft);
+    padding: .55rem .9rem;
+    text-align: left;
+}
+.cst th + th {
+    text-align: center;
+}
+.cst th:last-child {
+    text-align: right;
+}
+.cst td {
+    padding: .55rem .9rem;
+    border-top: 1px solid var(--d);
+    color: var(--t);
+}
+.cst td:first-child {
+    font-weight: 600;
+}
+.cst td + td {
+    text-align: center;
+}
+.cst td:last-child {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
 }
 
 /* ─── Approval-flow modal on a phone: rows become labelled cards ────────────

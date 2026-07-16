@@ -11,10 +11,6 @@
             flex-direction: column;
             gap: 1.5rem;
             --r: rgba(15,20,25,.08);
-            /* Card edges / dividers — bumped to the app-wide hairline so they
-               read clearly (was .07, nearly invisible). --elev is the lift. */
-            --d: rgba(15,20,25,.12);
-            --elev: 0 1px 2px rgba(15,20,25,.06), 0 1px 3px rgba(15,20,25,.05);
             --track: #e6ebf1;
             --accent-soft: rgba(37,99,235,.12);
             --accent-softer: rgba(37,99,235,.05);
@@ -23,8 +19,6 @@
         }
         .dark .cw {
             --r: rgba(255,255,255,.08);
-            --d: rgba(255,255,255,.14);
-            --elev: 0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04);
             --track: rgba(255,255,255,.10);
             --accent-strong: #a5b4fc;
             --accent-soft: rgba(129,140,248,.16);
@@ -1171,8 +1165,12 @@
             max-height: 86vh;
             overflow: auto;
             background: var(--s);
-            border-radius: 1.1rem;
-            box-shadow: 0 20px 25px rgba(15,20,25,.18), 0 10px 10px rgba(15,20,25,.08);
+            border: 1px solid var(--d);
+            border-radius: .75rem;
+            box-shadow: 0 24px 48px -12px rgba(15,20,25,.25);
+        }
+        .dark .cw-modal__card {
+            box-shadow: 0 24px 48px -12px rgba(0,0,0,.65);
         }
         .cw-modal__hd {
             display: flex;

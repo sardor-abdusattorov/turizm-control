@@ -6,30 +6,20 @@
 
 <div>
     @if ($contracts->isEmpty())
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-            {{ __('app.message.no_contracts') }}
-        </p>
+        <p class="bkd-empty">{{ __('app.message.no_contracts') }}</p>
     @else
-        {{-- One row per contract: number + type on the left, amount and status
-             on the right — the record-list layout every breakdown modal uses.
-             Only the contracts the viewer may see reach this view. --}}
-        <div class="overflow-hidden rounded-xl text-sm ring-1 ring-gray-950/5 dark:ring-white/10">
+        <div class="bkd">
             @foreach ($contracts as $contract)
-                <div class="border-t border-gray-100 text-gray-700 first:border-t-0 dark:border-white/5 dark:text-gray-200"
-                     style="display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;">
-                    <div style="flex:1 1 auto;min-width:0;">
-                        <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                            {{ $contract->number }}
-                        </div>
-                        <div class="text-gray-400" style="font-size:.72rem;margin-top:.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                <div class="bkd-row">
+                    <div class="bkd-row__l">
+                        <div class="bkd-row__nm">{{ $contract->number }}</div>
+                        <div class="bkd-row__sub" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                             {{ $contract->contractType?->title ?? $contract->title }}
                         </div>
                     </div>
-                    <div style="flex:0 0 auto;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">
+                    <div class="bkd-row__r">
                         <div style="font-weight:600;">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</div>
-                        <div class="text-gray-400" style="font-size:.72rem;margin-top:.1rem;">
-                            {{ $contract->status->label() }}
-                        </div>
+                        <div class="bkd-row__sub">{{ $contract->status->label() }}</div>
                     </div>
                 </div>
             @endforeach

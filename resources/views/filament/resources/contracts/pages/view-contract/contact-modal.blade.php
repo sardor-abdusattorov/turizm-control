@@ -7,7 +7,7 @@
                     x-transition:enter-start="opacity-0 scale-95"
                     x-transition:enter-end="opacity-100 scale-100">
                     <div class="cw-modal__hd">
-                        <span class="cw-row__ic" style="background:var(--accent-soft);width:2.6rem;height:2.6rem;border-radius:.7rem;display:inline-flex;align-items:center;justify-content:center;color:var(--accent);">
+                        <span style="background:var(--soft);box-shadow:inset 0 0 0 1px var(--d);width:2.6rem;height:2.6rem;border-radius:.65rem;display:inline-flex;align-items:center;justify-content:center;color:var(--m);flex-shrink:0;">
                             {!! $ic('heroicon-o-building-office-2', 22) !!}
                         </span>
                         <div style="min-width:0;flex:1;">
