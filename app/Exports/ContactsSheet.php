@@ -38,6 +38,7 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
     {
         return (clone $this->query)
             ->where('type', $this->type)
+            ->with('bankAccounts')
             ->reorder('id');
     }
 
@@ -93,6 +94,8 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
         $createdAt = $row->created_at?->format('d.m.Y H:i');
 
         if ($this->isLegal()) {
+            $account = $row->bankAccountFor();
+
             return [
                 $number,
                 self::localized($row->name),
@@ -105,9 +108,9 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
                 $row->website,
                 $row->contact_person,
                 $row->director_name,
-                $row->bank_account,
-                $row->bank_name,
-                $row->mfo,
+                $account?->account_number,
+                $account?->bank_name,
+                $account?->mfo,
                 $status,
                 $createdAt,
             ];

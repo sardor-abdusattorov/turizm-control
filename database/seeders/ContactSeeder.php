@@ -937,14 +937,32 @@ class ContactSeeder extends Seeder
         ];
 
         foreach ($contacts as $data) {
+            // Bank details live in their own table now (one account per
+            // currency). Peel the flat block out of the literal and attach it
+            // as the counterparty's first, currency-agnostic account.
+            $bank = [
+                'account_number' => $data['bank_account'] ?? null,
+                'bank_name' => $data['bank_name'] ?? null,
+                'mfo' => $data['mfo'] ?? null,
+                'swift' => $data['swift'] ?? null,
+            ];
+            unset($data['bank_account'], $data['bank_name'], $data['mfo'], $data['swift']);
+
             $key = $data['type'] === Contact::TYPE_LEGAL
                 ? ['inn' => $data['inn'] ?? null]
                 : ['pinfl' => $data['pinfl'] ?? null];
 
-            Contact::firstOrCreate(
+            $contact = Contact::firstOrCreate(
                 $key,
                 array_merge($data, ['status' => true])
             );
+
+            if (filled($bank['account_number'])) {
+                $contact->bankAccounts()->firstOrCreate(
+                    ['account_number' => $bank['account_number']],
+                    $bank,
+                );
+            }
         }
     }
 }

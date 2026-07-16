@@ -91,6 +91,7 @@ return [
         'director_name' => 'Director (full name)',
         'bank_requisites' => 'Bank details',
         'bank_account' => 'Account number',
+        'bank_account_any_currency' => 'Any currency',
         'bank_name' => 'Bank name',
         'mfo' => 'MFO',
 
@@ -374,6 +375,7 @@ return [
         'delete' => 'Delete',
         'update' => 'Update',
         'add_participant' => 'Add participant',
+        'add_bank_account' => 'Add account',
         'quick_view' => 'Quick view',
         'open_project' => 'Open project',
         'confirm' => 'Confirm',

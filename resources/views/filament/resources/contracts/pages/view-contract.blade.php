@@ -96,6 +96,8 @@
     ];
 
     $contact = $record->contact;
+    // The account matching this contract's currency (falls back to a generic one).
+    $bankAccount = $contact?->bankAccountFor($record->currency_id);
     $contactType = $contact?->type === \App\Models\Contact::TYPE_INDIVIDUAL
         ? __('app.contact.type.individual')
         : __('app.contact.type.legal');
@@ -124,9 +126,9 @@
         ], fn ($r) => ! empty($r[2])))],
 
         [__('app.label.bank_requisites'), array_values(array_filter([
-            ['heroicon-o-building-library', __('app.label.bank_name'), $contact->bank_name],
-            ['heroicon-o-banknotes', __('app.label.bank_account'), $contact->bank_account],
-            ['heroicon-o-hashtag', __('app.label.mfo'), $contact->mfo],
+            ['heroicon-o-building-library', __('app.label.bank_name'), $bankAccount?->bank_name],
+            ['heroicon-o-banknotes', __('app.label.bank_account'), $bankAccount?->account_number],
+            ['heroicon-o-hashtag', __('app.label.mfo'), $bankAccount?->mfo],
         ], fn ($r) => ! empty($r[2])))],
     ] : [];
     // Drop any group that ended up empty after filtering.

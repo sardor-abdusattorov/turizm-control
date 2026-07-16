@@ -30,10 +30,6 @@ class Contact extends Model
         'website',
         'contact_person',
         'director_name',
-        'bank_account',
-        'bank_name',
-        'swift',
-        'mfo',
         'status',
     ];
 
@@ -76,6 +72,27 @@ class Contact extends Model
                 $item->id => $item->getTranslation('name', app()->getLocale()),
             ])
             ->toArray();
+    }
+
+    public function bankAccounts(): HasMany
+    {
+        return $this->hasMany(BankAccount::class)->orderBy('sort')->orderBy('id');
+    }
+
+    /**
+     * The bank account to quote for a deal in the given currency: the exact
+     * currency match first, then a currency-agnostic account, then whatever
+     * comes first. Null when the counterparty has no accounts on file.
+     */
+    public function bankAccountFor(?int $currencyId = null): ?BankAccount
+    {
+        $accounts = $this->relationLoaded('bankAccounts')
+            ? $this->bankAccounts
+            : $this->bankAccounts()->get();
+
+        return $accounts->firstWhere('currency_id', $currencyId)
+            ?? $accounts->firstWhere('currency_id', null)
+            ?? $accounts->first();
     }
 
     public function contracts(): HasMany

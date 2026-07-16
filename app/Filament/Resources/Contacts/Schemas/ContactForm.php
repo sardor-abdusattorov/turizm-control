@@ -4,7 +4,10 @@ namespace App\Filament\Resources\Contacts\Schemas;
 
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
 use App\Models\Contact;
+use App\Models\Currency;
 use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -114,33 +117,55 @@ class ContactForm
                     ->collapsible()
                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                     ->schema([
-                        Grid::make(['default' => 1, 'md' => 2])
+                        // One row per account — a counterparty holds a separate
+                        // account per currency (UZS / USD / EUR / RUB), and the
+                        // contract document pulls the one matching the deal's
+                        // currency.
+                        Repeater::make('bankAccounts')
+                            ->relationship()
+                            ->hiddenLabel()
+                            ->addActionLabel(__('app.action.add_bank_account'))
+                            ->itemLabel(fn (array $state): ?string => $state['account_number'] ?? null)
+                            ->collapsible()
+                            ->cloneable()
+                            ->orderColumn('sort')
+                            ->defaultItems(0)
                             ->schema([
-                                // No ->numeric(): with it, Laravel reads max:N as
-                                // "value <= N", so a 20-digit account (~2e19)
-                                // silently failed max and the form would not save.
-                                // Length bounds (20–28 chars) stay as string rules —
-                                // wide enough for a foreign account too.
-                                TextInput::make('bank_account')
-                                    ->label(__('app.label.bank_account'))
-                                    ->helperText(__('app.helper.bank_account'))
-                                    ->minLength(20)
-                                    ->maxLength(28),
+                                Grid::make(['default' => 1, 'md' => 2])
+                                    ->schema([
+                                        Select::make('currency_id')
+                                            ->label(__('app.label.currency_single'))
+                                            ->options(Currency::getActive())
+                                            ->placeholder(__('app.label.bank_account_any_currency'))
+                                            ->native(false),
 
-                                TextInput::make('mfo')
-                                    ->label(__('app.label.mfo'))
-                                    ->helperText(__('app.helper.mfo'))
-                                    ->minLength(5)
-                                    ->maxLength(5),
+                                        // No ->numeric(): with it Laravel reads max:N
+                                        // as "value <= N", so a 20-digit account
+                                        // (~2e19) silently failed and the form would
+                                        // not save. Length is a plain string rule,
+                                        // wide enough for a foreign IBAN too.
+                                        TextInput::make('account_number')
+                                            ->label(__('app.label.bank_account'))
+                                            ->helperText(__('app.helper.bank_account'))
+                                            ->required()
+                                            ->minLength(20)
+                                            ->maxLength(34),
 
-                                TextInput::make('swift')
-                                    ->label(__('app.label.swift'))
-                                    ->maxLength(20),
+                                        TextInput::make('bank_name')
+                                            ->label(__('app.label.bank_name'))
+                                            ->columnSpanFull()
+                                            ->maxLength(255),
 
-                                TextInput::make('bank_name')
-                                    ->label(__('app.label.bank_name'))
-                                    ->columnSpanFull()
-                                    ->maxLength(255),
+                                        TextInput::make('mfo')
+                                            ->label(__('app.label.mfo'))
+                                            ->helperText(__('app.helper.mfo'))
+                                            ->minLength(5)
+                                            ->maxLength(5),
+
+                                        TextInput::make('swift')
+                                            ->label(__('app.label.swift'))
+                                            ->maxLength(20),
+                                    ]),
                             ]),
                     ]),
             ]);

@@ -24,6 +24,10 @@ class ContractPlaceholderValues
         $contactAddress = $contact?->getTranslation('address', $locale, false)
             ?: ($contact?->address ?? '');
 
+        // The counterparty keeps one account per currency; quote the one that
+        // matches this deal's currency (falling back to a generic account).
+        $bankAccount = $contact?->bankAccountFor($contract->currency_id);
+
         return [
             'number' => (string) $contract->number,
             'title' => (string) $contract->title,
@@ -43,9 +47,9 @@ class ContractPlaceholderValues
             'contact.address' => (string) $contactAddress,
             'contact.phone' => (string) ($contact?->phone ?? ''),
             'contact.email' => (string) ($contact?->email ?? ''),
-            'contact.bank_account' => (string) ($contact?->bank_account ?? ''),
-            'contact.bank_name' => (string) ($contact?->bank_name ?? ''),
-            'contact.mfo' => (string) ($contact?->mfo ?? ''),
+            'contact.bank_account' => (string) ($bankAccount?->account_number ?? ''),
+            'contact.bank_name' => (string) ($bankAccount?->bank_name ?? ''),
+            'contact.mfo' => (string) ($bankAccount?->mfo ?? ''),
         ];
     }
 }

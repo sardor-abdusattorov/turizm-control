@@ -91,6 +91,7 @@ return [
         'director_name' => 'Direktor (F.I.Sh.)',
         'bank_requisites' => 'Bank rekvizitlari',
         'bank_account' => 'Hisob raqami',
+        'bank_account_any_currency' => 'Har qanday valyuta',
         'bank_name' => 'Bank nomi',
         'mfo' => 'MFO',
 
@@ -369,6 +370,7 @@ return [
         'delete' => "O'chirish",
         'update' => 'Yangilash',
         'add_participant' => 'Ishtirokchi qo\'shish',
+        'add_bank_account' => 'Hisob qo\'shish',
         'quick_view' => 'Tezkor ko\'rish',
         'open_project' => 'Loyihani ochish',
         'confirm' => 'Tasdiqlash',

@@ -91,6 +91,7 @@ return [
         'director_name' => 'Директор (Ф.И.О.)',
         'bank_requisites' => 'Банковские реквизиты',
         'bank_account' => 'Расчётный счёт',
+        'bank_account_any_currency' => 'Любая валюта',
         'bank_name' => 'Наименование банка',
         'mfo' => 'МФО',
 
@@ -369,6 +370,7 @@ return [
         'delete' => 'Удалить',
         'update' => 'Обновить',
         'add_participant' => 'Добавить участника',
+        'add_bank_account' => 'Добавить счёт',
         'quick_view' => 'Быстрый просмотр',
         'open_project' => 'Открыть проект',
         'confirm' => 'Подтвердить',

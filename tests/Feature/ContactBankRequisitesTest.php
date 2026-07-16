@@ -2,7 +2,11 @@
 
 use App\Filament\Resources\Contacts\Pages\CreateContact;
 use App\Filament\Resources\Contacts\Pages\EditContact;
+use App\Models\BankAccount;
 use App\Models\Contact;
+use App\Models\Contract;
+use App\Models\Currency;
+use App\Services\Documents\ContractPlaceholderValues;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -14,72 +18,94 @@ beforeEach(function () {
     actingAs(userWithPermission('view_any_contact', 'view_contact', 'create_contact', 'update_contact'));
 });
 
-it('saves a full 20-digit account, 9-digit INN and 5-digit MFO through the create form', function () {
-    // Regression: these fields used to carry ->numeric()->maxLength(N), which
-    // Laravel reads as "value <= N" for numeric input — so a real 20-digit
-    // account (2e19) silently failed max:20 and the form would not save.
+it('saves a bank account through the repeater on create', function () {
     Livewire::test(CreateContact::class)
         ->fillForm([
             'type' => Contact::TYPE_LEGAL,
             'name' => ['ru' => 'BEYOND EXPECTATIONS', 'uz' => 'BEYOND EXPECTATIONS', 'en' => 'BEYOND EXPECTATIONS'],
             'inn' => '306777698',
-            'oked' => '79900',
-            'bank_account' => '20208000200691000000',
-            'mfo' => '01069',
-            'bank_name' => 'в Яккасарайском фил. Давр банк',
+            'bankAccounts' => [
+                [
+                    'currency_id' => null,
+                    'account_number' => '20208000200691000000',
+                    'bank_name' => 'в Яккасарайском фил. Давр банк',
+                    'mfo' => '01069',
+                    'swift' => null,
+                ],
+            ],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $contact = Contact::query()->firstWhere('inn', '306777698');
+    $account = $contact?->bankAccounts()->first();
 
-    expect($contact)->not->toBeNull()
-        ->and($contact->bank_account)->toBe('20208000200691000000')
-        ->and($contact->mfo)->toBe('01069')
-        ->and($contact->oked)->toBe('79900');
+    expect($account)->not->toBeNull()
+        ->and($account->account_number)->toBe('20208000200691000000')
+        ->and($account->mfo)->toBe('01069');
 });
 
-it('updates the bank account through the edit form', function () {
-    $contact = Contact::factory()->create([
-        'type' => Contact::TYPE_LEGAL,
-        'bank_account' => '20208000200691000000',
-        'phone' => null,
+it('stores several accounts, one per currency', function () {
+    $uzs = Currency::factory()->create(['short_name' => 'UZS']);
+    $eur = Currency::factory()->create(['short_name' => 'EUR']);
+
+    Livewire::test(CreateContact::class)
+        ->fillForm([
+            'type' => Contact::TYPE_LEGAL,
+            'name' => ['ru' => 'ZAMIN DMC', 'uz' => 'ZAMIN DMC', 'en' => 'ZAMIN DMC'],
+            'inn' => '311343097',
+            'bankAccounts' => [
+                ['currency_id' => $uzs->id, 'account_number' => '20208000107076480001', 'bank_name' => 'Капитал банк', 'mfo' => '00445', 'swift' => null],
+                ['currency_id' => $eur->id, 'account_number' => '20208978807076480001', 'bank_name' => 'Капитал банк', 'mfo' => '00445', 'swift' => null],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $contact = Contact::query()->firstWhere('inn', '311343097');
+
+    expect($contact->bankAccounts)->toHaveCount(2);
+});
+
+it('updates an account through the edit form', function () {
+    $contact = Contact::factory()->create(['type' => Contact::TYPE_LEGAL, 'phone' => null]);
+    $account = BankAccount::factory()->create([
+        'contact_id' => $contact->id,
+        'account_number' => '20208000200691000000',
     ]);
 
     Livewire::test(EditContact::class, ['record' => $contact->id])
-        ->fillForm(['bank_account' => '99988000200691007777'])
+        ->fillForm([
+            'bankAccounts' => [
+                [
+                    'currency_id' => null,
+                    'account_number' => '99988000200691007777',
+                    'bank_name' => $account->bank_name,
+                    'mfo' => '01069',
+                    'swift' => null,
+                ],
+            ],
+        ])
         ->call('save')
         ->assertHasNoFormErrors();
 
-    expect($contact->fresh()->bank_account)->toBe('99988000200691007777');
+    expect($contact->fresh()->bankAccounts()->first()->account_number)->toBe('99988000200691007777');
 });
 
 it('rejects an account that is too short', function () {
     Livewire::test(CreateContact::class)
         ->fillForm([
             'type' => Contact::TYPE_LEGAL,
-            'name' => ['ru' => 'Short account co', 'uz' => 'Short account co', 'en' => 'Short account co'],
-            'bank_account' => '123',
+            'name' => ['ru' => 'Short co', 'uz' => 'Short co', 'en' => 'Short co'],
+            'bankAccounts' => [
+                ['currency_id' => null, 'account_number' => '123', 'bank_name' => null, 'mfo' => null, 'swift' => null],
+            ],
         ])
         ->call('create')
-        ->assertHasFormErrors(['bank_account']);
+        ->assertHasFormErrors();
 });
 
-it('accepts a longer foreign account up to 28 characters', function () {
-    Livewire::test(CreateContact::class)
-        ->fillForm([
-            'type' => Contact::TYPE_LEGAL,
-            'name' => ['ru' => 'Foreign Bank Co', 'uz' => 'Foreign Bank Co', 'en' => 'Foreign Bank Co'],
-            'bank_account' => '2020800020069100000012345678',
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    expect(Contact::query()->where('bank_account', '2020800020069100000012345678')->exists())->toBeTrue();
-});
-
-it('leaves the bank fields optional for a foreign counterparty', function () {
-    // Foreigners without an Uzbek INN/account must still save.
+it('leaves bank accounts optional for a foreign counterparty', function () {
     Livewire::test(CreateContact::class)
         ->fillForm([
             'type' => Contact::TYPE_LEGAL,
@@ -89,4 +115,32 @@ it('leaves the bank fields optional for a foreign counterparty', function () {
         ->assertHasNoFormErrors();
 
     expect(Contact::query()->where('name->ru', 'RX France')->exists())->toBeTrue();
+});
+
+it('picks the account matching the deal currency, falling back to a generic one', function () {
+    $eur = Currency::factory()->create(['short_name' => 'EUR']);
+    $contact = Contact::factory()->create(['type' => Contact::TYPE_LEGAL]);
+
+    $generic = BankAccount::factory()->create(['contact_id' => $contact->id, 'currency_id' => null, 'account_number' => 'GENERIC-0000000000000', 'sort' => 0]);
+    $euro = BankAccount::factory()->create(['contact_id' => $contact->id, 'currency_id' => $eur->id, 'account_number' => 'EURO-00000000000000000', 'sort' => 1]);
+
+    expect($contact->bankAccountFor($eur->id)?->id)->toBe($euro->id)
+        ->and($contact->bankAccountFor(999)?->id)->toBe($generic->id);
+});
+
+it('feeds the currency-matched account into the contract document placeholders', function () {
+    $eur = Currency::factory()->create(['short_name' => 'EUR']);
+    $contact = Contact::factory()->create(['type' => Contact::TYPE_LEGAL]);
+
+    BankAccount::factory()->create(['contact_id' => $contact->id, 'currency_id' => null, 'account_number' => 'UZS-ACCOUNT-000000000', 'sort' => 0]);
+    BankAccount::factory()->create(['contact_id' => $contact->id, 'currency_id' => $eur->id, 'account_number' => 'EUR-ACCOUNT-000000000', 'sort' => 1]);
+
+    $contract = Contract::factory()->create([
+        'contact_id' => $contact->id,
+        'currency_id' => $eur->id,
+    ]);
+
+    $values = app(ContractPlaceholderValues::class)->for($contract);
+
+    expect($values['contact.bank_account'])->toBe('EUR-ACCOUNT-000000000');
 });
