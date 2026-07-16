@@ -121,12 +121,11 @@ class ContactForm
                                     ->helperText(__('app.helper.bank_account'))
                                     ->numeric()
                                     ->minLength(20)
-                                    ->maxLength(20),
+                                    ->maxLength(28),
 
                                 TextInput::make('mfo')
                                     ->label(__('app.label.mfo'))
                                     ->helperText(__('app.helper.mfo'))
-                                    ->numeric()
                                     ->minLength(5)
                                     ->maxLength(5),
 
