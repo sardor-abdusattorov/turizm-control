@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Contracts\Tables;
 
 use App\Enums\PaymentStatus;
-use App\Exports\ContractsExport;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Contracts\Pages\ViewContract;
 use App\Models\Contact;
@@ -24,13 +23,11 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ContractsTable
 {
@@ -165,13 +162,8 @@ class ContractsTable
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when($data['from'] ?? null, fn (Builder $q, $date) => $q->whereDate('created_at', '>=', $date))
                         ->when($data['until'] ?? null, fn (Builder $q, $date) => $q->whereDate('created_at', '<=', $date))),
-            ], layout: FiltersLayout::AboveContentCollapsible)
-            // The heaviest filter set in the app: a grid above the table
-            // (collapsed by default) instead of one endless dropdown column.
-            ->filtersFormColumns([
-                'md' => 2,
-                'xl' => 4,
             ])
+            ->filtersFormColumns(2)
             ->recordUrl(fn (Contract $record) => ContractResource::getUrl('view', ['record' => $record]))
             ->recordActions([
                 Action::make('contractFlow')
@@ -239,19 +231,6 @@ class ContractsTable
                         ->visible(fn (Contract $record) => $record->canBeDeletedBy()),
                 ])
                     ->icon('heroicon-m-ellipsis-vertical'),
-            ])
-            ->headerActions([
-                Action::make('exportXlsx')
-                    ->label(__('app.action.export_xlsx'))
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('gray')
-                    ->visible(fn (): bool => ViewContract::userCanExportContract())
-                    ->action(function ($livewire) {
-                        return Excel::download(
-                            new ContractsExport($livewire->getFilteredTableQuery()),
-                            'contracts-'.now()->format('Y-m-d').'.xlsx',
-                        );
-                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

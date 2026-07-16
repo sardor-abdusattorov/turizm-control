@@ -2,13 +2,16 @@
 
 namespace App\Filament\Resources\Contracts\Pages;
 
+use App\Exports\ContractsExport;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Models\ContractApprover;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListContracts extends ListRecords
 {
@@ -17,6 +20,15 @@ class ListContracts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('exportXlsx')
+                ->label(__('app.action.export_xlsx'))
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('gray')
+                ->visible(fn (): bool => ViewContract::userCanExportContract())
+                ->action(fn ($livewire) => Excel::download(
+                    new ContractsExport($livewire->getFilteredTableQuery()),
+                    'contracts-'.now()->format('Y-m-d').'.xlsx',
+                )),
             CreateAction::make(),
         ];
     }
