@@ -54,17 +54,17 @@ class ContactForm
                                     ->label(__('app.label.oked'))
                                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                                     ->helperText(__('app.helper.oked'))
-                                    ->numeric()
-                                    ->minLength(5)
-                                    ->maxLength(5),
+                                    ->maxLength(5)
+                                    ->rule('digits:5')
+                                    ->extraInputAttributes(['inputmode' => 'numeric']),
 
                                 TextInput::make('inn')
                                     ->label(__('app.label.inn'))
                                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                                     ->helperText(__('app.helper.inn'))
-                                    ->numeric()
-                                    ->minLength(9)
                                     ->maxLength(9)
+                                    ->rule('digits:9')
+                                    ->extraInputAttributes(['inputmode' => 'numeric'])
                                     ->unique('contacts', 'inn', ignoreRecord: true),
 
                                 TextInput::make('pinfl')
@@ -72,9 +72,9 @@ class ContactForm
                                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_INDIVIDUAL)
                                     ->required(fn (Get $get) => $get('type') === Contact::TYPE_INDIVIDUAL)
                                     ->helperText(__('app.helper.pinfl'))
-                                    ->numeric()
-                                    ->minLength(14)
                                     ->maxLength(14)
+                                    ->rule('digits:14')
+                                    ->extraInputAttributes(['inputmode' => 'numeric'])
                                     ->unique('contacts', 'pinfl', ignoreRecord: true),
 
                                 TextInput::make('director_name')
@@ -119,16 +119,16 @@ class ContactForm
                                 TextInput::make('bank_account')
                                     ->label(__('app.label.bank_account'))
                                     ->helperText(__('app.helper.bank_account'))
-                                    ->numeric()
-                                    ->minLength(20)
-                                    ->maxLength(20),
+                                    ->maxLength(20)
+                                    ->rule('digits:20')
+                                    ->extraInputAttributes(['inputmode' => 'numeric']),
 
                                 TextInput::make('mfo')
                                     ->label(__('app.label.mfo'))
                                     ->helperText(__('app.helper.mfo'))
-                                    ->numeric()
-                                    ->minLength(5)
-                                    ->maxLength(5),
+                                    ->maxLength(5)
+                                    ->rule('digits:5')
+                                    ->extraInputAttributes(['inputmode' => 'numeric']),
 
                                 TextInput::make('swift')
                                     ->label(__('app.label.swift'))
