@@ -21,30 +21,16 @@
 
 <x-filament-panels::page>
 <div class="pj" style="display:flex;flex-direction:column;gap:1rem;">
-    {{-- Hero --}}
-    <section class="pj-hero pj-hero--{{ $heroVariant }}">
-        <div class="pj-hero__l">
-            <div class="pj-hero__meta">
-                <span class="pj-chip">{!! $ic('heroicon-o-sparkles', 14) !!} {{ __('app.label.sponsor_single') }}</span>
-                <span class="pj-pill pj-pill--{{ $heroVariant }}">{{ $record->status ? __('app.status.active') : __('app.status.inactive') }}</span>
-            </div>
-            {{-- The name is already the page H1 (getHeading) — no second copy here. --}}
-            <div class="pj-hero__dates">
-                @if ($record->inn)
-                    <span style="display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;">{!! $ic('heroicon-o-finger-print', 14) !!} {{ __('app.label.inn') }}: {{ $record->inn }}</span>
-                @endif
-                @if ($record->phone)
-                    <span style="display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;">{!! $ic('heroicon-o-phone', 14) !!} {{ $record->phone }}</span>
-                @endif
-            </div>
-        </div>
-    </section>
-
-    {{-- All requisites --}}
+    {{-- No separate near-empty hero: тип + статус ride in the card header (the
+         name is already the page H1), the data lives in the bordered card. --}}
     <section class="ow-card">
         <header class="ow-hd">
             <span class="ow-hd__ic">{!! $ic('heroicon-o-clipboard-document-list', 18) !!}</span>
             <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
+            <span class="pj-hd-tags">
+                <span class="pj-chip">{!! $ic('heroicon-o-sparkles', 14) !!} {{ __('app.label.sponsor_single') }}</span>
+                <span class="pj-pill pj-pill--{{ $heroVariant }}">{{ $record->status ? __('app.status.active') : __('app.status.inactive') }}</span>
+            </span>
         </header>
         <div class="ow-dets">
             @foreach ($details as [$icon, $label, $value, $type])

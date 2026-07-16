@@ -178,6 +178,7 @@
         background: var(--s);
         border: 1px solid var(--d);
         border-radius: .75rem;
+        box-shadow: var(--elev);
     }
     .ow-hero__l {
         flex: 1;

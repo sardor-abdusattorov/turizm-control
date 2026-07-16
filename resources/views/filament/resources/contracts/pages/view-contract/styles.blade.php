@@ -11,7 +11,10 @@
             flex-direction: column;
             gap: 1.5rem;
             --r: rgba(15,20,25,.08);
-            --d: rgba(15,20,25,.07);
+            /* Card edges / dividers — bumped to the app-wide hairline so they
+               read clearly (was .07, nearly invisible). --elev is the lift. */
+            --d: rgba(15,20,25,.12);
+            --elev: 0 1px 2px rgba(15,20,25,.06), 0 1px 3px rgba(15,20,25,.05);
             --track: #e6ebf1;
             --accent-soft: rgba(37,99,235,.12);
             --accent-softer: rgba(37,99,235,.05);
@@ -20,19 +23,21 @@
         }
         .dark .cw {
             --r: rgba(255,255,255,.08);
-            --d: rgba(255,255,255,.07);
+            --d: rgba(255,255,255,.14);
+            --elev: 0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04);
             --track: rgba(255,255,255,.10);
             --accent-strong: #a5b4fc;
             --accent-soft: rgba(129,140,248,.16);
             --accent-softer: rgba(129,140,248,.08);
             --accent-ring: rgba(129,140,248,.25);
         }
-        /* Flat card — a hairline border, no drop shadow, matching the calm
-           minimalism the order/payment/project pages now share. */
+        /* Calm card — a clear hairline border plus a subtle lift, matching the
+           order/payment/project pages and Filament's own sections. */
         .cw-card {
             background: var(--s);
             border: 1px solid var(--d);
             border-radius: .75rem;
+            box-shadow: var(--elev);
             overflow: hidden;
         }
         .cw-hd {

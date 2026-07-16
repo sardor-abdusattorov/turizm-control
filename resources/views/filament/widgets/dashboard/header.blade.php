@@ -81,11 +81,13 @@
             padding: 1.25rem 1.5rem;
             border-radius: 0.75rem;
             background: #fff;
-            border: 1px solid rgba(17, 24, 39, 0.07);
+            border: 1px solid rgba(17, 24, 39, 0.12);
+            box-shadow: 0 1px 2px rgba(15, 20, 25, .06), 0 1px 3px rgba(15, 20, 25, .05);
         }
         .dark .dh {
-            background: rgba(255, 255, 255, 0.02);
-            border-color: rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .04);
         }
 
         .dh__top {
