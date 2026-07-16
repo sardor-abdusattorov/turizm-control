@@ -18,7 +18,11 @@ class SendApprovalReminders extends Command
         $candidates = ContractApprover::query()
             ->where('status', ContractApprover::STATUS_PENDING)
             ->whereNotNull('due_at')
-            ->whereHas('contract', fn ($query) => $query->where('status', Contract::STATUS_IN_REVIEW))
+            // Both review stages — the director's SLA must be reminded too.
+            ->whereHas('contract', fn ($query) => $query->whereIn('status', [
+                Contract::STATUS_IN_REVIEW,
+                Contract::STATUS_IN_REVIEW_DIRECTOR,
+            ]))
             ->with(['contract', 'user'])
             ->get();
 

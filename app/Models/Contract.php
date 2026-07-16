@@ -554,7 +554,9 @@ class Contract extends Model
         }
 
         return $query
-            ->where('status', self::STATUS_IN_REVIEW)
+            // Both review stages: a director reviewing (IN_REVIEW_DIRECTOR)
+            // must see their queue too, not only the regular chain stage.
+            ->whereIn('status', [self::STATUS_IN_REVIEW, self::STATUS_IN_REVIEW_DIRECTOR])
             ->whereIn('id', function ($sub) use ($user): void {
                 $sub->select('a1.contract_id')
                     ->from('contract_approvers as a1')
