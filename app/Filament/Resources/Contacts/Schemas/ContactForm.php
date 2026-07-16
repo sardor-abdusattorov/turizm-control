@@ -18,7 +18,7 @@ use Filament\Schemas\Schema;
 
 class ContactForm
 {
-    public static function configure(Schema $schema, bool $withBankAccounts = true): Schema
+    public static function configure(Schema $schema, bool $inline = false): Schema
     {
         return $schema
             ->columns(1)
@@ -113,74 +113,108 @@ class ContactForm
                             ->default(true),
                     ]),
 
-                // The bank-accounts repeater binds to a HasMany relationship, so
-                // it only works on the standalone Contact form. When this form is
-                // reused as a Select create-option (e.g. adding a counterparty
-                // inline while drafting a contract) there is no saved Contact to
-                // bind to — leave it out and let accounts be added by editing the
-                // contact afterwards.
-                ...($withBankAccounts ? [Section::make(__('app.label.bank_requisites'))
+                // A counterparty holds one account per currency (UZS / USD / EUR
+                // / RUB); the generated contract pulls the account matching the
+                // deal's currency. Shown for legal entities on both the standalone
+                // form and the inline create-option.
+                Section::make(__('app.label.bank_requisites'))
                     ->collapsible()
                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                     ->schema([
-                        // One row per account — a counterparty holds a separate
-                        // account per currency (UZS / USD / EUR / RUB), and the
-                        // contract document pulls the one matching the deal's
-                        // currency.
-                        Repeater::make('bankAccounts')
-                            ->relationship()
-                            ->hiddenLabel()
-                            ->addActionLabel(__('app.action.add_bank_account'))
-                            ->itemLabel(fn (array $state): ?string => $state['account_number'] ?? null)
-                            ->collapsible()
-                            ->cloneable()
-                            ->orderColumn('sort')
-                            ->defaultItems(0)
-                            ->schema([
-                                Grid::make(['default' => 1, 'md' => 2])
-                                    ->schema([
-                                        Select::make('currency_id')
-                                            ->label(__('app.label.currency_single'))
-                                            ->options(Currency::getActive())
-                                            ->placeholder(__('app.label.bank_account_any_currency'))
-                                            ->native(false),
-
-                                        // No ->numeric() (Laravel would read max:N
-                                        // as "value <= N" and reject a 20-digit
-                                        // account) and no strict minimum: a foreign
-                                        // account can be short (RX France: 11 digits)
-                                        // while an Uzbek one is 20.
-                                        TextInput::make('account_number')
-                                            ->label(__('app.label.bank_account'))
-                                            ->helperText(__('app.helper.bank_account'))
-                                            ->required()
-                                            ->minLength(5) // a floor to catch typos, not a format
-                                            ->maxLength(34),
-
-                                        TextInput::make('bank_name')
-                                            ->label(__('app.label.bank_name'))
-                                            ->columnSpanFull()
-                                            ->maxLength(255),
-
-                                        // Foreign requisites carry the bank's own
-                                        // address; Uzbek ones leave it blank.
-                                        TextInput::make('bank_address')
-                                            ->label(__('app.label.bank_address'))
-                                            ->columnSpanFull()
-                                            ->maxLength(255),
-
-                                        TextInput::make('mfo')
-                                            ->label(__('app.label.mfo'))
-                                            ->helperText(__('app.helper.mfo'))
-                                            ->minLength(5)
-                                            ->maxLength(5),
-
-                                        TextInput::make('swift')
-                                            ->label(__('app.label.swift'))
-                                            ->maxLength(20),
-                                    ]),
-                            ]),
-                    ])] : []),
+                        self::bankAccountsRepeater($inline),
+                    ]),
             ]);
+    }
+
+    /**
+     * The bank-accounts editor. On the standalone contact form it binds to the
+     * HasMany relationship, so Filament persists the rows through the contact. In
+     * the inline create-option (adding a counterparty while drafting a contract)
+     * there is no saved contact to bind to yet, so it stays a plain repeater and
+     * ContactForm::createWithBankAccounts() writes the rows by hand.
+     */
+    protected static function bankAccountsRepeater(bool $inline): Repeater
+    {
+        $repeater = Repeater::make('bankAccounts')
+            ->hiddenLabel()
+            ->addActionLabel(__('app.action.add_bank_account'))
+            ->itemLabel(fn (array $state): ?string => $state['account_number'] ?? null)
+            ->collapsible()
+            ->cloneable()
+            ->defaultItems(0)
+            ->schema([
+                Grid::make(['default' => 1, 'md' => 2])
+                    ->schema([
+                        Select::make('currency_id')
+                            ->label(__('app.label.currency_single'))
+                            ->options(Currency::getActive())
+                            ->placeholder(__('app.label.bank_account_any_currency'))
+                            ->native(false),
+
+                        // No ->numeric() (Laravel would read max:N as "value <= N"
+                        // and reject a 20-digit account) and no strict minimum: a
+                        // foreign account can be short (RX France: 11 digits) while
+                        // an Uzbek one is 20.
+                        TextInput::make('account_number')
+                            ->label(__('app.label.bank_account'))
+                            ->helperText(__('app.helper.bank_account'))
+                            ->required()
+                            ->minLength(5) // a floor to catch typos, not a format
+                            ->maxLength(34),
+
+                        TextInput::make('bank_name')
+                            ->label(__('app.label.bank_name'))
+                            ->columnSpanFull()
+                            ->maxLength(255),
+
+                        // Foreign requisites carry the bank's own address; Uzbek
+                        // ones leave it blank.
+                        TextInput::make('bank_address')
+                            ->label(__('app.label.bank_address'))
+                            ->columnSpanFull()
+                            ->maxLength(255),
+
+                        TextInput::make('mfo')
+                            ->label(__('app.label.mfo'))
+                            ->helperText(__('app.helper.mfo'))
+                            ->minLength(5)
+                            ->maxLength(5),
+
+                        TextInput::make('swift')
+                            ->label(__('app.label.swift'))
+                            ->maxLength(20),
+                    ]),
+            ]);
+
+        // Only the standalone form has a persisted parent to bind the HasMany to;
+        // the inline create-option stays a plain repeater (persisted by hand).
+        if (! $inline) {
+            $repeater->relationship()->orderColumn('sort');
+        }
+
+        return $repeater;
+    }
+
+    /**
+     * Persist a counterparty created inline from the contract form together with
+     * the bank accounts entered in the same modal. The inline repeater is a plain
+     * one (no parent existed while it rendered), so its rows arrive as nested data
+     * and are written to the HasMany here. Empty rows are dropped.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public static function createWithBankAccounts(array $data): Contact
+    {
+        $accounts = collect($data['bankAccounts'] ?? [])
+            ->filter(fn (array $row): bool => filled($row['account_number'] ?? null))
+            ->values()
+            ->all();
+
+        unset($data['bankAccounts']);
+
+        $contact = Contact::create($data);
+        $contact->bankAccounts()->createMany($accounts);
+
+        return $contact;
     }
 }

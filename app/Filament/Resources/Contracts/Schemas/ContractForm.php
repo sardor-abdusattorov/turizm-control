@@ -153,8 +153,8 @@ class ContractForm
                                     ->required(fn (Get $get): bool => ! self::typeUsesSponsor($get('contract_type_id')))
                                     ->searchable()
                                     ->preload()
-                                    ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema, withBankAccounts: false))
-                                    ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey())
+                                    ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema, inline: true))
+                                    ->createOptionUsing(fn (array $data) => ContactForm::createWithBankAccounts($data)->getKey())
                                     ->columnSpanFull(),
 
                                 Select::make('sponsor_id')
