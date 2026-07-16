@@ -27,10 +27,12 @@
             --accent-softer: rgba(129,140,248,.08);
             --accent-ring: rgba(129,140,248,.25);
         }
+        /* Flat card — a hairline border, no drop shadow, matching the calm
+           minimalism the order/payment/project pages now share. */
         .cw-card {
             background: var(--s);
-            border-radius: 1rem;
-            box-shadow: 0 0 0 1px var(--r), 0 1px 3px rgba(15,20,25,.06), 0 1px 2px rgba(15,20,25,.04);
+            border: 1px solid var(--d);
+            border-radius: .75rem;
             overflow: hidden;
         }
         .cw-hd {
@@ -689,16 +691,14 @@
         .cw-doc__ic {
             width: 3.25rem;
             height: 3.25rem;
-            border-radius: .85rem;
-            background: linear-gradient(135deg, var(--accent-ring), var(--accent-softer));
-            color: var(--accent-strong);
+            border-radius: .75rem;
+            background: var(--soft);
+            box-shadow: inset 0 0 0 1px var(--d);
+            color: var(--m);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-        }
-        .dark .cw-doc__ic {
-            color: var(--accent);
         }
         .cw-doc__nm {
             font-weight: 600;
@@ -827,12 +827,12 @@
             width: 5rem;
             height: 6rem;
             flex-shrink: 0;
-            background: var(--accent-softer);
+            background: var(--soft);
             border-radius: .7rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: inset 0 0 0 1px var(--accent-soft);
+            box-shadow: inset 0 0 0 1px var(--d);
         }
         .cw-file__thumb svg {
             width: 60%;
@@ -844,12 +844,15 @@
             bottom: .55rem;
             padding: .16rem .42rem;
             border-radius: .3rem;
-            background: var(--accent);
+            background: #475569;
             color: #fff;
             font-size: .6rem;
             font-weight: 700;
             letter-spacing: .04em;
             line-height: 1;
+        }
+        .dark .cw-file__ext {
+            background: #64748b;
         }
         .cw-file__body {
             display: flex;

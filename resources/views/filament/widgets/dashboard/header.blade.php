@@ -71,6 +71,8 @@
     </div>
 
     <style>
+        /* Flat greeting card — a hairline border, no colour stripe. The day's
+           state is carried by the summary text; the one accent is the CTA. */
         .dh {
             position: relative;
             display: flex;
@@ -78,7 +80,6 @@
             gap: 1rem;
             padding: 1.25rem 1.5rem;
             border-radius: 0.75rem;
-            overflow: hidden;
             background: #fff;
             border: 1px solid rgba(17, 24, 39, 0.07);
         }
@@ -86,15 +87,6 @@
             background: rgba(255, 255, 255, 0.02);
             border-color: rgba(255, 255, 255, 0.07);
         }
-        .dh::before {
-            content: "";
-            position: absolute;
-            inset: 0 auto 0 0;
-            width: 3px;
-        }
-        .dh--success::before { background: #16a34a; }
-        .dh--warning::before { background: #d97706; }
-        .dh--danger::before  { background: #dc2626; }
 
         .dh__top {
             display: flex;

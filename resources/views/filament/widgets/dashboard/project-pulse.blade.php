@@ -14,7 +14,7 @@
 
 <x-filament-widgets::widget>
     @if (! $project)
-        <section class="pj" style="border:1px solid var(--d);border-radius:1rem;background:var(--s);padding:1.5rem;">
+        <section class="pj" style="border:1px solid var(--d);border-radius:.75rem;background:var(--s);padding:1.5rem;">
             <p class="pj-empty" style="padding:0;text-align:left;">{{ __('app.message.no_projects_yet') }}</p>
         </section>
     @else

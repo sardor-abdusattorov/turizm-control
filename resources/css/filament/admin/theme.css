@@ -65,21 +65,15 @@
     border-bottom: 1px solid var(--d);
 }
 
+/* The section-header icon reads as a quiet muted glyph, not a coloured box —
+   the same calm treatment the contract page (.cw-hd__ic) already uses. Colour
+   is reserved for status pills and the one accent, per the minimalism language. */
 .ow-hd__ic,
 .pv-hd__ic {
-    width: 1.85rem;
-    height: 1.85rem;
-    border-radius: .55rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--accent-softer);
-    color: var(--accent-strong);
-}
-
-.dark .ow-hd__ic,
-.dark .pv-hd__ic {
-    color: var(--accent);
+    color: var(--m2);
 }
 
 .ow-hd__t,
@@ -928,65 +922,6 @@
 .pj-stat:hover {
     border-color: color-mix(in srgb, var(--t) 14%, transparent);
 }
-
-/* ══════════ Design-direction variants (A/B/C compare) ══════════
-   Toggled by a class on the .pj wrapper so all three ship in one build.
-   Base (no class) = calm minimalism (above). */
-
-/* B · Премиум / soft — gentle tinted depth, larger scale, hover lift, no borders */
-.pj.dz-soft { gap: 1.75rem; }
-.pj.dz-soft .pj-hero {
-    border-color: transparent;
-    border-radius: 1rem;
-    padding: 1.55rem 1.75rem;
-    box-shadow: 0 1px 2px rgba(15, 20, 25, .04), 0 16px 38px -20px rgba(15, 20, 25, .18);
-}
-.dark .pj.dz-soft .pj-hero { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 38px -20px rgba(0,0,0,.55); }
-.pj.dz-soft .pj-hero__r::before { display: none; }
-.pj.dz-soft .pj-hero__metric { font-size: 2.35rem; letter-spacing: -.03em; }
-.pj.dz-soft .pj-stats { gap: 1rem; }
-.pj.dz-soft .pj-stat {
-    border-color: transparent;
-    border-radius: .9rem;
-    padding: 1.1rem 1.2rem;
-    box-shadow: 0 1px 2px rgba(15, 20, 25, .04), 0 12px 26px -18px rgba(15, 20, 25, .16);
-    transition: transform .18s ease, box-shadow .18s ease;
-}
-.dark .pj.dz-soft .pj-stat { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 26px -18px rgba(0,0,0,.5); }
-.pj.dz-soft .pj-stat:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 3px 6px rgba(15, 20, 25, .05), 0 18px 34px -16px rgba(15, 20, 25, .22);
-}
-.pj.dz-soft .pj-stat__vl { font-size: 1.35rem; }
-
-/* C · Плотный дашборд — compact bar, tiles fused into one hairline-split strip */
-.pj.dz-dense { gap: .9rem; }
-.pj.dz-dense .pj-hero {
-    border-radius: .5rem;
-    padding: .85rem 1.05rem;
-    gap: .4rem 1.25rem;
-}
-.pj.dz-dense .pj-hero__r { padding-left: 1.1rem; }
-.pj.dz-dense .pj-hero__r::before { height: 2rem; }
-.pj.dz-dense .pj-hero__metric { font-size: 1.4rem; }
-.pj.dz-dense .pj-stats {
-    gap: 0;
-    border: 1px solid var(--d);
-    border-radius: .5rem;
-    overflow: hidden;
-    background: var(--s);
-}
-.pj.dz-dense .pj-stat {
-    border: 0;
-    border-right: 1px solid var(--d);
-    border-radius: 0;
-    padding: .55rem .85rem;
-}
-.pj.dz-dense .pj-stat:last-child { border-right: 0; }
-.pj.dz-dense .pj-stat:hover { background: var(--soft); }
-.pj.dz-dense .pj-stat__lb { font-size: .66rem; }
-.pj.dz-dense .pj-stat__vl { font-size: 1.02rem; margin-top: .2rem; }
-.pj.dz-dense .pj-stat__sub { font-size: .7rem; }
 .pj-stat__lb {
     font-size: .7rem;
     font-weight: 600;
@@ -1090,6 +1025,8 @@
     gap: .65rem;
     min-width: 0;
 }
+/* Quiet neutral icon chip (soft surface + hairline), matching the flattened
+   document icons — no accent box, keeping the calm minimalism language. */
 .pj-bar__ic {
     flex-shrink: 0;
     display: flex;
@@ -1098,12 +1035,9 @@
     width: 2.25rem;
     height: 2.25rem;
     border-radius: .65rem;
-    background: var(--accent-soft);
-    color: var(--accent-strong);
-}
-.dark .pj-bar__ic {
-    background: var(--accent-softer);
-    color: var(--accent);
+    background: var(--soft);
+    box-shadow: inset 0 0 0 1px var(--d);
+    color: var(--m);
 }
 .pj-bar__tx {
     display: flex;

@@ -45,7 +45,7 @@
                 <span class="pj-chip">{!! $ic($isLegal ? 'heroicon-o-building-office-2' : 'heroicon-o-user', 14) !!} {{ $typeLabel }}</span>
                 <span class="pj-pill pj-pill--{{ $heroVariant }}">{{ $record->status ? __('app.status.active') : __('app.status.inactive') }}</span>
             </div>
-            <span class="pj-hero__title">{{ $loc($record->name) }}</span>
+            {{-- The name is already the page H1 (getHeading) — no second copy here. --}}
             <div class="pj-hero__dates">
                 @if ($record->inn)
                     <span style="display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;">{!! $ic('heroicon-o-finger-print', 14) !!} {{ __('app.label.inn') }}: {{ $record->inn }}</span>

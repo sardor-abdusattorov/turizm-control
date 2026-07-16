@@ -166,29 +166,18 @@
         --track: rgba(255, 255, 255, .08);
     }
 
-    /* HERO */
+    /* HERO — grounded minimalism: a quiet surface with a hairline border, no
+       colour stripe (status lives in the pill on the right), matching the
+       project pilot the whole app now follows. */
     .ow-hero {
         position: relative;
         display: flex;
         align-items: flex-start;
         gap: 1.25rem;
-        padding: 1.25rem 1.5rem;
+        padding: 1.2rem 1.4rem;
         background: var(--s);
         border: 1px solid var(--d);
-        border-radius: 1rem;
-        overflow: hidden;
-    }
-    .ow-hero::before {
-        content: "";
-        position: absolute;
-        inset: 0 auto 0 0;
-        width: 4px;
-    }
-    .ow-hero--success::before {
-        background: #10b981;
-    }
-    .ow-hero--gray::before {
-        background: #94a3b8;
+        border-radius: .75rem;
     }
     .ow-hero__l {
         flex: 1;
@@ -203,17 +192,16 @@
         gap: .55rem;
         flex-wrap: wrap;
     }
+    /* Quiet grey category chip — colour is reserved for the status pill. */
     .ow-chip {
         display: inline-flex;
         align-items: center;
         gap: .35rem;
         font-size: .72rem;
         font-weight: 600;
-        letter-spacing: .03em;
-        text-transform: uppercase;
-        color: var(--accent-strong);
-        background: var(--accent-soft);
-        padding: .25rem .55rem;
+        color: var(--m);
+        background: var(--soft);
+        padding: .22rem .6rem;
         border-radius: 999px;
     }
     .ow-num {
@@ -308,12 +296,12 @@
         width: 5rem;
         height: 6rem;
         flex-shrink: 0;
-        background: var(--accent-softer);
+        background: var(--soft);
         border-radius: .7rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: inset 0 0 0 1px var(--accent-soft);
+        box-shadow: inset 0 0 0 1px var(--d);
     }
     .ow-file__thumb svg {
         width: 60%;
@@ -325,12 +313,15 @@
         bottom: .55rem;
         padding: .16rem .42rem;
         border-radius: .3rem;
-        background: var(--accent);
+        background: #475569;
         color: #fff;
         font-size: .6rem;
         font-weight: 700;
         letter-spacing: .04em;
         line-height: 1;
+    }
+    .dark .ow-file__ext {
+        background: #64748b;
     }
     .ow-file__body {
         display: flex;

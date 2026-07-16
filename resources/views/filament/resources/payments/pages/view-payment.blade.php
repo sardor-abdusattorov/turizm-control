@@ -89,24 +89,17 @@
         gap: 1rem;
     }
 
-    /* HERO */
+    /* HERO — grounded minimalism: quiet surface + hairline border, no colour
+       stripe (the paid percent on the right is the headline). */
     .pv-hero {
         position: relative;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 1.25rem;
-        padding: 1.25rem 1.5rem;
+        padding: 1.2rem 1.4rem;
         background: var(--s);
         border: 1px solid var(--d);
-        border-radius: 1rem;
-        overflow: hidden;
-    }
-    .pv-hero::before {
-        content: "";
-        position: absolute;
-        inset: 0 auto 0 0;
-        width: 4px;
-        background: #10b981;
+        border-radius: .75rem;
     }
     .pv-hero__l {
         flex: 1;
@@ -121,17 +114,16 @@
         gap: .55rem;
         flex-wrap: wrap;
     }
+    /* Quiet grey chip — colour is reserved for the paid-percent figure. */
     .pv-chip {
         display: inline-flex;
         align-items: center;
         gap: .35rem;
         font-size: .72rem;
         font-weight: 600;
-        letter-spacing: .03em;
-        text-transform: uppercase;
-        color: var(--accent-strong);
-        background: var(--accent-soft);
-        padding: .25rem .55rem;
+        color: var(--m);
+        background: var(--soft);
+        padding: .22rem .6rem;
         border-radius: 999px;
     }
     .pv-num {
@@ -174,21 +166,20 @@
         align-items: center;
         gap: .4rem;
     }
+    /* The paid percent as a plain headline figure (no filled pill), mirroring
+       the project hero's metric — big, tabular, quietly green for "paid". */
     .pv-amount {
         flex-shrink: 0;
         align-self: center;
-        font-size: 1.6rem;
-        font-weight: 750;
-        line-height: 1;
+        font-size: 1.9rem;
+        font-weight: 700;
+        line-height: 1.05;
         color: #047857;
-        background: #d1fae5;
-        padding: .5rem .85rem;
-        border-radius: .7rem;
-        letter-spacing: -.01em;
+        letter-spacing: -.02em;
+        font-variant-numeric: tabular-nums;
     }
     .dark .pv-amount {
         color: #6ee7b7;
-        background: rgba(16,185,129,.16);
     }
 
     /* card / hd / dets / row primitives live in theme.css. */
