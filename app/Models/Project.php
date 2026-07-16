@@ -198,6 +198,10 @@ class Project extends Model
         $rows = ($sponsors ? $this->sponsorshipContracts() : $this->feeContracts())
             ->visibleTo($user)
             ->where('status', '!=', Contract::STATUS_REJECTED->value)
+            // The relations carry a default ORDER BY created_at; a grouped
+            // aggregate must drop it or MySQL's only_full_group_by rejects the
+            // query (the rows are re-sorted by count below anyway).
+            ->reorder()
             ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount, SUM(amount * paid_percent / 100) as total_paid')
             ->groupBy('currency_id')
             ->get();
@@ -244,6 +248,9 @@ class Project extends Model
     {
         $rows = $this->contracts()
             ->visibleTo($user)
+            // Drop the relation's default ORDER BY created_at — a grouped
+            // aggregate with it set trips MySQL's only_full_group_by.
+            ->reorder()
             ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount')
             ->groupBy('currency_id')
             ->get();
