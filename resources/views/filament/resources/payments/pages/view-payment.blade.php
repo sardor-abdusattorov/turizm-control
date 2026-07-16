@@ -19,7 +19,7 @@
 
 <x-filament-panels::page>
 <div class="pv">
-    {{-- ============ HERO ============ --}}
+    {{-- HERO --}}
     <section class="pv-hero">
         <div class="pv-hero__l">
             <div class="pv-hero__meta">
@@ -38,7 +38,7 @@
         <span class="pv-amount">{{ $percent }}%</span>
     </section>
 
-    {{-- ============ INFORMATION TABLE ============ --}}
+    {{-- INFORMATION TABLE --}}
     <section class="pv-card">
         <div class="pv-hd">
             <span class="pv-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span>
@@ -63,7 +63,7 @@
         </div>
     </section>
 
-    {{-- ============ SCREENSHOT ============ --}}
+    {{-- SCREENSHOT --}}
     @if ($shotUrl)
         <section class="pv-card">
             <div class="pv-hd">

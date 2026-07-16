@@ -32,7 +32,7 @@
 
 <x-filament-panels::page>
 <div class="ow" x-data="{ basicExpanded: false }">
-    {{-- ============ HERO ============ --}}
+    {{-- HERO --}}
     <section class="ow-hero ow-hero--{{ $heroVariant }}">
         <div class="ow-hero__l">
             <div class="ow-hero__meta">
@@ -57,7 +57,7 @@
         <span class="ow-pill ow-pill--{{ $heroVariant }}">{{ $statusLabel }}</span>
     </section>
 
-    {{-- ============ FILE CARD — FULL WIDTH ============ --}}
+    {{-- FILE CARD — FULL WIDTH --}}
     @if ($record->fileExists())
         <section class="ow-card">
             <div class="ow-hd">
@@ -110,7 +110,7 @@
         </section>
     @endif
 
-    {{-- ============ INFORMATION — FULL WIDTH TABLE ============ --}}
+    {{-- INFORMATION — FULL WIDTH TABLE --}}
     <section class="ow-card">
         <div class="ow-hd">
             <span class="ow-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span>

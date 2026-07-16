@@ -80,7 +80,7 @@
 <x-filament-panels::page>
 <div class="pj">
 
-    {{-- ============ HERO ============ --}}
+    {{-- HERO --}}
     <section class="pj-hero pj-hero--{{ $heroVariant }}">
         <div class="pj-hero__l">
             <div class="pj-hero__meta">
@@ -105,7 +105,7 @@
         </div>
     </section>
 
-    {{-- ============ METRIC TILES ============ --}}
+    {{-- METRIC TILES --}}
     <section class="pj-stats">
         @if ($isInternalProject)
             {{-- Local events budget: plan vs fact from the registry columns. --}}
@@ -144,7 +144,7 @@
         </div>
     </section>
 
-    {{-- ============ TABS ============ --}}
+    {{-- TABS --}}
     {{-- go() pins the viewport to the tab strip when switching from a long
          panel to a short one — otherwise the browser keeps the old scroll
          offset and the page appears to jump. --}}

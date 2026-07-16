@@ -152,10 +152,8 @@ class Project extends Model
     }
 
     /**
-     * The project's income contracts — participant fees and sponsorship. This
-     * is the source project income is derived from now that manual participants
-     * are gone: «Взнос участника» rows face a Contact, «Спонсорство» rows a
-     * Sponsor, both with `direction = Income` on their type.
+     * Income contracts — participant fees (a Contact) and sponsorship
+     * (a Sponsor); the source all project income figures derive from.
      */
     public function incomeContracts(): HasMany
     {
@@ -165,8 +163,7 @@ class Project extends Model
     }
 
     /**
-     * Participant-fee income contracts — «Взнос участника» deals signed with a
-     * Contact (no sponsor). The «Участники» side of the project split.
+     * Participant-fee income contracts — deals signed with a Contact.
      */
     public function feeContracts(): HasMany
     {
@@ -174,8 +171,7 @@ class Project extends Model
     }
 
     /**
-     * Sponsorship income contracts — «Спонсорство» deals signed with a Sponsor
-     * (sponsor_id set). The «Спонсоры» side of the project split.
+     * Sponsorship income contracts — deals signed with a Sponsor.
      */
     public function sponsorshipContracts(): HasMany
     {
@@ -185,11 +181,9 @@ class Project extends Model
     }
 
     /**
-     * Per-currency totals of the project's income contracts of one kind (fees
-     * or sponsorship) the given user may see: one row per currency with the
-     * count, pledged and paid sums, ordered by count. Rejected contracts are
-     * dropped and "paid" is derived from the paid percent. Powers the
-     * «Участники» / «Спонсоры» count-badge breakdowns on the project lists.
+     * Per-currency totals of one income kind (fees or sponsorship) the given
+     * user may see; rejected contracts drop out, "paid" is derived from the
+     * paid percent. Powers the count-badge breakdowns on the project lists.
      *
      * @return Collection<int, array{currency: string, count: int, total: float, paid: float}>
      */
@@ -324,10 +318,8 @@ class Project extends Model
     }
 
     /**
-     * Non-rejected income contracts of the project as a collection — the source
-     * of the pledged/collected income figures below. Uses the eager-loaded
-     * relation when present (the export loads it) and excludes rejected
-     * contracts, mirroring the expense side in contractTotalsByCurrency().
+     * Non-rejected income contracts, reusing the eager-loaded relation when
+     * present (the export loads it).
      *
      * @return Collection<int, Contract>
      */
@@ -341,11 +333,9 @@ class Project extends Model
     }
 
     /**
-     * Revenue of the project — the pledged total of its income contracts
-     * (participant fees + sponsorship). Formerly summed manual participants;
-     * derived from contracts now that those are gone. Currency-blind by design
-     * (see the docblock history): fee projects are effectively single-currency
-     * and the registry "profit" equals this sum.
+     * Pledged total of the income contracts. Currency-blind by design: fee
+     * projects are effectively single-currency and the registry "profit"
+     * equals this sum.
      */
     public function feesTotal(): float
     {
@@ -354,9 +344,8 @@ class Project extends Model
     }
 
     /**
-     * Total actually collected across the project's income contracts. Contracts
-     * store a paid *percent*, not an absolute figure, so the collected money is
-     * derived per contract (amount * paid_percent / 100) and summed.
+     * Total actually collected. Contracts store a paid *percent*, so the money
+     * is derived per contract (amount * paid_percent / 100) and summed.
      */
     public function paidTotal(): float
     {
