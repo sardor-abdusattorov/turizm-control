@@ -29,7 +29,10 @@ it('seeds the foreign stand/land legal entities and their accounts', function ()
     expect($eb->bankAccounts()->count())->toBe(4)
         ->and($eb->inn)->toBe('240450027396')
         ->and($eb->bankAccountFor(Currency::where('short_name', 'USD')->value('id'))->account_number)
-        ->toBe('KZ948562203337407044');
+        ->toBe('KZ948562203337407044')
+        // KZT is now a seeded currency, so the tenge account resolves too
+        ->and($eb->bankAccountFor(Currency::where('short_name', 'KZT')->value('id'))->account_number)
+        ->toBe('KZ418562203137406915');
 });
 
 it('is idempotent — re-running creates no duplicates', function () {

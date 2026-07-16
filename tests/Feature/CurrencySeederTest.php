@@ -7,16 +7,16 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('seeds the five core currencies', function () {
+it('seeds the six core currencies', function () {
     $this->seed(CurrencySeeder::class);
 
-    expect(Currency::count())->toBe(5)
-        ->and(Currency::pluck('short_name')->all())->toContain('UZS', 'USD', 'EUR', 'RUB', 'GBP')
+    expect(Currency::count())->toBe(6)
+        ->and(Currency::pluck('short_name')->all())->toContain('UZS', 'USD', 'EUR', 'RUB', 'GBP', 'KZT')
         ->and(Currency::where('status', false)->count())->toBe(0);
 
     // Re-seeding must not duplicate anything.
     $this->seed(CurrencySeeder::class);
-    expect(Currency::count())->toBe(5);
+    expect(Currency::count())->toBe(6);
 });
 
 it('prunes retired unreferenced currencies but keeps referenced ones', function () {
