@@ -84,8 +84,7 @@ it('creates a project stamping the resource type, author, participants and spons
         ->and($project->created_by)->toBe($user->id)
         ->and($project->participants)->toHaveCount(2)
         ->and($project->sponsors)->toHaveCount(1)
-        ->and($project->sponsors->first()->sponsor_id)->toBe($sponsor->id)
-        ->and($project->feesTotal())->toBe(140000000.0);
+        ->and($project->sponsors->first()->sponsor_id)->toBe($sponsor->id);
 });
 
 it('validates that the project name is required', function () {

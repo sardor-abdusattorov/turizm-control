@@ -6,6 +6,7 @@ use App\Exports\SponsorsExport;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\StatusToggleColumn;
+use App\Models\Contract;
 use App\Models\Sponsor;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -26,7 +27,11 @@ class SponsorsTable
     {
         return $table
             ->defaultSort('name')
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount('participations'))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount([
+                'sponsorshipContracts' => fn (Builder $contracts): Builder => $contracts
+                    ->visibleTo()
+                    ->where('status', '!=', Contract::STATUS_REJECTED->value),
+            ]))
             ->columns([
                 TextColumn::make('name')
                     ->label(__('app.label.name'))
@@ -34,12 +39,12 @@ class SponsorsTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('participations_count')
+                TextColumn::make('sponsorship_contracts_count')
                     ->label(__('app.label.projects'))
                     ->badge()
                     ->alignCenter()
-                    ->color(fn (Sponsor $record): string => ($record->participations_count ?? 0) > 0 ? 'warning' : 'gray')
-                    ->tooltip(fn (Sponsor $record): ?string => ($record->participations_count ?? 0) > 0
+                    ->color(fn (Sponsor $record): string => ($record->sponsorship_contracts_count ?? 0) > 0 ? 'warning' : 'gray')
+                    ->tooltip(fn (Sponsor $record): ?string => ($record->sponsorship_contracts_count ?? 0) > 0
                         ? __('app.label.projects_breakdown_hint')
                         : null)
                     ->action(
@@ -49,7 +54,11 @@ class SponsorsTable
                             ->modalContent(fn (Sponsor $record) => view(
                                 'filament.resources.sponsors.tables.projects-breakdown',
                                 [
-                                    'participations' => $record->participations()->with(['project', 'currency'])->get(),
+                                    'participations' => $record->sponsorshipContracts()
+                                        ->visibleTo()
+                                        ->where('status', '!=', Contract::STATUS_REJECTED->value)
+                                        ->with(['project', 'currency'])
+                                        ->get(),
                                     'totals' => $record->projectTotalsByCurrency(),
                                 ],
                             ))

@@ -1,11 +1,9 @@
 <?php
 
-use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
 use App\Models\Contract;
 use App\Models\Order;
 use App\Models\Project;
-use App\Models\ProjectParticipant;
 use App\Models\Sponsor;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -28,37 +26,30 @@ it('seeds only the project registries — no contracts or orders', function () {
         ->and(Project::query()->where('type', ProjectType::Internal->value)->count())->toBe(5);
 });
 
-it('fills FITUR-2025 with its participant fees straight from the registry', function () {
+it('seeds FITUR-2025 as a shell from the registry — costs only, income entered by hand', function () {
     Storage::fake('local');
 
     $this->seed(DatabaseSeeder::class);
 
     $fitur = Project::query()->firstWhere('name', 'FITUR-2025');
 
+    // The project carries its registry площадь / stand costs, but no income
+    // yet — participant fees are added later as income contracts.
     expect($fitur)->not->toBeNull()
-        ->and($fitur->area_sqm)->not->toBeNull();
-
-    // 11 tour operators × 38 000 000 сум = 418 000 000 (the registry «profit»).
-    $participants = $fitur->participants()->where('role', ParticipantRole::Participant->value)->get();
-
-    expect($participants->count())->toBe(11)
-        ->and((float) $fitur->feesTotal())->toBe(418_000_000.0);
+        ->and($fitur->area_sqm)->not->toBeNull()
+        ->and($fitur->contracts()->count())->toBe(0)
+        ->and((float) $fitur->feesTotal())->toBe(0.0);
 });
 
-it('files Uzbekistan Airways rows as sponsor participations', function () {
+it('seeds the exhibition sponsors as standalone entities', function () {
     Storage::fake('local');
 
     $this->seed(DatabaseSeeder::class);
 
-    // Airways rows are sponsor contributions, not participation fees — the
-    // sponsor is auto-created by the registry linker.
-    expect(Sponsor::query()->where('name', 'like', '%Uzbekistan Airways%')->exists())->toBeTrue();
-
-    $sponsorParticipations = ProjectParticipant::query()
-        ->where('role', ParticipantRole::Sponsor->value)
-        ->count();
-
-    expect($sponsorParticipations)->toBeGreaterThan(0);
+    // Sponsors (the carriers/venues that fund the stands) are a directory now,
+    // seeded by SponsorsSeeder — no longer derived from participation rows.
+    expect(Sponsor::query()->where('name', 'Uzbekistan Airways')->exists())->toBeTrue()
+        ->and(Sponsor::count())->toBeGreaterThanOrEqual(4);
 });
 
 it('the five filled local events carry their estimates and photo reports', function () {

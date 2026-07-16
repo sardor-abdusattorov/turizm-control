@@ -1,14 +1,12 @@
 <?php
 
-use App\Enums\ParticipantRole;
 use App\Filament\Resources\Contacts\Pages\ViewContact;
 use App\Filament\Resources\Sponsors\Pages\ViewSponsor;
 use App\Models\BankAccount;
 use App\Models\Contact;
 use App\Models\Contract;
-use App\Models\Currency;
+use App\Models\ContractType;
 use App\Models\Project;
-use App\Models\ProjectParticipant;
 use App\Models\Sponsor;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,21 +30,18 @@ it('renders the contact view with all its data', function () {
         'account_number' => '20208000107076480001',
     ]);
 
+    $project = Project::factory()->international()->create(['name' => 'ZAMIN-EXPO']);
+
     // Approved, not a draft — drafts are private to their author even for a
     // view_all_contracts holder, which is exactly the security rule at work.
+    // An income (fee) contract tied to the project, so it surfaces both in the
+    // contracts table and in the projects section of the contact view.
     Contract::factory()->create([
         'contact_id' => $contact->id,
+        'project_id' => $project->id,
+        'contract_type_id' => ContractType::factory()->income(),
         'number' => 'ZAMIN-CONTRACT-1',
     ])->forceFill(['status' => Contract::STATUS_APPROVED])->saveQuietly();
-
-    $project = Project::factory()->international()->create(['name' => 'ZAMIN-EXPO']);
-    ProjectParticipant::factory()->create([
-        'project_id' => $project->id,
-        'contact_id' => $contact->id,
-        'role' => ParticipantRole::Participant->value,
-        'name' => 'ZAMIN DMC',
-        'currency_id' => Currency::factory()->create(['short_name' => 'UZS'])->id,
-    ]);
 
     Livewire::test(ViewContact::class, ['record' => $contact->id])
         ->assertOk()

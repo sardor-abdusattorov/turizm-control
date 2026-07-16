@@ -1,5 +1,5 @@
 @php
-    /** @var \Illuminate\Support\Collection<int, \App\Models\ProjectParticipant> $participations */
+    /** @var \Illuminate\Support\Collection<int, \App\Models\Contract> $participations */
     /** @var \Illuminate\Support\Collection<int, array{currency: string, count: int, total: float, paid: float}> $totals */
     $fmt = fn ($n) => \App\Support\Money::format($n);
 @endphp
@@ -22,13 +22,13 @@
                             {{ $p->project?->name ?? '—' }}
                         </div>
                         <div class="text-gray-400" style="font-size:.72rem;margin-top:.1rem;">
-                            {{ $p->role->label() }}
+                            {{ $p->number }}
                         </div>
                     </div>
                     <div style="flex:0 0 auto;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">
                         <div style="font-weight:600;">{{ $fmt($p->amount) }} {{ $p->currency?->short_name }}</div>
                         <div class="text-gray-400" style="font-size:.72rem;margin-top:.1rem;">
-                            {{ __('app.label.paid') }}: {{ $fmt($p->paid_amount) }}
+                            {{ __('app.label.paid') }}: {{ $fmt($p->paidAmount()) }}
                         </div>
                     </div>
                 </div>

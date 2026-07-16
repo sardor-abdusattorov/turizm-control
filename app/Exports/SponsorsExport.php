@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\StyledExportSheet;
+use App\Models\Contract;
 use App\Models\Sponsor;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -30,7 +31,11 @@ class SponsorsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
     public function query(): Builder
     {
         return (clone $this->query)
-            ->withCount('participations')
+            ->withCount([
+                'sponsorshipContracts' => fn (Builder $contracts): Builder => $contracts
+                    ->visibleTo()
+                    ->where('status', '!=', Contract::STATUS_REJECTED->value),
+            ])
             ->reorder('name');
     }
 
@@ -69,7 +74,7 @@ class SponsorsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
             $row->email,
             $row->website,
             $row->address,
-            (int) ($row->participations_count ?? 0),
+            (int) ($row->sponsorship_contracts_count ?? 0),
             $row->status ? __('app.label.active') : __('app.label.inactive'),
             $row->created_at?->format('d.m.Y H:i'),
         ];

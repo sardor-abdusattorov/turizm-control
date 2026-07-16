@@ -169,22 +169,33 @@ class Contact extends Model
             ->values();
     }
 
-    public function projectParticipations(): HasMany
+    /**
+     * This counterparty's income contracts — the participant-fee («Взнос
+     * участника») deals it takes part in. Replaces the old manual project
+     * participations: a contact's project involvement is now a fee contract.
+     */
+    public function incomeContracts(): HasMany
     {
-        return $this->hasMany(ProjectParticipant::class);
+        return $this->hasMany(Contract::class)
+            ->whereHas('contractType', fn (Builder $query) => $query->where('direction', ContractDirection::Income->value));
     }
 
     /**
-     * Per-currency totals of this counterparty's project participations: one
-     * row per currency with the count, pledged and paid sums, ordered by
-     * count. Powers the "projects" badge breakdown on the contacts list.
+     * Per-currency totals of this counterparty's income (fee) contracts the
+     * given user may see (defaults to the current one): one row per currency
+     * with the count, pledged and paid sums, ordered by count. Rejected
+     * contracts are dropped and "paid" is derived from the paid percent, since
+     * contracts carry no absolute paid column. Powers the "projects" badge
+     * breakdown on the contacts list.
      *
      * @return Collection<int, array{currency: string, count: int, total: float, paid: float}>
      */
-    public function projectTotalsByCurrency(): Collection
+    public function projectTotalsByCurrency(?User $user = null): Collection
     {
-        $rows = $this->projectParticipations()
-            ->selectRaw('currency_id, COUNT(*) as participations_count, SUM(amount) as total_amount, SUM(paid_amount) as total_paid')
+        $rows = $this->incomeContracts()
+            ->visibleTo($user)
+            ->where('status', '!=', Contract::STATUS_REJECTED->value)
+            ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount, SUM(amount * paid_percent / 100) as total_paid')
             ->groupBy('currency_id')
             ->get();
 
@@ -193,9 +204,9 @@ class Contact extends Model
             ->pluck('short_name', 'id');
 
         return $rows
-            ->map(fn (ProjectParticipant $row): array => [
+            ->map(fn (Contract $row): array => [
                 'currency' => $currencies->get($row->currency_id) ?? '—',
-                'count' => (int) $row->participations_count,
+                'count' => (int) $row->contracts_count,
                 'total' => (float) $row->total_amount,
                 'paid' => (float) $row->total_paid,
             ])

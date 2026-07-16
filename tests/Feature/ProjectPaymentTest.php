@@ -69,17 +69,6 @@ it('recomputes paid_amount when an installment is deleted', function () {
     expect((float) $participant->paid_amount)->toBe(15_000_000.0);
 });
 
-it('rolls the project paid total across participants', function () {
-    $project = Project::factory()->create();
-    $a = ProjectParticipant::factory()->create(['project_id' => $project->id, 'amount' => 30_000_000]);
-    $b = ProjectParticipant::factory()->create(['project_id' => $project->id, 'amount' => 20_000_000]);
-
-    ProjectPayment::factory()->create(['project_participant_id' => $a->id, 'amount' => 30_000_000]);
-    ProjectPayment::factory()->create(['project_participant_id' => $b->id, 'amount' => 5_000_000]);
-
-    expect($project->fresh()->paidTotal())->toBe(35_000_000.0);
-});
-
 it('deletes installments when the participant is removed', function () {
     $participant = participantWithPledge(40_000_000);
     ProjectPayment::factory()->count(2)->create(['project_participant_id' => $participant->id]);

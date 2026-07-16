@@ -41,23 +41,32 @@ class Sponsor extends Model
             ->all();
     }
 
-    public function participations(): HasMany
+    /**
+     * This sponsor's sponsorship contracts — «Спонсорство» income deals point
+     * at a Sponsor through contracts.sponsor_id (only sponsorship contracts
+     * ever set it, so the FK alone is the filter). Replaces the old manual
+     * project participations.
+     */
+    public function sponsorshipContracts(): HasMany
     {
-        return $this->hasMany(ProjectParticipant::class);
+        return $this->hasMany(Contract::class);
     }
 
     /**
-     * Per-currency totals of this sponsor's project participations: one row
-     * per currency with the count, pledged and paid sums, ordered by count.
-     * Powers the "projects" badge breakdown on the sponsors list — mixed
-     * currencies stay apart, never converted.
+     * Per-currency totals of this sponsor's sponsorship contracts the given
+     * user may see (defaults to the current one): one row per currency with the
+     * count, pledged and paid sums, ordered by count. Rejected contracts are
+     * dropped and "paid" is derived from the paid percent. Powers the "projects"
+     * badge breakdown on the sponsors list — mixed currencies stay apart.
      *
      * @return Collection<int, array{currency: string, count: int, total: float, paid: float}>
      */
-    public function projectTotalsByCurrency(): Collection
+    public function projectTotalsByCurrency(?User $user = null): Collection
     {
-        $rows = $this->participations()
-            ->selectRaw('currency_id, COUNT(*) as participations_count, SUM(amount) as total_amount, SUM(paid_amount) as total_paid')
+        $rows = $this->sponsorshipContracts()
+            ->visibleTo($user)
+            ->where('status', '!=', Contract::STATUS_REJECTED->value)
+            ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount, SUM(amount * paid_percent / 100) as total_paid')
             ->groupBy('currency_id')
             ->get();
 
@@ -66,9 +75,9 @@ class Sponsor extends Model
             ->pluck('short_name', 'id');
 
         return $rows
-            ->map(fn (ProjectParticipant $row): array => [
+            ->map(fn (Contract $row): array => [
                 'currency' => $currencies->get($row->currency_id) ?? '—',
-                'count' => (int) $row->participations_count,
+                'count' => (int) $row->contracts_count,
                 'total' => (float) $row->total_amount,
                 'paid' => (float) $row->total_paid,
             ])

@@ -14,7 +14,8 @@ class DatabaseSeeder extends Seeder
             // the UI, so their seeders stay runnable on their own for showcases.
             // Counterparties come from the contract requisites: ContactSeeder
             // holds the domestic tour agents, ForeignPartnerSeeder the foreign
-            // stand/land legal entities.
+            // stand/land legal entities, SponsorsSeeder the carriers/venues that
+            // fund the national stands.
             PositionSeeder::class,
             DepartmentSeeder::class,
             CurrencySeeder::class,
@@ -22,13 +23,14 @@ class DatabaseSeeder extends Seeder
             ContractTypeSeeder::class,
             ContactSeeder::class,
             ForeignPartnerSeeder::class,
+            SponsorsSeeder::class,
             RolesAndPermissionsSeeder::class,
             UserSeeder::class,
             TestUsersSeeder::class,
             SettingsSeeder::class,
-            // Projects, filled from the exhibition / local-event registries
-            // with their participants (fees) and the Uzbekistan Airways
-            // sponsor rows — the one data set seeded ready to use.
+            // Project shells from the exhibition / local-event registries —
+            // venue, dates and costs only. Participation income is entered by
+            // hand as income contracts against each project.
             Exhibitions2025Seeder::class,
             InternationalProjects2026Seeder::class,
             LocalEvents2026Seeder::class,

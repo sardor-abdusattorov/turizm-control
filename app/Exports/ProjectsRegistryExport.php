@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Enums\ProjectType;
+use App\Models\Contract;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -63,7 +64,7 @@ class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents,
     public function array(): array
     {
         $projects = (clone $this->query)
-            ->with(['participants.currency', 'areaCurrency', 'standCurrency'])
+            ->with(['incomeContracts.currency', 'incomeContracts.contact', 'incomeContracts.sponsor', 'areaCurrency', 'standCurrency'])
             ->reorder('starts_on')
             ->get();
 
@@ -85,12 +86,20 @@ class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents,
         ]];
 
         foreach ($projects as $index => $project) {
-            $participants = $project->participants;
-            $span = max(1, $participants->count());
+            // Income side is the project's non-rejected income contracts (fees
+            // + sponsorship) — one registry row per contract, its counterparty
+            // in column I. Rejected deals are dropped so the «Итог» (feesTotal)
+            // equals the sum of the rows listed.
+            $income = $project->incomeContracts
+                ->reject(fn (Contract $contract): bool => $contract->status === Contract::STATUS_REJECTED)
+                ->sortBy('id')
+                ->values();
+            $span = max(1, $income->count());
             $start = count($this->rows) - 1; // 0-based data index of the block's first row
 
             for ($i = 0; $i < $span; $i++) {
-                $participant = $participants[$i] ?? null;
+                $contract = $income[$i] ?? null;
+                $counterparty = $contract?->contact?->name ?? $contract?->sponsor?->name;
 
                 $this->rows[] = $i === 0
                     ? [
@@ -102,15 +111,15 @@ class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents,
                         $project->area_is_free ? null : $this->currencyLabel($project->areaCurrency?->short_name),
                         $project->stand_cost !== null ? (float) $project->stand_cost : null,
                         $this->currencyLabel($project->standCurrency?->short_name),
-                        $participant?->name,
-                        $participant !== null ? (float) $participant->amount : null,
-                        $this->currencyLabel($participants->first()?->currency?->short_name ?? 'UZS'),
+                        $counterparty,
+                        $contract !== null ? (float) $contract->amount : null,
+                        $this->currencyLabel($income->first()?->currency?->short_name ?? 'UZS'),
                         $project->feesTotal(),
                     ]
                     : [
                         null, null, null, null, null, null, null, null,
-                        $participant?->name,
-                        $participant !== null ? (float) $participant->amount : null,
+                        $counterparty,
+                        $contract !== null ? (float) $contract->amount : null,
                         null, null,
                     ];
             }

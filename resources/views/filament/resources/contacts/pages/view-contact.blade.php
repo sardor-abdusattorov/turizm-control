@@ -178,7 +178,7 @@
                     </thead>
                     <tbody>
                     @foreach ($participations as $p)
-                        @php $pay = $p->paymentStatus(); @endphp
+                        @php $pay = $p->payment_status; @endphp
                         <tr>
                             <td>
                                 @if ($p->project)
@@ -188,7 +188,7 @@
                                 @endif
                             </td>
                             <td class="pj-table__num">{{ $fmt($p->amount) }} {{ $p->currency?->short_name }}</td>
-                            <td class="pj-table__num">{{ $fmt($p->paid_amount) }}</td>
+                            <td class="pj-table__num">{{ $fmt($p->paidAmount()) }}</td>
                             <td>
                                 @if ((float) $p->amount > 0)
                                     <span class="pj-pill pj-pill--{{ $pay->color() }}">{{ $pay->label() }}</span>

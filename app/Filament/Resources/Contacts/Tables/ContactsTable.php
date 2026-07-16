@@ -9,6 +9,7 @@ use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Contact;
+use App\Models\Contract;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -32,7 +33,9 @@ class ContactsTable
                 ->withRoleFlags()
                 ->withCount([
                     'contracts' => fn (Builder $contracts) => $contracts->visibleTo(),
-                    'projectParticipations',
+                    'incomeContracts' => fn (Builder $contracts) => $contracts
+                        ->visibleTo()
+                        ->where('status', '!=', Contract::STATUS_REJECTED->value),
                 ]))
             ->columns([
                 TextColumn::make('type')
@@ -82,13 +85,13 @@ class ContactsTable
                             ->modalCancelAction(false),
                     ),
 
-                TextColumn::make('project_participations_count')
+                TextColumn::make('income_contracts_count')
                     ->label(__('app.label.projects'))
                     ->badge()
                     ->alignCenter()
-                    ->state(fn (Contact $record): int => (int) ($record->project_participations_count ?? 0))
-                    ->color(fn (Contact $record): string => ($record->project_participations_count ?? 0) > 0 ? 'warning' : 'gray')
-                    ->tooltip(fn (Contact $record): ?string => ($record->project_participations_count ?? 0) > 0
+                    ->state(fn (Contact $record): int => (int) ($record->income_contracts_count ?? 0))
+                    ->color(fn (Contact $record): string => ($record->income_contracts_count ?? 0) > 0 ? 'warning' : 'gray')
+                    ->tooltip(fn (Contact $record): ?string => ($record->income_contracts_count ?? 0) > 0
                         ? __('app.label.projects_breakdown_hint')
                         : null)
                     ->action(
@@ -98,7 +101,11 @@ class ContactsTable
                             ->modalContent(fn (Contact $record) => view(
                                 'filament.resources.contacts.projects-breakdown',
                                 [
-                                    'participations' => $record->projectParticipations()->with(['project', 'currency'])->get(),
+                                    'participations' => $record->incomeContracts()
+                                        ->visibleTo()
+                                        ->where('status', '!=', Contract::STATUS_REJECTED->value)
+                                        ->with(['project', 'currency', 'contractType'])
+                                        ->get(),
                                     'totals' => $record->projectTotalsByCurrency(),
                                 ],
                             ))

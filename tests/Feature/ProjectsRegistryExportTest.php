@@ -5,9 +5,11 @@ use App\Exports\ProjectsRegistryExport;
 use App\Exports\SponsorsExport;
 use App\Filament\Resources\Projects\Pages\ListInternationalProjects;
 use App\Filament\Resources\Sponsors\Pages\ListSponsors;
+use App\Models\Contact;
+use App\Models\Contract;
+use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Project;
-use App\Models\ProjectParticipant;
 use App\Models\Sponsor;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,6 +25,12 @@ it('reproduces the registry block format', function () {
 
     $eur = Currency::factory()->create(['short_name' => 'EUR']);
     $uzs = Currency::factory()->create(['short_name' => 'UZS']);
+    $feeType = ContractType::factory()->income()->create();
+
+    $named = fn (string $name) => Contact::factory()->create(['name' => ['ru' => $name, 'uz' => $name, 'en' => $name]]);
+    $rocket = $named('ROCKET DMC');
+    $zamin = $named('ZAMIN DMC');
+    $beyond = $named('BEYOND DMC');
 
     $fitur = Project::factory()->international()->create([
         'name' => 'FITUR-2025',
@@ -35,8 +43,18 @@ it('reproduces the registry block format', function () {
         'stand_cost' => 47890,
         'stand_currency_id' => $eur->id,
     ]);
-    ProjectParticipant::factory()->create(['project_id' => $fitur->id, 'name' => 'ROCKET DMC', 'amount' => 38000000, 'currency_id' => $uzs->id, 'sort' => 0]);
-    ProjectParticipant::factory()->create(['project_id' => $fitur->id, 'name' => 'ZAMIN DMC', 'amount' => 38000000, 'currency_id' => $uzs->id, 'sort' => 1]);
+
+    // Income = fee contracts against the project (ordered by id in the export).
+    $fee = fn (Project $project, Contact $contact, float $amount) => Contract::factory()->create([
+        'project_id' => $project->id,
+        'contact_id' => $contact->id,
+        'contract_type_id' => $feeType->id,
+        'currency_id' => $uzs->id,
+        'amount' => $amount,
+        'status' => Contract::STATUS_APPROVED,
+    ]);
+    $fee($fitur, $rocket, 38000000);
+    $fee($fitur, $zamin, 38000000);
 
     // Cross-month dates + free area, like ATM / SCITE in the source registry.
     $atm = Project::factory()->international()->create([
@@ -50,7 +68,7 @@ it('reproduces the registry block format', function () {
         'stand_cost' => 52705.8,
         'stand_currency_id' => $eur->id,
     ]);
-    ProjectParticipant::factory()->create(['project_id' => $atm->id, 'name' => 'BEYOND DMC', 'amount' => 10000000, 'currency_id' => $uzs->id]);
+    $fee($atm, $beyond, 10000000);
 
     $rows = (new ProjectsRegistryExport(Project::query(), ProjectType::International))->array();
 

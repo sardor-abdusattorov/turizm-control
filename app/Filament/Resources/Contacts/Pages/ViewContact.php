@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Contacts\Pages;
 
 use App\Filament\Resources\Contacts\ContactResource;
 use App\Models\Contract;
-use App\Models\ProjectParticipant;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Collection;
@@ -42,12 +41,13 @@ class ViewContact extends ViewRecord
      * Every project this counterparty took part in, newest first, with the
      * project and currency ready for the table.
      *
-     * @return Collection<int, ProjectParticipant>
+     * @return Collection<int, Contract>
      */
     public function participations(): Collection
     {
-        return $this->record->projectParticipations()
-            ->with(['project', 'currency'])
+        return $this->record->incomeContracts()
+            ->visibleTo()
+            ->with(['project', 'currency', 'contractType'])
             ->latest('id')
             ->get();
     }

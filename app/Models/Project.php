@@ -165,6 +165,19 @@ class Project extends Model
     }
 
     /**
+     * The project's income contracts — participant fees and sponsorship. This
+     * is the source project income is derived from now that manual participants
+     * are gone: «Взнос участника» rows face a Contact, «Спонсорство» rows a
+     * Sponsor, both with `direction = Income` on their type.
+     */
+    public function incomeContracts(): HasMany
+    {
+        return $this->hasMany(Contract::class)
+            ->whereHas('contractType', fn (Builder $query) => $query->where('direction', ContractDirection::Income->value))
+            ->orderByDesc('created_at');
+    }
+
+    /**
      * The project contracts the given user (defaults to the current one) is
      * allowed to see — the same visibility rule as the count badge and the
      * page tab, so a manager without oversight only ever sees their own.
@@ -287,31 +300,44 @@ class Project extends Model
     }
 
     /**
-     * Revenue of the project — the sum of participant fees. The source
-     * registry stores a "profit" figure per exhibition, and it always equals
-     * this sum (verified against all 16 rows of the 2025 registry), so it is
-     * computed rather than stored.
+     * Non-rejected income contracts of the project as a collection — the source
+     * of the pledged/collected income figures below. Uses the eager-loaded
+     * relation when present (the export loads it) and excludes rejected
+     * contracts, mirroring the expense side in contractTotalsByCurrency().
+     *
+     * @return Collection<int, Contract>
      */
-    public function feesTotal(): float
+    private function pledgedIncomeContracts(): Collection
     {
-        if ($this->relationLoaded('participants')) {
-            return (float) $this->participants->sum('amount');
-        }
+        $contracts = $this->relationLoaded('incomeContracts')
+            ? $this->incomeContracts
+            : $this->incomeContracts()->get();
 
-        return (float) $this->participants()->sum('amount');
+        return $contracts->reject(fn (Contract $contract): bool => $contract->status === Contract::STATUS_REJECTED);
     }
 
     /**
-     * Total actually collected across all participants (sum of their cached
-     * paid_amount, maintained by ProjectPaymentObserver).
+     * Revenue of the project — the pledged total of its income contracts
+     * (participant fees + sponsorship). Formerly summed manual participants;
+     * derived from contracts now that those are gone. Currency-blind by design
+     * (see the docblock history): fee projects are effectively single-currency
+     * and the registry "profit" equals this sum.
+     */
+    public function feesTotal(): float
+    {
+        return (float) $this->pledgedIncomeContracts()
+            ->sum(fn (Contract $contract): float => (float) $contract->amount);
+    }
+
+    /**
+     * Total actually collected across the project's income contracts. Contracts
+     * store a paid *percent*, not an absolute figure, so the collected money is
+     * derived per contract (amount * paid_percent / 100) and summed.
      */
     public function paidTotal(): float
     {
-        if ($this->relationLoaded('participants')) {
-            return (float) $this->participants->sum('paid_amount');
-        }
-
-        return (float) $this->participants()->sum('paid_amount');
+        return (float) $this->pledgedIncomeContracts()
+            ->sum(fn (Contract $contract): float => $contract->paidAmount());
     }
 
     /**
