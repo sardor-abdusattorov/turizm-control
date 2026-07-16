@@ -2,16 +2,11 @@
 
 namespace App\Filament\Resources\Projects\Schemas;
 
-use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
-use App\Filament\Resources\Sponsors\Schemas\SponsorForm;
 use App\Filament\Support\ImageGalleryUpload;
-use App\Models\Contact;
 use App\Models\Currency;
 use App\Models\Project;
-use App\Models\Sponsor;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -194,79 +189,6 @@ class ProjectForm
                                     ->live()
                                     ->visible(fn (Get $get): bool => (bool) $get('stand_currency_differs'))
                                     ->columnSpanFull(),
-                            ]),
-
-                        Tabs\Tab::make(__('app.label.participants'))
-                            ->icon('heroicon-o-user-group')
-                            ->schema([
-                                Repeater::make('participants')
-                                    ->hiddenLabel()
-                                    ->relationship()
-                                    ->orderColumn('sort')
-                                    ->defaultItems(0)
-                                    ->collapsible()
-                                    ->collapsed()
-                                    ->cloneable()
-                                    ->addActionLabel(__('app.action.add_participant'))
-                                    ->itemLabel(fn (array $state): ?string => filled($state['name'] ?? null)
-                                        ? $state['name'].(filled($state['amount'] ?? null) ? ' · '.number_format((float) $state['amount'], 0, ',', ' ') : '')
-                                        : null)
-                                    ->schema([
-                                        Select::make('role')
-                                            ->label(__('app.label.participant_role'))
-                                            ->options(ParticipantRole::options())
-                                            ->default(ParticipantRole::Participant->value)
-                                            ->live()
-                                            ->required(),
-
-                                        Select::make('contact_id')
-                                            ->label(__('app.label.contact_single'))
-                                            ->options(fn () => Contact::getActive())
-                                            ->searchable()
-                                            ->nullable()
-                                            ->live()
-                                            ->visible(fn (Get $get): bool => $get('role') !== ParticipantRole::Sponsor->value)
-                                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
-                                                if ($state && blank($get('name'))) {
-                                                    $set('name', Contact::find($state)?->getTranslation('name', app()->getLocale()));
-                                                }
-                                            }),
-
-                                        Select::make('sponsor_id')
-                                            ->label(__('app.label.sponsor_single'))
-                                            ->options(fn () => Sponsor::getActive())
-                                            ->searchable()
-                                            ->nullable()
-                                            ->live()
-                                            ->visible(fn (Get $get): bool => $get('role') === ParticipantRole::Sponsor->value)
-                                            ->createOptionForm(fn (Schema $schema) => SponsorForm::configure($schema))
-                                            ->createOptionUsing(fn (array $data) => Sponsor::create($data)->getKey())
-                                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
-                                                if ($state && blank($get('name'))) {
-                                                    $set('name', Sponsor::find($state)?->name);
-                                                }
-                                            }),
-
-                                        TextInput::make('name')
-                                            ->label(__('app.label.participant_name'))
-                                            ->required()
-                                            ->maxLength(255),
-
-                                        TextInput::make('amount')
-                                            ->label(__('app.label.participant_amount'))
-                                            ->numeric()
-                                            ->step(0.01)
-                                            ->minValue(0)
-                                            ->default(0)
-                                            ->required()
-                                            ->prefix(fn (Get $get): ?string => Currency::find($get('currency_id'))?->short_name),
-
-                                        Select::make('currency_id')
-                                            ->label(__('app.label.currency_single'))
-                                            ->options(fn () => Currency::getActive())
-                                            ->live()
-                                            ->default(fn () => Currency::query()->where('short_name', 'UZS')->value('id')),
-                                    ]),
                             ]),
 
                         Tabs\Tab::make(__('app.label.gallery'))

@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\Projects\Tables;
 
-use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
 use App\Exports\ProjectsRegistryExport;
 use App\Filament\Resources\Projects\BaseProjectResource;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\StatusToggleColumn;
+use App\Models\Contract;
 use App\Models\Project;
 use App\Support\Money;
 use Filament\Actions\Action;
@@ -28,13 +28,13 @@ use Maatwebsite\Excel\Facades\Excel;
 class ProjectsTable
 {
     /**
-     * Currency suffix for the fee columns — participants of one project pay
-     * in a single currency in practice (the registry), so the first row's
+     * Currency suffix for the fee columns — a project's income contracts are
+     * signed in a single currency in practice (the registry), so the first
      * code labels the total; a mixed project gets no (misleading) suffix.
      */
     protected static function feeCurrencySuffix(Project $record): string
     {
-        $codes = $record->participants->pluck('currency.short_name')->filter()->unique();
+        $codes = $record->incomeContracts->pluck('currency.short_name')->filter()->unique();
 
         return $codes->count() === 1 ? ' '.$codes->first() : '';
     }
@@ -52,15 +52,13 @@ class ProjectsTable
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query
-                ->with(['creator', 'participants.currency'])
+                ->with(['creator', 'incomeContracts.currency'])
                 ->withCount([
-                    'participants',
-                    'participants as sponsors_count' => fn (Builder $participants) => $participants
-                        ->where('role', ParticipantRole::Sponsor),
-                    'contracts' => fn (Builder $contracts) => $contracts->visibleTo(),
+                    'feeContracts as participants_count' => fn (Builder $q) => $q->visibleTo()->where('status', '!=', Contract::STATUS_REJECTED->value),
+                    'sponsorshipContracts as sponsors_count' => fn (Builder $q) => $q->visibleTo()->where('status', '!=', Contract::STATUS_REJECTED->value),
+                    'contracts' => fn (Builder $q) => $q->visibleTo(),
                 ])
-                ->withSum('participants', 'amount')
-                ->withSum('participants', 'paid_amount'))
+                ->withSum(['incomeContracts as participants_sum_amount' => fn (Builder $q) => $q->visibleTo()->where('status', '!=', Contract::STATUS_REJECTED->value)], 'amount'))
             ->defaultSort('starts_on', 'desc')
             ->columns([
                 TextColumn::make('name')
@@ -104,7 +102,7 @@ class ProjectsTable
                         : null)
                     ->action(self::participantBreakdownAction(
                         'participantsBreakdown',
-                        ParticipantRole::Participant,
+                        false,
                         'heroicon-o-user-group',
                     ))
                     ->sortable(),
@@ -119,7 +117,7 @@ class ProjectsTable
                         : null)
                     ->action(self::participantBreakdownAction(
                         'sponsorsBreakdown',
-                        ParticipantRole::Sponsor,
+                        true,
                         'heroicon-o-star',
                     ))
                     ->toggleable(),
@@ -168,6 +166,9 @@ class ProjectsTable
 
                 TextColumn::make('participants_sum_paid_amount')
                     ->label(__('app.label.paid'))
+                    ->state(fn (Project $record): float => $record->incomeContracts
+                        ->reject(fn (Contract $c): bool => $c->status === Contract::STATUS_REJECTED)
+                        ->sum(fn (Contract $c): float => $c->paidAmount()))
                     ->formatStateUsing(fn (?string $state, Project $record): string => Money::format($state).self::feeCurrencySuffix($record))
                     ->placeholder('0')
                     ->color('success')
@@ -263,9 +264,9 @@ class ProjectsTable
     /**
      * Role-scoped breakdown behind the participants / sponsors count badge —
      * the record-list modal the sponsor and contact lists set as the
-     * pattern: one row per participation, per-currency totals at the foot.
+     * pattern: one income contract per row, per-currency totals at the foot.
      */
-    private static function participantBreakdownAction(string $name, ParticipantRole $role, string $icon): Action
+    private static function participantBreakdownAction(string $name, bool $sponsors, string $icon): Action
     {
         return Action::make($name)
             ->modalHeading(fn (Project $record): string => $record->name)
@@ -273,9 +274,13 @@ class ProjectsTable
             ->modalContent(fn (Project $record) => view(
                 'filament.resources.projects.tables.participants-breakdown',
                 [
-                    'rows' => $record->participants->where('role', $role)->values(),
-                    'totals' => $record->participantTotalsByCurrency($role),
-                    'empty' => $role === ParticipantRole::Sponsor
+                    'rows' => $record->{$sponsors ? 'sponsorshipContracts' : 'feeContracts'}()
+                        ->visibleTo()
+                        ->where('status', '!=', Contract::STATUS_REJECTED->value)
+                        ->with(['contact', 'sponsor', 'currency'])
+                        ->get(),
+                    'totals' => $record->incomeTotalsByCurrency($sponsors),
+                    'empty' => $sponsors
                         ? __('app.message.no_sponsors')
                         : __('app.message.no_participants'),
                 ],

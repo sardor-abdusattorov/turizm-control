@@ -1,6 +1,5 @@
 @php
     use App\Enums\ContractDirection;
-    use App\Enums\ParticipantRole;
     use App\Enums\ProjectType;
     use App\Filament\Resources\Projects\BaseProjectResource;
     use App\Models\Contract;
@@ -20,8 +19,6 @@
         </section>
     @else
         @php
-            $project->loadMissing(['participants.currency']);
-
             $isInternalProject = $project->type === ProjectType::Internal;
 
             // Same visibility rule as everywhere: only the contracts this
@@ -37,14 +34,27 @@
             $incomeTotals = $sumByDirection(ContractDirection::Income);
             $moneyLines = fn ($totals) => $totals->map(fn ($v, $c) => $fmt($v).($c ? ' '.$c : ''))->implode(' · ');
 
-            $members = $project->participants->where('role', ParticipantRole::Participant)->values();
-            $sponsors = $project->participants->where('role', ParticipantRole::Sponsor)->values();
+            // «Участники» / «Спонсоры» are derived from the project's income
+            // contracts: participant-fee contracts (a Contact) vs sponsorship
+            // contracts (a Sponsor). Rejected contracts drop out and only the
+            // visibleTo() set reaches the viewer.
+            $members = $project->feeContracts()
+                ->visibleTo()
+                ->where('status', '!=', Contract::STATUS_REJECTED->value)
+                ->with(['contact', 'currency'])
+                ->get();
+            $sponsors = $project->sponsorshipContracts()
+                ->visibleTo()
+                ->where('status', '!=', Contract::STATUS_REJECTED->value)
+                ->with(['sponsor', 'currency'])
+                ->get();
+            $participantCount = $members->count() + $sponsors->count();
 
             $feesTotal = $project->feesTotal();
             $paidTotal = $project->paidTotal();
             $paidPercent = $feesTotal > 0 ? round($paidTotal / $feesTotal * 100) : 0;
 
-            $currencies = $project->participants->map(fn ($p) => $p->currency?->short_name)->filter()->unique()->values();
+            $currencies = $members->concat($sponsors)->map(fn ($c) => $c->currency?->short_name)->filter()->unique()->values();
             $feeCurrency = $currencies->count() === 1 ? $currencies->first() : '';
 
             $period = $project->starts_on
@@ -53,7 +63,7 @@
 
             $projectUrl = BaseProjectResource::resourceFor($project)::getUrl('view', ['record' => $project]);
             $topContracts = $visibleContracts->take(5);
-            $topParticipants = $project->participants->sortByDesc('amount')->take(5)->values();
+            $topParticipants = $members->concat($sponsors)->sortByDesc('amount')->take(5)->values();
         @endphp
 
         <div class="pj" style="display:flex;flex-direction:column;gap:1rem;">
@@ -179,7 +189,7 @@
                         <header class="ow-hd">
                             <span class="ow-hd__ic">{!! $ic('heroicon-o-user-group', 18) !!}</span>
                             <h2 class="ow-hd__t">{{ __('app.label.participants') }}</h2>
-                            <span class="pj-count">{{ $project->participants->count() }}</span>
+                            <span class="pj-count">{{ $participantCount }}</span>
                         </header>
                         @if ($topParticipants->isEmpty())
                             <p class="pj-empty">{{ __('app.message.no_participants') }}</p>
@@ -187,15 +197,12 @@
                             <div class="pj-table-wrap">
                                 <table class="pj-table pj-table--tight">
                                     <tbody>
-                                    @foreach ($topParticipants as $participant)
-                                        @php $payStatus = $participant->paymentStatus(); @endphp
+                                    @foreach ($topParticipants as $contract)
                                         <tr>
-                                            <td>{{ $participant->name }}</td>
-                                            <td class="pj-table__num">{{ $fmt($participant->amount) }} {{ $participant->currency?->short_name }}</td>
+                                            <td>{{ $contract->counterparty()?->name }}</td>
+                                            <td class="pj-table__num">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</td>
                                             <td style="width:1%;">
-                                                @if ((float) $participant->amount > 0)
-                                                    <span class="pj-pill pj-pill--{{ $payStatus->color() }}">{{ $payStatus->label() }}</span>
-                                                @endif
+                                                <span class="pj-pill pj-pill--{{ $contract->payment_status->color() }}">{{ $contract->payment_status->label() }}</span>
                                             </td>
                                         </tr>
                                     @endforeach

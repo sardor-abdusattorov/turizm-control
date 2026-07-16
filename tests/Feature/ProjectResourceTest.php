@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\ParticipantRole;
 use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\InternalProjectResource;
 use App\Filament\Resources\Projects\InternationalProjectResource;
@@ -9,16 +8,15 @@ use App\Filament\Resources\Projects\Pages\EditInternalProject;
 use App\Filament\Resources\Projects\Pages\ListInternalProjects;
 use App\Filament\Resources\Projects\Pages\ListInternationalProjects;
 use App\Filament\Resources\Projects\Pages\ViewInternationalProject;
+use App\Models\Contact;
 use App\Models\Contract;
+use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Project;
 use App\Models\ProjectParticipant;
-use App\Models\ProjectPayment;
-use App\Models\Sponsor;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
@@ -57,8 +55,7 @@ it('scopes each resource to its own project type', function () {
         ->and(InternationalProjectResource::getUrl('index'))->toContain('international-projects');
 });
 
-it('creates a project stamping the resource type, author, participants and sponsor', function () {
-    $sponsor = Sponsor::factory()->create(['name' => 'UZBEKISTAN AIRWAYS AJ']);
+it('creates a project stamping the resource type and author', function () {
     $user = userWithPermission('view_any_project', 'create_project');
     actingAs($user);
 
@@ -70,10 +67,6 @@ it('creates a project stamping the resource type, author, participants and spons
             'area_sqm' => 80,
             'area_cost' => 17000,
             'stand_cost' => 50000,
-            'participants' => [
-                ['role' => ParticipantRole::Participant->value, 'name' => 'OOO "ZAMIN DMC"', 'amount' => 40000000],
-                ['role' => ParticipantRole::Sponsor->value, 'sponsor_id' => $sponsor->id, 'name' => $sponsor->name, 'amount' => 100000000],
-            ],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -81,10 +74,7 @@ it('creates a project stamping the resource type, author, participants and spons
     $project = Project::where('name', 'FITUR-2026')->firstOrFail();
 
     expect($project->type)->toBe(ProjectType::International)
-        ->and($project->created_by)->toBe($user->id)
-        ->and($project->participants)->toHaveCount(2)
-        ->and($project->sponsors)->toHaveCount(1)
-        ->and($project->sponsors->first()->sponsor_id)->toBe($sponsor->id);
+        ->and($project->created_by)->toBe($user->id);
 });
 
 it('validates that the project name is required', function () {
@@ -134,13 +124,26 @@ it('renders the gallery through the image-gallery component', function () {
 
 it('opens the role-scoped breakdown modals from the count badges', function () {
     $project = Project::factory()->international()->create(['name' => 'PREVIEW-EXPO-2025']);
-    ProjectParticipant::factory()->create([
+    $currency = Currency::factory()->create();
+
+    Contract::factory()->create([
+        'contract_type_id' => ContractType::factory()->income(),
+        'contact_id' => Contact::factory(),
         'project_id' => $project->id,
-        'name' => 'OOO "PREVIEW TRAVEL"',
+        'currency_id' => $currency->id,
         'amount' => 12_000_000,
+        'paid_percent' => 0,
+        'status' => Contract::STATUS_APPROVED,
+    ]);
+    Contract::factory()->sponsorship()->create([
+        'project_id' => $project->id,
+        'currency_id' => $currency->id,
+        'amount' => 100_000_000,
+        'paid_percent' => 0,
+        'status' => Contract::STATUS_APPROVED,
     ]);
 
-    actingAs(userWithPermission('view_any_project'));
+    actingAs(userWithPermission('view_any_project', 'view_all_contracts'));
 
     Livewire::test(ListInternationalProjects::class)
         ->assertSuccessful()
@@ -182,39 +185,34 @@ it('scopes the breakdown view to one role and totals it per currency', function 
     $uzs = Currency::factory()->create(['short_name' => 'UZS']);
     $project = Project::factory()->international()->create();
 
-    ProjectParticipant::factory()->create([
+    Contract::factory()->create([
+        'contract_type_id' => ContractType::factory()->income(),
+        'contact_id' => Contact::factory(),
         'project_id' => $project->id,
-        'name' => 'OOO "MEMBER TRAVEL"',
-        'role' => ParticipantRole::Participant,
         'currency_id' => $uzs->id,
         'amount' => 12_000_000,
-        'paid_amount' => 12_000_000,
+        'paid_percent' => 100,
+        'status' => Contract::STATUS_APPROVED,
     ]);
-    ProjectParticipant::factory()->create([
+    Contract::factory()->sponsorship()->create([
         'project_id' => $project->id,
-        'name' => '"SPONSOR AIRWAYS"',
-        'role' => ParticipantRole::Sponsor,
         'currency_id' => $uzs->id,
         'amount' => 100_000_000,
-        'paid_amount' => 0,
+        'paid_percent' => 0,
+        'status' => Contract::STATUS_APPROVED,
     ]);
 
-    $totals = $project->participantTotalsByCurrency(ParticipantRole::Sponsor);
+    actingAs(userWithPermission('view_any_project', 'view_all_contracts'));
 
-    expect($totals)->toHaveCount(1)
-        ->and($totals->first())->toMatchArray(['currency' => 'UZS', 'count' => 1, 'total' => 100_000_000.0, 'paid' => 0.0]);
+    // The sponsors breakdown must not leak participant fees — and vice versa:
+    // each role totals its own income contracts, per currency.
+    $sponsorTotals = $project->incomeTotalsByCurrency(true);
+    $feeTotals = $project->incomeTotalsByCurrency(false);
 
-    // The sponsors modal must not leak participants — and vice versa.
-    $html = view('filament.resources.projects.tables.participants-breakdown', [
-        'rows' => $project->participants->where('role', ParticipantRole::Sponsor)->values(),
-        'totals' => $totals,
-        'empty' => __('app.message.no_sponsors'),
-    ])->render();
-
-    expect($html)
-        ->toContain('SPONSOR AIRWAYS')
-        ->toContain('100 000 000')
-        ->not->toContain('MEMBER TRAVEL');
+    expect($sponsorTotals)->toHaveCount(1)
+        ->and($sponsorTotals->first())->toMatchArray(['currency' => 'UZS', 'count' => 1, 'total' => 100_000_000.0, 'paid' => 0.0])
+        ->and($feeTotals)->toHaveCount(1)
+        ->and($feeTotals->first())->toMatchArray(['currency' => 'UZS', 'count' => 1, 'total' => 12_000_000.0, 'paid' => 12_000_000.0]);
 });
 
 it('filters the project list by year', function () {
@@ -252,27 +250,4 @@ it('shows a manager only their own contracts on the project page', function () {
         ->assertSuccessful()
         ->assertSee('OWN-2026-001')
         ->assertDontSee('FOREIGN-2026-002');
-});
-
-it('records a project payment through the view page action', function () {
-    $project = Project::factory()->international()->create();
-    $participant = ProjectParticipant::factory()->create([
-        'project_id' => $project->id,
-        'amount' => 25_000_000,
-        'paid_amount' => 0,
-    ]);
-
-    actingAs(userWithPermission('view_any_project', 'view_project', 'record_project_payment'));
-
-    Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
-        ->callAction('recordPayment', [
-            'project_participant_id' => $participant->id,
-            'amount' => 25_000_000,
-            'paid_at' => now()->toDateString(),
-            'screenshot' => UploadedFile::fake()->image('proof.jpg'),
-        ])
-        ->assertHasNoActionErrors();
-
-    expect((float) $participant->fresh()->paid_amount)->toBe(25_000_000.0)
-        ->and(ProjectPayment::where('project_participant_id', $participant->id)->count())->toBe(1);
 });

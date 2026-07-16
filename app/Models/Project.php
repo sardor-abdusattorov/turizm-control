@@ -178,6 +178,59 @@ class Project extends Model
     }
 
     /**
+     * Participant-fee income contracts — «Взнос участника» deals signed with a
+     * Contact (no sponsor). The «Участники» side of the project split.
+     */
+    public function feeContracts(): HasMany
+    {
+        return $this->incomeContracts()->whereNull('sponsor_id');
+    }
+
+    /**
+     * Sponsorship income contracts — «Спонсорство» deals signed with a Sponsor
+     * (sponsor_id set). The «Спонсоры» side of the project split.
+     */
+    public function sponsorshipContracts(): HasMany
+    {
+        return $this->hasMany(Contract::class)
+            ->whereNotNull('sponsor_id')
+            ->orderByDesc('created_at');
+    }
+
+    /**
+     * Per-currency totals of the project's income contracts of one kind (fees
+     * or sponsorship) the given user may see: one row per currency with the
+     * count, pledged and paid sums, ordered by count. Rejected contracts are
+     * dropped and "paid" is derived from the paid percent. Powers the
+     * «Участники» / «Спонсоры» count-badge breakdowns on the project lists.
+     *
+     * @return Collection<int, array{currency: string, count: int, total: float, paid: float}>
+     */
+    public function incomeTotalsByCurrency(bool $sponsors = false, ?User $user = null): Collection
+    {
+        $rows = ($sponsors ? $this->sponsorshipContracts() : $this->feeContracts())
+            ->visibleTo($user)
+            ->where('status', '!=', Contract::STATUS_REJECTED->value)
+            ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount, SUM(amount * paid_percent / 100) as total_paid')
+            ->groupBy('currency_id')
+            ->get();
+
+        $currencies = Currency::query()
+            ->whereIn('id', $rows->pluck('currency_id')->filter())
+            ->pluck('short_name', 'id');
+
+        return $rows
+            ->map(fn (Contract $row): array => [
+                'currency' => $currencies->get($row->currency_id) ?? '—',
+                'count' => (int) $row->contracts_count,
+                'total' => (float) $row->total_amount,
+                'paid' => (float) $row->total_paid,
+            ])
+            ->sortByDesc('count')
+            ->values();
+    }
+
+    /**
      * The project contracts the given user (defaults to the current one) is
      * allowed to see — the same visibility rule as the count badge and the
      * page tab, so a manager without oversight only ever sees their own.

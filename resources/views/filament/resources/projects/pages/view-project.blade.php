@@ -1,10 +1,7 @@
 @php
-    use App\Enums\ParticipantRole;
-
     /** @var \App\Models\Project $record */
     $record = $this->record;
     $record->loadMissing([
-        'participants.contact', 'participants.sponsor', 'participants.currency', 'participants.payments',
         'areaCurrency', 'standCurrency', 'creator',
     ]);
 
@@ -38,52 +35,45 @@
         ? $record->starts_on->format('d.m.Y').($record->ends_on ? ' — '.$record->ends_on->format('d.m.Y') : '')
         : '—';
 
-    $members = $record->participants->where('role', ParticipantRole::Participant)->values();
-    $sponsors = $record->participants->where('role', ParticipantRole::Sponsor)->values();
+    // «Участники» / «Спонсоры» are derived from the project's income contracts:
+    // participant-fee contracts (a Contact, no sponsor) vs sponsorship contracts
+    // (a Sponsor). Rejected contracts are dropped and only the visibleTo() set
+    // reaches the viewer, mirroring the contracts list.
+    $members = $record->feeContracts()
+        ->visibleTo()
+        ->where('status', '!=', \App\Models\Contract::STATUS_REJECTED->value)
+        ->with(['contact', 'currency'])
+        ->get();
+    $sponsors = $record->sponsorshipContracts()
+        ->visibleTo()
+        ->where('status', '!=', \App\Models\Contract::STATUS_REJECTED->value)
+        ->with(['sponsor', 'currency'])
+        ->get();
     $participantCount = $members->count() + $sponsors->count();
 
     $feesTotal = $record->feesTotal();
     $paidTotal = $record->paidTotal();
 
-    // Fees per currency (members + sponsors together) for the finance card —
-    // mixed currencies stay apart, never converted.
-    $feeTotalsByCurrency = $record->participants
-        ->groupBy(fn ($p) => $p->currency?->short_name ?? '—')
-        ->map(fn ($group, $currency) => [
-            'currency' => $currency,
-            'count' => $group->count(),
-            'total' => (float) $group->sum('amount'),
-            'paid' => (float) $group->sum('paid_amount'),
-        ])
-        ->sortByDesc('count')
-        ->values();
+    // Per-currency income-contract totals for the finance card and the panel
+    // footers — mixed currencies stay apart, never converted.
+    $feeTotalsByCurrency = $record->incomeTotalsByCurrency(false);
+    $sponsorTotalsByCurrency = $record->incomeTotalsByCurrency(true);
 
-    // A single fee currency is shown only when every participant shares it;
+    // A single fee currency is shown only when every income contract shares it;
     // mixed-currency projects drop the suffix rather than mislead.
-    $currencies = $record->participants->map(fn ($p) => $p->currency?->short_name)->filter()->unique()->values();
+    $currencies = $members->concat($sponsors)->map(fn ($c) => $c->currency?->short_name)->filter()->unique()->values();
     $feeCurrency = $currencies->count() === 1 ? $currencies->first() : '';
 
     $paidPercent = $feesTotal > 0 ? round($paidTotal / $feesTotal * 100) : 0;
 
     $galleryUrls = $record->galleryUrls();
 
-    $payments = $record->participants
-        ->flatMap(fn ($p) => $p->payments->map(fn ($pay) => (object) [
-            'name' => $p->name,
-            'amount' => $pay->amount,
-            'currency' => $p->currency?->short_name,
-            'paid_at' => $pay->paid_at,
-            'shot' => $pay->screenshotUrl(),
-        ]))
-        ->sortByDesc('paid_at')
-        ->values();
-
     $heroVariant = $record->status ? 'success' : 'gray';
     $typeIcon = $record->type === \App\Enums\ProjectType::International ? 'heroicon-o-globe-alt' : 'heroicon-o-building-office-2';
 
     $participantBlocks = [
-        ['title' => __('app.label.participants'), 'rows' => $members, 'pill' => 'info', 'icon' => 'heroicon-o-user-group', 'empty' => __('app.message.no_participants')],
-        ['title' => __('app.label.sponsors'), 'rows' => $sponsors, 'pill' => 'warning', 'icon' => 'heroicon-o-star', 'empty' => __('app.message.no_sponsors')],
+        ['title' => __('app.label.participants'), 'rows' => $members, 'totals' => $feeTotalsByCurrency, 'pill' => 'info', 'icon' => 'heroicon-o-user-group', 'empty' => __('app.message.no_participants')],
+        ['title' => __('app.label.sponsors'), 'rows' => $sponsors, 'totals' => $sponsorTotalsByCurrency, 'pill' => 'warning', 'icon' => 'heroicon-o-star', 'empty' => __('app.message.no_sponsors')],
     ];
 @endphp
 
@@ -325,7 +315,7 @@
             </section>
         </div>
 
-        {{-- ---------- PARTICIPANTS & PAYMENTS ---------- --}}
+        {{-- ---------- PARTICIPANTS (derived from income contracts) ---------- --}}
         <div x-show="tab === 'participants'" x-cloak class="pj-panel">
             @foreach ($participantBlocks as $block)
                 <section class="ow-card">
@@ -344,90 +334,45 @@
                                 <tr>
                                     <th>№</th>
                                     <th>{{ __('app.label.participant_name') }}</th>
-                                    <th class="pj-table__num">{{ __('app.label.participant_amount') }}</th>
+                                    <th>{{ __('app.label.contract_number') }}</th>
+                                    <th class="pj-table__num">{{ __('app.label.amount') }}</th>
                                     <th class="pj-table__num">{{ __('app.label.paid') }}</th>
                                     <th>{{ __('app.label.status') }}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach ($block['rows'] as $p)
-                                    @php $status = $p->paymentStatus(); @endphp
+                                @foreach ($block['rows'] as $c)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $c->counterparty()?->name }}</td>
                                         <td>
-                                            {{ $p->name }}
-                                            @if ($p->contact)
-                                                <span class="pj-pill pj-pill--{{ $block['pill'] }}">{{ __('app.label.contact_single') }}</span>
-                                            @elseif ($p->sponsor)
-                                                <span class="pj-pill pj-pill--{{ $block['pill'] }}">{{ __('app.label.sponsor_single') }}</span>
-                                            @endif
+                                            <a class="pj-link" href="{{ \App\Filament\Resources\Contracts\ContractResource::getUrl('view', ['record' => $c]) }}">
+                                                {{ $c->number }}
+                                            </a>
                                         </td>
-                                        <td class="pj-table__num">{{ $fmt($p->amount) }} {{ $p->currency?->short_name }}</td>
-                                        <td class="pj-table__num">{{ $fmt($p->paid_amount) }} {{ $p->currency?->short_name }}</td>
-                                        <td>
-                                            @if ((float) $p->amount > 0)
-                                                <span class="pj-pill pj-pill--{{ $status->color() }}">{{ $status->label() }}</span>
-                                            @else
-                                                <span class="pj-pill pj-pill--gray">—</span>
-                                            @endif
-                                        </td>
+                                        <td class="pj-table__num">{{ $fmt($c->amount) }} {{ $c->currency?->short_name }}</td>
+                                        <td class="pj-table__num">{{ $fmt($c->paidAmount()) }} {{ $c->currency?->short_name }}</td>
+                                        <td><span class="pj-pill pj-pill--{{ $c->payment_status->color() }}">{{ $c->payment_status->label() }}</span></td>
                                     </tr>
                                 @endforeach
                                 </tbody>
-                                <tfoot>
-                                <tr>
-                                    <td colspan="2">{{ __('app.label.fees_total') }}</td>
-                                    <td class="pj-table__num">{{ $fmt($block['rows']->sum('amount')) }}</td>
-                                    <td class="pj-table__num">{{ $fmt($block['rows']->sum('paid_amount')) }}</td>
-                                    <td></td>
-                                </tr>
-                                </tfoot>
+                                @if ($block['totals']->isNotEmpty())
+                                    <tfoot>
+                                    @foreach ($block['totals'] as $t)
+                                        <tr>
+                                            <td colspan="3">{{ $t['currency'] }}</td>
+                                            <td class="pj-table__num">{{ $fmt($t['total']) }}</td>
+                                            <td class="pj-table__num">{{ $fmt($t['paid']) }}</td>
+                                            <td></td>
+                                        </tr>
+                                    @endforeach
+                                    </tfoot>
+                                @endif
                             </table>
                         </div>
                     @endif
                 </section>
             @endforeach
-
-            @if ($payments->isNotEmpty())
-                <section class="ow-card">
-                    <header class="ow-hd">
-                        <span class="ow-hd__ic">{!! $ic('heroicon-o-credit-card', 18) !!}</span>
-                        <h2 class="ow-hd__t">{{ __('app.label.payments') }}</h2>
-                        <span class="pj-count">{{ $payments->count() }}</span>
-                    </header>
-                    {{-- data-viewer-gallery: the plugin's Viewer.js picks up every
-                         screenshot inside, so one click opens a navigable viewer
-                         across all payment proofs. --}}
-                    <div class="pj-table-wrap" data-viewer-gallery>
-                        <table class="pj-table">
-                            <thead>
-                            <tr>
-                                <th>{{ __('app.label.participant_name') }}</th>
-                                <th class="pj-table__num">{{ __('app.label.payment_amount') }}</th>
-                                <th>{{ __('app.label.paid_at') }}</th>
-                                <th>{{ __('app.label.screenshot') }}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($payments as $pay)
-                                <tr>
-                                    <td>{{ $pay->name }}</td>
-                                    <td class="pj-table__num">{{ $fmt($pay->amount) }} {{ $pay->currency }}</td>
-                                    <td>{{ $pay->paid_at?->format('d.m.Y') }}</td>
-                                    <td>
-                                        @if ($pay->shot)
-                                            <img class="pj-shot" src="{{ $pay->shot }}" alt="{{ $pay->name }}">
-                                        @else
-                                            —
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            @endif
         </div>
 
         {{-- ---------- GALLERY ---------- --}}
