@@ -642,6 +642,11 @@ return [
         'active' => 'Active',
         'inactive' => 'Inactive',
     ],
+    'counterparty_kind' => [
+        'contact' => 'Counterparty',
+        'sponsor' => 'Sponsor',
+    ],
+
     'contract' => [
         'status' => [
             'draft' => 'Draft',

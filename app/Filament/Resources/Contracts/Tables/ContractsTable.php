@@ -40,6 +40,7 @@ class ContractsTable
             // keeps it to a flat handful.
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
                 'contact',
+                'sponsor',
                 'contractType',
                 'project',
                 'currency',
@@ -72,8 +73,13 @@ class ContractsTable
                     ->wrap()
                     ->limit(50),
 
+                // Counterparty: the contact on most contracts, the sponsor on
+                // «Спонсорство». Search still targets the contact name (the
+                // common case); the state() falls back to the sponsor.
                 TextColumn::make('contact.name')
-                    ->label(__('app.label.contact_single'))
+                    ->label(__('app.label.counterparty'))
+                    ->state(fn (Contract $record): ?string => $record->contact?->name ?? $record->sponsor?->name)
+                    ->placeholder('—')
                     ->searchable()
                     ->limit(40)
                     ->toggleable(),

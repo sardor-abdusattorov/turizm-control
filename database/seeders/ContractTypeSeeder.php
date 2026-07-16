@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\ContractDirection;
+use App\Enums\CounterpartyKind;
 use App\Models\ContractType;
 use Illuminate\Database\Seeder;
 
@@ -75,6 +76,7 @@ class ContractTypeSeeder extends Seeder
                     'en' => 'Sponsor contribution to a project (e.g. Uzbekistan Airways)',
                 ],
                 'direction' => ContractDirection::Income,
+                'counterparty_kind' => CounterpartyKind::Sponsor,
                 'sort' => 6,
             ],
         ];
@@ -86,6 +88,7 @@ class ContractTypeSeeder extends Seeder
                     'title' => $data['title'],
                     'description' => $data['description'],
                     'direction' => $data['direction']->value,
+                    'counterparty_kind' => ($data['counterparty_kind'] ?? CounterpartyKind::Contact)->value,
                     'sort' => $data['sort'],
                     'status' => true,
                 ]

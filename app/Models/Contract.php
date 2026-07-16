@@ -30,6 +30,7 @@ class Contract extends Model
         'contract_type_id',
         'order_id',
         'contact_id',
+        'sponsor_id',
         'project_id',
         'currency_id',
         'responsible_id',
@@ -84,6 +85,7 @@ class Contract extends Model
         'amount',
         'currency_id',
         'contact_id',
+        'sponsor_id',
         'contract_type_id',
         'contract_template_id',
         'document_file',
@@ -250,6 +252,25 @@ class Contract extends Model
     public function contact(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
+    }
+
+    /**
+     * The sponsor this contract is signed with, on sponsorship («Спонсорство»)
+     * contracts. Mutually exclusive with {@see contact()} — the type's
+     * counterparty_kind decides which one is filled.
+     */
+    public function sponsor(): BelongsTo
+    {
+        return $this->belongsTo(Sponsor::class);
+    }
+
+    /**
+     * The counterparty this contract faces, whichever kind it is: the sponsor
+     * on sponsorship contracts, the contact otherwise.
+     */
+    public function counterparty(): Contact|Sponsor|null
+    {
+        return $this->sponsor_id !== null ? $this->sponsor : $this->contact;
     }
 
     public function project(): BelongsTo
@@ -575,6 +596,18 @@ class Contract extends Model
         }
 
         return (float) $this->payments()->sum('percent');
+    }
+
+    /**
+     * Money actually collected on this contract. Contracts track a paid
+     * *percent* (maintained by the payment observers), not an absolute figure,
+     * so the collected amount is derived from the total — this is the income
+     * counterpart of the old ProjectParticipant::paid_amount column, kept as a
+     * helper so every project/contact/sponsor breakdown reads it the same way.
+     */
+    public function paidAmount(): float
+    {
+        return round((float) $this->amount * $this->paidPercent() / 100, 2);
     }
 
     public function remainingPercent(): float

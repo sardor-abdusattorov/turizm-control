@@ -637,6 +637,11 @@ return [
         'active' => 'Faol',
         'inactive' => 'Nofaol',
     ],
+    'counterparty_kind' => [
+        'contact' => 'Kontragent',
+        'sponsor' => 'Homiy',
+    ],
+
     'contract' => [
         'status' => [
             'draft' => 'Qoralama',

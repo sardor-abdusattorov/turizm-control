@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\ContractDirection;
+use App\Enums\CounterpartyKind;
 use App\Models\ContractType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,6 +22,7 @@ class ContractTypeFactory extends Factory
             'title' => ['ru' => $title, 'uz' => $title, 'en' => $title],
             'description' => null,
             'direction' => ContractDirection::Expense->value,
+            'counterparty_kind' => CounterpartyKind::Contact->value,
             'sort' => 0,
             'status' => true,
         ];
@@ -29,5 +31,16 @@ class ContractTypeFactory extends Factory
     public function income(): static
     {
         return $this->state(fn () => ['direction' => ContractDirection::Income->value]);
+    }
+
+    /**
+     * Sponsorship kind: income-direction and signed with a Sponsor.
+     */
+    public function sponsorship(): static
+    {
+        return $this->state(fn () => [
+            'direction' => ContractDirection::Income->value,
+            'counterparty_kind' => CounterpartyKind::Sponsor->value,
+        ]);
     }
 }

@@ -5,7 +5,9 @@ namespace Database\Factories;
 use App\Enums\PaymentStatus;
 use App\Models\Contact;
 use App\Models\Contract;
+use App\Models\ContractType;
 use App\Models\Currency;
+use App\Models\Sponsor;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Storage;
@@ -48,6 +50,19 @@ class ContractFactory extends Factory
     public function rejected(): static
     {
         return $this->state(fn () => ['status' => Contract::STATUS_REJECTED]);
+    }
+
+    /**
+     * A sponsorship income contract: signed with a Sponsor (no contact),
+     * under a sponsorship-kind ContractType.
+     */
+    public function sponsorship(): static
+    {
+        return $this->state(fn () => [
+            'contact_id' => null,
+            'sponsor_id' => Sponsor::factory(),
+            'contract_type_id' => ContractType::factory()->sponsorship(),
+        ]);
     }
 
     /**

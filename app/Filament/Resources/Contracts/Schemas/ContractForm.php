@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Contracts\Schemas;
 
 use App\Filament\Resources\Contacts\Schemas\ContactForm;
+use App\Filament\Resources\Sponsors\Schemas\SponsorForm;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
@@ -12,6 +13,7 @@ use App\Models\Currency;
 use App\Models\Department;
 use App\Models\Order;
 use App\Models\Project;
+use App\Models\Sponsor;
 use App\Models\User;
 use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractWorkflow;
@@ -106,7 +108,19 @@ class ContractForm
                                     ->searchable()
                                     ->preload()
                                     ->live()
-                                    ->afterStateUpdated(fn (Set $set) => $set('contract_template_id', null))
+                                    ->afterStateUpdated(function (Set $set, mixed $state): void {
+                                        $set('contract_template_id', null);
+
+                                        // The counterparty picker flips with the
+                                        // type; clear whichever party no longer
+                                        // applies so a contact contract never
+                                        // saves a stale sponsor and vice versa.
+                                        if (self::typeUsesSponsor($state)) {
+                                            $set('contact_id', null);
+                                        } else {
+                                            $set('sponsor_id', null);
+                                        }
+                                    })
                                     ->columnSpanFull(),
 
                                 Select::make('contract_template_id')
@@ -128,14 +142,30 @@ class ContractForm
                                     ->nullable()
                                     ->columnSpanFull(),
 
+                                // Counterparty — a Contact on most kinds, a
+                                // Sponsor on «Спонсорство». The type's
+                                // counterparty_kind toggles which picker shows;
+                                // exactly one of the two is filled and required.
                                 Select::make('contact_id')
                                     ->label(__('app.label.contact_single'))
                                     ->options(Contact::getActive())
-                                    ->required()
+                                    ->visible(fn (Get $get): bool => ! self::typeUsesSponsor($get('contract_type_id')))
+                                    ->required(fn (Get $get): bool => ! self::typeUsesSponsor($get('contract_type_id')))
                                     ->searchable()
                                     ->preload()
                                     ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema, withBankAccounts: false))
                                     ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey())
+                                    ->columnSpanFull(),
+
+                                Select::make('sponsor_id')
+                                    ->label(__('app.label.sponsor_single'))
+                                    ->options(Sponsor::getActive())
+                                    ->visible(fn (Get $get): bool => self::typeUsesSponsor($get('contract_type_id')))
+                                    ->required(fn (Get $get): bool => self::typeUsesSponsor($get('contract_type_id')))
+                                    ->searchable()
+                                    ->preload()
+                                    ->createOptionForm(fn (Schema $schema) => SponsorForm::configure($schema))
+                                    ->createOptionUsing(fn (array $data) => Sponsor::create($data)->getKey())
                                     ->columnSpanFull(),
 
                                 Grid::make(['default' => 1, 'md' => 3])
@@ -247,6 +277,20 @@ class ContractForm
                             ]),
                     ]),
             ]);
+    }
+
+    /**
+     * Whether the chosen contract type faces a Sponsor rather than a Contact.
+     * Memoised for the request so the visible/required closures don't hit the
+     * database on every keystroke.
+     */
+    protected static function typeUsesSponsor(mixed $contractTypeId): bool
+    {
+        if (blank($contractTypeId)) {
+            return false;
+        }
+
+        return in_array((int) $contractTypeId, ContractType::sponsorFacingIds(), true);
     }
 
     /**

@@ -637,6 +637,11 @@ return [
         'active' => 'Активен',
         'inactive' => 'Неактивен',
     ],
+    'counterparty_kind' => [
+        'contact' => 'Контрагент',
+        'sponsor' => 'Спонсор',
+    ],
+
     'contract' => [
         'status' => [
             'draft' => 'Черновик',
