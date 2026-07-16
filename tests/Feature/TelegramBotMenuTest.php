@@ -31,10 +31,22 @@ it('shows the locale picker after linking', function () {
     $url = app(TelegramBot::class)->connectUrl($user);
     $token = str($url)->after('start=')->value();
 
+    // Linking is a two-step handshake now: /start shows the confirmation,
+    // the «yes, it's me» tap completes it — and THEN the picker appears.
     app(TelegramBot::class)->handleUpdate([
         'message' => [
             'chat' => ['id' => 111],
+            'from' => ['id' => 111],
             'text' => "/start {$token}",
+        ],
+    ]);
+
+    app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb-link-menu',
+            'from' => ['id' => 111],
+            'message' => ['message_id' => 3],
+            'data' => "lnk:{$token}",
         ],
     ]);
 

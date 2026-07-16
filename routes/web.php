@@ -31,6 +31,7 @@ Route::post('/orders/{order}/save-callback', [OnlyOfficeOrderController::class, 
     ->name('orders.save-callback');
 
 Route::post('/telegram/webhook/{secret}', [TelegramWebhookController::class, 'handle'])
+    ->middleware('throttle:120,1')
     ->name('telegram.webhook');
 
 Route::middleware(['web', 'auth'])->group(function () {

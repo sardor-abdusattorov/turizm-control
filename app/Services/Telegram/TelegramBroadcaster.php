@@ -15,8 +15,10 @@ class TelegramBroadcaster
     public function __construct(public TelegramService $telegram) {}
 
     /**
-     * Send the message to every connected chat. Returns how many chats
-     * actually accepted it.
+     * Queue the message for every connected chat. Returns how many chats it
+     * was queued for. Delivery happens on the queue worker so a broadcast to
+     * hundreds of chats never blocks the admin's HTTP request, and per-chat
+     * failures are retried by the job instead of being dropped.
      */
     public function send(string $message): int
     {
@@ -29,9 +31,8 @@ class TelegramBroadcaster
             ->whereNotNull('chat_id')
             ->chunkById(100, function ($chunk) use ($body, &$count): void {
                 foreach ($chunk as $telegramUser) {
-                    if ($this->telegram->send($telegramUser->chat_id, $body)) {
-                        $count++;
-                    }
+                    $this->telegram->queue($telegramUser->chat_id, $body);
+                    $count++;
                 }
             });
 

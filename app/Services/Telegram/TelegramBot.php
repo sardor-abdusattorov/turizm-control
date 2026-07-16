@@ -3,6 +3,7 @@
 namespace App\Services\Telegram;
 
 use App\Models\Contract;
+use App\Models\TelegramUser;
 use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
 use Illuminate\Support\Facades\App;
@@ -62,6 +63,8 @@ class TelegramBot
         if ($chatId === '') {
             return;
         }
+
+        $this->touchPresence($chatId, $message['from'] ?? []);
 
         // /start [<token>] — link or just say hi
         if (Str::startsWith($text, '/start')) {
@@ -129,7 +132,10 @@ class TelegramBot
             return;
         }
 
-        $userId = Cache::pull($this->linkKey($token));
+        // Peek — do NOT consume the token yet. Linking happens only after the
+        // person in the chat confirms the account name: a forwarded deep link
+        // must not silently hand a stranger's chat all of the notifications.
+        $userId = Cache::get($this->linkKey($token));
         $user = $userId ? User::find($userId) : null;
 
         if (! $user) {
@@ -138,19 +144,13 @@ class TelegramBot
             return;
         }
 
-        // If the user is already linked to THIS chat, the diplink they just
-        // followed was a no-op — don't reset locale and don't drag them
-        // through the language picker again, just drop them straight into
-        // the main menu.
+        // If the user is already linked to THIS chat, the deep link they just
+        // followed was a no-op — consume the token and drop them straight
+        // into the main menu without the confirm/locale dance.
         $existing = $user->telegram;
-        $alreadyLinkedHere = $existing && (string) $existing->chat_id === $chatId;
 
-        $user->telegram()->updateOrCreate(
-            [],
-            ['chat_id' => $chatId, 'linked_at' => now()],
-        );
-
-        if ($alreadyLinkedHere) {
+        if ($existing && (string) $existing->chat_id === $chatId) {
+            Cache::forget($this->linkKey($token));
             $this->withUserLocale($chatId, fn () => $this->sendMainMenu($chatId));
 
             return;
@@ -160,6 +160,72 @@ class TelegramBot
 
         $this->telegram->send(
             $chatId,
+            '<b>'.__('app.telegram.link_confirm_title').'</b>'."\n\n"
+                .__('app.telegram.link_confirm_body', ['name' => $user->name]),
+            [
+                [[
+                    'text' => '✅ '.__('app.telegram.link_confirm_yes'),
+                    'callback_data' => "lnk:{$token}",
+                ]],
+                [[
+                    'text' => '✖️ '.__('app.telegram.link_confirm_no'),
+                    'callback_data' => 'lnkc',
+                ]],
+            ],
+        );
+    }
+
+    /**
+     * The "Yes, it's me" tap that actually writes the link. Runs BEFORE the
+     * usual linked-user gate (the chat is by definition not linked yet).
+     * Consumes the one-time token, frees the chat id from any other account
+     * (a phone reassigned to a new employee) and records the sender's
+     * username for the admin broadcast table.
+     *
+     * @param  array<string, mixed>  $from
+     */
+    private function handleLinkCallback(string $callbackId, string $chatId, ?int $messageId, string $data, array $from): void
+    {
+        if ($data === 'lnkc') {
+            $this->telegram->answerCallbackQuery($callbackId, __('app.telegram.cancelled'));
+            $this->telegram->editMessage($chatId, $messageId, __('app.telegram.link_cancelled'));
+
+            return;
+        }
+
+        $token = (string) Str::after($data, 'lnk:');
+        $userId = Cache::pull($this->linkKey($token));
+        $user = $userId ? User::find($userId) : null;
+
+        if (! $user) {
+            $this->telegram->answerCallbackQuery($callbackId);
+            $this->telegram->editMessage($chatId, $messageId, __('app.telegram.link_expired'));
+
+            return;
+        }
+
+        // One chat — one account: the unique index on chat_id would reject
+        // the write anyway; releasing the old row makes the takeover an
+        // explicit re-link instead of a 500 inside the webhook.
+        TelegramUser::query()
+            ->where('chat_id', $chatId)
+            ->where('user_id', '!=', $user->id)
+            ->delete();
+
+        $user->telegram()->updateOrCreate(
+            [],
+            [
+                'chat_id' => $chatId,
+                'username' => $from['username'] ?? null,
+                'linked_at' => now(),
+                'last_seen_at' => now(),
+            ],
+        );
+
+        $this->telegram->answerCallbackQuery($callbackId);
+        $this->telegram->editMessage(
+            $chatId,
+            $messageId,
             __('app.telegram.link_success', ['name' => $user->name]),
         );
 
@@ -174,6 +240,14 @@ class TelegramBot
         $messageId = isset($callback['message']['message_id']) ? (int) $callback['message']['message_id'] : null;
         $data = (string) ($callback['data'] ?? '');
 
+        // Link confirmation comes from a chat that is NOT linked yet — it
+        // must bypass the linked-user gate below.
+        if ($data === 'lnkc' || Str::startsWith($data, 'lnk:')) {
+            $this->handleLinkCallback($callbackId, $chatId, $messageId, $data, $callback['from'] ?? []);
+
+            return;
+        }
+
         $user = $this->resolveUser($chatId);
 
         if (! $user) {
@@ -181,6 +255,8 @@ class TelegramBot
 
             return;
         }
+
+        $this->touchPresence($chatId, $callback['from'] ?? [], $user);
 
         $this->withUserLocale($chatId, function () use ($callbackId, $chatId, $messageId, $data, $user): void {
             $this->routeCallback($callbackId, $chatId, $messageId, $data, $user);
@@ -539,6 +615,26 @@ class TelegramBot
     private function resolveUser(string $chatId): ?User
     {
         return User::whereHas('telegram', fn ($q) => $q->where('chat_id', $chatId))->first();
+    }
+
+    /**
+     * Keep the linked row's username and last-seen stamp fresh — the admin
+     * broadcast table shows both, and until now they were never written.
+     *
+     * @param  array<string, mixed>  $from
+     */
+    private function touchPresence(string $chatId, array $from, ?User $user = null): void
+    {
+        $telegram = ($user ?? $this->resolveUser($chatId))?->telegram;
+
+        if (! $telegram) {
+            return;
+        }
+
+        $telegram->forceFill(array_filter([
+            'username' => $from['username'] ?? null,
+            'last_seen_at' => now(),
+        ]))->saveQuietly();
     }
 
     private function withUserLocale(string $chatId, callable $callback): void

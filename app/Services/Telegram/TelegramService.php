@@ -2,12 +2,47 @@
 
 namespace App\Services\Telegram;
 
+use App\Jobs\SendTelegramMessage;
+use App\Jobs\SendTelegramPhoto;
 use App\Models\TelegramMessageLog;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class TelegramService
 {
+    /**
+     * Queue an HTML message for delivery after the surrounding DB transaction
+     * commits. This is the path every NOTIFICATION should take — it keeps the
+     * 10-second Telegram timeout out of HTTP requests and open transactions.
+     * Interactive bot replies (webhook conversations) stay on send()/edit
+     * Message() because the user is waiting on the other side of the chat.
+     *
+     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
+     */
+    public function queue(?string $chatId, string $message, ?array $inlineKeyboard = null): void
+    {
+        if (! $this->token() || ! $chatId) {
+            return;
+        }
+
+        SendTelegramMessage::dispatch($chatId, $message, $inlineKeyboard);
+    }
+
+    /**
+     * Queue a photo (path relative to the private `local` disk) with a caption.
+     *
+     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
+     */
+    public function queuePhoto(?string $chatId, string $path, string $caption, ?array $inlineKeyboard = null): void
+    {
+        if (! $this->token() || ! $chatId) {
+            return;
+        }
+
+        SendTelegramPhoto::dispatch($chatId, $path, $caption, $inlineKeyboard);
+    }
+
     /**
      * Send an HTML message to a chat, optionally with an inline keyboard.
      * Silently no-ops when the bot token or the chat id is missing.
@@ -59,6 +94,63 @@ class TelegramService
         }
 
         return $this->call('editMessageText', $payload);
+    }
+
+    /**
+     * Send a photo from the private `local` disk with an HTML caption. Falls
+     * back to a plain text message when the file no longer exists, so the
+     * notification survives a purged screenshot. Telegram caps captions at
+     * 1024 characters — longer ones are truncated.
+     *
+     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
+     */
+    public function sendPhoto(?string $chatId, string $path, string $caption, ?array $inlineKeyboard = null): bool
+    {
+        if (! $this->token() || ! $chatId) {
+            return false;
+        }
+
+        if (! Storage::disk('local')->exists($path)) {
+            return $this->send($chatId, $caption, $inlineKeyboard);
+        }
+
+        $payload = [
+            'chat_id' => $chatId,
+            'caption' => mb_substr($caption, 0, 1024),
+            'parse_mode' => 'HTML',
+        ];
+
+        if ($inlineKeyboard !== null) {
+            // Multipart fields must be scalar — the keyboard rides as JSON.
+            $payload['reply_markup'] = json_encode(['inline_keyboard' => $inlineKeyboard]);
+        }
+
+        try {
+            $response = Http::timeout(15)
+                ->attach('photo', Storage::disk('local')->get($path), basename($path))
+                ->post("https://api.telegram.org/bot{$this->token()}/sendPhoto", $payload);
+
+            if (! $response->successful()) {
+                Log::warning('Telegram sendPhoto rejected', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+            }
+
+            $this->record('sendPhoto', ['chat_id' => $chatId, 'text' => $payload['caption']],
+                $response->successful(), $response->status(),
+                $response->successful() ? null : $response->body());
+
+            return $response->successful();
+        } catch (\Throwable $e) {
+            $error = $this->redactToken($e->getMessage());
+
+            Log::warning('Telegram sendPhoto failed', ['error' => $error]);
+
+            $this->record('sendPhoto', ['chat_id' => $chatId, 'text' => $payload['caption']], false, null, $error);
+
+            return false;
+        }
     }
 
     public function answerCallbackQuery(string $callbackQueryId, ?string $text = null): bool
@@ -164,7 +256,7 @@ class TelegramService
      */
     private function record(string $method, array $payload, bool $ok, ?int $status, ?string $error): void
     {
-        if (! in_array($method, ['sendMessage', 'editMessageText'], true)) {
+        if (! in_array($method, ['sendMessage', 'editMessageText', 'sendPhoto'], true)) {
             return;
         }
 

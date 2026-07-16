@@ -48,7 +48,9 @@ class ContractNotifier
         $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract): void {
             $screen = $this->botMenu->notificationApprovalRequested($contract);
 
-            $this->telegram->send(
+            // Queued (afterCommit) — submit()/approve() call this inside an
+            // open DB transaction.
+            $this->telegram->queue(
                 $recipient->telegram?->chat_id,
                 $screen['text'],
                 $screen['keyboard'],

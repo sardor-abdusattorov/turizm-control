@@ -33,7 +33,7 @@ it('generates a connect deep link that maps a token to the user', function () {
     expect(Cache::get("telegram_link:{$token}"))->toBe($user->id);
 });
 
-it('links the chat id to the user when /start arrives with a valid token', function () {
+it('asks for confirmation and links the chat only after «yes, it is me»', function () {
     $user = User::factory()->create();
     $url = app(TelegramBot::class)->connectUrl($user);
     $token = str($url)->after('start=')->value();
@@ -41,19 +41,110 @@ it('links the chat id to the user when /start arrives with a valid token', funct
     app(TelegramBot::class)->handleUpdate([
         'message' => [
             'chat' => ['id' => 987654],
+            'from' => ['id' => 987654, 'username' => 'sardor_uz'],
             'text' => "/start {$token}",
         ],
     ]);
 
-    expect($user->fresh()->telegram?->chat_id)->toBe('987654');
+    // A forwarded deep link must never bind a chat silently — nothing is
+    // linked until the person in the chat confirms the account name.
+    expect($user->fresh()->telegram)->toBeNull();
+
+    app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb-link',
+            'from' => ['id' => 987654, 'username' => 'sardor_uz'],
+            'message' => ['message_id' => 5],
+            'data' => "lnk:{$token}",
+        ],
+    ]);
+
+    $telegram = $user->fresh()->telegram;
+
+    expect($telegram?->chat_id)->toBe('987654')
+        ->and($telegram?->username)->toBe('sardor_uz')
+        ->and($telegram?->last_seen_at)->not->toBeNull();
 });
 
-it('rejects the webhook with a wrong secret and accepts the right one', function () {
+it('declining the link confirmation leaves the account untouched', function () {
+    $user = User::factory()->create();
+    $url = app(TelegramBot::class)->connectUrl($user);
+    $token = str($url)->after('start=')->value();
+
+    app(TelegramBot::class)->handleUpdate([
+        'message' => [
+            'chat' => ['id' => 111222],
+            'from' => ['id' => 111222],
+            'text' => "/start {$token}",
+        ],
+    ]);
+
+    app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb-cancel',
+            'from' => ['id' => 111222],
+            'message' => ['message_id' => 6],
+            'data' => 'lnkc',
+        ],
+    ]);
+
+    expect($user->fresh()->telegram)->toBeNull();
+});
+
+it('a consumed confirmation token cannot be replayed', function () {
+    $user = User::factory()->create();
+    $url = app(TelegramBot::class)->connectUrl($user);
+    $token = str($url)->after('start=')->value();
+
+    $confirm = fn (string $chatId) => app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb-'.$chatId,
+            'from' => ['id' => (int) $chatId],
+            'message' => ['message_id' => 7],
+            'data' => "lnk:{$token}",
+        ],
+    ]);
+
+    $confirm('333');
+    expect($user->fresh()->telegram?->chat_id)->toBe('333');
+
+    // Replaying the same token from another chat must not re-link.
+    $confirm('444');
+    expect($user->fresh()->telegram?->chat_id)->toBe('333');
+});
+
+it('re-linking a chat that belonged to another user releases the old row', function () {
+    $old = User::factory()->withTelegram('550001')->create();
+    $new = User::factory()->create();
+
+    $url = app(TelegramBot::class)->connectUrl($new);
+    $token = str($url)->after('start=')->value();
+
+    app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb-relink',
+            'from' => ['id' => 550001],
+            'message' => ['message_id' => 8],
+            'data' => "lnk:{$token}",
+        ],
+    ]);
+
+    expect($new->fresh()->telegram?->chat_id)->toBe('550001')
+        ->and($old->fresh()->telegram)->toBeNull();
+});
+
+it('rejects the webhook without the secret header and accepts a fully signed call', function () {
     post('/telegram/webhook/wrong-secret', [])->assertForbidden();
+
+    // The right path secret alone is not enough — the header must match too:
+    // the path can leak into proxy access logs, the header cannot.
+    post('/telegram/webhook/hook-secret', [
+        'message' => ['chat' => ['id' => 1], 'text' => '/start'],
+    ])->assertForbidden();
 
     post('/telegram/webhook/hook-secret', [
         'message' => ['chat' => ['id' => 1], 'text' => '/start'],
-    ])->assertOk();
+    ], ['X-Telegram-Bot-Api-Secret-Token' => 'hook-secret'])->assertOk();
 });
 
 it('opens a comment step on approve and stores the typed comment', function () {

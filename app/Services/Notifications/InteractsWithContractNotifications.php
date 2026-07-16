@@ -42,7 +42,10 @@ trait InteractsWithContractNotifications
             'url' => $url,
         ]];
 
-        $this->telegram->send(
+        // Queued (afterCommit): notifications must never hold the workflow's
+        // DB transaction open on a slow Telegram round-trip, nor fire for a
+        // transaction that ends up rolled back.
+        $this->telegram->queue(
             $recipient->telegram?->chat_id,
             "<b>{$title}</b>\n{$body}",
             $keyboard,
