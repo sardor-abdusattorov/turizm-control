@@ -10,16 +10,18 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             // Reference data + accounts — the defaults the app can't run
-            // without. Contacts, orders, contracts and templates are entered
-            // by hand in the UI, so their seeders are deliberately absent here
-            // (ContactSeeder carries a single example row, ContractSeeder /
-            // OrdersSeeder stay runnable by hand for showcases).
+            // without. Orders, contracts and templates are entered by hand in
+            // the UI, so their seeders stay runnable on their own for showcases.
+            // Counterparties come from the contract requisites: ContactSeeder
+            // holds the domestic tour agents, ForeignPartnerSeeder the foreign
+            // stand/land legal entities.
             PositionSeeder::class,
             DepartmentSeeder::class,
             CurrencySeeder::class,
             OrderTypeSeeder::class,
             ContractTypeSeeder::class,
             ContactSeeder::class,
+            ForeignPartnerSeeder::class,
             RolesAndPermissionsSeeder::class,
             UserSeeder::class,
             TestUsersSeeder::class,
