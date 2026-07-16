@@ -134,7 +134,7 @@ class ContractForm
                                     ->required()
                                     ->searchable()
                                     ->preload()
-                                    ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema))
+                                    ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema, withBankAccounts: false))
                                     ->createOptionUsing(fn (array $data) => Contact::create($data)->getKey())
                                     ->columnSpanFull(),
 

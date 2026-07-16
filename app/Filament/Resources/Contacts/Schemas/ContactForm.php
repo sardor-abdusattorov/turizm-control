@@ -18,7 +18,7 @@ use Filament\Schemas\Schema;
 
 class ContactForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Schema $schema, bool $withBankAccounts = true): Schema
     {
         return $schema
             ->columns(1)
@@ -113,7 +113,13 @@ class ContactForm
                             ->default(true),
                     ]),
 
-                Section::make(__('app.label.bank_requisites'))
+                // The bank-accounts repeater binds to a HasMany relationship, so
+                // it only works on the standalone Contact form. When this form is
+                // reused as a Select create-option (e.g. adding a counterparty
+                // inline while drafting a contract) there is no saved Contact to
+                // bind to — leave it out and let accounts be added by editing the
+                // contact afterwards.
+                ...($withBankAccounts ? [Section::make(__('app.label.bank_requisites'))
                     ->collapsible()
                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
                     ->schema([
@@ -174,7 +180,7 @@ class ContactForm
                                             ->maxLength(20),
                                     ]),
                             ]),
-                    ]),
+                    ])] : []),
             ]);
     }
 }
