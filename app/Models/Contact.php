@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\ContractDirection;
 use App\Models\Concerns\HasActiveStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -77,6 +79,26 @@ class Contact extends Model
     public function bankAccounts(): HasMany
     {
         return $this->hasMany(BankAccount::class)->orderBy('sort')->orderBy('id');
+    }
+
+    /**
+     * Tag each row with `is_supplier` / `is_client` booleans derived from the
+     * direction of its contracts: a supplier is someone we PAY (an expense
+     * contract), a client is someone who PAYS us (an income contract). A
+     * counterparty can be both, or neither. Used by the contacts-list column
+     * and filter — one subquery each, no per-row lookups.
+     *
+     * @param  Builder<Contact>  $query
+     * @return Builder<Contact>
+     */
+    public function scopeWithRoleFlags(Builder $query): Builder
+    {
+        $hasDirection = fn (ContractDirection $direction) => fn (Builder $contracts) => $contracts
+            ->whereHas('contractType', fn (Builder $type) => $type->where('direction', $direction->value));
+
+        return $query
+            ->withExists(['contracts as is_supplier' => $hasDirection(ContractDirection::Expense)])
+            ->withExists(['contracts as is_client' => $hasDirection(ContractDirection::Income)]);
     }
 
     /**

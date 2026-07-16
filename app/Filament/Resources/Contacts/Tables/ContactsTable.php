@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Contacts\Tables;
 
+use App\Enums\ContractDirection;
 use App\Exports\ContactsExport;
 use App\Filament\Resources\Contacts\ContactResource;
 use App\Filament\Support\CreatedAtColumn;
@@ -27,10 +28,12 @@ class ContactsTable
     {
         return $table
             ->defaultSort('id', 'desc')
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount([
-                'contracts' => fn (Builder $contracts) => $contracts->visibleTo(),
-                'projectParticipations',
-            ]))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query
+                ->withRoleFlags()
+                ->withCount([
+                    'contracts' => fn (Builder $contracts) => $contracts->visibleTo(),
+                    'projectParticipations',
+                ]))
             ->columns([
                 TextColumn::make('type')
                     ->label(__('app.label.contact_type'))
@@ -43,6 +46,17 @@ class ContactsTable
                     ->label(__('app.label.contact_name'))
                     ->searchable()
                     ->sortable(),
+
+                TextColumn::make('role')
+                    ->label(__('app.label.contact_role'))
+                    ->badge()
+                    ->state(fn (Contact $record): array => array_values(array_filter([
+                        ($record->is_supplier ?? false) ? 'supplier' : null,
+                        ($record->is_client ?? false) ? 'client' : null,
+                    ])))
+                    ->formatStateUsing(fn (string $state): string => __('app.label.role_'.$state))
+                    ->color(fn (string $state): string => $state === 'supplier' ? 'warning' : 'success')
+                    ->placeholder('—'),
 
                 TextColumn::make('contracts_count')
                     ->label(__('app.label.contracts'))
@@ -130,6 +144,32 @@ class ContactsTable
                 SelectFilter::make('type')
                     ->label(__('app.label.contact_type'))
                     ->options(Contact::getTypes()),
+
+                SelectFilter::make('role')
+                    ->label(__('app.label.contact_role'))
+                    ->options([
+                        'supplier' => __('app.label.role_supplier'),
+                        'client' => __('app.label.role_client'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+
+                        if (in_array($value, [null, ''], true)) {
+                            return $query;
+                        }
+
+                        $direction = $value === 'supplier'
+                            ? ContractDirection::Expense
+                            : ContractDirection::Income;
+
+                        return $query->whereHas(
+                            'contracts',
+                            fn (Builder $contracts) => $contracts->whereHas(
+                                'contractType',
+                                fn (Builder $type) => $type->where('direction', $direction->value),
+                            ),
+                        );
+                    }),
 
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
