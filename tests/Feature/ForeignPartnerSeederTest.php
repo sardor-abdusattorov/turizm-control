@@ -43,3 +43,15 @@ it('is idempotent — re-running creates no duplicates', function () {
     expect(Contact::count())->toBe(21)
         ->and(BankAccount::count())->toBe(24);
 });
+
+// IBANs are the longest identifiers here; the account_number column is 34.
+it('keeps foreign IBANs and phones within their column limits', function () {
+    $this->seed(CurrencySeeder::class);
+    $this->seed(ForeignPartnerSeeder::class);
+
+    BankAccount::all()->each(fn (BankAccount $a) => expect(mb_strlen((string) $a->account_number))->toBeLessThanOrEqual(34)
+        ->and(mb_strlen((string) $a->swift))->toBeLessThanOrEqual(20));
+
+    Contact::all()->each(fn (Contact $c) => expect(mb_strlen((string) $c->phone))->toBeLessThanOrEqual(100)
+        ->and(mb_strlen((string) $c->legal_form))->toBeLessThanOrEqual(50));
+});

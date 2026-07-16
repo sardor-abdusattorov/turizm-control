@@ -41,3 +41,24 @@ it('is idempotent — re-running creates no duplicates', function () {
     expect(Contact::count())->toBe(72)
         ->and(BankAccount::count())->toBe(80);
 });
+
+// SQLite ignores VARCHAR lengths but MySQL does not, so assert the tight
+// columns fit their limits here (phone 100, legal_form 50, inn 30, oked 20;
+// account_number 34, swift 20, mfo 20) — this is what a raw seed on MySQL hits.
+it('keeps every seeded value within its column limits', function () {
+    $this->seed(CurrencySeeder::class);
+    $this->seed(ContactSeeder::class);
+
+    Contact::all()->each(function (Contact $c) {
+        expect(mb_strlen((string) $c->phone))->toBeLessThanOrEqual(100)
+            ->and(mb_strlen((string) $c->legal_form))->toBeLessThanOrEqual(50)
+            ->and(mb_strlen((string) $c->inn))->toBeLessThanOrEqual(30)
+            ->and(mb_strlen((string) $c->oked))->toBeLessThanOrEqual(20);
+    });
+
+    BankAccount::all()->each(function (BankAccount $a) {
+        expect(mb_strlen((string) $a->account_number))->toBeLessThanOrEqual(34)
+            ->and(mb_strlen((string) $a->swift))->toBeLessThanOrEqual(20)
+            ->and(mb_strlen((string) $a->mfo))->toBeLessThanOrEqual(20);
+    });
+});
