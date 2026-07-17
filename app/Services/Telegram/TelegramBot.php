@@ -107,6 +107,16 @@ class TelegramBot
             return;
         }
 
+        // A sticker/photo/voice arrives with no text — ask for text instead of
+        // silently finishing the flow with an empty reason.
+        if ($text === '') {
+            $this->withUserLocale($chatId, function () use ($chatId): void {
+                $this->telegram->send($chatId, __('app.telegram.text_required'));
+            });
+
+            return;
+        }
+
         $contractId = (int) ($state['contract_id'] ?? 0);
 
         match ($state['action'] ?? null) {

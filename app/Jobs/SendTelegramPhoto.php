@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Services\Telegram\TelegramService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use RuntimeException;
 
 /**
  * Delivers one Telegram photo (a payment screenshot) with a caption, off the
@@ -35,6 +36,14 @@ class SendTelegramPhoto implements ShouldQueue
 
     public function handle(TelegramService $telegram): void
     {
-        $telegram->sendPhoto($this->chatId, $this->path, $this->caption, $this->inlineKeyboard);
+        if (! $this->chatId) {
+            return;
+        }
+
+        // The service swallows transport errors into a bool — surface failure
+        // as an exception, otherwise $tries/$backoff never retry anything.
+        if (! $telegram->sendPhoto($this->chatId, $this->path, $this->caption, $this->inlineKeyboard)) {
+            throw new RuntimeException("Telegram photo to chat {$this->chatId} failed");
+        }
     }
 }

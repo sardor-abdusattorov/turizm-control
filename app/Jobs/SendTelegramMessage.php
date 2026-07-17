@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Services\Telegram\TelegramService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use RuntimeException;
 
 /**
  * Delivers one Telegram text message off the request path. Dispatched
@@ -34,6 +35,14 @@ class SendTelegramMessage implements ShouldQueue
 
     public function handle(TelegramService $telegram): void
     {
-        $telegram->send($this->chatId, $this->message, $this->inlineKeyboard);
+        if (! $this->chatId) {
+            return;
+        }
+
+        // The service swallows transport errors into a bool — surface failure
+        // as an exception, otherwise $tries/$backoff never retry anything.
+        if (! $telegram->send($this->chatId, $this->message, $this->inlineKeyboard)) {
+            throw new RuntimeException("Telegram message to chat {$this->chatId} failed");
+        }
     }
 }

@@ -223,3 +223,43 @@ it('does not approve when the caller is not the current approver', function () {
 
     expect($contract->fresh()->status)->toBe(Contract::STATUS_IN_REVIEW);
 });
+
+it('keeps the reject flow open when a non-text message arrives', function () {
+    $approver = asApprover(User::factory()->withTelegram('557')->create());
+    $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $approver->id,
+        'order' => 1,
+    ]);
+
+    app(TelegramBot::class)->handleUpdate([
+        'callback_query' => [
+            'id' => 'cb1',
+            'from' => ['id' => 557],
+            'data' => "reject:{$contract->id}",
+        ],
+    ]);
+
+    // A sticker has no text — the flow must ask for text, not finalise with
+    // an empty reason.
+    app(TelegramBot::class)->handleUpdate([
+        'message' => [
+            'chat' => ['id' => 557],
+            'sticker' => ['file_id' => 'abc'],
+        ],
+    ]);
+
+    expect($contract->fresh()->status)->toBe(Contract::STATUS_IN_REVIEW);
+
+    app(TelegramBot::class)->handleUpdate([
+        'message' => [
+            'chat' => ['id' => 557],
+            'text' => 'Сумма не совпадает с приказом',
+        ],
+    ]);
+
+    expect($contract->fresh()->status)->toBe(Contract::STATUS_REJECTED)
+        ->and($contract->approvers()->where('user_id', $approver->id)->first()->comment)
+        ->toBe('Сумма не совпадает с приказом');
+});
