@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\FormatsLocalizedValue;
 use App\Exports\Concerns\StyledExportSheet;
 use App\Models\Contact;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,6 +24,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
  */
 class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadings, WithMapping, WithStyles, WithTitle
 {
+    use FormatsLocalizedValue;
     use StyledExportSheet;
 
     private int $rowNumber = 0;
@@ -164,14 +166,5 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
     private function isLegal(): bool
     {
         return $this->type === Contact::TYPE_LEGAL;
-    }
-
-    private static function localized(mixed $value): ?string
-    {
-        if (is_array($value)) {
-            return $value[app()->getLocale()] ?? $value['ru'] ?? (reset($value) ?: null);
-        }
-
-        return $value;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\FormatsLocalizedValue;
+use App\Exports\Concerns\StyledExportSheet;
 use App\Models\Contract;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -13,14 +15,13 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadings, WithMapping, WithStyles, WithTitle
 {
     use Exportable;
+    use FormatsLocalizedValue;
+    use StyledExportSheet;
 
     /**
      * @param  Builder<Contract>  $query  Already-filtered query straight off
@@ -76,60 +77,19 @@ class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHead
         ];
     }
 
+    /** @return array<int, array<string, mixed>> */
     public function styles(Worksheet $sheet): array
     {
-        return [
-            1 => [
-                'font' => ['bold' => true, 'name' => 'Times New Roman', 'size' => 12],
-                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => 'D9E1F2'],
-                ],
-            ],
-        ];
+        return [1 => $this->headingStyle()];
     }
 
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function (AfterSheet $event): void {
-                $sheet = $event->sheet->getDelegate();
-                $lastColumn = $sheet->getHighestColumn();
-                $lastRow = $sheet->getHighestRow();
-
-                $sheet->insertNewRowBefore(1, 1);
-                $titleRange = "A1:{$lastColumn}1";
-                $sheet->mergeCells($titleRange);
-                $sheet->setCellValue('A1', __('app.export.contracts_title', ['year' => now()->year]));
-                $sheet->getStyle($titleRange)->applyFromArray([
-                    'font' => ['bold' => true, 'name' => 'Times New Roman', 'size' => 14],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                ]);
-                $sheet->getRowDimension(1)->setRowHeight(28);
-
-                $bodyRange = "A2:{$lastColumn}".($lastRow + 1);
-                $sheet->getStyle($bodyRange)->getFont()->setName('Times New Roman')->setSize(11);
-
-                $tableRange = "A2:{$lastColumn}".($lastRow + 1);
-                $sheet->getStyle($tableRange)->applyFromArray([
-                    'borders' => [
-                        'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']],
-                    ],
-                    'alignment' => ['vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true],
-                ]);
-
-                $sheet->freezePane('A3');
-            },
+            AfterSheet::class => fn (AfterSheet $event) => $this->applyLayout(
+                $event,
+                __('app.export.contracts_title', ['year' => now()->year]),
+            ),
         ];
-    }
-
-    private static function localized(mixed $value): ?string
-    {
-        if (is_array($value)) {
-            return $value[app()->getLocale()] ?? $value['ru'] ?? (reset($value) ?: null);
-        }
-
-        return $value;
     }
 }

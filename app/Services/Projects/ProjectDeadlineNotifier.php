@@ -7,9 +7,9 @@ use App\Filament\Resources\Projects\BaseProjectResource;
 use App\Models\Contract;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\Notifications\RendersInRecipientLocale;
 use App\Services\Telegram\TelegramService;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
 
 /**
  * «До выставки X осталось N дней» — the pre-event countdown. Directors get
@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\App;
  */
 class ProjectDeadlineNotifier
 {
+    use RendersInRecipientLocale;
+
     public function __construct(public TelegramService $telegram) {}
 
     public function notifyDeadline(Project $project, int $daysLeft): void
@@ -48,7 +50,7 @@ class ProjectDeadlineNotifier
             ->get();
 
         foreach ($recipients as $recipient) {
-            $this->inTelegramLocale($recipient, function () use ($recipient, $project, $daysLeft, $total, $pending, $paidPercent): void {
+            $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $project, $daysLeft, $total, $pending, $paidPercent): void {
                 $lines = ['<b>⏰ '.__('app.notification.project_deadline.title', [
                     'name' => $project->name,
                     'days' => $daysLeft,
@@ -92,7 +94,7 @@ class ProjectDeadlineNotifier
                 continue;
             }
 
-            $this->inTelegramLocale($recipient, function () use ($recipient, $project, $daysLeft, $contracts): void {
+            $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $project, $daysLeft, $contracts): void {
                 $lines = ['<b>⏰ '.__('app.notification.project_deadline.title', [
                     'name' => $project->name,
                     'days' => $daysLeft,
@@ -132,17 +134,5 @@ class ProjectDeadlineNotifier
             Contract::STATUS_APPROVED->value,
             Contract::STATUS_REJECTED->value,
         ]);
-    }
-
-    private function inTelegramLocale(User $recipient, callable $callback): void
-    {
-        $previous = App::getLocale();
-        App::setLocale($recipient->telegram?->locale ?? $previous);
-
-        try {
-            $callback();
-        } finally {
-            App::setLocale($previous);
-        }
     }
 }

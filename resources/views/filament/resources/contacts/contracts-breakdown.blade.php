@@ -2,31 +2,23 @@
     /** @var \Illuminate\Support\Collection<int, \App\Models\Contract> $contracts */
     /** @var \Illuminate\Support\Collection<int, array{currency: string, count: int, total: float}> $totals */
     $fmt = fn ($n) => \App\Support\Money::format($n);
+
+    $line = function (\App\Models\Contract $contract) use ($fmt): array {
+        return [
+            'title' => $contract->number,
+            'sub' => $contract->contractType?->title ?? $contract->title,
+            'amount' => $fmt($contract->amount).' '.$contract->currency?->short_name,
+            'amountSub' => $contract->status->label(),
+        ];
+    };
 @endphp
 
-<div>
-    @if ($contracts->isEmpty())
-        <p class="bkd-empty">{{ __('app.message.no_contracts_for_contact') }}</p>
-    @else
-        <div class="bkd">
-            @foreach ($contracts as $contract)
-                <div class="bkd-row">
-                    <div class="bkd-row__l">
-                        <div class="bkd-row__nm">{{ $contract->number }}</div>
-                        <div class="bkd-row__sub" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                            {{ $contract->contractType?->title ?? $contract->title }}
-                        </div>
-                    </div>
-                    <div class="bkd-row__r">
-                        <div style="font-weight:600;">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</div>
-                        <div class="bkd-row__sub">{{ $contract->status->label() }}</div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-
-        @if ($totals->isNotEmpty())
-            @include('filament.partials.currency-summary-table', ['totals' => $totals, 'amountHeading' => __('app.label.total_amount'), 'withPaid' => false])
-        @endif
-    @endif
-</div>
+@include('filament.partials.records-breakdown', [
+    'rows' => $contracts,
+    'empty' => __('app.message.no_contracts_for_contact'),
+    'line' => $line,
+    'totals' => $totals,
+    'amountHeading' => __('app.label.total_amount'),
+    'withPaid' => false,
+    'subEllipsis' => true,
+])

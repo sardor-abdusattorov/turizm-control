@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasOptions;
+
 enum ContractStatus: string
 {
+    use HasOptions;
+
     case Draft = 'draft';
     case InReview = 'in_review';
     case PendingDirector = 'pending_director';
@@ -25,23 +29,5 @@ enum ContractStatus: string
             self::Approved => 'success',
             self::Rejected => 'danger',
         };
-    }
-
-    /**
-     * value => label map for select filters and pickers.
-     *
-     * @return array<string, string>
-     */
-    public static function options(): array
-    {
-        return array_reduce(
-            self::cases(),
-            static function (array $carry, self $status): array {
-                $carry[$status->value] = $status->label();
-
-                return $carry;
-            },
-            [],
-        );
     }
 }

@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasOptions;
+
 enum ContractDirection: string
 {
+    use HasOptions;
+
     case Expense = 'expense';
     case Income = 'income';
 
@@ -18,23 +22,5 @@ enum ContractDirection: string
             self::Expense => 'info',
             self::Income => 'warning',
         };
-    }
-
-    /**
-     * value => label map for select filters and pickers.
-     *
-     * @return array<string, string>
-     */
-    public static function options(): array
-    {
-        return array_reduce(
-            self::cases(),
-            static function (array $carry, self $direction): array {
-                $carry[$direction->value] = $direction->label();
-
-                return $carry;
-            },
-            [],
-        );
     }
 }

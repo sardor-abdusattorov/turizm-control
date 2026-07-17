@@ -146,23 +146,15 @@ class ContractNotifier
             ])
             ->sendToDatabase($recipient, isEventDispatched: true);
 
-        $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $fresh, $who, $when, $comment): void {
+        $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $who, $when, $tail, $comment): void {
             $tgBody = __('app.notification.step_approved.body', [
                 'number' => $contract->number,
                 'name' => $who,
                 'time' => $when,
             ]);
 
-            $tgTail = match (true) {
-                $fresh?->status === Contract::STATUS_PENDING_DIRECTOR => __('app.notification.step_ready_director'),
-                $fresh?->currentApprover()?->user !== null => __('app.notification.step_next', [
-                    'name' => $fresh->currentApprover()->user->name,
-                ]),
-                default => '',
-            };
-
-            if ($tgTail !== '') {
-                $tgBody .= ' '.$tgTail;
+            if ($tail !== '') {
+                $tgBody .= ' '.$tail;
             }
 
             if ($comment !== '') {

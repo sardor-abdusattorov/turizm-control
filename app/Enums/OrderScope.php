@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasOptions;
+
 enum OrderScope: string
 {
+    use HasOptions;
+
     case Internal = 'internal';
     case External = 'external';
 
@@ -18,21 +22,5 @@ enum OrderScope: string
             self::Internal => 'info',
             self::External => 'success',
         };
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public static function options(): array
-    {
-        return array_reduce(
-            self::cases(),
-            function (array $options, self $scope): array {
-                $options[$scope->value] = $scope->label();
-
-                return $options;
-            },
-            [],
-        );
     }
 }

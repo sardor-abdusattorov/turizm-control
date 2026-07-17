@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasOptions;
+
 enum ProjectType: string
 {
+    use HasOptions;
+
     case Internal = 'internal';
     case International = 'international';
 
@@ -18,21 +22,5 @@ enum ProjectType: string
             self::Internal => 'info',
             self::International => 'success',
         };
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public static function options(): array
-    {
-        return array_reduce(
-            self::cases(),
-            function (array $options, self $type): array {
-                $options[$type->value] = $type->label();
-
-                return $options;
-            },
-            [],
-        );
     }
 }
