@@ -972,10 +972,6 @@ button.cw-row:focus-visible {
     width: 1px;
     background: var(--d);
 }
-@media (max-width: 640px) {
-    .pj-hero__r { padding-left: 0; }
-    .pj-hero__r::before { display: none; }
-}
 .pj-hero__l {
     display: flex;
     flex-direction: column;
@@ -1031,6 +1027,22 @@ button.cw-row:focus-visible {
     font-size: .75rem;
     color: var(--m);
     margin-top: .1rem;
+}
+/* Phone: the money metric drops below the title block instead of racing it
+   for the same row (they overlapped on 390px), left-aligned like the rest. */
+@media (max-width: 640px) {
+    .pj-hero {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .pj-hero__r {
+        padding-left: 0;
+        margin-left: 0;
+        align-items: flex-start;
+        border-top: 1px solid var(--d);
+        padding-top: .75rem;
+    }
+    .pj-hero__r::before { display: none; }
 }
 .pj-chip {
     display: inline-flex;
@@ -1149,50 +1161,15 @@ button.cw-row:focus-visible {
     color: var(--accent);
 }
 
-/* ─── Dashboard pulse toolbar: card title + the project picker ─────────────
-   The picker is a native select (optgroups «тип · год») dressed in the pj
-   tokens — no bare Filament filters form above the page. */
-.pj-bar {
+/* ─── Dashboard pulse top row: the project filters + the open button ─────── */
+.pj-toprow {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: .75rem 1rem;
-    flex-wrap: wrap;
 }
-.pj-bar__l {
-    display: flex;
-    align-items: center;
-    gap: .65rem;
+.pj-toprow .pj-filters {
+    flex: 1;
     min-width: 0;
-}
-/* Quiet neutral icon chip (soft surface + hairline), matching the flattened
-   document icons — no accent box, keeping the calm minimalism language. */
-.pj-bar__ic {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: .65rem;
-    background: var(--soft);
-    box-shadow: inset 0 0 0 1px var(--d);
-    color: var(--m);
-}
-.pj-bar__tx {
-    display: flex;
-    flex-direction: column;
-    gap: .05rem;
-    min-width: 0;
-}
-.pj-bar__t {
-    font-size: .95rem;
-    font-weight: 700;
-    color: var(--t);
-    letter-spacing: -.01em;
-}
-.pj-bar__s {
-    font-size: .75rem;
-    color: var(--m);
 }
 .pj-open {
     flex-shrink: 0;
@@ -1218,14 +1195,8 @@ button.cw-row:focus-visible {
 .dark .pj-open:hover {
     color: var(--accent);
 }
-/* Filter row: the embedded Filament schema (type + year segmented toggles and
-   the project Select) sits on its own line under the title. The schema's own
-   responsive grid handles the columns; this just gives the block room and
-   trims the container's default vertical rhythm. */
-.pj-filters {
-    border-top: 1px solid var(--d);
-    padding-top: 1rem;
-}
+/* The embedded Filament schema (type + year toggles and the project Select);
+   its own responsive grid handles the columns. */
 .pj-filters .fi-fo-field-wrp,
 .pj-filters .fi-sc-component {
     gap: .35rem;

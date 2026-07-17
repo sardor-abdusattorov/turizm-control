@@ -68,6 +68,44 @@ class DashboardHeaderWidget extends Widget
     }
 
     /**
+     * Clickable "needs me" counters — each is one tap away from the exact
+     * contracts list tab it counts. Only non-zero chips render, so a clear
+     * day keeps the header to a single calm line.
+     *
+     * @return array<int, array{label: string, count: int, tone: string, url: string}>
+     */
+    public function attentionChips(): array
+    {
+        $context = app(DashboardContext::class);
+        $chips = [];
+
+        if ($context->isApprover()) {
+            $awaitingUrl = ContractResource::getUrl('index', ['activeTab' => 'awaiting_me']);
+            $overdue = $context->overdueForMe()->count();
+            $awaiting = $context->awaitingMe()->count();
+
+            if ($overdue > 0) {
+                $chips[] = ['label' => __('app.dashboard.chip_overdue'), 'count' => $overdue, 'tone' => 'danger', 'url' => $awaitingUrl];
+            }
+
+            if ($awaiting > 0) {
+                $chips[] = ['label' => __('app.dashboard.chip_awaiting'), 'count' => $awaiting, 'tone' => 'warning', 'url' => $awaitingUrl];
+            }
+        }
+
+        if ($context->isManager() && $context->managerCounts()['stalled'] > 0) {
+            $chips[] = [
+                'label' => __('app.dashboard.chip_stalled'),
+                'count' => $context->managerCounts()['stalled'],
+                'tone' => 'gray',
+                'url' => ContractResource::getUrl('index', ['activeTab' => 'my_contracts']),
+            ];
+        }
+
+        return $chips;
+    }
+
+    /**
      * The "create contract" quick action for users who may author contracts —
      * the dashboard is otherwise read-only, and a manager lands here to start
      * work. Null hides the button for everyone else.

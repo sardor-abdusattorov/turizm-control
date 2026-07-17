@@ -1,5 +1,6 @@
 @php
     $h = $this->headerData();
+    $chips = $this->attentionChips();
     $offerTelegram = $this->shouldOfferTelegram();
     $createUrl = $this->createContractUrl();
 @endphp
@@ -9,7 +10,18 @@
         <div class="dh__top">
             <div class="dh__l">
                 <h2 class="dh__greeting">{{ $h['greeting'] }}</h2>
-                <p class="dh__summary">{{ $h['summary'] }}</p>
+                @if ($chips === [])
+                    <p class="dh__summary">{{ $h['summary'] }}</p>
+                @else
+                    {{-- One tap from each counter to the exact list it counts. --}}
+                    <div class="dh__chips">
+                        @foreach ($chips as $chip)
+                            <a href="{{ $chip['url'] }}" class="dh__chip dh__chip--{{ $chip['tone'] }}" wire:navigate>
+                                <b>{{ $chip['count'] }}</b>{{ $chip['label'] }}
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
             @if ($createUrl)
@@ -114,6 +126,46 @@
             color: #6b7280;
         }
         .dark .dh__summary { color: #9ca3af; }
+
+        /* "Needs me" counters — each links to the exact contracts-list tab it
+           counts. Colour lives only in the number (semantic state). */
+        .dh__chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.6rem;
+        }
+        .dh__chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.38rem 0.8rem;
+            border: 1px solid var(--d);
+            border-radius: 999px;
+            background: var(--s);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--m);
+            text-decoration: none;
+            transition: border-color 0.12s ease, background 0.12s ease;
+        }
+        .dh__chip b {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+        .dh__chip--danger b { color: #b91c1c; }
+        .dark .dh__chip--danger b { color: #fca5a5; }
+        .dh__chip--warning b { color: #b45309; }
+        .dark .dh__chip--warning b { color: #fcd34d; }
+        .dh__chip--gray b { color: var(--t); }
+        .dh__chip:hover {
+            background: var(--soft);
+            border-color: color-mix(in srgb, var(--t) 22%, transparent);
+        }
+        .dh__chip:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
         .dh__date {
             font-size: 0.8rem;
             font-weight: 500;
