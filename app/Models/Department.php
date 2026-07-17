@@ -28,7 +28,8 @@ class Department extends Model
     ];
 
     /**
-     * Department codes that participate in the approval workflow.
+     * Department codes whose members may appear in an approval chain — feeds
+     * the approver pickers via scopeApprovers().
      *
      * @var array<int, string>
      */
@@ -71,11 +72,6 @@ class Department extends Model
             ->where('status', User::STATUS_ACTIVE)
             ->orderBy('id')
             ->first();
-    }
-
-    public function isApproverDepartment(): bool
-    {
-        return in_array($this->code, self::APPROVER_CODES, true);
     }
 
     public function scopeApprovers($query)

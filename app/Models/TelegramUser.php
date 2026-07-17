@@ -25,9 +25,4 @@ class TelegramUser extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function touchLastSeen(): void
-    {
-        $this->forceFill(['last_seen_at' => now()])->saveQuietly();
-    }
 }

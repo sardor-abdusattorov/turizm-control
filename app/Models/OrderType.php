@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Models\Concerns\HasActiveStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
 class OrderType extends Model
@@ -42,10 +41,5 @@ class OrderType extends Model
                 $item->id => $item->getTranslation('title', app()->getLocale()),
             ])
             ->toArray();
-    }
-
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class);
     }
 }

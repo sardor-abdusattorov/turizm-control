@@ -118,11 +118,6 @@ class ContractApprover extends Model
         ]);
     }
 
-    public function isPending(): bool
-    {
-        return $this->status === self::STATUS_PENDING;
-    }
-
     public function displayStatus(): ContractApproverStatus
     {
         return $this->status === self::STATUS_INVALIDATED && $this->original_status

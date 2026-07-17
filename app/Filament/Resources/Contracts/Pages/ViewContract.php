@@ -32,6 +32,21 @@ class ViewContract extends ViewRecord
 
     protected string $view = 'filament.resources.contracts.pages.view-contract';
 
+    public function mount(int|string $record): void
+    {
+        parent::mount($record);
+
+        // The chain timeline and payment list walk these relations per row —
+        // load them once instead of a query per approver/payment (N+1).
+        $this->record->loadMissing([
+            'approvers.user.department',
+            'approvers.user.position',
+            'activeApprovers.user.department',
+            'activeApprovers.user.position',
+            'payments.creator',
+        ]);
+    }
+
     public function getHeading(): string
     {
         return $this->record->number;

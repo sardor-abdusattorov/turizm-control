@@ -84,9 +84,4 @@ class ContractType extends Model
     {
         return $this->hasMany(Contract::class);
     }
-
-    public function contractTemplates(): HasMany
-    {
-        return $this->hasMany(ContractTemplate::class);
-    }
 }
