@@ -765,11 +765,45 @@
 .pj-wrap {
     white-space: normal;
 }
-.pj-empty {
-    padding: 1.5rem 1.25rem;
+/* Empty states share one calm voice: centred, muted, breathing room, and a
+   soft inner well so the emptiness reads as intentional, not broken. */
+.pj-empty,
+.bkd-empty {
+    display: block;
+    padding: 2rem 1.25rem;
     font-size: .85rem;
     color: var(--m2);
     text-align: center;
+}
+.bkd-empty {
+    background: var(--soft);
+    border: 1px dashed var(--d);
+    border-radius: .625rem;
+    margin: 0;
+}
+
+/* Keyboard focus on the custom interactive elements — the same visible ring
+   Filament's own controls get, so tab-navigation never goes dark. */
+.pj-open:focus-visible,
+.pj-link:focus-visible,
+.ca:focus-visible,
+.ow-btn:focus-visible,
+.ow-show-more:focus-visible,
+.cw-btn:focus-visible,
+.cw-tab:focus-visible,
+.cw-chip:focus-visible,
+.cw-eye:focus-visible,
+.cw-show-more:focus-visible,
+.cw-loadmore:focus-visible,
+.cw-act__toggle:focus-visible,
+.cw-modal__x:focus-visible,
+.dh__cta:focus-visible,
+.dh__tg-cta:focus-visible,
+.dh__tg-x:focus-visible,
+button.cw-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: .4rem;
 }
 /* Record sub-navigation tabs — mirror the contract page's tab bar, scrolls
    horizontally on narrow screens instead of wrapping. */

@@ -159,7 +159,7 @@ it('marks the director step as the final sign-off in the chain', function () {
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
     expect($html)->toContain('cw-step--director')
-        ->and($html)->toContain('Final sign-off');
+        ->and($html)->toContain(__('app.label.final_sign_off'));
 });
 
 it('hides the PDF preview link until the contract is approved', function () {
@@ -221,8 +221,8 @@ it('shows a per-approver detail modal trigger and renders queued steps distinctl
         ->and($html)->toContain('approver = '.$contract->approvers()->where('order', 1)->first()->user_id)
         ->and($html)->toContain('approver === '.$contract->approvers()->where('order', 1)->first()->user_id)
         // Queued step shows the "In queue" pill, current shows "Reviewing".
-        ->and($html)->toContain('In queue')
-        ->and($html)->toContain('Reviewing')
+        ->and($html)->toContain(__('app.contract_approver.status.queued'))
+        ->and($html)->toContain(__('app.contract_approver.status.pending'))
         // Timeline day grouping container.
         ->and($html)->toContain('cw-day');
 });

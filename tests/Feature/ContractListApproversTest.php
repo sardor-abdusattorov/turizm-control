@@ -74,8 +74,8 @@ it('renders the approval flow modal as a stepper of the active chain', function 
         ->toContain('Madina Accountant')
         ->toContain('Olim Reviewer')
         ->toContain('Looks fine to me')
-        ->toContain('Approved')
-        ->toContain('Reviewing');
+        ->toContain(__('app.contract_approver.status.approved'))
+        ->toContain(__('app.contract_approver.status.pending'));
 });
 
 it('lists invalidated attempts under previous attempts with comments preserved', function () {
@@ -110,7 +110,7 @@ it('lists invalidated attempts under previous attempts with comments preserved',
     expect($html)
         ->toContain('Olim Repeated')
         ->toContain('Approved on first pass')
-        ->toContain('Cancelled — contract was edited.')
+        ->toContain(__('app.message.invalidated_on_edit'))
         ->toContain('is-inactive')
         ->toContain(__('app.contract_approver.status.invalidated'));
 });
