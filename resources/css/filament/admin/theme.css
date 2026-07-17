@@ -11,14 +11,13 @@
    needs a different accent. */
 /* Design tokens live on :root so every surface — pages, widgets and modal
    content rendered outside the page wrappers — resolves the same palette.
-   --d is the hairline, --elev the card lift. */
+   --d is the hairline; surfaces separate by border, never by drop shadow. */
 :root {
     --s: #fff;
     --t: #0f1419;
     --m: #57606a;
     --m2: #8b949e;
     --d: rgba(15, 20, 25, .12);
-    --elev: 0 1px 2px rgba(15, 20, 25, .06), 0 1px 3px rgba(15, 20, 25, .05);
     --soft: #f8fafc;
     --accent: #2563eb;
     --accent-soft: #eff6ff;
@@ -31,10 +30,8 @@
     --t: #f0f6fc;
     --m: #9aa4b2;
     --m2: #6e7681;
-    /* Dark needs a stronger edge (a drop shadow barely shows on dark), plus a
-       faint top highlight so cards separate from the page. */
+    /* Dark needs a stronger edge — the hairline alone separates cards. */
     --d: rgba(255, 255, 255, .14);
-    --elev: 0 2px 6px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .04);
     --soft: rgba(255, 255, 255, .04);
     --accent: #60a5fa;
     --accent-soft: rgba(37, 99, 235, .12);
@@ -54,7 +51,6 @@
     background: var(--s);
     border: 1px solid var(--d);
     border-radius: .75rem;
-    box-shadow: var(--elev);
     overflow: hidden;
 }
 
@@ -955,7 +951,6 @@ button.cw-row:focus-visible {
     background: var(--s);
     border: 1px solid var(--d);
     border-radius: .75rem;
-    box-shadow: var(--elev);
     padding: 1.2rem 1.4rem;
 }
 .pj-hero__r {
@@ -1067,7 +1062,6 @@ button.cw-row:focus-visible {
     border-radius: .625rem;
     padding: .85rem 1rem;
     background: var(--s);
-    box-shadow: var(--elev);
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 .pj-stat:hover {

@@ -4,13 +4,12 @@
         }
         /* Base palette tokens (--s/--t/--m/--accent/...) live in theme.css.
            The cw page tunes a few values for tighter contrast against the
-           chain/progress bars and keeps its page-specific extras (--r,
-           --track, --accent-ring, --accent-on). */
+           chain/progress bars and keeps its page-specific extras (--track,
+           --accent-ring, --accent-on). */
         .cw {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
-            --r: rgba(15,20,25,.08);
             --track: #e6ebf1;
             --accent-soft: rgba(37,99,235,.12);
             --accent-softer: rgba(37,99,235,.05);
@@ -18,20 +17,18 @@
             --accent-on: #fff;
         }
         .dark .cw {
-            --r: rgba(255,255,255,.08);
             --track: rgba(255,255,255,.10);
             --accent-strong: #a5b4fc;
             --accent-soft: rgba(129,140,248,.16);
             --accent-softer: rgba(129,140,248,.08);
             --accent-ring: rgba(129,140,248,.25);
         }
-        /* Calm card — a clear hairline border plus a subtle lift, matching the
-           order/payment/project pages and Filament's own sections. */
+        /* Calm card — a clear hairline border, no drop shadow, matching the
+           order/payment/project pages. */
         .cw-card {
             background: var(--s);
             border: 1px solid var(--d);
             border-radius: .75rem;
-            box-shadow: var(--elev);
             overflow: hidden;
         }
         .cw-hd {
@@ -113,7 +110,7 @@
         .cw-tab--active {
             color: var(--accent);
             background: var(--s);
-            box-shadow: 0 0 0 1px var(--r), 0 1px 2px rgba(0,0,0,.05);
+            box-shadow: 0 0 0 1px var(--d);
         }
         .cw-tab__c {
             font-size: 0.74rem;
@@ -126,146 +123,6 @@
         .cw-tab--active .cw-tab__c {
             background: var(--accent-soft);
             color: var(--accent);
-        }
-
-        /* hero */
-        .cw-hero {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-            flex-wrap: wrap;
-            border-radius: 1.1rem;
-            padding: 1.35rem 1.5rem 1.35rem 1.65rem;
-            overflow: hidden;
-            box-shadow: 0 0 0 1px var(--r), 0 1px 2px rgba(15,20,25,.05);
-        }
-        .cw-hero::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-        }
-        .cw-hero--gray {
-            background: linear-gradient(120deg,rgba(148,163,184,.08),var(--s) 52%);
-        }
-        .cw-hero--gray::before {
-            background: #94a3b8;
-        }
-        .cw-hero--warning {
-            background: linear-gradient(120deg,rgba(251,146,60,.09),var(--s) 52%);
-        }
-        .cw-hero--warning::before {
-            background: #fb923c;
-        }
-        .dark .cw-hero--warning {
-            background: linear-gradient(120deg,rgba(251,146,60,.10),var(--s) 52%);
-        }
-        .cw-hero--success {
-            background: linear-gradient(120deg,rgba(16,185,129,.08),var(--s) 52%);
-        }
-        .cw-hero--success::before {
-            background: #10b981;
-        }
-        .dark .cw-hero--success {
-            background: linear-gradient(120deg,rgba(16,185,129,.10),var(--s) 52%);
-        }
-        .cw-hero--danger {
-            background: linear-gradient(120deg,rgba(239,68,68,.08),var(--s) 52%);
-        }
-        .cw-hero--danger::before {
-            background: #ef4444;
-        }
-        .dark .cw-hero--danger {
-            background: linear-gradient(120deg,rgba(239,68,68,.10),var(--s) 52%);
-        }
-        .cw-hero--info {
-            background: linear-gradient(120deg,var(--accent-soft),var(--s) 52%);
-        }
-        .cw-hero--info::before {
-            background: var(--accent);
-        }
-        .cw-hero__l {
-            display: flex;
-            flex-direction: column;
-            gap: .5rem;
-            min-width: 0;
-        }
-        .cw-hero__msg {
-            font-size: 1.02rem;
-            font-weight: 650;
-            color: var(--t);
-            letter-spacing: -.01em;
-        }
-        .cw-hero__sla {
-            font-size: 0.765rem;
-            font-weight: 650;
-            color: #dc2626;
-            display: inline-flex;
-            align-items: center;
-            gap: .3rem;
-        }
-        .cw-hero__due {
-            font-size: 0.765rem;
-            color: var(--m);
-            display: inline-flex;
-            align-items: center;
-            gap: .3rem;
-        }
-        .cw-hero__r {
-            display: flex;
-            align-items: center;
-            gap: 1.4rem;
-            margin-left: auto;
-        }
-        .cw-hero__cur {
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-        }
-        .cw-hero__cur img {
-            width: 2.4rem;
-            height: 2.4rem;
-            border-radius: 999px;
-            object-fit: cover;
-            box-shadow: 0 0 0 2px #fb923c;
-        }
-        .cw-hero__lbl {
-            font-size: 0.664rem;
-            color: var(--m2);
-            text-transform: uppercase;
-            letter-spacing: .05em;
-        }
-        .cw-hero__nm {
-            font-size: 0.854rem;
-            font-weight: 650;
-            color: var(--t);
-        }
-        .cw-ring {
-            position: relative;
-            width: 3.7rem;
-            height: 3.7rem;
-            flex-shrink: 0;
-            border-radius: 50%;
-            background: conic-gradient(#10b981 calc(var(--p)*1%), var(--track) 0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .cw-ring::before {
-            content: '';
-            position: absolute;
-            inset: .32rem;
-            border-radius: 50%;
-            background: var(--s);
-        }
-        .cw-ring span {
-            position: relative;
-            font-size: 0.765rem;
-            font-weight: 750;
-            color: var(--t);
         }
 
         /* pills */

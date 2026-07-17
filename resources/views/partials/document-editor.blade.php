@@ -38,7 +38,6 @@
             color: #111827;
             border-bottom: 1px solid #e5e7eb;
             flex-shrink: 0;
-            box-shadow: 0 1px 2px rgba(0,0,0,.04);
         }
         .editor-topbar .close-btn {
             display: inline-flex;

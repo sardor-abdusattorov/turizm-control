@@ -103,7 +103,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 1px 2px rgba(15,20,25,.06), inset 0 0 0 1px rgba(37,99,235,.10);
+            box-shadow: inset 0 0 0 1px rgba(37,99,235,.10);
         }
         .dark .cf-file__thumb {
             background: rgba(255,255,255,.06);

@@ -83,8 +83,9 @@
     </div>
 
     <style>
-        /* Flat greeting card — a hairline border, no colour stripe. The day's
-           state is carried by the summary text; the one accent is the CTA. */
+        /* Flat greeting card — a hairline border and a tone stripe on the left
+           edge: green when the day is clear, amber when reviews wait, red when
+           something is overdue. Semantic colour, not decoration. */
         .dh {
             position: relative;
             display: flex;
@@ -94,13 +95,21 @@
             border-radius: 0.75rem;
             background: #fff;
             border: 1px solid rgba(17, 24, 39, 0.12);
-            box-shadow: 0 1px 2px rgba(15, 20, 25, .06), 0 1px 3px rgba(15, 20, 25, .05);
+            overflow: hidden;
         }
         .dark .dh {
             background: rgba(255, 255, 255, 0.03);
             border-color: rgba(255, 255, 255, 0.14);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .04);
         }
+        .dh::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 3px;
+        }
+        .dh--success::before { background: #16a34a; }
+        .dh--warning::before { background: #d97706; }
+        .dh--danger::before  { background: #dc2626; }
 
         .dh__top {
             display: flex;
