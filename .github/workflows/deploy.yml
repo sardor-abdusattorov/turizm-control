@@ -16,13 +16,11 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
-          extensions: pdo_mysql, sqlite3, pdo_sqlite, mbstring, exif, bcmath, gd, zip, intl, pcntl
+          php-version: "8.4"
+          extensions: pdo_mysql,sqlite3,pdo_sqlite,mbstring,exif,bcmath,gd,zip,intl,pcntl
           coverage: none
 
-      # The demo seeder renders bank-receipt images with imagettftext, which needs
-      # a real TTF on disk — install DejaVu so DemoSeederTest can run in CI.
-      - name: Install fonts for GD tests
+      - name: Install fonts
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fonts-dejavu-core
 
       - name: Cache Composer
@@ -31,7 +29,7 @@ jobs:
           path: vendor
           key: composer-${{ hashFiles('composer.lock') }}
 
-      - name: Install PHP deps
+      - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Prepare environment
@@ -39,8 +37,6 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
-      # Tests run on sqlite :memory: (see phpunit.xml), so no database service is
-      # needed. A red suite blocks the deploy job below.
       - name: Run tests
         run: php artisan test --compact
 
@@ -59,41 +55,26 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             set -e
+
             cd ${{ secrets.SERVER_APP_PATH }}
 
-            # Mirror origin/main exactly. fetch + reset --hard (not pull) realigns
-            # the tree even if tracked files drifted on the server, while leaving
-            # untracked files (.env, storage, public/build, uploaded media) alone.
             git fetch origin main
             git reset --hard origin/main
 
-            # Production stack only — never the dev override (MySQL/phpMyAdmin/Vite).
-            # --remove-orphans clears leftovers from the prod/dev split.
             docker compose -f docker-compose.yml up -d --remove-orphans
 
-            # composer.lock may have changed — refresh the vendor volume before
-            # anything boots the app.
             docker compose -f docker-compose.yml exec -T app composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
 
-            # Build assets ON the server, not in CI. Vite bakes VITE_REVERB_* into
-            # the bundle at build time, and only the server's .env carries the real
-            # wss host — building in CI would ship a notification bell that can't
-            # connect. Node runs on the host; the app container picks up the result
-            # through the ./:/var/www bind mount.
-            npm ci && npm run build
+            npm ci
+            npm run build
 
             docker compose -f docker-compose.yml exec -T app php artisan migrate --force
             docker compose -f docker-compose.yml exec -T app php artisan filament:assets
+            docker compose -f docker-compose.yml exec -T app php artisan livewire:publish --assets
             docker compose -f docker-compose.yml exec -T app php artisan optimize:clear
             docker compose -f docker-compose.yml exec -T app php artisan project:cache
             docker compose -f docker-compose.yml exec -T app php artisan storage:link || true
 
-            # No `app` user exists in the image — php-fpm drops to www-data, and the
-            # composer/artisan steps above ran as root, so they leave root-owned
-            # files. Hand storage and the bootstrap cache back to www-data so the
-            # workers can write them. public/ is intentionally left alone: the
-            # workers only read it, and chowning public/build to www-data would
-            # block the next host-side `npm run build` (it runs as the deploy user).
             docker compose -f docker-compose.yml exec -T -u root app chown -R www-data:www-data storage bootstrap/cache
             docker compose -f docker-compose.yml exec -T -u root app chmod -R 775 storage bootstrap/cache
 
