@@ -1283,19 +1283,18 @@ button.cw-row:focus-visible {
 .pj-card .pj-stat:hover {
     border-color: transparent;
 }
+/* Contracts + participants are two different lists, not two halves of the
+   same thing — each keeps its own full ow-card boundary (same treatment as
+   the project view page) instead of a bare hairline between them, with real
+   breathing room so they read as clearly separate sections. */
 .pj-duo {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-    gap: 1px;
-    background: var(--d);
+    gap: 1rem;
+    padding: 1.25rem;
     border-top: 1px solid var(--d);
-    /* The card itself can't clip (the filters popover hangs outside it),
-       so the last section rounds its own bottom corners instead. */
-    border-radius: 0 0 calc(.75rem - 1px) calc(.75rem - 1px);
-    overflow: hidden;
 }
 .pj-sec {
-    background: var(--s);
     min-width: 0;
 }
 .pj-open {

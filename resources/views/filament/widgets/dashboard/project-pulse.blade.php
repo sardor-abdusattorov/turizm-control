@@ -167,7 +167,7 @@
 
                 {{-- Freshest contracts + top participants, side by side --}}
                 <div class="pj-duo">
-                    <section class="pj-sec">
+                    <section class="ow-card pj-sec">
                         {{-- No count badge here — the stat tile above already shows this
                              exact number; the participants header keeps its badge because
                              that count (all roles) differs from its tile (participants only). --}}
@@ -201,7 +201,7 @@
                         @endif
                     </section>
 
-                    <section class="pj-sec">
+                    <section class="ow-card pj-sec">
                         <header class="ow-hd">
                             <span class="ow-hd__ic">{!! $ic('heroicon-o-user-group', 18) !!}</span>
                             <h2 class="ow-hd__t">{{ __('app.label.participants') }}</h2>
