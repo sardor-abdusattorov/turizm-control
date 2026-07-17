@@ -10,6 +10,7 @@ use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\ContractAttachment;
 use App\Models\Payment;
+use App\Models\User;
 use App\Rules\PaymentWithinRemaining;
 use App\Services\Contracts\ContractWorkflow;
 use App\Services\Payments\RecordPayment;
@@ -18,6 +19,7 @@ use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
@@ -140,6 +142,57 @@ class ViewContract extends ViewRecord
                     }
 
                     Notification::make()->title(__('app.message.sent_to_director'))->success()->send();
+                    $this->refreshFormData(['status']);
+                }),
+
+            Action::make('returnToWork')
+                ->label(__('app.action.return_to_work'))
+                ->icon('heroicon-o-arrow-uturn-left')
+                ->color('warning')
+                ->requiresConfirmation()
+                ->modalHeading(__('app.action.return_to_work'))
+                ->modalDescription(__('app.message.return_to_work_confirm'))
+                ->visible(fn (): bool => $this->record?->status === Contract::STATUS_REJECTED
+                    && $this->record->canBeEditedBy())
+                ->action(function (ContractWorkflow $workflow): void {
+                    if (! $workflow->returnToWork($this->record)) {
+                        Notification::make()->title(__('app.message.action_not_allowed'))->danger()->send();
+
+                        return;
+                    }
+
+                    Notification::make()->title(__('app.message.returned_to_work'))->success()->send();
+                    $this->refreshFormData(['status']);
+                }),
+
+            Action::make('reassignApprover')
+                ->label(__('app.action.reassign_approver'))
+                ->icon('heroicon-o-arrow-path-rounded-square')
+                ->color('gray')
+                ->modalHeading(__('app.action.reassign_approver'))
+                ->modalDescription(__('app.message.reassign_approver_confirm'))
+                ->visible(fn (): bool => (bool) auth()->user()?->hasRole('super_admin')
+                    && in_array($this->record?->status, [Contract::STATUS_IN_REVIEW, Contract::STATUS_IN_REVIEW_DIRECTOR], true)
+                    && $this->record->currentApprover() !== null)
+                ->schema([
+                    Select::make('user_id')
+                        ->label(__('app.label.new_approver'))
+                        ->options(fn (): array => User::approverOptionsGroupedByDepartment(
+                            excludeId: $this->record->currentApprover()?->user_id,
+                        ))
+                        ->searchable()
+                        ->required(),
+                ])
+                ->action(function (array $data, ContractWorkflow $workflow): void {
+                    $newApprover = User::find($data['user_id']);
+
+                    if (! $newApprover || ! $workflow->reassignCurrentApprover($this->record, $newApprover)) {
+                        Notification::make()->title(__('app.message.action_not_allowed'))->danger()->send();
+
+                        return;
+                    }
+
+                    Notification::make()->title(__('app.message.approver_reassigned_done'))->success()->send();
                     $this->refreshFormData(['status']);
                 }),
 

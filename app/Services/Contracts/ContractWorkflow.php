@@ -22,17 +22,37 @@ class ContractWorkflow
         return (bool) settings('approval.enabled', true);
     }
 
+    /**
+     * Lock the contract row and re-read its state. Actions arrive from two
+     * channels (web and the Telegram bot), so every workflow transition
+     * re-checks its gate under this lock — a double tap or a concurrent
+     * approve/reject must see the first action's result, not the stale state
+     * it was rendered from. No-op on SQLite (tests), a real row lock on MySQL.
+     */
+    private function lockAndRefresh(Contract $contract): bool
+    {
+        if (! Contract::query()->lockForUpdate()->find($contract->getKey())) {
+            return false;
+        }
+
+        $contract->refresh();
+
+        return true;
+    }
+
     public function submit(Contract $contract, ?User $user = null): bool
     {
         $user ??= auth()->user();
 
-        if (! $contract->canBeSubmittedBy($user)) {
-            return false;
-        }
-
         DB::beginTransaction();
 
         try {
+            if (! $this->lockAndRefresh($contract) || ! $contract->canBeSubmittedBy($user)) {
+                DB::rollBack();
+
+                return false;
+            }
+
             if (! $contract->activeApprovers()->exists()) {
                 $contract->buildApprovalChainFromFlow();
             }
@@ -89,23 +109,23 @@ class ContractWorkflow
 
     public function approve(Contract $contract, User $user, ?string $comment = null): bool
     {
-        if (! $contract->canBeApprovedBy($user)) {
-            return false;
-        }
+        return (bool) DB::transaction(function () use ($contract, $user, $comment): bool {
+            if (! $this->lockAndRefresh($contract) || ! $contract->canBeApprovedBy($user)) {
+                return false;
+            }
 
-        $current = $contract->currentApprover();
+            $current = $contract->currentApprover();
 
-        if (! $current) {
-            return false;
-        }
+            if (! $current) {
+                return false;
+            }
 
-        DB::transaction(function () use ($contract, $current, $comment, $user): void {
             $current->markApproved($comment);
 
             if ($contract->fresh()->allApproved()) {
                 $this->finalizeOrAwaitDirector($contract, $user, $comment, $current);
 
-                return;
+                return true;
             }
 
             $next = $this->advanceToActiveApprover($contract);
@@ -113,7 +133,7 @@ class ContractWorkflow
             if (! $next && $contract->fresh()->allApproved()) {
                 $this->finalizeOrAwaitDirector($contract, $user, $comment, $current);
 
-                return;
+                return true;
             }
 
             if ($next) {
@@ -134,9 +154,9 @@ class ContractWorkflow
                     'next_approver_id' => $next?->user_id,
                 ],
             );
-        });
 
-        return true;
+            return true;
+        });
     }
 
     private function finalizeOrAwaitDirector(Contract $contract, User $user, ?string $comment, ContractApprover $current): void
@@ -178,15 +198,18 @@ class ContractWorkflow
     {
         $user ??= auth()->user();
 
-        if (! $contract->canBeSentToDirectorBy($user)) {
-            return false;
-        }
+        return (bool) DB::transaction(function () use ($contract, $user): bool {
+            if (! $this->lockAndRefresh($contract) || ! $contract->canBeSentToDirectorBy($user)) {
+                return false;
+            }
 
-        DB::transaction(function () use ($contract, $user): void {
             $director = $contract->appendDirectorApprover();
 
+            // The director is already in the active chain (or a double click
+            // raced us) — nothing was sent, so say so instead of a false
+            // "sent" confirmation.
             if (! $director) {
-                return;
+                return false;
             }
 
             $contract->update(['status' => Contract::STATUS_IN_REVIEW_DIRECTOR]);
@@ -199,24 +222,24 @@ class ContractWorkflow
                 user: $user,
                 properties: ['director_id' => $director->user_id],
             );
-        });
 
-        return true;
+            return true;
+        });
     }
 
     public function reject(Contract $contract, User $user, ?string $comment = null): bool
     {
-        if (! $contract->canBeApprovedBy($user)) {
-            return false;
-        }
+        return (bool) DB::transaction(function () use ($contract, $user, $comment): bool {
+            if (! $this->lockAndRefresh($contract) || ! $contract->canBeApprovedBy($user)) {
+                return false;
+            }
 
-        $current = $contract->currentApprover();
+            $current = $contract->currentApprover();
 
-        if (! $current) {
-            return false;
-        }
+            if (! $current) {
+                return false;
+            }
 
-        DB::transaction(function () use ($contract, $current, $comment, $user): void {
             $current->markRejected($comment);
             $contract->update(['status' => Contract::STATUS_REJECTED]);
             $this->notifier->notifyRejected($contract, $comment, $current);
@@ -227,9 +250,99 @@ class ContractWorkflow
                 user: $user,
                 properties: ['comment' => $comment],
             );
-        });
 
-        return true;
+            return true;
+        });
+    }
+
+    /**
+     * Bring a rejected contract back to Draft with its chain re-queued, so the
+     * responsible can fix the remarks and resubmit. Previously this only
+     * happened as a side effect of saving the edit form.
+     */
+    public function returnToWork(Contract $contract, ?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        return (bool) DB::transaction(function () use ($contract, $user): bool {
+            if (! $this->lockAndRefresh($contract)) {
+                return false;
+            }
+
+            if ($contract->status !== Contract::STATUS_REJECTED || ! $contract->canBeEditedBy($user)) {
+                return false;
+            }
+
+            $previousUserIds = $contract->activeApprovers()
+                ->orderBy('order')
+                ->pluck('user_id')
+                ->all();
+
+            app(ApprovalChain::class)->resyncOnEdit($contract, $previousUserIds, cancelDecided: true);
+
+            $this->logWorkflowEvent(
+                event: 'Contract Returned To Work',
+                contract: $contract,
+                user: $user,
+            );
+
+            return true;
+        });
+    }
+
+    /**
+     * Replace the current (stuck) approver with another user: the old PENDING
+     * row is marked skipped for the audit trail and a fresh row with the same
+     * order takes over, SLA restarted. Admin-only — the UI gates it.
+     */
+    public function reassignCurrentApprover(Contract $contract, User $newApprover, ?User $actor = null): bool
+    {
+        $actor ??= auth()->user();
+
+        return (bool) DB::transaction(function () use ($contract, $newApprover, $actor): bool {
+            if (! $this->lockAndRefresh($contract)) {
+                return false;
+            }
+
+            $inReview = in_array($contract->status, [
+                Contract::STATUS_IN_REVIEW,
+                Contract::STATUS_IN_REVIEW_DIRECTOR,
+            ], true);
+
+            $current = $contract->currentApprover();
+
+            if (! $inReview || ! $current || $current->user_id === $newApprover->id) {
+                return false;
+            }
+
+            $current->update([
+                'status' => ContractApprover::STATUS_SKIPPED,
+                'comment' => __('app.message.approver_reassigned'),
+                'acted_at' => now(),
+            ]);
+
+            $replacement = ContractApprover::create([
+                'contract_id' => $contract->id,
+                'user_id' => $newApprover->id,
+                'order' => $current->order,
+                'status' => ContractApprover::STATUS_PENDING,
+            ]);
+
+            $replacement->startReview($this->slaDays());
+            $this->notifier->notifyApprovalRequested($replacement);
+
+            $this->logWorkflowEvent(
+                event: 'Contract Approver Reassigned',
+                contract: $contract,
+                user: $actor,
+                properties: [
+                    'from_user_id' => $current->user_id,
+                    'to_user_id' => $newApprover->id,
+                ],
+            );
+
+            return true;
+        });
     }
 
     private function slaDays(): int

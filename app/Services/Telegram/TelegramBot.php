@@ -43,6 +43,16 @@ class TelegramBot
     /** @param  array<string, mixed>  $update */
     public function handleUpdate(array $update): void
     {
+        // Telegram redelivers an update when it doesn't get a fast 200 (and
+        // this handler makes live API calls before responding). Cache::add is
+        // atomic — a redelivered update_id is dropped instead of approving or
+        // rejecting a contract twice.
+        $updateId = $update['update_id'] ?? null;
+
+        if ($updateId !== null && ! Cache::add("telegram:update:{$updateId}", true, now()->addDay())) {
+            return;
+        }
+
         if (isset($update['callback_query'])) {
             $this->handleCallback($update['callback_query']);
 

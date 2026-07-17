@@ -263,3 +263,31 @@ it('keeps the reject flow open when a non-text message arrives', function () {
         ->and($contract->approvers()->where('user_id', $approver->id)->first()->comment)
         ->toBe('Сумма не совпадает с приказом');
 });
+
+it('ignores a redelivered update with the same update_id', function () {
+    $approver = asApprover(User::factory()->withTelegram('558')->create());
+    $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $approver->id,
+        'order' => 1,
+    ]);
+
+    $update = [
+        'update_id' => 424242,
+        'callback_query' => [
+            'id' => 'cb-dup',
+            'from' => ['id' => 558],
+            'data' => "apnc:{$contract->id}",
+        ],
+    ];
+
+    app(TelegramBot::class)->handleUpdate($update);
+    expect($contract->fresh()->status)->toBe(Contract::STATUS_APPROVED);
+
+    Http::fake(['*' => Http::response(['ok' => true])]);
+    app(TelegramBot::class)->handleUpdate($update);
+
+    // The redelivery is dropped before any handler runs — no Telegram call.
+    Http::assertNothingSent();
+});

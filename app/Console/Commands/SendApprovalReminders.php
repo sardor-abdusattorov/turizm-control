@@ -29,6 +29,12 @@ class SendApprovalReminders extends Command
         $sent = 0;
 
         foreach ($candidates as $approver) {
+            // A deactivated user can't act — reminding them daily is noise;
+            // the admin resolves the stall via «Заменить согласующего».
+            if (! $approver->user || ! $approver->user->status) {
+                continue;
+            }
+
             if (! $approver->contract?->isCurrentApprover($approver->user)) {
                 continue;
             }
