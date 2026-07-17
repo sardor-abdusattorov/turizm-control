@@ -279,6 +279,7 @@ return [
         'edit_events' => 'Изменения',
         'load_more' => 'Показать ещё',
         'all' => 'Все',
+        'filters' => 'Фильтры',
 
         // Payments
         'payment_single' => 'Платёж',
@@ -378,6 +379,8 @@ return [
         'add_bank_account' => 'Добавить счёт',
         'quick_view' => 'Быстрый просмотр',
         'open_project' => 'Открыть проект',
+        'previous_project' => 'Предыдущий проект',
+        'next_project' => 'Следующий проект',
         'confirm' => 'Подтвердить',
         'cancel' => 'Отмена',
         'save_anyway' => 'Всё равно сохранить',

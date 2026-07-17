@@ -107,7 +107,7 @@ it('narrows and rehomes the selection when the type filter changes', function ()
     Livewire::test(ProjectPulseWidget::class)
         ->assertSet('data.projectId', $intl->id)
         ->assertSee('Берлин')
-        ->set('data.type', 'internal')
+        ->set('filters.type', 'internal')
         ->assertSet('data.projectId', $internal->id)
         ->assertSee('Самарканд')
         ->assertDontSee('Берлин');
@@ -123,7 +123,7 @@ it('keeps the selection when it still matches the changed filter', function () {
 
     Livewire::test(ProjectPulseWidget::class)
         ->assertSet('data.projectId', $a->id)
-        ->set('data.type', 'international')
+        ->set('filters.type', 'international')
         ->assertSet('data.projectId', $a->id)
         ->assertSee('Париж');
 });
@@ -136,9 +136,49 @@ it('rehomes the selection when the year filter changes', function () {
 
     Livewire::test(ProjectPulseWidget::class)
         ->assertSet('data.projectId', $upcoming->id)
-        ->set('data.year', (string) now()->subYear()->year)
+        ->set('filters.year', (string) now()->subYear()->year)
         ->assertSet('data.projectId', $past->id)
         ->assertSee('Токио');
+});
+
+it('steps through projects with the arrows in dropdown order, wrapping around', function () {
+    // pickerQuery orders newest first: C (in 3 months), B (in 2), A (in 1).
+    $a = Project::factory()->international()->create(['name' => 'EXPO-A', 'starts_on' => now()->addMonth(), 'status' => true]);
+    $b = Project::factory()->international()->create(['name' => 'EXPO-B', 'starts_on' => now()->addMonths(2), 'status' => true]);
+    $c = Project::factory()->international()->create(['name' => 'EXPO-C', 'starts_on' => now()->addMonths(3), 'status' => true]);
+
+    actingAs(userWithPermission('view_any_project'));
+
+    $ordered = Project::filteredIds();
+
+    // The default selection is the nearest upcoming project (A, the list's
+    // tail); stepping forward wraps to the head, stepping back returns.
+    Livewire::test(ProjectPulseWidget::class)
+        ->assertSet('data.projectId', $a->id)
+        ->call('stepProject', 1)
+        ->assertSet('data.projectId', $ordered[0])
+        ->call('stepProject', -1)
+        ->assertSet('data.projectId', $a->id);
+
+    expect($ordered)->toBe([$c->id, $b->id, $a->id])
+        ->and(session('dashboard.project_id'))->toBe($a->id);
+});
+
+it('steps only within the filtered project list', function () {
+    Project::factory()->internal()->create(['name' => 'LOCAL-FEST', 'starts_on' => now()->addWeek(), 'status' => true]);
+    $intl1 = Project::factory()->international()->create(['name' => 'EXPO-1', 'starts_on' => now()->addMonth(), 'status' => true]);
+    $intl2 = Project::factory()->international()->create(['name' => 'EXPO-2', 'starts_on' => now()->addMonths(2), 'status' => true]);
+
+    actingAs(userWithPermission('view_any_project'));
+
+    // With the type filter narrowed to international, the arrows cycle
+    // between the two matching projects and never land on the internal one.
+    Livewire::test(ProjectPulseWidget::class)
+        ->set('filters.type', 'international')
+        ->call('stepProject', 1)
+        ->assertSet('data.projectId', $intl1->id)
+        ->call('stepProject', 1)
+        ->assertSet('data.projectId', $intl2->id);
 });
 
 it('is hidden from users without the projects permission', function () {

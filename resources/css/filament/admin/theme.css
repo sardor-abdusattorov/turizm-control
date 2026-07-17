@@ -1169,15 +1169,67 @@ button.cw-row:focus-visible {
     color: var(--accent);
 }
 
-/* ─── Dashboard pulse top row: the project filters + the open button ─────── */
+/* ─── Dashboard pulse top row: project picker + arrows + filters + open ──── */
+[x-cloak] {
+    display: none !important;
+}
 .pj-toprow {
     display: flex;
-    align-items: flex-end;
-    gap: .75rem 1rem;
+    align-items: center;
+    gap: .5rem;
 }
-.pj-toprow .pj-filters {
+.pj-toprow .pj-picker {
     flex: 1;
     min-width: 0;
+}
+/* Square icon buttons: prev/next project and the filters toggle. */
+.pj-navbtn {
+    position: relative;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 1px solid var(--d);
+    border-radius: .5rem;
+    background: var(--s);
+    color: var(--m);
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+}
+.pj-navbtn:hover,
+.pj-navbtn--on {
+    background: var(--soft);
+    color: var(--t);
+}
+/* Type + year live behind the funnel, index-style; the dot marks a
+   narrowed list. */
+.pj-filterbox {
+    position: relative;
+    flex-shrink: 0;
+}
+.pj-filterbox__dot {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: .55rem;
+    height: .55rem;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 0 2px var(--s);
+}
+.pj-filterbox__panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + .5rem);
+    z-index: 30;
+    width: 17rem;
+    padding: 1rem;
+    background: var(--s);
+    border: 1px solid var(--d);
+    border-radius: .75rem;
 }
 .pj-open {
     flex-shrink: 0;
@@ -1203,15 +1255,12 @@ button.cw-row:focus-visible {
 .dark .pj-open:hover {
     color: var(--accent);
 }
-/* The embedded Filament schema (type + year toggles and the project Select);
-   its own responsive grid handles the columns. */
-.pj-filters .fi-fo-field-wrp,
-.pj-filters .fi-sc-component {
+/* Compact, quiet field labels inside the filters popover. */
+.pj-filterbox__panel .fi-fo-field-wrp,
+.pj-filterbox__panel .fi-sc-component {
     gap: .35rem;
 }
-/* Keep the toggle-group filter labels compact and quiet, matching the tile
-   labels rather than shouting like a full form field. */
-.pj-filters .fi-fo-field-label {
+.pj-filterbox__panel .fi-fo-field-label {
     font-size: .72rem;
     font-weight: 600;
     color: var(--m2);
@@ -1222,7 +1271,7 @@ button.cw-row:focus-visible {
    too, making long names unreadable while browsing. Restore wrapping for
    just the list items; the closed trigger uses a different selector
    (.fi-select-input-value-ctn>span) and stays untouched. */
-.pj-filters .fi-select-input-ctn.fi-select-input-ctn-option-labels-not-wrapped .fi-select-input-option > span {
+.pj-picker .fi-select-input-ctn.fi-select-input-ctn-option-labels-not-wrapped .fi-select-input-option > span {
     white-space: normal !important;
     overflow: visible !important;
     text-overflow: clip !important;
@@ -1243,6 +1292,13 @@ button.cw-row:focus-visible {
 @media (max-width: 640px) {
     .pj-open__lb {
         display: none;
+    }
+    /* Picker takes its own row; the icon buttons drop to a second line. */
+    .pj-toprow {
+        flex-wrap: wrap;
+    }
+    .pj-toprow .pj-picker {
+        flex: 1 0 100%;
     }
 }
 

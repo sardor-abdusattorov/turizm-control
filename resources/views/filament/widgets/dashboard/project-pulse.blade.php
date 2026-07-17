@@ -67,11 +67,38 @@
         @endphp
 
         <div class="pj" style="display:flex;flex-direction:column;gap:1rem;">
-            {{-- Filters pick the project; the open button rides the same row. --}}
+            {{-- One visible control: the project picker. Arrows step through
+                 the filtered list; type/year hide behind the funnel. --}}
             <div class="pj-toprow">
-                <div class="pj-filters">
+                <div class="pj-picker">
                     {{ $this->form }}
                 </div>
+
+                <button type="button" class="pj-navbtn" wire:click="stepProject(-1)" title="{{ __('app.action.previous_project') }}">
+                    {!! $ic('heroicon-m-chevron-left', 16) !!}
+                </button>
+                <button type="button" class="pj-navbtn" wire:click="stepProject(1)" title="{{ __('app.action.next_project') }}">
+                    {!! $ic('heroicon-m-chevron-right', 16) !!}
+                </button>
+
+                <div class="pj-filterbox" x-data="{ open: false }" @click.outside="open = false">
+                    <button
+                        type="button"
+                        class="pj-navbtn"
+                        :class="open && 'pj-navbtn--on'"
+                        @click="open = ! open"
+                        title="{{ __('app.label.filters') }}"
+                    >
+                        {!! $ic('heroicon-o-funnel', 16) !!}
+                        @if ($this->hasActiveFilters())
+                            <span class="pj-filterbox__dot"></span>
+                        @endif
+                    </button>
+                    <div x-show="open" x-cloak class="pj-filterbox__panel">
+                        {{ $this->filtersForm }}
+                    </div>
+                </div>
+
                 <a href="{{ $projectUrl }}" class="pj-open" wire:navigate title="{{ __('app.action.open_project') }}">
                     {!! $ic('heroicon-m-arrow-top-right-on-square', 15) !!}
                     <span class="pj-open__lb">{{ __('app.action.open_project') }}</span>
@@ -79,7 +106,7 @@
             </div>
 
             <div style="display:flex;flex-direction:column;gap:1rem;"
-                 wire:loading.class="pj--loading" wire:target="data.projectId,data.type,data.year">
+                 wire:loading.class="pj--loading" wire:target="data.projectId,filters.type,filters.year,stepProject">
                 {{-- Hero: what & when, money on the right --}}
                 <section class="pj-hero pj-hero--{{ $project->status ? 'success' : 'gray' }}">
                     <div class="pj-hero__l">

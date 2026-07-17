@@ -279,6 +279,7 @@ return [
         'edit_events' => 'Tahrirlar',
         'load_more' => 'Ko‘proq ko‘rsatish',
         'all' => 'Hammasi',
+        'filters' => 'Filtrlar',
 
         // To‘lovlar
         'payment_single' => 'To‘lov',
@@ -378,6 +379,8 @@ return [
         'add_bank_account' => 'Hisob qo\'shish',
         'quick_view' => 'Tezkor ko\'rish',
         'open_project' => 'Loyihani ochish',
+        'previous_project' => 'Oldingi loyiha',
+        'next_project' => 'Keyingi loyiha',
         'confirm' => 'Tasdiqlash',
         'cancel' => 'Bekor qilish',
         'save_anyway' => 'Baribir saqlash',

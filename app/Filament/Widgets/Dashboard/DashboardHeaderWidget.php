@@ -4,7 +4,6 @@ namespace App\Filament\Widgets\Dashboard;
 
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Services\Dashboard\DashboardContext;
-use App\Services\Telegram\TelegramService;
 use Filament\Widgets\Widget;
 
 class DashboardHeaderWidget extends Widget
@@ -110,24 +109,5 @@ class DashboardHeaderWidget extends Widget
         return auth()->user()?->can('create_contract')
             ? ContractResource::getUrl('create')
             : null;
-    }
-
-    /**
-     * Whether to surface the "connect Telegram" prompt inside the header card.
-     * Lives here — on the dashboard only — instead of a panel-wide render hook,
-     * so the reminder shows once where the user lands, not on every page. The
-     * user menu keeps a permanent "Connect Telegram" item for the other pages.
-     */
-    public function shouldOfferTelegram(): bool
-    {
-        $user = auth()->user();
-
-        if ($user === null || ! app(TelegramService::class)->isConfigured()) {
-            return false;
-        }
-
-        // A link whose owner blocked the bot is dead — offer to reconnect.
-        return ! $user->isTelegramLinked()
-            || $user->telegram?->blocked_at !== null;
     }
 }

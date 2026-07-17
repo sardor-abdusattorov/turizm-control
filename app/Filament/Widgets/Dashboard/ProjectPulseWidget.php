@@ -4,9 +4,6 @@ namespace App\Filament\Widgets\Dashboard;
 
 use App\Models\Project;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
@@ -17,11 +14,10 @@ use Filament\Widgets\Widget;
  * (defaulting to the nearest upcoming one): dates, money, participants and
  * the freshest contracts, without leaving the page.
  *
- * The picker toolbar carries two quick filters — type (all / internal /
- * international) and year — that narrow the project list; picking a project,
- * or changing a filter, updates the card in place. The choice is remembered
- * in the session, so the page carries no separate filters form above the
- * greeting.
+ * The toolbar keeps one visible control — the project picker — flanked by
+ * prev/next arrows that step through the filtered list in dropdown order.
+ * The type/year refinements hide behind a funnel button, index-style, and
+ * only narrow the list. The choice is remembered in the session.
  *
  * Contract money and lists go through visibleTo(): a manager only ever sees
  * their own contracts here, same as everywhere else. The picker only changes
@@ -44,6 +40,9 @@ class ProjectPulseWidget extends Widget implements HasSchemas
     /** @var array<string, mixed>|null */
     public ?array $data = [];
 
+    /** @var array<string, mixed>|null */
+    public ?array $filters = [];
+
     public static function canView(): bool
     {
         return auth()->user()?->can('view_any_project') ?? false;
@@ -57,67 +56,61 @@ class ProjectPulseWidget extends Widget implements HasSchemas
             ? (int) $remembered
             : Project::dashboardDefault()?->id;
 
-        $this->form->fill([
+        $this->filtersForm->fill([
             'type' => self::ALL,
             'year' => self::ALL,
-            'projectId' => $projectId,
         ]);
+
+        $this->form->fill(['projectId' => $projectId]);
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                // Type + year are short, few-option refinements — compact
-                // selects (not native(false) means they stay the same styled
-                // dropdown as the project picker, not the browser's own),
-                // paired side by side even on a phone. Project gets the rest
-                // of the row: it carries the actual long names.
-                Grid::make(['default' => 12, 'md' => 12])
-                    ->schema([
-                        Select::make('type')
-                            ->label(__('app.label.project_type'))
-                            ->options([
-                                self::ALL => __('app.label.all'),
-                                'internal' => __('app.label.projects_internal'),
-                                'international' => __('app.label.projects_international'),
-                            ])
-                            ->default(self::ALL)
-                            ->native(false)
-                            ->selectablePlaceholder(false)
-                            ->live()
-                            ->afterStateUpdated(fn (Get $get, Set $set) => $this->rehomeSelection($get, $set))
-                            ->columnSpan(['default' => 6, 'md' => 3]),
-
-                        Select::make('year')
-                            ->label(__('app.label.year'))
-                            ->options(self::yearOptions())
-                            ->default(self::ALL)
-                            ->native(false)
-                            ->selectablePlaceholder(false)
-                            ->live()
-                            ->afterStateUpdated(fn (Get $get, Set $set) => $this->rehomeSelection($get, $set))
-                            ->columnSpan(['default' => 6, 'md' => 2]),
-
-                        Select::make('projectId')
-                            ->label(__('app.label.project_single'))
-                            ->options(fn (Get $get): array => Project::groupedOptions(
-                                self::filterValue($get('year')),
-                                self::filterValue($get('type')),
-                            ))
-                            ->searchable()
-                            ->preload()
-                            ->selectablePlaceholder(false)
-                            // Keep the closed control one line tall — long project
-                            // names ellipsize instead of wrapping the toolbar. The
-                            // OPEN list still wraps them in full (see theme.css).
-                            ->wrapOptionLabels(false)
-                            ->live()
-                            ->afterStateUpdated(fn (?string $state) => $this->persist($state))
-                            ->columnSpan(['default' => 12, 'md' => 7]),
-                    ]),
+                Select::make('projectId')
+                    ->hiddenLabel()
+                    ->options(fn (): array => Project::groupedOptions($this->yearFilter(), $this->typeFilter()))
+                    ->searchable()
+                    ->preload()
+                    ->selectablePlaceholder(false)
+                    // Keep the closed control one line tall — long project
+                    // names ellipsize instead of wrapping the toolbar. The
+                    // OPEN list still wraps them in full (see theme.css).
+                    ->wrapOptionLabels(false)
+                    ->live()
+                    ->afterStateUpdated(fn (?string $state) => $this->persist($state)),
             ])
             ->statePath('data');
+    }
+
+    public function filtersForm(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Select::make('type')
+                    ->label(__('app.label.project_type'))
+                    ->options([
+                        self::ALL => __('app.label.all'),
+                        'internal' => __('app.label.projects_internal'),
+                        'international' => __('app.label.projects_international'),
+                    ])
+                    ->default(self::ALL)
+                    ->native(false)
+                    ->selectablePlaceholder(false)
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->rehomeSelection()),
+
+                Select::make('year')
+                    ->label(__('app.label.year'))
+                    ->options(self::yearOptions())
+                    ->default(self::ALL)
+                    ->native(false)
+                    ->selectablePlaceholder(false)
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->rehomeSelection()),
+            ])
+            ->statePath('filters');
     }
 
     public function project(): ?Project
@@ -132,29 +125,67 @@ class ProjectPulseWidget extends Widget implements HasSchemas
     }
 
     /**
+     * The prev/next arrows: step through the filtered project list in the
+     * same order the dropdown shows, wrapping at both ends.
+     */
+    public function stepProject(int $step): void
+    {
+        $ids = Project::filteredIds($this->typeFilter(), $this->yearFilter());
+
+        if ($ids === []) {
+            return;
+        }
+
+        $current = array_search((int) data_get($this->data, 'projectId'), $ids, true);
+
+        $next = $current === false
+            ? $ids[0]
+            : $ids[($current + $step + count($ids)) % count($ids)];
+
+        $this->data['projectId'] = $next;
+        $this->persist($next);
+    }
+
+    /**
+     * Feeds the dot on the funnel button — visible only while the list is
+     * actually narrowed.
+     */
+    public function hasActiveFilters(): bool
+    {
+        return $this->typeFilter() !== null || $this->yearFilter() !== null;
+    }
+
+    /**
      * When a filter changes, keep the shown project if it still matches;
      * otherwise jump to the first project in the narrowed set so the card
      * never shows a project that falls outside the active filters.
      */
-    protected function rehomeSelection(Get $get, Set $set): void
+    protected function rehomeSelection(): void
     {
-        $ids = Project::filteredIds(
-            self::filterValue($get('type')),
-            self::filterValue($get('year')),
-        );
+        $ids = Project::filteredIds($this->typeFilter(), $this->yearFilter());
 
-        if (in_array((int) $get('projectId'), $ids, true)) {
+        if (in_array((int) data_get($this->data, 'projectId'), $ids, true)) {
             return;
         }
 
         $next = $ids[0] ?? null;
-        $set('projectId', $next);
+        $this->data['projectId'] = $next;
         $this->persist($next);
     }
 
     protected function persist(mixed $state): void
     {
         session()->put(self::SESSION_KEY, filled($state) ? (int) $state : null);
+    }
+
+    protected function typeFilter(): ?string
+    {
+        return self::filterValue(data_get($this->filters, 'type'));
+    }
+
+    protected function yearFilter(): ?string
+    {
+        return self::filterValue(data_get($this->filters, 'year'));
     }
 
     /**

@@ -279,6 +279,7 @@ return [
         'edit_events' => 'Edits',
         'load_more' => 'Show more',
         'all' => 'All',
+        'filters' => 'Filters',
 
         // Payments
         'payment_single' => 'Payment',
@@ -383,6 +384,8 @@ return [
         'add_bank_account' => 'Add account',
         'quick_view' => 'Quick view',
         'open_project' => 'Open project',
+        'previous_project' => 'Previous project',
+        'next_project' => 'Next project',
         'confirm' => 'Confirm',
         'cancel' => 'Cancel',
         'save_anyway' => 'Save anyway',
