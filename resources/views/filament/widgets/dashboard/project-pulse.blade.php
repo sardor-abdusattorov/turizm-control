@@ -66,10 +66,10 @@
             $topParticipants = $members->concat($sponsors)->sortByDesc('amount')->take(5)->values();
         @endphp
 
-        {{-- The whole pulse is one card: toolbar, hero, stat row and the two
-             lists join flush, separated by hairlines instead of floating as
-             separate boxes. --}}
-        <div class="pj pj-card">
+        {{-- Three calm groups: a bare toolbar row, the project card (hero +
+             stat row joined), and the two lists as their own cards below.
+             No controls inside the data card, no cards nested in cards. --}}
+        <div class="pj pj-stack">
             <div class="pj-toprow">
                 <div class="pj-picker">
                     {{ $this->form }}
@@ -105,6 +105,7 @@
 
             <div class="pj-body"
                  wire:loading.class="pj--loading" wire:target="data.projectId,filters.type,filters.year,stepProject">
+                <div class="pj-card">
                 {{-- Hero: what & when, money on the right --}}
                 <section class="pj-hero pj-hero--{{ $project->status ? 'success' : 'gray' }}">
                     <div class="pj-hero__l">
@@ -164,6 +165,7 @@
                         <div class="pj-stat__sub">{{ __('app.label.sponsors') }}: {{ $sponsors->count() }}</div>
                     </div>
                 </section>
+                </div>
 
                 {{-- Freshest contracts + top participants, side by side --}}
                 <div class="pj-duo">
