@@ -215,7 +215,7 @@
         .dh__date {
             font-size: 0.8rem;
             font-weight: 500;
-            color: #9ca3af;
+            color: var(--m2);
             text-transform: capitalize;
             white-space: nowrap;
             flex-shrink: 0;
