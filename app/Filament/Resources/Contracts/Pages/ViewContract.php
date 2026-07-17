@@ -62,7 +62,13 @@ class ViewContract extends ViewRecord
      */
     public function timeRemaining(): ?array
     {
-        if ($this->record->status !== Contract::STATUS_IN_REVIEW) {
+        // Both review stages — the director's SLA must surface here too.
+        $inReview = in_array($this->record->status, [
+            Contract::STATUS_IN_REVIEW,
+            Contract::STATUS_IN_REVIEW_DIRECTOR,
+        ], true);
+
+        if (! $inReview) {
             return null;
         }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Filament\Resources\Contracts\Pages\ViewContract;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -44,4 +45,15 @@ it('reminds the director about an overdue review via the command', function () {
     artisan('contracts:send-approval-reminders')->assertSuccessful();
 
     expect($step->fresh()->reminder_sent_at)->not->toBeNull();
+});
+
+it('shows the SLA countdown on the view page during the director stage', function () {
+    [$contract, $director] = directorStageContract();
+    $this->actingAs($director);
+
+    $page = new ViewContract;
+    $page->record = $contract;
+
+    expect($page->timeRemaining())->not->toBeNull()
+        ->and($page->timeRemaining()['overdue'])->toBeFalse();
 });

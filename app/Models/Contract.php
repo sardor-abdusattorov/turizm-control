@@ -307,6 +307,15 @@ class Contract extends Model
 
     public function currentApprover(): ?ContractApprover
     {
+        // Reuse the eager-loaded relation when present — table columns call
+        // this per row and must not issue a query each (N+1).
+        if ($this->relationLoaded('activeApprovers')) {
+            return $this->activeApprovers
+                ->where('status', ContractApprover::STATUS_PENDING)
+                ->sortBy('order')
+                ->first();
+        }
+
         return $this->activeApprovers()
             ->where('status', ContractApprover::STATUS_PENDING)
             ->orderBy('order')
