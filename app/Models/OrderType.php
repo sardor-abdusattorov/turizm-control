@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActiveOptions;
 use App\Models\Concerns\HasActiveStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,7 @@ use Spatie\Translatable\HasTranslations;
 
 class OrderType extends Model
 {
+    use HasActiveOptions;
     use HasActiveStatus;
     use HasFactory;
     use HasTranslations;
@@ -33,13 +35,6 @@ class OrderType extends Model
      */
     public static function getActive(): array
     {
-        return static::query()
-            ->active()
-            ->orderBy('sort')
-            ->get()
-            ->mapWithKeys(fn (self $item) => [
-                $item->id => $item->getTranslation('title', app()->getLocale()),
-            ])
-            ->toArray();
+        return static::activeOptions('title');
     }
 }

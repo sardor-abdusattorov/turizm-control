@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ContractDirection;
 use App\Enums\ProjectType;
 use App\Models\Concerns\HasActiveStatus;
+use App\Models\Concerns\SumsContractsByCurrency;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +18,7 @@ class Project extends Model
 {
     use HasActiveStatus;
     use HasFactory;
+    use SumsContractsByCurrency;
 
     protected $fillable = [
         'type',
@@ -189,30 +191,12 @@ class Project extends Model
      */
     public function incomeTotalsByCurrency(bool $sponsors = false, ?User $user = null): Collection
     {
-        $rows = ($sponsors ? $this->sponsorshipContracts() : $this->feeContracts())
-            ->visibleTo($user)
-            ->where('status', '!=', Contract::STATUS_REJECTED->value)
-            // The relations carry a default ORDER BY created_at; a grouped
-            // aggregate must drop it or MySQL's only_full_group_by rejects the
-            // query (the rows are re-sorted by count below anyway).
-            ->reorder()
-            ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount, SUM(amount * paid_percent / 100) as total_paid')
-            ->groupBy('currency_id')
-            ->get();
-
-        $currencies = Currency::query()
-            ->whereIn('id', $rows->pluck('currency_id')->filter())
-            ->pluck('short_name', 'id');
-
-        return $rows
-            ->map(fn (Contract $row): array => [
-                'currency' => $currencies->get($row->currency_id) ?? '—',
-                'count' => (int) $row->contracts_count,
-                'total' => (float) $row->total_amount,
-                'paid' => (float) $row->total_paid,
-            ])
-            ->sortByDesc('count')
-            ->values();
+        return $this->contractsByCurrency(
+            ($sponsors ? $this->sponsorshipContracts() : $this->feeContracts())
+                ->visibleTo($user)
+                ->where('status', '!=', Contract::STATUS_REJECTED->value),
+            withPaid: true,
+        );
     }
 
     /**
@@ -240,27 +224,10 @@ class Project extends Model
      */
     public function visibleContractTotalsByCurrency(?User $user = null): Collection
     {
-        $rows = $this->contracts()
-            ->visibleTo($user)
-            // Drop the relation's default ORDER BY created_at — a grouped
-            // aggregate with it set trips MySQL's only_full_group_by.
-            ->reorder()
-            ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount')
-            ->groupBy('currency_id')
-            ->get();
-
-        $currencies = Currency::query()
-            ->whereIn('id', $rows->pluck('currency_id')->filter())
-            ->pluck('short_name', 'id');
-
-        return $rows
-            ->map(fn (Contract $row): array => [
-                'currency' => $currencies->get($row->currency_id) ?? '—',
-                'count' => (int) $row->contracts_count,
-                'total' => (float) $row->total_amount,
-            ])
-            ->sortByDesc('count')
-            ->values();
+        return $this->contractsByCurrency(
+            $this->contracts()->visibleTo($user),
+            withPaid: false,
+        );
     }
 
     /**

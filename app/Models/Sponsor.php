@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasActiveStatus;
+use App\Models\Concerns\SumsContractsByCurrency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,6 +13,7 @@ class Sponsor extends Model
 {
     use HasActiveStatus;
     use HasFactory;
+    use SumsContractsByCurrency;
 
     protected $fillable = [
         'name',
@@ -63,25 +65,11 @@ class Sponsor extends Model
      */
     public function projectTotalsByCurrency(?User $user = null): Collection
     {
-        $rows = $this->sponsorshipContracts()
-            ->visibleTo($user)
-            ->where('status', '!=', Contract::STATUS_REJECTED->value)
-            ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount, SUM(amount * paid_percent / 100) as total_paid')
-            ->groupBy('currency_id')
-            ->get();
-
-        $currencies = Currency::query()
-            ->whereIn('id', $rows->pluck('currency_id')->filter())
-            ->pluck('short_name', 'id');
-
-        return $rows
-            ->map(fn (Contract $row): array => [
-                'currency' => $currencies->get($row->currency_id) ?? '—',
-                'count' => (int) $row->contracts_count,
-                'total' => (float) $row->total_amount,
-                'paid' => (float) $row->total_paid,
-            ])
-            ->sortByDesc('count')
-            ->values();
+        return $this->contractsByCurrency(
+            $this->sponsorshipContracts()
+                ->visibleTo($user)
+                ->where('status', '!=', Contract::STATUS_REJECTED->value),
+            withPaid: true,
+        );
     }
 }

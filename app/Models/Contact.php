@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Enums\ContractDirection;
+use App\Models\Concerns\HasActiveOptions;
 use App\Models\Concerns\HasActiveStatus;
+use App\Models\Concerns\SumsContractsByCurrency;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,9 +15,11 @@ use Spatie\Translatable\HasTranslations;
 
 class Contact extends Model
 {
+    use HasActiveOptions;
     use HasActiveStatus;
     use HasFactory;
     use HasTranslations;
+    use SumsContractsByCurrency;
 
     public $translatable = ['name', 'address'];
 
@@ -66,14 +70,7 @@ class Contact extends Model
      */
     public static function getActive(): array
     {
-        return static::query()
-            ->active()
-            ->orderBy('id')
-            ->get()
-            ->mapWithKeys(fn (self $item) => [
-                $item->id => $item->getTranslation('name', app()->getLocale()),
-            ])
-            ->toArray();
+        return static::activeOptions('name', 'id');
     }
 
     public function bankAccounts(): HasMany
@@ -149,24 +146,10 @@ class Contact extends Model
      */
     public function contractTotalsByCurrency(?User $user = null): Collection
     {
-        $rows = $this->contracts()
-            ->visibleTo($user)
-            ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount')
-            ->groupBy('currency_id')
-            ->get();
-
-        $currencies = Currency::query()
-            ->whereIn('id', $rows->pluck('currency_id')->filter())
-            ->pluck('short_name', 'id');
-
-        return $rows
-            ->map(fn (Contract $row): array => [
-                'currency' => $currencies->get($row->currency_id) ?? '—',
-                'count' => (int) $row->contracts_count,
-                'total' => (float) $row->total_amount,
-            ])
-            ->sortByDesc('count')
-            ->values();
+        return $this->contractsByCurrency(
+            $this->contracts()->visibleTo($user),
+            withPaid: false,
+        );
     }
 
     /**
@@ -192,25 +175,11 @@ class Contact extends Model
      */
     public function projectTotalsByCurrency(?User $user = null): Collection
     {
-        $rows = $this->incomeContracts()
-            ->visibleTo($user)
-            ->where('status', '!=', Contract::STATUS_REJECTED->value)
-            ->selectRaw('currency_id, COUNT(*) as contracts_count, SUM(amount) as total_amount, SUM(amount * paid_percent / 100) as total_paid')
-            ->groupBy('currency_id')
-            ->get();
-
-        $currencies = Currency::query()
-            ->whereIn('id', $rows->pluck('currency_id')->filter())
-            ->pluck('short_name', 'id');
-
-        return $rows
-            ->map(fn (Contract $row): array => [
-                'currency' => $currencies->get($row->currency_id) ?? '—',
-                'count' => (int) $row->contracts_count,
-                'total' => (float) $row->total_amount,
-                'paid' => (float) $row->total_paid,
-            ])
-            ->sortByDesc('count')
-            ->values();
+        return $this->contractsByCurrency(
+            $this->incomeContracts()
+                ->visibleTo($user)
+                ->where('status', '!=', Contract::STATUS_REJECTED->value),
+            withPaid: true,
+        );
     }
 }
