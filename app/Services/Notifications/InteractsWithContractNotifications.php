@@ -37,6 +37,13 @@ trait InteractsWithContractNotifications
             ]];
         }
 
+        // The full interactive card without leaving Telegram, plus the web
+        // link for the desktop.
+        $keyboard[] = [[
+            'text' => __('app.telegram.open_in_bot'),
+            'callback_data' => "view:{$contract->id}",
+        ]];
+
         $keyboard[] = [[
             'text' => __('app.action.open_contract'),
             'url' => $url,

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\TelegramUser;
 use App\Services\Telegram\TelegramService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -35,7 +36,7 @@ class SendTelegramMessage implements ShouldQueue
 
     public function handle(TelegramService $telegram): void
     {
-        if (! $this->chatId) {
+        if (! $this->chatId || TelegramUser::isBlockedChat($this->chatId)) {
             return;
         }
 

@@ -89,8 +89,12 @@ class DashboardHeaderWidget extends Widget
     {
         $user = auth()->user();
 
-        return $user !== null
-            && app(TelegramService::class)->isConfigured()
-            && ! $user->isTelegramLinked();
+        if ($user === null || ! app(TelegramService::class)->isConfigured()) {
+            return false;
+        }
+
+        // A link whose owner blocked the bot is dead — offer to reconnect.
+        return ! $user->isTelegramLinked()
+            || $user->telegram?->blocked_at !== null;
     }
 }

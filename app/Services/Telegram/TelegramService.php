@@ -5,6 +5,7 @@ namespace App\Services\Telegram;
 use App\Jobs\SendTelegramMessage;
 use App\Jobs\SendTelegramPhoto;
 use App\Models\TelegramMessageLog;
+use App\Models\TelegramUser;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -135,6 +136,8 @@ class TelegramService
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
+
+                $this->markBlockedIfNeeded($response->status(), $chatId);
             }
 
             $this->record('sendPhoto', ['chat_id' => $chatId, 'text' => $payload['caption']],
@@ -179,6 +182,24 @@ class TelegramService
         ], static fn ($value) => $value !== null));
     }
 
+    /**
+     * Publish the bot's command menu (the client's hamburger next to the
+     * input). Pass a language code to localise per client language.
+     *
+     * @param  array<int, array{command: string, description: string}>  $commands
+     */
+    public function setMyCommands(array $commands, ?string $languageCode = null): bool
+    {
+        if (! $this->token()) {
+            return false;
+        }
+
+        return $this->call('setMyCommands', array_filter([
+            'commands' => $commands,
+            'language_code' => $languageCode,
+        ], static fn ($value) => $value !== null));
+    }
+
     public function botUsername(): ?string
     {
         return config('services.telegram.bot_username');
@@ -192,6 +213,23 @@ class TelegramService
     private function token(): ?string
     {
         return config('services.telegram.bot_token');
+    }
+
+    /**
+     * A 403 from Telegram on a chat call means the user blocked the bot.
+     * Mark the link so reminders and broadcasts stop hammering a dead chat;
+     * the mark clears when the user talks to the bot again.
+     */
+    private function markBlockedIfNeeded(int $status, mixed $chatId): void
+    {
+        if ($status !== 403 || ! $chatId) {
+            return;
+        }
+
+        TelegramUser::query()
+            ->where('chat_id', (string) $chatId)
+            ->whereNull('blocked_at')
+            ->update(['blocked_at' => now()]);
     }
 
     /**
@@ -209,6 +247,8 @@ class TelegramService
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
+
+                $this->markBlockedIfNeeded($response->status(), $payload['chat_id'] ?? null);
             }
 
             $this->record($method, $payload, $response->successful(), $response->status(),

@@ -654,7 +654,11 @@ class TelegramBot
         $telegram->forceFill(array_filter([
             'username' => $from['username'] ?? null,
             'last_seen_at' => now(),
-        ]))->saveQuietly();
+        ]))
+            // Talking to the bot proves the chat is alive again — lift the
+            // blocked mark set by a 403 so notifications resume.
+            ->forceFill(['blocked_at' => null])
+            ->saveQuietly();
     }
 
     private function withUserLocale(string $chatId, callable $callback): void

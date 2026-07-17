@@ -703,6 +703,7 @@ return [
         'not_allowed' => 'You cannot do that right now.',
         'action_failed' => 'Could not process the action.',
         'text_required' => 'Please send a text message.',
+        'open_in_bot' => '📄 Open in bot',
         'not_linked' => 'Your Telegram account is no longer linked. Reconnect it from the profile page.',
         'cancelled' => 'Cancelled.',
         'sent_to_director' => 'Sent to the director.',

@@ -29,6 +29,7 @@ class TelegramBroadcaster
 
         TelegramUser::query()
             ->whereNotNull('chat_id')
+            ->whereNull('blocked_at')
             ->chunkById(100, function ($chunk) use ($body, &$count): void {
                 foreach ($chunk as $telegramUser) {
                     $this->telegram->queue($telegramUser->chat_id, $body);

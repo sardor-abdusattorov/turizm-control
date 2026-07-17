@@ -698,6 +698,7 @@ return [
         'not_allowed' => 'Hozir buni qila olmaysiz.',
         'action_failed' => 'Amalni bajarib bo‘lmadi.',
         'text_required' => 'Iltimos, matnli xabar yuboring.',
+        'open_in_bot' => '📄 Botda ochish',
         'not_linked' => 'Telegram akkauntingiz endi bog‘lanmagan. Uni profil sahifasidan qayta ulang.',
         'cancelled' => 'Bekor qilindi.',
         'sent_to_director' => 'Direktorga yuborildi.',

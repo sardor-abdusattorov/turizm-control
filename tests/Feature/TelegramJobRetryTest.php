@@ -2,7 +2,10 @@
 
 use App\Jobs\SendTelegramMessage;
 use App\Services\Telegram\TelegramService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     config(['services.telegram.bot_token' => 'test-token']);

@@ -46,6 +46,42 @@ class InstallWebhookCommand extends Command
 
         $this->info('Webhook installed.');
 
+        $this->publishCommandMenu($telegram);
+
         return self::SUCCESS;
+    }
+
+    /**
+     * Publish the bot's native command menu (the hamburger next to the input)
+     * per client language: ru and uz explicitly, English as the fallback.
+     */
+    private function publishCommandMenu(TelegramService $telegram): void
+    {
+        $menus = [
+            null => [
+                ['command' => 'menu', 'description' => 'Main menu'],
+                ['command' => 'lang', 'description' => 'Language'],
+                ['command' => 'unlink', 'description' => 'Unlink account'],
+                ['command' => 'help', 'description' => 'Help'],
+            ],
+            'ru' => [
+                ['command' => 'menu', 'description' => 'Главное меню'],
+                ['command' => 'lang', 'description' => 'Язык'],
+                ['command' => 'unlink', 'description' => 'Отвязать аккаунт'],
+                ['command' => 'help', 'description' => 'Помощь'],
+            ],
+            'uz' => [
+                ['command' => 'menu', 'description' => 'Asosiy menyu'],
+                ['command' => 'lang', 'description' => 'Til'],
+                ['command' => 'unlink', 'description' => 'Akkauntni uzish'],
+                ['command' => 'help', 'description' => 'Yordam'],
+            ],
+        ];
+
+        foreach ($menus as $language => $commands) {
+            $telegram->setMyCommands($commands, $language ?: null);
+        }
+
+        $this->info('Bot command menu published (default, ru, uz).');
     }
 }
