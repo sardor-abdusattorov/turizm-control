@@ -101,9 +101,9 @@
     </div>
 
     <style>
-        /* Flat greeting card. The day's state shows as a soft glow bleeding
-           from the left edge — green when clear, amber when reviews wait,
-           red when something is overdue — plus the counter chips. */
+        /* Flat greeting card. The day's state is the solid line on the left
+           edge — green when clear, amber when reviews wait, red when
+           something is overdue — plus the counter chips. */
         .dh {
             position: relative;
             display: flex;
@@ -119,15 +119,15 @@
             content: "";
             position: absolute;
             inset: 0 auto 0 0;
-            width: 11rem;
+            width: 4px;
             pointer-events: none;
         }
-        .dh--success::before { background: linear-gradient(90deg, rgba(22, 163, 74, 0.09), transparent); }
-        .dh--warning::before { background: linear-gradient(90deg, rgba(217, 119, 6, 0.09), transparent); }
-        .dh--danger::before  { background: linear-gradient(90deg, rgba(220, 38, 38, 0.09), transparent); }
-        .dark .dh--success::before { background: linear-gradient(90deg, rgba(34, 197, 94, 0.13), transparent); }
-        .dark .dh--warning::before { background: linear-gradient(90deg, rgba(245, 158, 11, 0.13), transparent); }
-        .dark .dh--danger::before  { background: linear-gradient(90deg, rgba(248, 113, 113, 0.13), transparent); }
+        .dh--success::before { background: #16a34a; }
+        .dh--warning::before { background: #d97706; }
+        .dh--danger::before  { background: #dc2626; }
+        .dark .dh--success::before { background: #22c55e; }
+        .dark .dh--warning::before { background: #f59e0b; }
+        .dark .dh--danger::before  { background: #f87171; }
 
         .dh__top {
             display: flex;
