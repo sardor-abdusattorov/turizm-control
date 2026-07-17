@@ -256,14 +256,28 @@ it('confirms then deletes the telegram link on /unlink', function () {
     expect($user->fresh()->telegram)->toBeNull();
 });
 
-it('keeps the dashboard header free of the Telegram prompt (connect lives in profile settings)', function () {
+it('offers the Telegram connect prompt for users who have not linked', function () {
     $user = User::factory()->create();
 
     actingAs($user);
 
+    expect((new DashboardHeaderWidget)->shouldOfferTelegram())->toBeTrue();
+
     Livewire::test(DashboardHeaderWidget::class)
-        ->assertDontSee(__('app.label.telegram_nag_title'))
-        ->assertDontSee(route('telegram.connect'));
+        ->assertSee(__('app.label.telegram_nag_title'))
+        ->assertSee(route('telegram.connect'))
+        ->assertSee(__('app.action.close'));
+});
+
+it('hides the Telegram connect prompt once the user has linked', function () {
+    $user = User::factory()->withTelegram('999')->create();
+
+    actingAs($user);
+
+    expect((new DashboardHeaderWidget)->shouldOfferTelegram())->toBeFalse();
+
+    Livewire::test(DashboardHeaderWidget::class)
+        ->assertDontSee(__('app.label.telegram_nag_title'));
 });
 
 it('shows the history menu item when the user has past approvals', function () {

@@ -1,13 +1,19 @@
 @php
     $h = $this->headerData();
     $chips = $this->attentionChips();
+    $avatarUrl = $this->userAvatarUrl();
+    $offerTelegram = $this->shouldOfferTelegram();
     $createUrl = $this->createContractUrl();
 @endphp
 
 <x-filament-widgets::widget>
-    <div class="dh">
+    <div class="dh dh--{{ $h['tone'] }}">
         <div class="dh__top">
-            <span class="dh__ava" aria-hidden="true">{{ $this->userInitials() }}</span>
+            @if ($avatarUrl)
+                <img class="dh__ava dh__ava--img" src="{{ $avatarUrl }}" alt="" aria-hidden="true">
+            @else
+                <span class="dh__ava" aria-hidden="true">{{ $this->userInitials() }}</span>
+            @endif
             <div class="dh__l">
                 <h2 class="dh__greeting">{{ $h['greeting'] }}</h2>
                 @if ($chips === [])
@@ -49,12 +55,57 @@
             </div>
         </div>
 
+        @if ($offerTelegram)
+            <div
+                x-data="{
+                    dismissed: localStorage.getItem('turizm:tg-nag-dismissed') === '1',
+                    dismiss() {
+                        this.dismissed = true;
+                        localStorage.setItem('turizm:tg-nag-dismissed', '1');
+                    },
+                }"
+                x-show="! dismissed"
+                x-cloak
+                class="dh__tg"
+            >
+                <span class="dh__tg-ic" aria-hidden="true">
+                    {{ svg('heroicon-o-paper-airplane', 'dh__tg-svg') }}
+                </span>
+
+                <div class="dh__tg-text">
+                    <span class="dh__tg-title">{{ __('app.label.telegram_nag_title') }}</span>
+                    <span class="dh__tg-sub">{{ __('app.label.telegram_nag_body') }}</span>
+                </div>
+
+                <a
+                    href="{{ route('telegram.connect') }}"
+                    target="_blank"
+                    rel="noopener"
+                    class="dh__tg-cta"
+                >
+                    <span>{{ __('app.action.connect_telegram') }}</span>
+                    {{ svg('heroicon-m-arrow-top-right-on-square', 'dh__tg-cta-ic') }}
+                </a>
+
+                <button
+                    type="button"
+                    class="dh__tg-x"
+                    x-on:click="dismiss()"
+                    aria-label="{{ __('app.action.close') }}"
+                    title="{{ __('app.action.close') }}"
+                >
+                    {{ svg('heroicon-m-x-mark', 'dh__tg-x-ic') }}
+                </button>
+            </div>
+        @endif
     </div>
 
     <style>
-        /* Flat greeting card — hairline border, no stripe. State colour lives
-           only where it means something: in the counter chips. */
+        /* Flat greeting card. The day's state shows as a soft glow bleeding
+           from the left edge — green when clear, amber when reviews wait,
+           red when something is overdue — plus the counter chips. */
         .dh {
+            position: relative;
             display: flex;
             flex-direction: column;
             gap: 1rem;
@@ -62,15 +113,29 @@
             border-radius: 0.75rem;
             background: var(--s);
             border: 1px solid var(--d);
+            overflow: hidden;
         }
+        .dh::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 11rem;
+            pointer-events: none;
+        }
+        .dh--success::before { background: linear-gradient(90deg, rgba(22, 163, 74, 0.09), transparent); }
+        .dh--warning::before { background: linear-gradient(90deg, rgba(217, 119, 6, 0.09), transparent); }
+        .dh--danger::before  { background: linear-gradient(90deg, rgba(220, 38, 38, 0.09), transparent); }
+        .dark .dh--success::before { background: linear-gradient(90deg, rgba(34, 197, 94, 0.13), transparent); }
+        .dark .dh--warning::before { background: linear-gradient(90deg, rgba(245, 158, 11, 0.13), transparent); }
+        .dark .dh--danger::before  { background: linear-gradient(90deg, rgba(248, 113, 113, 0.13), transparent); }
 
         .dh__top {
             display: flex;
             align-items: center;
             gap: 0.9rem;
         }
-        /* Local initials disc — the identity anchor the bare text row lacked.
-           Pure CSS, so it needs no avatar service on a closed network. */
+        /* The user's own photo when one is uploaded; otherwise a local
+           initials disc — no external avatar service on a closed network. */
         .dh__ava {
             flex-shrink: 0;
             width: 2.75rem;
@@ -84,6 +149,10 @@
             letter-spacing: 0.02em;
             color: var(--accent-strong);
             background: var(--accent-soft);
+        }
+        .dh__ava--img {
+            object-fit: cover;
+            background: var(--soft);
         }
         .dh__l {
             flex: 1;
@@ -142,8 +211,7 @@
             outline: 2px solid var(--accent);
             outline-offset: 2px;
         }
-        /* Live clock — tabular digits keep the line from shivering as
-           seconds tick. */
+        /* Live clock — tabular digits keep the line width steady as it ticks. */
         .dh__date {
             font-size: 0.8rem;
             font-weight: 500;
@@ -177,9 +245,95 @@
         .dh__cta:hover { background: #1d4ed8; }
         .dh__cta-ic { width: 0.95rem; height: 0.95rem; }
 
+        /* Telegram connect prompt — a flat, Filament-style info row shown until
+           the account is linked. Lives inside the greeting so the offer sits
+           where the user starts their day. */
+        .dh__tg {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 0.8rem;
+            border-radius: 0.6rem;
+            background: rgba(59, 130, 246, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.16);
+        }
+        .dh__tg[x-cloak] { display: none; }
+        .dark .dh__tg {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.24);
+        }
+        .dh__tg-ic {
+            flex-shrink: 0;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: #229ed9;
+        }
+        .dh__tg-svg { width: 1.05rem; height: 1.05rem; }
+        .dh__tg-text {
+            flex: 1 1 9rem;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+        .dh__tg-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            line-height: 1.25;
+            color: var(--t);
+        }
+        .dh__tg-sub {
+            font-size: 0.8rem;
+            line-height: 1.25;
+            color: var(--m);
+        }
+        .dh__tg-cta {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.45rem 0.85rem;
+            border-radius: 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            text-decoration: none;
+            background: #229ed9;
+            transition: background 0.12s ease;
+        }
+        .dh__tg-cta:hover { background: #1b87b9; }
+        .dh__tg-cta-ic { width: 0.85rem; height: 0.85rem; }
+        .dh__tg-x {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.65rem;
+            height: 1.65rem;
+            padding: 0;
+            border: 0;
+            border-radius: 0.4rem;
+            background: transparent;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: background 0.12s ease, color 0.12s ease;
+        }
+        .dh__tg-x:hover { background: rgba(17, 24, 39, 0.06); color: #4b5563; }
+        .dark .dh__tg-x:hover { background: rgba(255, 255, 255, 0.08); color: #d1d5db; }
+        .dh__tg-x-ic { width: 1rem; height: 1rem; }
+
         @media (max-width: 640px) {
             .dh { padding: 1rem 1.1rem; }
             .dh__date { display: none; }
+            .dh__tg-sub { display: none; }
             /* Drop the create action onto its own full-width row under the
                greeting; the date is hidden so the cluster holds just the CTA. */
             .dh__top { flex-wrap: wrap; }
@@ -188,6 +342,14 @@
                clock — drop it so it doesn't leave a phantom gap. */
             .dh__top-r:not(:has(.dh__cta)) { display: none; }
             .dh__cta { flex: 1; justify-content: center; padding: 0.6rem; }
+            /* Stack the connect action onto its own full-width row, keep the
+               close button up on the title row. */
+            .dh__tg-cta {
+                order: 1;
+                flex: 1 0 100%;
+                justify-content: center;
+                padding: 0.55rem 0.85rem;
+            }
         }
     </style>
 </x-filament-widgets::widget>

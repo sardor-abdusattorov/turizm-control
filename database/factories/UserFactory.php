@@ -25,6 +25,9 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            // Explicit null keeps the attribute present on freshly-created
+            // models — strict mode trips on it otherwise (greeting avatar).
+            'avatar_url' => null,
         ];
     }
 

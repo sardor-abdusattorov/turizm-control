@@ -66,32 +66,30 @@
             $topParticipants = $members->concat($sponsors)->sortByDesc('amount')->take(5)->values();
         @endphp
 
-        <div class="pj" style="display:flex;flex-direction:column;gap:1rem;">
-            {{-- One visible control: the project picker. Arrows step through
-                 the filtered list; type/year hide behind the funnel. --}}
+        {{-- The whole pulse is one card: toolbar, hero, stat row and the two
+             lists join flush, separated by hairlines instead of floating as
+             separate boxes. --}}
+        <div class="pj pj-card">
             <div class="pj-toprow">
                 <div class="pj-picker">
                     {{ $this->form }}
                 </div>
 
-                <button type="button" class="pj-navbtn" wire:click="stepProject(-1)" title="{{ __('app.action.previous_project') }}">
-                    {!! $ic('heroicon-m-chevron-left', 16) !!}
-                </button>
-                <button type="button" class="pj-navbtn" wire:click="stepProject(1)" title="{{ __('app.action.next_project') }}">
-                    {!! $ic('heroicon-m-chevron-right', 16) !!}
-                </button>
+                <div class="pj-arrows">
+                    <button type="button" class="pj-arrow" wire:click="stepProject(-1)" title="{{ __('app.action.previous_project') }}">
+                        {!! $ic('heroicon-m-chevron-left', 16) !!}
+                    </button>
+                    <button type="button" class="pj-arrow" wire:click="stepProject(1)" title="{{ __('app.action.next_project') }}">
+                        {!! $ic('heroicon-m-chevron-right', 16) !!}
+                    </button>
+                </div>
 
                 <div class="pj-filterbox" x-data="{ open: false }" @click.outside="open = false">
-                    <button
-                        type="button"
-                        class="pj-navbtn"
-                        :class="open && 'pj-navbtn--on'"
-                        @click="open = ! open"
-                        title="{{ __('app.label.filters') }}"
-                    >
-                        {!! $ic('heroicon-o-funnel', 16) !!}
+                    <button type="button" class="pj-filterbtn" :class="open && 'pj-filterbtn--on'" @click="open = ! open">
+                        {!! $ic('heroicon-o-funnel', 15) !!}
+                        <span class="pj-open__lb">{{ __('app.label.filters') }}</span>
                         @if ($this->hasActiveFilters())
-                            <span class="pj-filterbox__dot"></span>
+                            <span class="pj-filterbtn__dot"></span>
                         @endif
                     </button>
                     <div x-show="open" x-cloak class="pj-filterbox__panel">
@@ -105,7 +103,7 @@
                 </a>
             </div>
 
-            <div style="display:flex;flex-direction:column;gap:1rem;"
+            <div class="pj-body"
                  wire:loading.class="pj--loading" wire:target="data.projectId,filters.type,filters.year,stepProject">
                 {{-- Hero: what & when, money on the right --}}
                 <section class="pj-hero pj-hero--{{ $project->status ? 'success' : 'gray' }}">
@@ -168,8 +166,8 @@
                 </section>
 
                 {{-- Freshest contracts + top participants, side by side --}}
-                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(20rem, 1fr));gap:1rem;">
-                    <section class="ow-card">
+                <div class="pj-duo">
+                    <section class="pj-sec">
                         {{-- No count badge here — the stat tile above already shows this
                              exact number; the participants header keeps its badge because
                              that count (all roles) differs from its tile (participants only). --}}
@@ -203,7 +201,7 @@
                         @endif
                     </section>
 
-                    <section class="ow-card">
+                    <section class="pj-sec">
                         <header class="ow-hd">
                             <span class="ow-hd__ic">{!! $ic('heroicon-o-user-group', 18) !!}</span>
                             <h2 class="ow-hd__t">{{ __('app.label.participants') }}</h2>

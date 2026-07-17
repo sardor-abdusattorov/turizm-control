@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Dashboard;
 
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Services\Dashboard\DashboardContext;
+use App\Services\Telegram\TelegramService;
 use Filament\Widgets\Widget;
 
 class DashboardHeaderWidget extends Widget
@@ -18,9 +19,10 @@ class DashboardHeaderWidget extends Widget
 
     /**
      * One personalised line that answers "what should I care about right now",
-     * picked by what is actually demanding the user's attention.
+     * picked by what is actually demanding the user's attention. The tone
+     * drives the soft glow on the card's left edge.
      *
-     * @return array{greeting: string, summary: string}
+     * @return array{greeting: string, summary: string, tone: string}
      */
     public function headerData(): array
     {
@@ -35,14 +37,24 @@ class DashboardHeaderWidget extends Widget
         $awaiting = $context->isApprover() ? $context->awaitingMe()->count() : 0;
         $stalled = $context->isManager() ? $context->managerCounts()['stalled'] : 0;
 
-        $summary = match (true) {
-            $overdue > 0 => __('app.dashboard.summary_overdue', ['count' => $overdue, 'total' => $awaiting]),
-            $awaiting > 0 => __('app.dashboard.summary_awaiting', ['count' => $awaiting]),
-            $stalled > 0 => __('app.dashboard.summary_stalled', ['count' => $stalled]),
-            default => __('app.dashboard.summary_clear'),
+        [$summary, $tone] = match (true) {
+            $overdue > 0 => [__('app.dashboard.summary_overdue', ['count' => $overdue, 'total' => $awaiting]), 'danger'],
+            $awaiting > 0 => [__('app.dashboard.summary_awaiting', ['count' => $awaiting]), 'warning'],
+            $stalled > 0 => [__('app.dashboard.summary_stalled', ['count' => $stalled]), 'warning'],
+            default => [__('app.dashboard.summary_clear'), 'success'],
         };
 
-        return ['greeting' => $greeting, 'summary' => $summary];
+        return ['greeting' => $greeting, 'summary' => $summary, 'tone' => $tone];
+    }
+
+    /**
+     * The user's own photo for the greeting disc, when one is uploaded —
+     * the same source as the panel's top-bar avatar. Null falls back to
+     * the CSS initials disc.
+     */
+    public function userAvatarUrl(): ?string
+    {
+        return auth()->user()?->getFilamentAvatarUrl();
     }
 
     /**
@@ -109,5 +121,23 @@ class DashboardHeaderWidget extends Widget
         return auth()->user()?->can('create_contract')
             ? ContractResource::getUrl('create')
             : null;
+    }
+
+    /**
+     * Whether to surface the "connect Telegram" prompt inside the greeting.
+     * It sits where the user starts their day; profile settings keep the
+     * permanent connect/disconnect actions.
+     */
+    public function shouldOfferTelegram(): bool
+    {
+        $user = auth()->user();
+
+        if ($user === null || ! app(TelegramService::class)->isConfigured()) {
+            return false;
+        }
+
+        // A link whose owner blocked the bot is dead — offer to reconnect.
+        return ! $user->isTelegramLinked()
+            || $user->telegram?->blocked_at !== null;
     }
 }

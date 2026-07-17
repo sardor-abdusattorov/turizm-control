@@ -1169,56 +1169,88 @@ button.cw-row:focus-visible {
     color: var(--accent);
 }
 
-/* ─── Dashboard pulse top row: project picker + arrows + filters + open ──── */
+/* ─── Dashboard pulse: one card — toolbar, hero, stats and lists join
+   flush, separated by hairlines instead of floating as separate boxes. ──── */
 [x-cloak] {
     display: none !important;
+}
+.pj-card {
+    background: var(--s);
+    border: 1px solid var(--d);
+    border-radius: .75rem;
 }
 .pj-toprow {
     display: flex;
     align-items: center;
     gap: .5rem;
 }
+.pj-card .pj-toprow {
+    padding: .9rem 1rem;
+}
 .pj-toprow .pj-picker {
     flex: 1;
     min-width: 0;
 }
-/* Square icon buttons: prev/next project and the filters toggle. */
-.pj-navbtn {
-    position: relative;
+/* Prev/next as one segmented control — fewer floating boxes. */
+.pj-arrows {
     flex-shrink: 0;
+    display: inline-flex;
+    border: 1px solid var(--d);
+    border-radius: .6rem;
+    overflow: hidden;
+}
+.pj-arrow {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
+    width: 2.2rem;
     height: 2.25rem;
     padding: 0;
-    border: 1px solid var(--d);
-    border-radius: .5rem;
+    border: 0;
     background: var(--s);
     color: var(--m);
     cursor: pointer;
     transition: background .12s ease, color .12s ease;
 }
-.pj-navbtn:hover,
-.pj-navbtn--on {
+.pj-arrow + .pj-arrow {
+    border-left: 1px solid var(--d);
+}
+.pj-arrow:hover {
     background: var(--soft);
     color: var(--t);
 }
-/* Type + year live behind the funnel, index-style; the dot marks a
-   narrowed list. */
+/* Type + year live behind a labelled «Фильтры» button, index-style;
+   the dot marks a narrowed list. */
 .pj-filterbox {
     position: relative;
     flex-shrink: 0;
 }
-.pj-filterbox__dot {
-    position: absolute;
-    top: -3px;
-    right: -3px;
-    width: .55rem;
-    height: .55rem;
+.pj-filterbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    height: 2.25rem;
+    padding: 0 .8rem;
+    border: 1px solid var(--d);
+    border-radius: .6rem;
+    background: var(--s);
+    color: var(--m);
+    font-size: .8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+}
+.pj-filterbtn:hover,
+.pj-filterbtn--on {
+    background: var(--soft);
+    color: var(--t);
+}
+.pj-filterbtn__dot {
+    width: .45rem;
+    height: .45rem;
     border-radius: 999px;
     background: var(--accent);
-    box-shadow: 0 0 0 2px var(--s);
 }
 .pj-filterbox__panel {
     position: absolute;
@@ -1230,6 +1262,41 @@ button.cw-row:focus-visible {
     background: var(--s);
     border: 1px solid var(--d);
     border-radius: .75rem;
+}
+/* Inner sections flatten inside the card: hairline separators, no own
+   borders. The 1px grid gap trick draws dividers that survive wrapping. */
+.pj-card .pj-hero {
+    border: 0;
+    border-top: 1px solid var(--d);
+    border-radius: 0;
+}
+.pj-card .pj-stats {
+    gap: 1px;
+    background: var(--d);
+    border-top: 1px solid var(--d);
+}
+.pj-card .pj-stat {
+    border: 0;
+    border-radius: 0;
+    padding: 1rem 1.25rem;
+}
+.pj-card .pj-stat:hover {
+    border-color: transparent;
+}
+.pj-duo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 1px;
+    background: var(--d);
+    border-top: 1px solid var(--d);
+    /* The card itself can't clip (the filters popover hangs outside it),
+       so the last section rounds its own bottom corners instead. */
+    border-radius: 0 0 calc(.75rem - 1px) calc(.75rem - 1px);
+    overflow: hidden;
+}
+.pj-sec {
+    background: var(--s);
+    min-width: 0;
 }
 .pj-open {
     flex-shrink: 0;
