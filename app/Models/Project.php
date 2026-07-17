@@ -320,18 +320,43 @@ class Project extends Model
             ->sum(fn (Contract $contract): float => $contract->paidAmount());
     }
 
+    public static function isVideoPath(string $path): bool
+    {
+        return in_array(
+            strtolower(pathinfo($path, PATHINFO_EXTENSION)),
+            ['mp4', 'mov', 'avi', 'webm', 'mkv', 'm4v'],
+            true,
+        );
+    }
+
     /**
-     * Signed temporary URLs for the gallery images, mirroring
+     * @return list<string>
+     */
+    public function galleryImageUrls(): array
+    {
+        return $this->signedGalleryUrls(videos: false);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function galleryVideoUrls(): array
+    {
+        return $this->signedGalleryUrls(videos: true);
+    }
+
+    /**
+     * Signed temporary URLs for the gallery, mirroring
      * Payment::screenshotUrl() — the private disk serves files only through
      * expiring links.
      *
      * @return list<string>
      */
-    public function galleryUrls(): array
+    private function signedGalleryUrls(bool $videos): array
     {
         return array_values(array_map(
             fn (string $path): string => Storage::disk('local')->temporaryUrl($path, now()->addMinutes(30)),
-            $this->gallery ?? [],
+            array_filter($this->gallery ?? [], fn (string $path): bool => self::isVideoPath($path) === $videos),
         ));
     }
 }

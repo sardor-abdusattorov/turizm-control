@@ -112,6 +112,37 @@ it('renders the gallery through the image-gallery component', function () {
         ->assertSee('data-viewer-gallery', false);
 });
 
+it('splits gallery urls into images and videos', function () {
+    Storage::disk('local')->put('uploads/images/projects/2025/01/a.jpg', 'stub');
+    Storage::disk('local')->put('uploads/images/projects/2025/01/b.mp4', 'stub');
+
+    $project = Project::factory()->international()->create([
+        'gallery' => [
+            'uploads/images/projects/2025/01/a.jpg',
+            'uploads/images/projects/2025/01/b.mp4',
+        ],
+    ]);
+
+    expect($project->galleryImageUrls())->toHaveCount(1)
+        ->and($project->galleryImageUrls()[0])->toContain('a.jpg')
+        ->and($project->galleryVideoUrls())->toHaveCount(1)
+        ->and($project->galleryVideoUrls()[0])->toContain('b.mp4');
+});
+
+it('renders gallery videos as native players', function () {
+    Storage::disk('local')->put('uploads/images/projects/2025/01/clip.mp4', 'stub');
+
+    $project = Project::factory()->international()->create([
+        'gallery' => ['uploads/images/projects/2025/01/clip.mp4'],
+    ]);
+
+    actingAs(userWithPermission('view_any_project', 'view_project'));
+
+    Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
+        ->assertSuccessful()
+        ->assertSee('<video class="pj-video"', false);
+});
+
 it('opens the role-scoped breakdown modals from the count badges', function () {
     $project = Project::factory()->international()->create(['name' => 'PREVIEW-EXPO-2025']);
     $currency = Currency::factory()->create();

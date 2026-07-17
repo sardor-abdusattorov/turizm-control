@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Projects\Schemas;
 
 use App\Enums\ProjectType;
-use App\Filament\Support\ImageGalleryUpload;
+use App\Filament\Support\MediaGalleryUpload;
 use App\Models\Currency;
 use App\Models\Project;
 use Filament\Forms\Components\DatePicker;
@@ -194,7 +194,7 @@ class ProjectForm
                         Tabs\Tab::make(__('app.label.gallery'))
                             ->icon('heroicon-o-photo')
                             ->schema([
-                                ImageGalleryUpload::make('projects', 'gallery')
+                                MediaGalleryUpload::make('projects', 'gallery')
                                     ->hiddenLabel(),
                             ]),
                     ]),

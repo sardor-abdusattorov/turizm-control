@@ -514,7 +514,7 @@ return [
         'project_payment_exceeds_pledge' => 'The payment cannot exceed the remaining :amount.',
         'no_projects_for_contact' => 'This counterparty has no project participations yet.',
         'no_projects_for_sponsor' => 'This sponsor has no project participations yet.',
-        'no_gallery' => 'No photos uploaded yet.',
+        'no_gallery' => 'No photos or videos uploaded yet.',
         'hero_draft' => 'Draft — not submitted for approval yet.',
         'hero_in_review' => 'Awaiting approval from :name.',
         'hero_in_review_generic' => 'Moving through the approval chain.',

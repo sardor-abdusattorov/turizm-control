@@ -509,7 +509,7 @@ return [
         'project_payment_exceeds_pledge' => 'To\'lov summasi qoldiq :amount dan oshmasligi kerak.',
         'no_projects_for_contact' => 'Kontragent hali loyihalarda ishtirok etmagan.',
         'no_projects_for_sponsor' => 'Homiy hali loyihalarda ishtirok etmagan.',
-        'no_gallery' => 'Rasmlar hali yuklanmagan.',
+        'no_gallery' => 'Foto va videolar hali yuklanmagan.',
         'hero_draft' => 'Qoralama — hali kelishuvga yuborilmagan.',
         'hero_in_review' => ':name tomonidan kelishuvni kutmoqda.',
         'hero_in_review_generic' => 'Kelishuv zanjiridan o‘tmoqda.',

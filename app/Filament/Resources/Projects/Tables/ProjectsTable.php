@@ -149,6 +149,10 @@ class ProjectsTable
 
                 ImageColumn::make('gallery')
                     ->label(__('app.label.gallery'))
+                    ->state(fn (Project $record): array => array_values(array_filter(
+                        $record->gallery ?? [],
+                        fn (string $path): bool => ! Project::isVideoPath($path),
+                    )))
                     ->disk('local')
                     ->imageGallery()
                     ->imageHeight(36)

@@ -66,7 +66,9 @@
 
     $paidPercent = $feesTotal > 0 ? round($paidTotal / $feesTotal * 100) : 0;
 
-    $galleryUrls = $record->galleryUrls();
+    $galleryImages = $record->galleryImageUrls();
+    $galleryVideos = $record->galleryVideoUrls();
+    $galleryCount = count($galleryImages) + count($galleryVideos);
 
     $heroVariant = $record->status ? 'success' : 'gray';
     $typeIcon = $record->type === \App\Enums\ProjectType::International ? 'heroicon-o-globe-alt' : 'heroicon-o-building-office-2';
@@ -161,7 +163,7 @@
                 {!! $ic('heroicon-o-user-group', 15) !!} {{ __('app.label.participants') }}@if ($participantCount)<span class="pj-tab__c">{{ $participantCount }}</span>@endif
             </button>
             <button type="button" class="pj-tab" :class="tab === 'gallery' ? 'pj-tab--active' : ''" @click="go('gallery')">
-                {!! $ic('heroicon-o-photo', 15) !!} {{ __('app.label.gallery') }}@if (count($galleryUrls))<span class="pj-tab__c">{{ count($galleryUrls) }}</span>@endif
+                {!! $ic('heroicon-o-photo', 15) !!} {{ __('app.label.gallery') }}@if ($galleryCount)<span class="pj-tab__c">{{ $galleryCount }}</span>@endif
             </button>
         </div>
 
@@ -380,19 +382,29 @@
                 <header class="ow-hd">
                     <span class="ow-hd__ic">{!! $ic('heroicon-o-photo', 18) !!}</span>
                     <h2 class="ow-hd__t">{{ __('app.label.gallery') }}</h2>
-                    <span class="pj-count">{{ count($galleryUrls) }}</span>
+                    <span class="pj-count">{{ $galleryCount }}</span>
                 </header>
 
-                @if ($galleryUrls === [])
+                @if ($galleryCount === 0)
                     <p class="pj-empty">{{ __('app.message.no_gallery') }}</p>
                 @else
                     <div class="pj-gallery-pad">
-                        <x-image-gallery::image-gallery
-                            :images="$galleryUrls"
-                            :thumb-width="160"
-                            :thumb-height="120"
-                            rounded="rounded-xl"
-                        />
+                        @if ($galleryImages !== [])
+                            <x-image-gallery::image-gallery
+                                :images="$galleryImages"
+                                :thumb-width="160"
+                                :thumb-height="120"
+                                rounded="rounded-xl"
+                            />
+                        @endif
+
+                        @if ($galleryVideos !== [])
+                            <div class="pj-videos">
+                                @foreach ($galleryVideos as $videoUrl)
+                                    <video class="pj-video" src="{{ $videoUrl }}" controls preload="metadata"></video>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 @endif
             </section>

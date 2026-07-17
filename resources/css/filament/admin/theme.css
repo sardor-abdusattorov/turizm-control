@@ -901,6 +901,20 @@ button.cw-row:focus-visible {
 .pj-gallery-pad {
     padding: .25rem 1.25rem 1rem;
 }
+/* Videos sit under the photo strip as native players. */
+.pj-videos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: .75rem;
+    margin-top: .75rem;
+}
+.pj-video {
+    width: 100%;
+    max-height: 18rem;
+    border: 1px solid var(--d);
+    border-radius: .75rem;
+    background: #000;
+}
 
 /* Scrollable body inside the quick-view modal — every participant stays
    reachable without the modal itself growing past the screen. */
