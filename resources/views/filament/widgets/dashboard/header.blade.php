@@ -24,17 +24,29 @@
                 @endif
             </div>
 
-            @if ($createUrl)
-                <div class="dh__top-r">
+            <div class="dh__top-r">
+                @if ($createUrl)
                     <a href="{{ $createUrl }}" class="dh__cta" wire:navigate>
                         {{ svg('heroicon-m-plus', 'dh__cta-ic') }}
                         <span>{{ __('app.action.create_contract') }}</span>
                     </a>
-                    <div class="dh__date">{{ now()->translatedFormat('l, d F Y') }}</div>
+                @endif
+                <div
+                    class="dh__date"
+                    x-data="{
+                        time: '{{ now()->format('H:i:s') }}',
+                        timer: null,
+                        init() {
+                            const tick = () => this.time = new Date().toLocaleTimeString('en-GB');
+                            tick();
+                            this.timer = setInterval(tick, 1000);
+                        },
+                        destroy() { clearInterval(this.timer); },
+                    }"
+                >
+                    {{ now()->translatedFormat('l, d F Y') }} · <span x-text="time">{{ now()->format('H:i:s') }}</span>
                 </div>
-            @else
-                <div class="dh__date">{{ now()->translatedFormat('l, d F Y') }}</div>
-            @endif
+            </div>
         </div>
 
         @if ($offerTelegram)
@@ -175,6 +187,8 @@
             outline: 2px solid var(--accent);
             outline-offset: 2px;
         }
+        /* Live clock — tabular digits keep the line from shivering as
+           seconds tick. */
         .dh__date {
             font-size: 0.8rem;
             font-weight: 500;
@@ -183,6 +197,7 @@
             white-space: nowrap;
             flex-shrink: 0;
             padding-top: 0.15rem;
+            font-variant-numeric: tabular-nums;
         }
         .dh__top-r {
             display: flex;
@@ -300,6 +315,9 @@
                greeting; the date is hidden so the cluster holds just the CTA. */
             .dh__top { flex-wrap: wrap; }
             .dh__top-r { flex: 1 0 100%; }
+            /* Without the CTA the right cluster holds only the (hidden)
+               clock — drop it so it doesn't leave a phantom gap. */
+            .dh__top-r:not(:has(.dh__cta)) { display: none; }
             .dh__cta { flex: 1; justify-content: center; padding: 0.6rem; }
             /* Stack the action onto its own full-width row, keep the close
                button up on the title row. */
