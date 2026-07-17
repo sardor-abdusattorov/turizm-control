@@ -16,6 +16,9 @@ return new class extends Migration
             // (expense — space rental, stand construction) or gets paid
             // (income — participant fees, sponsorship).
             $table->string('direction', 10)->default('expense');
+            // Which party this kind faces: a Contact (suppliers, participant
+            // fees) or a Sponsor (sponsorship) — drives the counterparty picker.
+            $table->string('counterparty_kind', 20)->default('contact');
             $table->unsignedInteger('sort')->default(0);
             $table->boolean('status')->default(true);
             $table->timestamps();

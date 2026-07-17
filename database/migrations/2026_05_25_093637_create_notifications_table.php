@@ -15,6 +15,10 @@ return new class extends Migration
             $table->json('data');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
+
+            // The bell reads by notifiable id first — an id-leading index on
+            // top of the (type, id) one morphs() already creates.
+            $table->index(['notifiable_id', 'notifiable_type'], 'notifications_notifiable_index');
         });
     }
 

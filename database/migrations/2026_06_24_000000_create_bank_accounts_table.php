@@ -22,6 +22,9 @@ return new class extends Migration
             $table->foreignId('currency_id')->nullable()->constrained()->nullOnDelete();
             $table->string('account_number', 34); // IBAN is up to 34 chars
             $table->string('bank_name')->nullable();
+            // Foreign requisites carry the bank's own address (e.g. RX
+            // France); Uzbek ones leave it blank.
+            $table->string('bank_address')->nullable();
             $table->string('mfo', 20)->nullable();
             $table->string('swift', 20)->nullable();
             $table->unsignedInteger('sort')->default(0);

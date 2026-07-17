@@ -16,7 +16,10 @@ return new class extends Migration
             // The buyruq this contract was concluded under («на основании
             // приказа № 74-АФ»); many contracts may share one order.
             $table->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('contact_id')->constrained()->restrictOnDelete();
+            // A contract faces exactly one counterparty: a Contact OR a
+            // Sponsor, chosen by its type's counterparty_kind.
+            $table->foreignId('contact_id')->nullable()->constrained()->restrictOnDelete();
+            $table->foreignId('sponsor_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('project_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('currency_id')->constrained()->restrictOnDelete();
             $table->foreignId('responsible_id')->constrained('users')->cascadeOnDelete();
@@ -38,6 +41,7 @@ return new class extends Migration
             $table->index('status');
             $table->index('payment_status');
             $table->index('contract_type_id');
+            $table->index(['responsible_id', 'status'], 'contracts_responsible_status_index');
         });
     }
 

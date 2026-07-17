@@ -400,3 +400,7 @@ livewire(ListUsers::class)
   - `$view`: `protected string` (not `protected static string`) on `Page` and `Widget` classes
 
 </laravel-boost-guidelines>
+
+## Project Conventions
+
+- **Migrations: never create `add_*_to_*` migrations while the app is in active development.** Add new columns/indexes directly to the original `create_*` migration — every environment is rebuilt with `php artisan migrate:fresh --seed`. Incremental add-migrations are only acceptable after a real production deployment freezes the schema.
