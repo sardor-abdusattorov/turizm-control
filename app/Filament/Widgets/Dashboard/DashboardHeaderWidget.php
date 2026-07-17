@@ -21,7 +21,7 @@ class DashboardHeaderWidget extends Widget
      * One personalised line that answers "what should I care about right now",
      * picked by what is actually demanding the user's attention.
      *
-     * @return array{greeting: string, summary: string, tone: string}
+     * @return array{greeting: string, summary: string}
      */
     public function headerData(): array
     {
@@ -36,35 +36,30 @@ class DashboardHeaderWidget extends Widget
         $awaiting = $context->isApprover() ? $context->awaitingMe()->count() : 0;
         $stalled = $context->isManager() ? $context->managerCounts()['stalled'] : 0;
 
-        if ($overdue > 0) {
-            return [
-                'greeting' => $greeting,
-                'summary' => __('app.dashboard.summary_overdue', ['count' => $overdue, 'total' => $awaiting]),
-                'tone' => 'danger',
-            ];
-        }
+        $summary = match (true) {
+            $overdue > 0 => __('app.dashboard.summary_overdue', ['count' => $overdue, 'total' => $awaiting]),
+            $awaiting > 0 => __('app.dashboard.summary_awaiting', ['count' => $awaiting]),
+            $stalled > 0 => __('app.dashboard.summary_stalled', ['count' => $stalled]),
+            default => __('app.dashboard.summary_clear'),
+        };
 
-        if ($awaiting > 0) {
-            return [
-                'greeting' => $greeting,
-                'summary' => __('app.dashboard.summary_awaiting', ['count' => $awaiting]),
-                'tone' => 'warning',
-            ];
-        }
+        return ['greeting' => $greeting, 'summary' => $summary];
+    }
 
-        if ($stalled > 0) {
-            return [
-                'greeting' => $greeting,
-                'summary' => __('app.dashboard.summary_stalled', ['count' => $stalled]),
-                'tone' => 'warning',
-            ];
-        }
+    /**
+     * Initials for the local avatar disc — first letters of the first two
+     * name words. Rendered in CSS, so no external avatar service is needed.
+     */
+    public function userInitials(): string
+    {
+        $words = preg_split('/\s+/', trim((string) auth()->user()?->name), -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
-        return [
-            'greeting' => $greeting,
-            'summary' => __('app.dashboard.summary_clear'),
-            'tone' => 'success',
-        ];
+        $letters = array_map(
+            fn (string $word): string => mb_strtoupper(mb_substr($word, 0, 1)),
+            array_slice($words, 0, 2),
+        );
+
+        return implode('', $letters) !== '' ? implode('', $letters) : '·';
     }
 
     /**

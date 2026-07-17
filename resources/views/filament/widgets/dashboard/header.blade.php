@@ -6,8 +6,9 @@
 @endphp
 
 <x-filament-widgets::widget>
-    <div class="dh dh--{{ $h['tone'] }}">
+    <div class="dh">
         <div class="dh__top">
+            <span class="dh__ava" aria-hidden="true">{{ $this->userInitials() }}</span>
             <div class="dh__l">
                 <h2 class="dh__greeting">{{ $h['greeting'] }}</h2>
                 @if ($chips === [])
@@ -95,38 +96,38 @@
     </div>
 
     <style>
-        /* Flat greeting card — a hairline border and a tone stripe on the left
-           edge: green when the day is clear, amber when reviews wait, red when
-           something is overdue. Semantic colour, not decoration. */
+        /* Flat greeting card — hairline border, no stripe. State colour lives
+           only where it means something: in the counter chips. */
         .dh {
-            position: relative;
             display: flex;
             flex-direction: column;
             gap: 1rem;
             padding: 1.25rem 1.5rem;
             border-radius: 0.75rem;
-            background: #fff;
-            border: 1px solid rgba(17, 24, 39, 0.12);
-            overflow: hidden;
+            background: var(--s);
+            border: 1px solid var(--d);
         }
-        .dark .dh {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.14);
-        }
-        .dh::before {
-            content: "";
-            position: absolute;
-            inset: 0 auto 0 0;
-            width: 3px;
-        }
-        .dh--success::before { background: #16a34a; }
-        .dh--warning::before { background: #d97706; }
-        .dh--danger::before  { background: #dc2626; }
 
         .dh__top {
             display: flex;
-            align-items: flex-start;
-            gap: 1rem;
+            align-items: center;
+            gap: 0.9rem;
+        }
+        /* Local initials disc — the identity anchor the bare text row lacked.
+           Pure CSS, so it needs no avatar service on a closed network. */
+        .dh__ava {
+            flex-shrink: 0;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: var(--accent-strong);
+            background: var(--accent-soft);
         }
         .dh__l {
             flex: 1;
@@ -137,16 +138,14 @@
             font-weight: 700;
             line-height: 1.25;
             margin: 0;
-            color: #111827;
+            color: var(--t);
             letter-spacing: -0.01em;
         }
-        .dark .dh__greeting { color: #f9fafb; }
         .dh__summary {
             margin: 0.35rem 0 0;
             font-size: 0.875rem;
-            color: #6b7280;
+            color: var(--m);
         }
-        .dark .dh__summary { color: #9ca3af; }
 
         /* "Needs me" counters — each links to the exact contracts-list tab it
            counts. Colour lives only in the number (semantic state). */
