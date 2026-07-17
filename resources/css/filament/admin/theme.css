@@ -955,7 +955,6 @@ button.cw-row:focus-visible {
     background: var(--s);
     border: 1px solid var(--d);
     border-radius: .75rem;
-    box-shadow: var(--elev);
     padding: 1.2rem 1.4rem;
 }
 .pj-hero__r {
