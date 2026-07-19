@@ -1,0 +1,3104 @@
+{
+  "contracts": [
+    {
+      "number": "A-1",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ATM 25».",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-03-24",
+      "contract_type": "Оказание услуг",
+      "project": "ATM 25",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "BEYOND DMC LLC",
+          "ru": "ООО «BEYOND DMC»",
+          "uz": "\"BEYOND DMC\" MChJ"
+        },
+        "inn": "311687587",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 99 235 48 36; +998 94 092 11 75; 909062456",
+        "email": "info@beyond-dmc.com",
+        "address": {
+          "en": "44A Bahodir Street, Rakatboshi Mahalla, Yakkasaray District, Tashkent, Republic of Uzbekistan",
+          "ru": "Республика Узбекистан, г. Ташкент, Яккасарайский район, МСГ «Ракатбоши», ул. Баходир, 44А",
+          "uz": "Oʻzbekiston Respublikasi, Toshkent shahri, Yakkasaroy tumani, \"Rakatboshi\" MFY, Bahodir koʻchasi, 44A"
+        },
+        "director_name": "Раджеш Кумар",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000907160357001",
+            "bank_name": "АТБ «УзсаноатКурилишбанк» ф-л Ракат",
+            "bank_address": null,
+            "mfo": "00440",
+            "swift": "UJSIUZ22"
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXMFK4JP1R45BSZ0SA9PEWT.pdf",
+          "original_name": "01KXXMFK4JP1R45BSZ0SA9PEWT.pdf",
+          "type": null,
+          "size": 2945667,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "А-4",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и участию в международной туристической выставке «IATM 25».",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-03-24",
+      "contract_type": "Оказание услуг",
+      "project": "ATM 25",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Beyond Expectations JV",
+          "ru": "СП «Beyond Expectations»",
+          "uz": "\"Beyond Expectations\" QK"
+        },
+        "inn": "304415856",
+        "type": "legal",
+        "legal_form": "СП",
+        "phone": "+998 90 955 94 31",
+        "email": "beyondexpectations.uz@gmail.com",
+        "address": {
+          "en": "Rakat 1-13, Yakkasaray District, Tashkent",
+          "ru": "г. Ташкент, Яккасарайский район, Ракат 1-13",
+          "uz": "Toshkent shahri, Yakkasaroy tumani, Rakat 1-13"
+        },
+        "director_name": "О.О. Хакимова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000200690529001",
+            "bank_name": "в Яккасарайском фил. Давр банк",
+            "bank_address": null,
+            "mfo": "01069",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXMPGPQVXM6PFNN2EV5HCMY.pdf",
+          "original_name": "01KXXMPGPQVXM6PFNN2EV5HCMY.pdf",
+          "type": null,
+          "size": 2945892,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "A-7",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и участию в международной туристической выставке «ATM 25».",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-05-24",
+      "contract_type": "Оказание услуг",
+      "project": "ATM 25",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ASIA LUXE TRAVEL LLC",
+          "ru": "ООО «ASIA LUXE TRAVEL»",
+          "uz": "\"ASIA LUXE TRAVEL\" MChJ"
+        },
+        "inn": "305855245",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": null,
+        "email": null,
+        "address": {
+          "en": "24 Amir Temur Street, Mirabad District, Tashkent",
+          "ru": "г. Ташкент, Мирабадский район, ул. Амира Темура, 24",
+          "uz": "Toshkent shahri, Mirabod tumani, Amir Temur koʻchasi, 24"
+        },
+        "director_name": "Ташмухамедов Сирожидин",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000604996690001",
+            "bank_name": "АТIB \"IPOTEKA BANK\" Юнусабадский Ф-л",
+            "bank_address": null,
+            "mfo": "00837",
+            "swift": "UZHOUZ22"
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXMW44C2FS2W5B67E62R0FS.pdf",
+          "original_name": "01KXXMW44C2FS2W5B67E62R0FS.pdf",
+          "type": null,
+          "size": 2950715,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "A-3",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и участию в международной туристической выставке «ATM 25».",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-05-24",
+      "contract_type": "Оказание услуг",
+      "project": "ATM 25",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Rezbook Global International LLC",
+          "ru": "ООО «Rezbook Global International»",
+          "uz": "\"Rezbook Global International\" MChJ"
+        },
+        "inn": "311247643",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 90 951 46 64; +998 93 324 38 83",
+        "email": "Uzbekistan@rezbookglobal.com",
+        "address": {
+          "en": "7/1 Mukumiy Street, Yakkasaray District, Tashkent",
+          "ru": "г. Ташкент, Яккасарайский район, ул. Мукумий 7/1",
+          "uz": "Toshkent shahri, Yakkasaroy tumani, Mukumiy koʻchasi 7/1"
+        },
+        "director_name": "Ж.Ф. Сафаров",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000907044121001",
+            "bank_name": "«Asia Alliance Bank» городской филиал г. Ташкент",
+            "bank_address": null,
+            "mfo": "00981",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXMYC3HET93K35A23BKWP7R.pdf",
+          "original_name": "01KXXMYC3HET93K35A23BKWP7R.pdf",
+          "type": null,
+          "size": 2952125,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "A-5",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и участию в международной туристической выставке «ATM 25»",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-05-24",
+      "contract_type": "Оказание услуг",
+      "project": "ATM 25",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "VERSAILLES TRAVEL LLC",
+          "ru": "ООО «VERSAILLES TRAVEL»",
+          "uz": "\"VERSAILLES TRAVEL\" MChJ"
+        },
+        "inn": "207153986",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "(+99871) 256 64 21; (+99891) 162 22 09",
+        "email": null,
+        "address": {
+          "en": "8/1 Afrosiyob Street, Tashkent, 100015",
+          "ru": "100015, г. Ташкент, ул. Афросиеб 8/1",
+          "uz": "100015, Toshkent shahri, Afrosiyob koʻchasi 8/1"
+        },
+        "director_name": "Иноятова Н.Ш.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000604996690001",
+            "bank_name": "в ОАИКБ \"Ипак Йули\" Яккасарай Ф-л",
+            "bank_address": null,
+            "mfo": "01028",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXN38N56TDWBY2YS92ZTJBS.pdf",
+          "original_name": "01KXXN38N56TDWBY2YS92ZTJBS.pdf",
+          "type": null,
+          "size": 2942558,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "A-6",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и участию в международной туристической выставке «ATM 25»",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-03-24",
+      "contract_type": "Оказание услуг",
+      "project": "ATM 25",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Sanat Travel Experts JV",
+          "ru": "СП «Sanat Travel Experts»",
+          "uz": "\"Sanat Travel Experts\" QK"
+        },
+        "inn": "305072628",
+        "type": "legal",
+        "legal_form": "СП",
+        "phone": "+998 99 807 06 08",
+        "email": "timur@ste.uz",
+        "address": {
+          "en": "2 Chatqol Street, Mirzo Ulugbek District, Tashkent, 100007",
+          "ru": "г. Ташкент, Мирзо-Улугбекский район, ул. Чаткол 2, индекс 100007",
+          "uz": "Toshkent shahri, Mirzo Ulugʻbek tumani, Chatqol koʻchasi 2, 100007"
+        },
+        "director_name": "Ишмухаметов Тимур",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000500802685001",
+            "bank_name": "ЧАБ \"TRASTBANK\" Филиал Дархан",
+            "bank_address": "Город Ташкент, Мирзо-Улугбекский район, площадь Хамида Алимджана, 5 Б, западная сторона",
+            "mfo": "00954",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXN64YPS3N2Y7J8MHSJ50AZ.pdf",
+          "original_name": "01KXXN64YPS3N2Y7J8MHSJ50AZ.pdf",
+          "type": null,
+          "size": 2965991,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "A-2",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и участию в международной туристической выставке «ATM 25»",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-03-24",
+      "contract_type": "Оказание услуг",
+      "project": "ATM 25",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ZAMIN DMC LLC",
+          "ru": "ООО «ZAMIN DMC»",
+          "uz": "\"ZAMIN DMC\" MChJ"
+        },
+        "inn": "311343097",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 99 575 50 50; +99899 5750550",
+        "email": "info@zamindmc.uz",
+        "address": {
+          "en": "22 A. Temur Street, Mirabad District, Tashkent",
+          "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
+          "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+        },
+        "director_name": "Ходжаев Т.А.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000107076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "USD",
+            "account_number": "20208840407076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "EUR",
+            "account_number": "20208978807076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "RUB",
+            "account_number": "20208643507076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXN7QGCMRYVBVZYYE3FFS4Q.pdf",
+          "original_name": "01KXXN7QGCMRYVBVZYYE3FFS4Q.pdf",
+          "type": null,
+          "size": 2934886,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-1",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "38000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2024-12-11",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Rocket DMC Registan LLC",
+          "ru": "ООО «Rocket DMC Registan»",
+          "uz": "\"Rocket DMC Registan\" MChJ"
+        },
+        "inn": "310367653",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "90 809 26 01; +998 90 512 24 78",
+        "email": "rocketuz.all@rocketdmc.com",
+        "address": {
+          "en": "Samarkand, Kunigil",
+          "ru": "Самарканд, Кунигил",
+          "uz": "Samarqand, Kunigil"
+        },
+        "director_name": "Н.М Мухтарова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000705631732001",
+            "bank_name": "Самаркандское отд, Национального банка ВЭД РУз",
+            "bank_address": null,
+            "mfo": "00450",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXPJRQA5SSTDXNSVGG622G8.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-1  11.12.2024 дан.pdf",
+          "type": null,
+          "size": 2956758,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-2",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "20000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-16",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "SAMARCANDA ADVENTURES LLC",
+          "ru": "ООО «SAMARCANDA ADVENTURES»",
+          "uz": "\"SAMARCANDA ADVENTURES\" MChJ"
+        },
+        "inn": "311728344",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998-50-444-17-17",
+        "email": "info@samarcanda.uz",
+        "address": {
+          "en": "Avisozlar-3, 50, Yashnabad District, Tashkent",
+          "ru": "Ависозлар-3, 50, Яшнабадский р-н г. Ташкент",
+          "uz": "Avisozlar-3, 50, Yashnobod tumani, Toshkent"
+        },
+        "director_name": "А.К. Муминов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000607167211001",
+            "bank_name": "ОПЕРУ АИКБ Яшнабадский ф-л КАПИТАЛБАНК",
+            "bank_address": null,
+            "mfo": "01136",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXPNCEEACV6EH37WD2B499A.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-2  16.01.2025 дан.pdf",
+          "type": null,
+          "size": 3075734,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-3",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "38000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2024-12-11",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ZAMIN TRAVEL LLC",
+          "ru": "ООО «ZAMIN TRAVEL»",
+          "uz": "\"ZAMIN TRAVEL\" MChJ"
+        },
+        "inn": "205315190",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "(99866) 2350036",
+        "email": "info@zamin-travel.com",
+        "address": {
+          "en": "35 I. Karimov Street, Samarkand",
+          "ru": "г. Самарканд, ул. И. Каримова, 35",
+          "uz": "Samarqand, I. Karimov koʻchasi, 35"
+        },
+        "director_name": "Усанов. И.Х",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000704368503001",
+            "bank_name": "СО НБ ВЭД Р. Уз",
+            "bank_address": null,
+            "mfo": "00278",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXPQS3JM3GJSTEBC8ZV1HJ0.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-3  11.12.2024 дан.pdf",
+          "type": null,
+          "size": 3012263,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-4",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "38000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2024-12-11",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Dolores Travel Services JV LLC",
+          "ru": "СП ООО «Dolores Travel Services»",
+          "uz": "\"Dolores Travel Services\" QK MChJ"
+        },
+        "inn": "205424619",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "(99871) 1208883; +99855 515-88-83; (99875) 5158883; (99878) 1208883; (998 78) 1208873",
+        "email": "info@dolores.uz",
+        "address": {
+          "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent",
+          "ru": "104 А, ул. Кичик Бешагач, Яккасарайский р-он, г. Ташкент",
+          "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent"
+        },
+        "director_name": "Байзакова Ш.Б.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20214000804383781001",
+            "bank_name": "«HAMKORBANK» АТБ Ташкент региональный ОБУ",
+            "bank_address": "Узбекистан, г. Ташкент, ул. Фуркат 14",
+            "mfo": "00083",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXPTT7567HB34599MPV7ACH.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-4  11.12.2024 дан.pdf",
+          "type": null,
+          "size": 2822929,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-5",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "38000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2024-12-11",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "GLOBAL EXPLORE LLC",
+          "ru": "ООО «GLOBAL EXPLORE»",
+          "uz": "\"GLOBAL EXPLORE\" MChJ"
+        },
+        "inn": "308716494",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99897 444 45 33",
+        "email": "info@uzbekistandiscovery.com",
+        "address": {
+          "en": "Y квартал 3/82, Chilanzar District, Tashkent",
+          "ru": "Чиланзарский район, Е квартал, 3/82, г. Ташкент",
+          "uz": "Chilonzor tumani, Y kvartal, 3/82, Toshkent"
+        },
+        "director_name": "И.Н.Курбонов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000405418270001",
+            "bank_name": null,
+            "bank_address": null,
+            "mfo": "00401",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXPXA14FJ65A8ZF7E0WH8KS.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-5  11.12.2024 дан.pdf",
+          "type": null,
+          "size": 2994554,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-6",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "38000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2024-12-11",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Sonder Voyage LLC",
+          "ru": "ООО «Sonder Voyage»",
+          "uz": "\"Sonder Voyage\" MChJ"
+        },
+        "inn": "311240258",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "998 90 908 00 82",
+        "email": "sonderuz@gmail.com",
+        "address": {
+          "en": "154 Yangi Avlod, Kibray District, Tashkent",
+          "ru": "г. Ташкент, Кибрайский район, Янги Авлод, 154",
+          "uz": "Toshkent, Qibray tumani, Yangi Avlod, 154"
+        },
+        "director_name": "Д.У.Сарикова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000107085063001",
+            "bank_name": "ОПЕРУ АИКБ Кибрай т. ЧЭКИ «INVEST FINANCE BANK»",
+            "bank_address": null,
+            "mfo": "01056",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXPZQSGSEHMET6F0KQWW612.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-6  11.12.2024 дан.pdf",
+          "type": null,
+          "size": 2988132,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-7",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "38000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2024-12-11",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ADVANTOUR LLC",
+          "ru": "ООО «ADVANTOUR»",
+          "uz": "\"ADVANTOUR\" MChJ"
+        },
+        "inn": "204702676",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99878 150 30 20",
+        "email": "info@advantour.com",
+        "address": {
+          "en": "43 Mirobod Street, 1, Yakkasaray District, Tashkent",
+          "ru": "г. Ташкент, Яккасарайский район, ул. Миробод, 1 дом 43",
+          "uz": "Toshkent, Yakkasaroy tumani, Mirobod koʻchasi, 1-uy 43"
+        },
+        "director_name": "Ф.О. Назарова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000504288840001",
+            "bank_name": "АО КДБ Банк Узбекистан",
+            "bank_address": null,
+            "mfo": "00842",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQ2NC8R8EHNWR0Y2ENW94Z.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-7  11.12.2024 дан.pdf",
+          "type": null,
+          "size": 3018484,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-8",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "38000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2024-12-11",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "OLIMPIK TURSERVIS LLC",
+          "ru": "ООО «OLIMPIK TURSERVIS»",
+          "uz": "\"OLIMPIK TURSERVIS\" MChJ"
+        },
+        "inn": "204511749",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "(998 78) 120-63-00; (998 78) 120-64-00; +998977470630",
+        "email": "info@olympic-ts.com",
+        "address": {
+          "en": "51A S. Azimov Street, Tashkent",
+          "ru": "г. Ташкент, ул. С. Азимова, 51А",
+          "uz": "Toshkent, S. Azimov koʻchasi, 51A"
+        },
+        "director_name": "В.В. Сильченко",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000904262013001",
+            "bank_name": "АКБ «Азия Альянс банк»",
+            "bank_address": null,
+            "mfo": "01095",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQ4S3JYQMAEJ790K23DG4Y.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-8  11.12.2024 дан.pdf",
+          "type": null,
+          "size": 2987565,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-09",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-12-01",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ZAMIN DMC LLC",
+          "ru": "ООО «ZAMIN DMC»",
+          "uz": "\"ZAMIN DMC\" MChJ"
+        },
+        "inn": "311343097",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 99 575 50 50; +99899 5750550",
+        "email": "info@zamindmc.uz",
+        "address": {
+          "en": "22 A. Temur Street, Mirabad District, Tashkent",
+          "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
+          "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+        },
+        "director_name": "Ходжаев Т.А.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000107076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "USD",
+            "account_number": "20208840407076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "EUR",
+            "account_number": "20208978807076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "RUB",
+            "account_number": "20208643507076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQ7A80M6ZH3646GD00C36V.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-09  01.12.2025 дан (1).pdf",
+          "type": null,
+          "size": 5372003,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-10",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "38000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2024-12-11",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "EL MUNDO TOUR LLC",
+          "ru": "ООО «EL MUNDO TOUR»",
+          "uz": "\"EL MUNDO TOUR\" MChJ"
+        },
+        "inn": "206752534",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "97 707 32 82",
+        "email": null,
+        "address": {
+          "en": "4 Chorsu, Apartment 117, Shaykhantakhur District, Tashkent",
+          "ru": "г. Ташкент, Шайхантахурский район, край Чорсу, дом 4, квартира 117",
+          "uz": "Toshkent, Shayxontohur tumani, Chorsu chekkasi, 4-uy, 117-xonadon"
+        },
+        "director_name": "Хаитов Т.Ю",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000104537447001",
+            "bank_name": "г.Ташкент., «УЗСАНОАТКУРИЛИШБАНКИ» АКБ Головной филиал",
+            "bank_address": null,
+            "mfo": "00440",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQ9942GAVQB6M0B1DPK0V1.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-10  11.12.2024 дан.pdf",
+          "type": null,
+          "size": 2988436,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "F-11",
+      "title": "«Оказание услуг по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «FITUR 2025»",
+      "amount": "38000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2024-12-11",
+      "contract_type": "Оказание услуг",
+      "project": "FITUR-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ORIENT STAR GROUP LLC",
+          "ru": "ООО «ORIENT STAR GROUP»",
+          "uz": "\"ORIENT STAR GROUP\" MChJ"
+        },
+        "inn": "303722254",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99897-722-22-26; +998974441555",
+        "email": "welcome@orientstar.uz",
+        "address": {
+          "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
+          "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
+          "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+        },
+        "director_name": "С. Х. Бегматов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000400565085001",
+            "bank_name": "АКБ «Hamkorbank» Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          },
+          {
+            "currency": "USD",
+            "account_number": "20208840900565085002",
+            "bank_name": "АКБ \"Hamkorbank\" Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          },
+          {
+            "currency": "EUR",
+            "account_number": "20208978200565085002",
+            "bank_name": "АКБ \"Hamkorbank\" Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQB3Y57FGN6VBY93CXWVW9.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ F-11  11.12.2024 дан.pdf",
+          "type": null,
+          "size": 3008255,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "G-1",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «GITF Guangzhou 2025»",
+      "amount": "5000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-05-18",
+      "contract_type": "Оказание услуг",
+      "project": "GITF Guanchjou 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "CAUCASSIA TRAVEL LLC",
+          "ru": "ООО «CAUCASSIA TRAVEL»",
+          "uz": "\"CAUCASSIA TRAVEL\" MChJ"
+        },
+        "inn": "310711881",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 94 540 53 54",
+        "email": null,
+        "address": {
+          "en": "36 Gagarin Street, Orzu MFY, Samarkand",
+          "ru": "Самарканд шахар, Орзу МФЙ, Гагарина кучаси, 36-уй",
+          "uz": "Samarqand shahar, Orzu MFY, Gagarin koʻchasi, 36-uy"
+        },
+        "director_name": "В. Анохин",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000405702929001",
+            "bank_name": "ЧАБ «TRASTBANK» Дарханский ф-л.",
+            "bank_address": null,
+            "mfo": "01061",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQGD36R4X40N4EG4DX4PPX.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ G-1  18.04.2025 дан.pdf",
+          "type": null,
+          "size": 2822316,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "G-2",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «GITF Guangzhou 2025»",
+      "amount": "5000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-04-18",
+      "contract_type": "Оказание услуг",
+      "project": "GITF Guanchjou 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ZAMIN DMC LLC",
+          "ru": "ООО «ZAMIN DMC»",
+          "uz": "\"ZAMIN DMC\" MChJ"
+        },
+        "inn": "311343097",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 99 575 50 50; +99899 5750550",
+        "email": "info@zamindmc.uz",
+        "address": {
+          "en": "22 A. Temur Street, Mirabad District, Tashkent",
+          "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
+          "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+        },
+        "director_name": "Ходжаев Т.А.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000107076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "USD",
+            "account_number": "20208840407076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "EUR",
+            "account_number": "20208978807076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "RUB",
+            "account_number": "20208643507076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQJ9M6RG9F33WMHMPCYP6H.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ G-2  18.04.2025 дан.pdf",
+          "type": null,
+          "size": 2871294,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "G-3",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «GITF Guangzhou 2025»",
+      "amount": "5000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-04-18",
+      "contract_type": "Оказание услуг",
+      "project": "GITF Guanchjou 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "UZTUR INVESTMENT AND DEVELOPMENT LLC",
+          "ru": "ИП ООО «UZTUR INVESTMENT AND DEVELOPMENT»",
+          "uz": "\"UZTUR INVESTMENT AND DEVELOPMENT\" IP MChJ"
+        },
+        "inn": "306777698",
+        "type": "legal",
+        "legal_form": "ИП ООО",
+        "phone": null,
+        "email": null,
+        "address": {
+          "en": "24A A. Kodiriy Street, Yunusabad District, Tashkent, Republic of Uzbekistan",
+          "ru": "Республика Узбекистан, г. Ташкент, Юнусабадский р-он, ул. А. Кодирий, 24А",
+          "uz": "Oʻzbekiston Respublikasi, Toshkent shahri, Yunusobod tumani, A. Qodiriy koʻchasi, 24A"
+        },
+        "director_name": "Эрик Сейлер",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000905132507009",
+            "bank_name": "''IpotekaBank'' OTB Group",
+            "bank_address": null,
+            "mfo": "00937",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQKXH56D2BM66S6S7QWZRC.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ G-3  18.04.2025 дан.pdf",
+          "type": null,
+          "size": 312317,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "G-4",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «GITF Guangzhou 2025»",
+      "amount": "5000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-04-18",
+      "contract_type": "Оказание услуг",
+      "project": "GITF Guanchjou 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ORIENT STAR GROUP LLC",
+          "ru": "ООО «ORIENT STAR GROUP»",
+          "uz": "\"ORIENT STAR GROUP\" MChJ"
+        },
+        "inn": "303722254",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99897-722-22-26; +998974441555",
+        "email": "welcome@orientstar.uz",
+        "address": {
+          "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
+          "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
+          "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+        },
+        "director_name": "С. Х. Бегматов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000400565085001",
+            "bank_name": "АКБ «Hamkorbank» Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          },
+          {
+            "currency": "USD",
+            "account_number": "20208840900565085002",
+            "bank_name": "АКБ \"Hamkorbank\" Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          },
+          {
+            "currency": "EUR",
+            "account_number": "20208978200565085002",
+            "bank_name": "АКБ \"Hamkorbank\" Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQNFZ25983R6Y2NAEFZBAN.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ G-4  18.04.2025 дан.pdf",
+          "type": null,
+          "size": 2836067,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "G-5",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «GITF Guangzhou 2025»",
+      "amount": "5000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-04-24",
+      "contract_type": "Оказание услуг",
+      "project": "GITF Guanchjou 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "SunRoad LLC",
+          "ru": "ООО «SunRoad»",
+          "uz": "\"SunRoad\" MChJ"
+        },
+        "inn": "311534832",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "909228549",
+        "email": null,
+        "address": {
+          "en": "26, 2nd Passage, Pakhlavon Makhmud Street, Tashkent, 100070",
+          "ru": "100070, г. Ташкент, ул. Пахлавон Махмуд, 2 проезд 26",
+          "uz": "100070, Toshkent, Paxlavon Mahmud koʻchasi, 2-tor koʻchasi 26"
+        },
+        "director_name": "Г. Исакова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000907123985001",
+            "bank_name": "«Капитал» АТБ банк",
+            "bank_address": "г. Ташкент",
+            "mfo": "01158",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQQ4XM7NT3Z6MPNX1R536X.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ G-5  24.04.2025 дан.pdf",
+          "type": null,
+          "size": 3390769,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "G-6",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «GITF Guangzhou 2025»",
+      "amount": "5000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-05-24",
+      "contract_type": "Оказание услуг",
+      "project": "GITF Guanchjou 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Another Travel LLC",
+          "ru": "ООО «Another Travel»",
+          "uz": "\"Another Travel\" MChJ"
+        },
+        "inn": "309484364",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": null,
+        "email": null,
+        "address": {
+          "en": "14 Zulfiyaxonim Street, Labzak MFY, Shaykhantakhur District, Tashkent",
+          "ru": "г. Ташкент, Шайхантахурский район, ул. Зулфияхоним, Лабзак МСГ, 14-дом",
+          "uz": "Toshkent, Shayxontohur tumani, Zulfiyaxonim koʻchasi, Labzak MFY, 14-uy"
+        },
+        "director_name": "М. Тагаева",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000805519373001",
+            "bank_name": "ЧАБ \"TRASTBANK\" Дарханский ф-л.",
+            "bank_address": null,
+            "mfo": "00954",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQRW3PNJF7F8J6GP0XRZCZ.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ G-6  24.04.2025 дан.pdf",
+          "type": null,
+          "size": 3212532,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "689-6.3.3",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "70000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-11-19",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "UZBEKISTAN AIRWAYS JSC",
+          "ru": "АО «UZBEKISTAN AIRWAYS»",
+          "uz": "«UZBEKISTAN AIRWAYS» AJ"
+        },
+        "inn": "306628114",
+        "type": "legal",
+        "legal_form": "АО",
+        "phone": null,
+        "email": null,
+        "address": {
+          "en": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
+          "ru": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
+          "uz": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,"
+        },
+        "director_name": "У.А. Хусанов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20210000905115307001",
+            "bank_name": "Центральный операционный Центр Банковских услуг АО «Узнацбанка»",
+            "bank_address": "101, улица Амира Темура, Ташкент 100084",
+            "mfo": "00450",
+            "swift": null
+          },
+          {
+            "currency": "UZS",
+            "account_number": "20210000305115307009",
+            "bank_name": "ОПЕРУ при ЧАКБ «Ориент Финанс»",
+            "bank_address": "Узбекистан, 100029, г. Ташкент, Мирзо-Улугбекский район, ул.Осие-5",
+            "mfo": "01071",
+            "swift": "ORFBUZ22"
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQWNQ3PTVRG0RXDRY50B6H.PDF",
+          "original_name": "689-6.3.3-Uzbekistan airways.PDF",
+          "type": null,
+          "size": 4827762,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "IFTM-1",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "30000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-17",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "East Asia Point JV",
+          "ru": "СП «East Asia Point»",
+          "uz": "\"East Asia Point\" QK"
+        },
+        "inn": "207160718",
+        "type": "legal",
+        "legal_form": "Семейное предприятие",
+        "phone": "+998977207752",
+        "email": null,
+        "address": {
+          "en": "25 Binokor Street, Tashkent",
+          "ru": "г. Ташкент, ул. Бинокор, дом 25",
+          "uz": "Toshkent, Binokor koʻchasi, 25"
+        },
+        "director_name": "Расулев Б.Б.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000306000278001",
+            "bank_name": "Bank Asaka Nurafshan branch (в Асака Банк Нурафшон ф-л)",
+            "bank_address": null,
+            "mfo": "00873",
+            "swift": "ASBKUZ22XXX"
+          },
+          {
+            "currency": "USD",
+            "account_number": "20208840605000278001",
+            "bank_name": "Bank Asaka Nurafshan branch (в Асака Банк Нурафшон ф-л)",
+            "bank_address": null,
+            "mfo": "00873",
+            "swift": "ASBKUZ22XXX"
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXQYPXXZVZBX9NWPGFY9XXM.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ IFTM-1  17.07.2025 дан.pdf",
+          "type": null,
+          "size": 6813570,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "IFTM-2",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "30000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-17",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ANUR TOUR LLC",
+          "ru": "ООО «ANUR TOUR»",
+          "uz": "\"ANUR TOUR\" MChJ"
+        },
+        "inn": "202232646",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99855 501 22 60; +99871 2302260",
+        "email": "info@anurtour.com",
+        "address": {
+          "en": "C-5, 65, Apartment 185, Tashkent, 100017",
+          "ru": "г. Ташкент, Ц-5, дом-65, кв-185, 100017",
+          "uz": "Toshkent, C-5, 65-uy, 185-xonadon, 100017"
+        },
+        "director_name": "М.К. Раубаев",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000201522892001",
+            "bank_name": "г. ТАШКЕНТ, ГОЛОВНОЙ ОФИС АО БАНКА \"ИПАК ЙУЛИ\"",
+            "bank_address": null,
+            "mfo": "00444",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXR0PCW6SYVP4T9Z29JTP9A.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ IFTM-2  17.07.2025 дан.pdf",
+          "type": null,
+          "size": 6688885,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "IFTM-3",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "30000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-17",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "KARAVAN TRAVEL LLC",
+          "ru": "ООО «KARAVAN TRAVEL»",
+          "uz": "\"KARAVAN TRAVEL\" MChJ"
+        },
+        "inn": "300832523",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 97 910 13 87; +998 97 288 44 00",
+        "email": "jahongir.kt@gmail.com",
+        "address": {
+          "en": "72 M. Koshgariy Street, Samarkand, 140100",
+          "ru": "Улица М. Кошгарий 72, Самарканд, 140100",
+          "uz": "M. Koshgariy koʻchasi 72, Samarqand, 140100"
+        },
+        "director_name": "Ж.Х. Санакулов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000504706353001",
+            "bank_name": "Национальный банк внешнеэкономической деятельности Республики Узбекистан, Самаркандский филиал",
+            "bank_address": null,
+            "mfo": "00278",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXR3CKX6ZJH37J0Z78PYJHG.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ IFTM-3  17.07.2025 дан.pdf",
+          "type": null,
+          "size": 6807947,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "IFTM-4",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "30000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-17",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "MEGA TOUR LLC",
+          "ru": "ООО «MEGA TOUR»",
+          "uz": "\"MEGA TOUR\" MChJ"
+        },
+        "inn": "205886850",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99890-185-33-33",
+        "email": "megatour@mail.com",
+        "address": {
+          "en": "235 A Buyuk Ipak Yoli Street, Tashkent",
+          "ru": "г. Ташкент, ул. Буюк Ипак Йули, 235 А",
+          "uz": "Toshkent, Buyuk Ipak Yoʻli koʻchasi, 235 A"
+        },
+        "director_name": "А.В. Хабарова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000004442549001",
+            "bank_name": "\"DAVR-BANK\" Мирзо-Улугбекский ф-л",
+            "bank_address": null,
+            "mfo": "01072",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXR4YS2B6VKQH8SSAP1SKAK.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ IFTM-4  17.07.2025 дан.pdf",
+          "type": null,
+          "size": 6697378,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "IFTM-5",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "30000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-17",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "SACRED EAST TRAVEL LLC",
+          "ru": "ООО «SACRED EAST TRAVEL»",
+          "uz": "\"SACRED EAST TRAVEL\" MChJ"
+        },
+        "inn": "308308202",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 906550500",
+        "email": "info@sacredeasttravel.com",
+        "address": {
+          "en": "3 Pushkin Street, Samarkand",
+          "ru": "г. Самарканд, ул. Пушкина 3",
+          "uz": "Samarqand, Pushkin koʻchasi 3"
+        },
+        "director_name": "Н.У.Садыкова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000605365263001",
+            "bank_name": "ЧАБ «Трастбанк» г.Ташкент",
+            "bank_address": null,
+            "mfo": "00491",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXR6C1APM6NKTXXG7H2GMXW.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ IFTM-5  17.07.2025 дан.pdf",
+          "type": null,
+          "size": 6800604,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "IFTM-6",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "30000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-17",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ORIENT STAR GROUP LLC",
+          "ru": "ООО «ORIENT STAR GROUP»",
+          "uz": "\"ORIENT STAR GROUP\" MChJ"
+        },
+        "inn": "303722254",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99897-722-22-26; +998974441555",
+        "email": "welcome@orientstar.uz",
+        "address": {
+          "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
+          "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
+          "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+        },
+        "director_name": "С. Х. Бегматов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000400565085001",
+            "bank_name": "АКБ «Hamkorbank» Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          },
+          {
+            "currency": "USD",
+            "account_number": "20208840900565085002",
+            "bank_name": "АКБ \"Hamkorbank\" Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          },
+          {
+            "currency": "EUR",
+            "account_number": "20208978200565085002",
+            "bank_name": "АКБ \"Hamkorbank\" Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXR8627JFCC819KPRRRJ4W5.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ IFTM-6  17.07.2025 дан.pdf",
+          "type": null,
+          "size": 6633131,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "IFTM-8",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "30000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-17",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Uktamxon Tour LLC",
+          "ru": "ООО «Uktamxon Tour»",
+          "uz": "\"Uktamxon Tour\" MChJ"
+        },
+        "inn": "310148514",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "(97) 577 07 57",
+        "email": "uktamxontour01@gmail.com",
+        "address": {
+          "en": "31 Mirzo Ulugbek Street, Samarkand",
+          "ru": "г. Самарканд, ул. Мирзо Улугбек-31",
+          "uz": "Samarqand, Mirzo Ulugʻbek koʻchasi 31"
+        },
+        "director_name": "Махсудов М.У.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000305603836001",
+            "bank_name": "ХАТБ «Ипак йули банк»",
+            "bank_address": null,
+            "mfo": "00283",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXRAPSWH0R2ER5H5EXHRN78.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ IFTM-8  17.07.2025 дан.pdf",
+          "type": null,
+          "size": 6618787,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "IFTM-9",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "30000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-18",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Selfie Travel LLC",
+          "ru": "ООО «Selfie Travel»",
+          "uz": "\"Selfie Travel\" MChJ"
+        },
+        "inn": "305299709",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998910185141",
+        "email": "inc@selfietravel.uzb",
+        "address": {
+          "en": "7/71 Sebzor Street, Shaykhantakhur District, Tashkent",
+          "ru": "г. Ташкент, Шайхантахурский р-н, ул. Себзор 7/71",
+          "uz": "Toshkent, Shayxontohur tumani, Sebzor koʻchasi 7/71"
+        },
+        "director_name": "Р.М.Мухрумбаев",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000200843864001",
+            "bank_name": "ЦОО АКБ \"Капиталбанк\"",
+            "bank_address": null,
+            "mfo": "01088",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXRC6FQRAS3SYWAX1PJQKYW.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ IFTM-9  18.07.2025 дан.pdf",
+          "type": null,
+          "size": 5454634,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "IFTM-10",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "30000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-21",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "CENTRAL ASIA TRAVEL LLC",
+          "ru": "ООО «CENTRAL ASIA TRAVEL»",
+          "uz": "\"CENTRAL ASIA TRAVEL\" MChJ"
+        },
+        "inn": "206976184",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "71 20002 99; +99871 2525008; +998 71 252 50 07",
+        "email": "info@centralasia-travel.com",
+        "address": {
+          "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan",
+          "ru": "Улица Ойбек 40, офис 3, Ташкент, Узбекистан",
+          "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston"
+        },
+        "director_name": "Н.А. Сербин",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000304736797001",
+            "bank_name": "«АСАКА БАНК» Юнусабадского отд.",
+            "bank_address": "Узбекистан, Ташкент, Юнус-Абад кв-л 2, дом 8.",
+            "mfo": "00873",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXRDYY8MVZB5PE4JG4YJSS5.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ IFTM-10  21.07.2025 дан.pdf",
+          "type": null,
+          "size": 775837,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "IFTM-11",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «IFTM Top Resa 2025»",
+      "amount": "30000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-24",
+      "contract_type": "Оказание услуг",
+      "project": "IFTM Top Resa 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "EMERALD TRAVEL PE",
+          "ru": "ЧП «EMERALD TRAVEL»",
+          "uz": "\"EMERALD TRAVEL\" XK"
+        },
+        "inn": "206228464",
+        "type": "legal",
+        "legal_form": "ЧП",
+        "phone": "998905120123",
+        "email": "info@emerald.uz",
+        "address": {
+          "en": "91 M. Anbar Street, Bukhara, 200118",
+          "ru": "Бухара, улица М. Анбара, дом 91, индекс 200118",
+          "uz": "Buxoro, M. Anbar koʻchasi, 91-uy, 200118"
+        },
+        "director_name": "Н. Ботирова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000104477456001",
+            "bank_name": "«Национальный банк» Филиал Академический, город Ташкент",
+            "bank_address": null,
+            "mfo": "00431",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXRFC23P7QJ8BTYNWRMB7MF.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ IFTM-11  24.07.2025 дан.pdf",
+          "type": null,
+          "size": 9476710,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-1",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-10",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "CENTRAL ASIA TRAVEL LLC",
+          "ru": "ООО «CENTRAL ASIA TRAVEL»",
+          "uz": "\"CENTRAL ASIA TRAVEL\" MChJ"
+        },
+        "inn": "206976184",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "71 20002 99; +99871 2525008; +998 71 252 50 07",
+        "email": "info@centralasia-travel.com",
+        "address": {
+          "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan",
+          "ru": "Улица Ойбек 40, офис 3, Ташкент, Узбекистан",
+          "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston"
+        },
+        "director_name": "Н.А. Сербин",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000304736797001",
+            "bank_name": "«АСАКА БАНК» Юнусабадского отд.",
+            "bank_address": "Узбекистан, Ташкент, Юнус-Абад кв-л 2, дом 8.",
+            "mfo": "00873",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXSZSDPQR01891F44ZF7WV1.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-1  10.01.2025 дан.pdf",
+          "type": null,
+          "size": 3153437,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-2",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-10",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "SEZAM TRAVEL LLC",
+          "ru": "ООО «SEZAM TRAVEL»",
+          "uz": "\"SEZAM TRAVEL\" MChJ"
+        },
+        "inn": "301755974",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99871 271 2267",
+        "email": "sales@sezamtravel.com",
+        "address": {
+          "en": "44/1 Chilanzar Street, Tashkent",
+          "ru": "44/1, ул. Чиланзарская, г. Ташкент",
+          "uz": "44/1, Chilonzor koʻchasi, Toshkent"
+        },
+        "director_name": "Сабитова К.А.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000904879519001",
+            "bank_name": "ЧАБ Трастбанк офис ТОШКЕНТ",
+            "bank_address": null,
+            "mfo": "00491",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXT2S88J2AFBJXEKGXVH0Z2.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-2  10.01.2025 дан.pdf",
+          "type": null,
+          "size": 3155606,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-3",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-10",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "JALOL QUDUQ AVIA TRANS PE",
+          "ru": "ЧП «JALOL QUDUQ AVIA TRANS»",
+          "uz": "\"JALOL QUDUQ AVIA TRANS\" XK"
+        },
+        "inn": "302076552",
+        "type": "legal",
+        "legal_form": "ЧП",
+        "phone": "+9989117305001",
+        "email": "SAIDA9717@MAIL.RU",
+        "address": {
+          "en": "Namuna Mahalla, Okhunboboyev, Jalolquduq District, Jizzakh Region",
+          "ru": "Джизакская область, Жалолкудукский район, г. Охунбобоев, махалля Намуна",
+          "uz": "Jizzax viloyati, Jalolquduq tumani, Oxunboboyev shahri, Namuna mahallasi"
+        },
+        "director_name": "АХМЕДОВА САИДА",
+        "bank_accounts": [
+          {
+            "currency": "USD",
+            "account_number": "20208840104929827005",
+            "bank_name": "TRASTBANK",
+            "bank_address": null,
+            "mfo": "01074",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXT4695Q9WVEWCN1TQG2V76.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-3  10.01.2025 дан.pdf",
+          "type": null,
+          "size": 3142422,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-4",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-10",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "PEOPLETRAVEL LLC",
+          "ru": "ООО «PEOPLETRAVEL»",
+          "uz": "\"PEOPLETRAVEL\" MChJ"
+        },
+        "inn": "207071194",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 71 232 23 33",
+        "email": "info@peopletravel.uz",
+        "address": {
+          "en": "47/1 M. Keuja Street, Tashkent",
+          "ru": "г. Ташкент, ул. М. Кеужа, 47/1",
+          "uz": "Toshkent, M. Keuja koʻchasi, 47/1"
+        },
+        "director_name": "Султанов У.А.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000504848824001",
+            "bank_name": "ОПЕРУ АКБ «Asian Alliance Bank»",
+            "bank_address": null,
+            "mfo": "01095",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXT620FGEZ7HR42JTVJ1XAN.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-4  10.01.2025 дан.pdf",
+          "type": null,
+          "size": 3017523,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-5",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-10",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Antique Travel Experts JV",
+          "ru": "СП «Antique Travel Experts»",
+          "uz": "\"Antique Travel Experts\" QK"
+        },
+        "inn": "310149060",
+        "type": "legal",
+        "legal_form": "СП",
+        "phone": "+997977255255",
+        "email": "info@antique-travel.com",
+        "address": {
+          "en": "9/1 K. Murtazoyev Street, Apartment 6, Bukhara",
+          "ru": "г. Бухара, ул. К. Муртазоева, 9/1, 6-хонадон",
+          "uz": "Buxoro, Q. Murtazoyev koʻchasi 9/1, 6-xonadon"
+        },
+        "director_name": "Б.Р.Ражабов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000505603800001",
+            "bank_name": "«Milly bank» BOSH Ofisi AJ",
+            "bank_address": null,
+            "mfo": "00450",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXT7D3QHY3F50TFKVQ45328.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-5  10.01.2025 дан.pdf",
+          "type": null,
+          "size": 3083423,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-6",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-10",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Dolores Travel Services JV LLC",
+          "ru": "СП ООО «Dolores Travel Services»",
+          "uz": "\"Dolores Travel Services\" QK MChJ"
+        },
+        "inn": "205424619",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "(99871) 1208883; +99855 515-88-83; (99875) 5158883; (99878) 1208883; (998 78) 1208873",
+        "email": "info@dolores.uz",
+        "address": {
+          "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent",
+          "ru": "104 А, ул. Кичик Бешагач, Яккасарайский р-он, г. Ташкент",
+          "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent"
+        },
+        "director_name": "Байзакова Ш.Б.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20214000804383781001",
+            "bank_name": "«HAMKORBANK» АТБ Ташкент региональный ОБУ",
+            "bank_address": "Узбекистан, г. Ташкент, ул. Фуркат 14",
+            "mfo": "00083",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXT978831Y7XF71972YFYTS.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-6  10.01.2025 дан.pdf",
+          "type": null,
+          "size": 3156241,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-7",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-10",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "MEGA TOUR LLC",
+          "ru": "ООО «MEGA TOUR»",
+          "uz": "\"MEGA TOUR\" MChJ"
+        },
+        "inn": "205886850",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99890-185-33-33",
+        "email": "megatour@mail.com",
+        "address": {
+          "en": "235 A Buyuk Ipak Yoli Street, Tashkent",
+          "ru": "г. Ташкент, ул. Буюк Ипак Йули, 235 А",
+          "uz": "Toshkent, Buyuk Ipak Yoʻli koʻchasi, 235 A"
+        },
+        "director_name": "А.В. Хабарова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000004442549001",
+            "bank_name": "\"DAVR-BANK\" Мирзо-Улугбекский ф-л",
+            "bank_address": null,
+            "mfo": "01072",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTAKYD8N5EDTY28BHBYHR0.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-7  10.01.2025 дан.pdf",
+          "type": null,
+          "size": 3134677,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-8",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-10",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "IMRAN-TOURS LLC",
+          "ru": "ООО «IMRAN-TOURS»",
+          "uz": "\"IMRAN-TOURS\" MChJ"
+        },
+        "inn": "309963464",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998977376060; +99897 548 33 33",
+        "email": "assalom.tour@mail.ru",
+        "address": {
+          "en": "2 Kichik Xalqa Yoli Street, Apartment 2, Tashkent",
+          "ru": "г. Ташкент, Кичик Халка Йули, 2-уй, 2-хонадон",
+          "uz": "Toshkent, Kichik Xalqa Yoʻli, 2-uy, 2-xonadon"
+        },
+        "director_name": "Дадаходжаев.С.Ф",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000905579066001",
+            "bank_name": "Хамкор Банк Шайхантахур филиали",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTC2094P6JGJW17HAN4N0A.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-8  10.01.2025 дан.pdf",
+          "type": null,
+          "size": 3134591,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-9",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-10",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Geo Tour Service LLC",
+          "ru": "ООО «Geo Tour Service»",
+          "uz": "\"Geo Tour Service\" MChJ"
+        },
+        "inn": "303906847",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 71 288 44 48; +998 99 575 5050; +99890 9600150; +99899 7610150",
+        "email": "info@orientmice.com",
+        "address": {
+          "en": "9 Mavze, 12, Apartment 1, Chilanzar District, Tashkent",
+          "ru": "г. Ташкент, Чиланзарский район, 9 квартал, дом 12, квартира 1",
+          "uz": "Toshkent, Chilonzor tumani, 9-mavze, 12-uy, 1-xonadon"
+        },
+        "director_name": "Ш. Пардаев",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000200611475001",
+            "bank_name": "Автотранспортный филиал банка «Асака»",
+            "bank_address": null,
+            "mfo": "01069",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTDHBEMGY3CA0HQGWMEMF6.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-9  10.01.2025 дан.pdf",
+          "type": null,
+          "size": 3121303,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-10",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-10",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ORIENT STAR GROUP LLC",
+          "ru": "ООО «ORIENT STAR GROUP»",
+          "uz": "\"ORIENT STAR GROUP\" MChJ"
+        },
+        "inn": "303722254",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99897-722-22-26; +998974441555",
+        "email": "welcome@orientstar.uz",
+        "address": {
+          "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
+          "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
+          "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+        },
+        "director_name": "С. Х. Бегматов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000400565085001",
+            "bank_name": "АКБ «Hamkorbank» Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          },
+          {
+            "currency": "USD",
+            "account_number": "20208840900565085002",
+            "bank_name": "АКБ \"Hamkorbank\" Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          },
+          {
+            "currency": "EUR",
+            "account_number": "20208978200565085002",
+            "bank_name": "АКБ \"Hamkorbank\" Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTEWXT5ZBV4DQQJCZ9X6G4.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-10  10.01.2025 дан.pdf",
+          "type": null,
+          "size": 3138040,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-12",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "120000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-20",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Rocket DMC Registan LLC",
+          "ru": "ООО «Rocket DMC Registan»",
+          "uz": "\"Rocket DMC Registan\" MChJ"
+        },
+        "inn": "310367653",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "90 809 26 01; +998 90 512 24 78",
+        "email": "rocketuz.all@rocketdmc.com",
+        "address": {
+          "en": "Samarkand, Kunigil",
+          "ru": "Самарканд, Кунигил",
+          "uz": "Samarqand, Kunigil"
+        },
+        "director_name": "Н.М Мухтарова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000705631732001",
+            "bank_name": "Самаркандское отд, Национального банка ВЭД РУз",
+            "bank_address": null,
+            "mfo": "00450",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTGDVW4W95PB43NW0M0S09.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-12  20.01.2025 дан.pdf",
+          "type": null,
+          "size": 3247883,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-13",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "100000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-20",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ZAMIN DMC LLC",
+          "ru": "ООО «ZAMIN DMC»",
+          "uz": "\"ZAMIN DMC\" MChJ"
+        },
+        "inn": "311343097",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 99 575 50 50; +99899 5750550",
+        "email": "info@zamindmc.uz",
+        "address": {
+          "en": "22 A. Temur Street, Mirabad District, Tashkent",
+          "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
+          "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+        },
+        "director_name": "Ходжаев Т.А.",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000107076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "USD",
+            "account_number": "20208840407076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "EUR",
+            "account_number": "20208978807076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          },
+          {
+            "currency": "RUB",
+            "account_number": "20208643507076480001",
+            "bank_name": "АКБ «Капитал банк» городской филиал г. Ташкента",
+            "bank_address": null,
+            "mfo": "00445",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTJ1CNMQ5WNTC6QY73520B.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-13  20.01.2025 дан.pdf",
+          "type": null,
+          "size": 3234984,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-14",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-28",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "SITARA INTERNATIONAL LTD LLC",
+          "ru": "ИП ООО «SITARA INTERNATIONAL LTD»",
+          "uz": "\"SITARA INTERNATIONAL LTD\" IP MChJ"
+        },
+        "inn": "201904269",
+        "type": "legal",
+        "legal_form": "ИП ООО",
+        "phone": "+99871 2814148; (+99871) 255-35-04",
+        "email": "tashkent@sitara.com",
+        "address": {
+          "en": "45 Shota Rustaveli Street, Tashkent, 100100",
+          "ru": "100100 г. Ташкент, ул. Шота Руставели, 45",
+          "uz": "100100 Toshkent, Shota Rustaveli koʻchasi, 45"
+        },
+        "director_name": "Н.Б. Сангилова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000300155609001",
+            "bank_name": "SQB \"Uzpromstroybank\" г. Ташкент",
+            "bank_address": null,
+            "mfo": "00440",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTKT9KNTJPDFCTEXH2BWNY.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-14  28.01.2025 дан.pdf",
+          "type": null,
+          "size": 3297688,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-15",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-01-28",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ANUR TOUR LLC",
+          "ru": "ООО «ANUR TOUR»",
+          "uz": "\"ANUR TOUR\" MChJ"
+        },
+        "inn": "202232646",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99855 501 22 60; +99871 2302260",
+        "email": "info@anurtour.com",
+        "address": {
+          "en": "C-5, 65, Apartment 185, Tashkent, 100017",
+          "ru": "г. Ташкент, Ц-5, дом-65, кв-185, 100017",
+          "uz": "Toshkent, C-5, 65-uy, 185-xonadon, 100017"
+        },
+        "director_name": "М.К. Раубаев",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000201522892001",
+            "bank_name": "г. ТАШКЕНТ, ГОЛОВНОЙ ОФИС АО БАНКА \"ИПАК ЙУЛИ\"",
+            "bank_address": null,
+            "mfo": "00444",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTN6A41R8XVCAETEJH0F1C.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-15  28.01.2025 дан.pdf",
+          "type": null,
+          "size": 3229252,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "B-17",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITB Berlin 2025»",
+      "amount": "40000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-02-13",
+      "contract_type": "Оказание услуг",
+      "project": "ITB BERLIN-2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "OLIMPIK TURSERVIS LLC",
+          "ru": "ООО «OLIMPIK TURSERVIS»",
+          "uz": "\"OLIMPIK TURSERVIS\" MChJ"
+        },
+        "inn": "204511749",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "(998 78) 120-63-00; (998 78) 120-64-00; +998977470630",
+        "email": "info@olympic-ts.com",
+        "address": {
+          "en": "51A S. Azimov Street, Tashkent",
+          "ru": "г. Ташкент, ул. С. Азимова, 51А",
+          "uz": "Toshkent, S. Azimov koʻchasi, 51A"
+        },
+        "director_name": "В.В. Сильченко",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000904262013001",
+            "bank_name": "АКБ «Азия Альянс банк»",
+            "bank_address": null,
+            "mfo": "01095",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTPNTZ7QFSDA5CHH4QFCQW.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ B-17  13.02.2025 дан.pdf",
+          "type": null,
+          "size": 3176025,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "ITE-1",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITE Hong Kong 2025»",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-06-02",
+      "contract_type": "Оказание услуг",
+      "project": "ITE Hong Kong 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Selfie Travel LLC",
+          "ru": "ООО «Selfie Travel»",
+          "uz": "\"Selfie Travel\" MChJ"
+        },
+        "inn": "305299709",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998910185141",
+        "email": "inc@selfietravel.uzb",
+        "address": {
+          "en": "7/71 Sebzor Street, Shaykhantakhur District, Tashkent",
+          "ru": "г. Ташкент, Шайхантахурский р-н, ул. Себзор 7/71",
+          "uz": "Toshkent, Shayxontohur tumani, Sebzor koʻchasi 7/71"
+        },
+        "director_name": "Р.М.Мухрумбаев",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000200843864001",
+            "bank_name": "ЦОО АКБ \"Капиталбанк\"",
+            "bank_address": null,
+            "mfo": "01088",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTTEPG52ANN864MCT44JC7.pdf",
+          "original_name": "ITE-1 OOO Selfie Travel.pdf",
+          "type": null,
+          "size": 410513,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "ITE-2",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITE Hong Kong 2025»",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-06-02",
+      "contract_type": "Оказание услуг",
+      "project": "ITE Hong Kong 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ORIENT STAR GROUP LLC",
+          "ru": "ООО «ORIENT STAR GROUP»",
+          "uz": "\"ORIENT STAR GROUP\" MChJ"
+        },
+        "inn": "303722254",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+99897-722-22-26; +998974441555",
+        "email": "welcome@orientstar.uz",
+        "address": {
+          "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
+          "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
+          "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+        },
+        "director_name": "С. Х. Бегматов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000400565085001",
+            "bank_name": "АКБ «Hamkorbank» Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          },
+          {
+            "currency": "USD",
+            "account_number": "20208840900565085002",
+            "bank_name": "АКБ \"Hamkorbank\" Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          },
+          {
+            "currency": "EUR",
+            "account_number": "20208978200565085002",
+            "bank_name": "АКБ \"Hamkorbank\" Яккасарайский филиал",
+            "bank_address": null,
+            "mfo": "00083",
+            "swift": "KHKKUZ22XXX"
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTVQ9DJ6N3VBDEPD6WG49R.pdf",
+          "original_name": "ITE-2 OOO Orient Star Group.pdf",
+          "type": null,
+          "size": 1389151,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "ITE-3",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITE Hong Kong 2025»",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-06-02",
+      "contract_type": "Оказание услуг",
+      "project": "ITE Hong Kong 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Rocket DMC Registan LLC",
+          "ru": "ООО «Rocket DMC Registan»",
+          "uz": "\"Rocket DMC Registan\" MChJ"
+        },
+        "inn": "310367653",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "90 809 26 01; +998 90 512 24 78",
+        "email": "rocketuz.all@rocketdmc.com",
+        "address": {
+          "en": "Samarkand, Kunigil",
+          "ru": "Самарканд, Кунигил",
+          "uz": "Samarqand, Kunigil"
+        },
+        "director_name": "Н.М Мухтарова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000705631732001",
+            "bank_name": "Самаркандское отд, Национального банка ВЭД РУз",
+            "bank_address": null,
+            "mfo": "00450",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTXC18JV988M9MDX4AQZZF.pdf",
+          "original_name": "ITE -3 OOO Rocket DMC Registan.pdf",
+          "type": null,
+          "size": 1390835,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "ITE-4",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «ITE Hong Kong 2025»",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-06-03",
+      "contract_type": "Оказание услуг",
+      "project": "ITE Hong Kong 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "IZEL LLC",
+          "ru": "ООО «IZEL»",
+          "uz": "«IZEL» MChJ"
+        },
+        "inn": "311884303",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 94 092 55 44",
+        "email": "izelchina@gmail.com",
+        "address": {
+          "en": "Тошкент вилояти.Янгиюл шахар Туркистон МФЙ, Регистон кучаси, 16-дом",
+          "ru": "Тошкент вилояти.Янгиюл шахар Туркистон МФЙ, Регистон кучаси, 16-дом",
+          "uz": "Тошкент вилояти.Янгиюл шахар Туркистон МФЙ, Регистон кучаси, 16-дом"
+        },
+        "director_name": "Е.А Умаралиев",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000307196304001",
+            "bank_name": "ЯНГИЙУЛ Т.. \"ИПАК ЙУЛИ\" АИТ БАНКИНИНГ ЯНГИЙУЛ ФИЛИАЛИ",
+            "bank_address": null,
+            "mfo": "01081",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXTYNE3MJ0PWT2YAEZ1BW06.pdf",
+          "original_name": "ITE-4- OOO IZEL.pdf",
+          "type": null,
+          "size": 443245,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "MF-01",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «MATTA Fair 2025»",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-15",
+      "contract_type": "Оказание услуг",
+      "project": "Matta Fair 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "ZIYARAH TRAVEL LLC",
+          "ru": "ООО «ZIYARAH TRAVEL»",
+          "uz": "«ZIYARAH TRAVEL» MChJ"
+        },
+        "inn": "305282002",
+        "type": "legal",
+        "legal_form": "ООО",
+        "phone": "+998 97 182 82 00",
+        "email": "info@ziyarah-travel.uz",
+        "address": {
+          "en": "Наманганская область, город Наманган, улица Машраб, Дом-5",
+          "ru": "Наманганская область, город Наманган, улица Машраб, Дом-5",
+          "uz": "Наманганская область, город Наманган, улица Машраб, Дом-5"
+        },
+        "director_name": null,
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000500838807001",
+            "bank_name": "Наманганский филиал АКБ «Капиталбанк»",
+            "bank_address": null,
+            "mfo": "01085",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXV0S0RZPQJR5SH01HTTPKM.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ MF-01  15.07.2025 дан.pdf",
+          "type": null,
+          "size": 6846567,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "MF-03",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «MATTA Fair 2025»",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-15",
+      "contract_type": "Оказание услуг",
+      "project": "Matta Fair 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Antique Travel Experts JV",
+          "ru": "СП «Antique Travel Experts»",
+          "uz": "\"Antique Travel Experts\" QK"
+        },
+        "inn": "310149060",
+        "type": "legal",
+        "legal_form": "СП",
+        "phone": "+997977255255",
+        "email": "info@antique-travel.com",
+        "address": {
+          "en": "9/1 K. Murtazoyev Street, Apartment 6, Bukhara",
+          "ru": "г. Бухара, ул. К. Муртазоева, 9/1, 6-хонадон",
+          "uz": "Buxoro, Q. Murtazoyev koʻchasi 9/1, 6-xonadon"
+        },
+        "director_name": "Б.Р.Ражабов",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000505603800001",
+            "bank_name": "«Milly bank» BOSH Ofisi AJ",
+            "bank_address": null,
+            "mfo": "00450",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXV22X1HV0WD6C788T1RB83.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ MF-03  15.07.2025 дан.pdf",
+          "type": null,
+          "size": 6841326,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    },
+    {
+      "number": "MF-04",
+      "title": "«Оказание услуг (стандарт) по организации единого национального стенда «Узбекистан» и обеспечению участия в международной туристической выставке «MATTA Fair 2025»",
+      "amount": "10000000.00",
+      "currency": "UZS",
+      "status": "approved",
+      "signed_at": "2025-07-15",
+      "contract_type": "Оказание услуг",
+      "project": "Matta Fair 2025",
+      "order_number": null,
+      "responsible_email": "mr.silverwind1998@gmail.com",
+      "contact": {
+        "name": {
+          "en": "Beyond Expectations JV",
+          "ru": "СП «Beyond Expectations»",
+          "uz": "\"Beyond Expectations\" QK"
+        },
+        "inn": "304415856",
+        "type": "legal",
+        "legal_form": "СП",
+        "phone": "+998 90 955 94 31",
+        "email": "beyondexpectations.uz@gmail.com",
+        "address": {
+          "en": "Rakat 1-13, Yakkasaray District, Tashkent",
+          "ru": "г. Ташкент, Яккасарайский район, Ракат 1-13",
+          "uz": "Toshkent shahri, Yakkasaroy tumani, Rakat 1-13"
+        },
+        "director_name": "О.О. Хакимова",
+        "bank_accounts": [
+          {
+            "currency": "UZS",
+            "account_number": "20208000200690529001",
+            "bank_name": "в Яккасарайском фил. Давр банк",
+            "bank_address": null,
+            "mfo": "01069",
+            "swift": null
+          }
+        ]
+      },
+      "sponsor": null,
+      "attachments": [
+        {
+          "file_path": "uploads/files/contract-attachments/2026/07/01KXXV4QFFD5ZANWVQYSN2DF87.pdf",
+          "original_name": "Эркин шаклдаги ҳужжат_ MF-04  15.07.2025 дан.pdf",
+          "type": null,
+          "size": 6766726,
+          "sort": 1
+        }
+      ],
+      "payments": []
+    }
+  ],
+  "orders": []
+}

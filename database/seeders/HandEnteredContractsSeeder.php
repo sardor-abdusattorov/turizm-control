@@ -24,9 +24,12 @@ use Illuminate\Support\Facades\File;
  */
 class HandEnteredContractsSeeder extends Seeder
 {
+    /** Overridable so tests replay a scratch file, never the real snapshot. */
+    public static ?string $path = null;
+
     public function run(): void
     {
-        $path = database_path('seeders/data/contracts-snapshot.json');
+        $path = static::$path ?? database_path('seeders/data/contracts-snapshot.json');
 
         if (! File::exists($path)) {
             return;

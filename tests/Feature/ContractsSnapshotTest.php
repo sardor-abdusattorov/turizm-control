@@ -14,8 +14,16 @@ use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
+// Tests snapshot into a scratch file — the REAL committed snapshot at
+// database/seeders/data/ must survive test runs untouched.
+beforeEach(function () {
+    $this->snapshotPath = storage_path('framework/testing/contracts-snapshot-test.json');
+    HandEnteredContractsSeeder::$path = $this->snapshotPath;
+});
+
 afterEach(function () {
-    File::delete(database_path('seeders/data/contracts-snapshot.json'));
+    File::delete($this->snapshotPath);
+    HandEnteredContractsSeeder::$path = null;
 });
 
 it('replays a snapshot after a wipe: contracts, contacts, attachments and payments come back verbatim', function () {
@@ -65,7 +73,7 @@ it('replays a snapshot after a wipe: contracts, contacts, attachments and paymen
         'created_by' => $author->id,
     ]);
 
-    $this->artisan('contracts:snapshot')->assertSuccessful();
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
 
     // The rebuild: contract-side data vanishes, reference data survives
     // (currencies / types / projects / users are re-seeded on fresh).
@@ -109,7 +117,7 @@ it('replaying the same snapshot twice never duplicates anything', function () {
         'original_name' => 'b1.pdf', 'size' => 1, 'sort' => 1,
     ]);
 
-    $this->artisan('contracts:snapshot')->assertSuccessful();
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
 
     $this->seed(HandEnteredContractsSeeder::class);
     $this->seed(HandEnteredContractsSeeder::class);
