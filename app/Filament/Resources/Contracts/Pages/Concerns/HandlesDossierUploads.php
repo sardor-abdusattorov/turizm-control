@@ -42,7 +42,9 @@ trait HandlesDossierUploads
         foreach ($this->attachmentFiles as $key => $path) {
             $this->record->attachments()->create([
                 'file_path' => $path,
-                'original_name' => $this->attachmentNames[$key] ?? basename((string) $path),
+                // Filament keys the stored names by the stored PATH, not by
+                // the upload uuid — looking up by $key alone always missed.
+                'original_name' => $this->attachmentNames[$path] ?? $this->attachmentNames[$key] ?? basename((string) $path),
                 'size' => Storage::disk('local')->exists($path) ? Storage::disk('local')->size($path) : 0,
                 'uploaded_by' => Auth::id(),
                 'sort' => ++$sort,

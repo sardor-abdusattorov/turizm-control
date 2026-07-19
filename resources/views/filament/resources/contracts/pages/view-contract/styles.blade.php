@@ -2,6 +2,11 @@
         [x-cloak] {
             display: none !important;
         }
+        /* While a custom cw-modal is open the page behind it must not
+           scroll — the root x-data toggles this class via x-effect. */
+        .cw-noscroll {
+            overflow: hidden;
+        }
         /* Base palette tokens (--s/--t/--m/--accent/...) live in theme.css.
            The cw page tunes a few values for tighter contrast against the
            chain/progress bars and keeps its page-specific extras (--track,

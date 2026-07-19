@@ -159,7 +159,10 @@ it('uploads dossier scans from the view page too', function () {
         ])
         ->assertHasNoActionErrors();
 
-    expect($contract->attachments()->count())->toBe(1);
+    // The dossier must list the file under the name the user uploaded, not
+    // the random hash Filament stores it as on disk.
+    expect($contract->attachments()->count())->toBe(1)
+        ->and($contract->attachments()->first()->original_name)->toBe('proposal.pdf');
 });
 
 it('keeps uploading open after full approval — SWIFT and act arrive later', function () {

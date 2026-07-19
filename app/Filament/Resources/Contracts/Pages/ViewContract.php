@@ -332,7 +332,9 @@ class ViewContract extends ViewRecord
                 foreach ((array) ($data['files'] ?? []) as $key => $path) {
                     $this->record->attachments()->create([
                         'file_path' => $path,
-                        'original_name' => $names[$key] ?? basename((string) $path),
+                        // Filament keys the stored names by the stored PATH,
+                        // not by the upload uuid — $key alone always missed.
+                        'original_name' => $names[$path] ?? $names[$key] ?? basename((string) $path),
                         'size' => Storage::disk('local')->exists($path) ? Storage::disk('local')->size($path) : 0,
                         'uploaded_by' => auth()->id(),
                         'sort' => ++$sort,

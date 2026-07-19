@@ -24,7 +24,7 @@
         @if ($attachments->isEmpty())
             <div class="cw-empty">{{ __('app.message.no_attachments') }}</div>
         @else
-            <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.75rem">
+            <div style="display:flex;flex-direction:column;gap:.5rem;padding:1rem 1.25rem 1.25rem">
                 @foreach ($attachments as $attachment)
                     <div class="cw-doc">
                         <span class="cw-doc__ic">{!! $ic('heroicon-o-document-text', 18) !!}</span>

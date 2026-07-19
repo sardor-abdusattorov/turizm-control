@@ -142,6 +142,7 @@
 
     <div class="cw"
         x-data="{ approver: null, contactOpen: false, basicExpanded: false, tab: 'overview', historyShown: 8, historyFilter: 'all', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }"
+        x-effect="document.documentElement.classList.toggle('cw-noscroll', approver !== null || contactOpen)"
         @keydown.escape.window="approver = null; contactOpen = false">
         @php
             $submittedAt = $this->submittedAt();
