@@ -206,10 +206,10 @@ it('shows a per-approver detail modal trigger and renders queued steps distinctl
     // Eye-modal wiring + Alpine state + tabs.
     expect($html)->toContain('approver: null')
         ->and($html)->toContain("tab: 'overview'")
-        ->and($html)->toContain('cw-tabs')
+        ->and($html)->toContain('rec-tabs')
         ->and($html)->toContain('cw-eye')
         // Status pill now rides on the tab bar instead of a separate strip.
-        ->and($html)->toContain('cw-tabs__status')
+        ->and($html)->toContain('rec-tabs__side')
         ->and($html)->not->toContain('cw-meta')
         // Progress band: a single continuous fill track + status legend + the
         // "Awaiting" tile (the old per-step segmented bar was replaced).

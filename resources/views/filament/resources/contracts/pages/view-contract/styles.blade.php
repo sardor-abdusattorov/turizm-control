@@ -85,50 +85,7 @@
             flex-direction: column;
             gap: 1.5rem;
         }
-        .cw-tabs {
-            display: flex;
-            align-items: center;
-            gap: .15rem;
-            flex-wrap: wrap;
-        }
-        .cw-tabs__status {
-            margin-left: auto;
-        }
-        .cw-tab {
-            display: flex;
-            align-items: center;
-            gap: .45rem;
-            padding: .7rem 1.15rem;
-            font-size: 0.92rem;
-            font-weight: 600;
-            color: var(--m);
-            background: transparent;
-            border: 0;
-            border-radius: .7rem;
-            cursor: pointer;
-            transition: all .15s;
-        }
-        .cw-tab:hover {
-            color: var(--t);
-            background: var(--soft);
-        }
-        .cw-tab--active {
-            color: var(--accent);
-            background: var(--s);
-            box-shadow: 0 0 0 1px var(--d);
-        }
-        .cw-tab__c {
-            font-size: 0.74rem;
-            font-weight: 700;
-            color: var(--m);
-            background: var(--soft);
-            border-radius: 999px;
-            padding: .12rem .5rem;
-        }
-        .cw-tab--active .cw-tab__c {
-            background: var(--accent-soft);
-            color: var(--accent);
-        }
+        /* Tab strip lives in theme.css as the shared .rec-tabs block. */
 
         /* pills */
         .cw-pill {

@@ -152,18 +152,18 @@
          offset and the page appears to jump. --}}
     <div class="pj-tabwrap"
          x-data="{ tab: 'overview', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }">
-        <div class="pj-tabs" role="tablist">
-            <button type="button" class="pj-tab" :class="tab === 'overview' ? 'pj-tab--active' : ''" @click="go('overview')">
-                {!! $ic('heroicon-o-rectangle-group', 15) !!} {{ __('app.label.overview') }}
+        <div class="rec-tabs" role="tablist">
+            <button type="button" class="rec-tab" :class="tab === 'overview' ? 'rec-tab--active' : ''" @click="go('overview')">
+                {!! $ic('heroicon-o-rectangle-group', 16) !!} {{ __('app.label.overview') }}
             </button>
-            <button type="button" class="pj-tab" :class="tab === 'contracts' ? 'pj-tab--active' : ''" @click="go('contracts')">
-                {!! $ic('heroicon-o-document-text', 15) !!} {{ __('app.label.contracts') }}@if ($visibleContracts->isNotEmpty())<span class="pj-tab__c">{{ $visibleContracts->count() }}</span>@endif
+            <button type="button" class="rec-tab" :class="tab === 'contracts' ? 'rec-tab--active' : ''" @click="go('contracts')">
+                {!! $ic('heroicon-o-document-text', 16) !!} {{ __('app.label.contracts') }}@if ($visibleContracts->isNotEmpty())<span class="rec-tab__c">{{ $visibleContracts->count() }}</span>@endif
             </button>
-            <button type="button" class="pj-tab" :class="tab === 'participants' ? 'pj-tab--active' : ''" @click="go('participants')">
-                {!! $ic('heroicon-o-user-group', 15) !!} {{ __('app.label.participants') }}@if ($participantCount)<span class="pj-tab__c">{{ $participantCount }}</span>@endif
+            <button type="button" class="rec-tab" :class="tab === 'participants' ? 'rec-tab--active' : ''" @click="go('participants')">
+                {!! $ic('heroicon-o-user-group', 16) !!} {{ __('app.label.participants') }}@if ($participantCount)<span class="rec-tab__c">{{ $participantCount }}</span>@endif
             </button>
-            <button type="button" class="pj-tab" :class="tab === 'gallery' ? 'pj-tab--active' : ''" @click="go('gallery')">
-                {!! $ic('heroicon-o-photo', 15) !!} {{ __('app.label.gallery') }}@if ($galleryCount)<span class="pj-tab__c">{{ $galleryCount }}</span>@endif
+            <button type="button" class="rec-tab" :class="tab === 'gallery' ? 'rec-tab--active' : ''" @click="go('gallery')">
+                {!! $ic('heroicon-o-photo', 16) !!} {{ __('app.label.gallery') }}@if ($galleryCount)<span class="rec-tab__c">{{ $galleryCount }}</span>@endif
             </button>
         </div>
 

@@ -150,11 +150,11 @@
 
         {{-- Tabs — overall status pill rides on the right so it stays visible
              on both tabs without a redundant full-width strip up top. --}}
-        <div class="cw-tabs">
-            <button type="button" class="cw-tab" :class="tab === 'overview' ? 'cw-tab--active' : ''" @click="go('overview')">{!! $ic('heroicon-o-rectangle-group', 16) !!} {{ __('app.label.overview') }}</button>
-            <button type="button" class="cw-tab" :class="tab === 'attachments' ? 'cw-tab--active' : ''" @click="go('attachments')">{!! $ic('heroicon-o-paper-clip', 16) !!} {{ __('app.label.attachments') }}@if ($this->attachments()->isNotEmpty())<span class="cw-tab__c">{{ $this->attachments()->count() }}</span>@endif</button>
-            <button type="button" class="cw-tab" :class="tab === 'history' ? 'cw-tab--active' : ''" @click="go('history')">{!! $ic('heroicon-o-clock', 16) !!} {{ __('app.label.history') }}@if ($activities->isNotEmpty())<span class="cw-tab__c">{{ $activities->count() }}</span>@endif</button>
-            <span class="cw-pill cw-pill--{{ $statusColor }} cw-pill--lg cw-tabs__status">{{ $statusLabel }}</span>
+        <div class="rec-tabs" role="tablist">
+            <button type="button" class="rec-tab" :class="tab === 'overview' ? 'rec-tab--active' : ''" @click="go('overview')">{!! $ic('heroicon-o-rectangle-group', 16) !!} {{ __('app.label.overview') }}</button>
+            <button type="button" class="rec-tab" :class="tab === 'attachments' ? 'rec-tab--active' : ''" @click="go('attachments')">{!! $ic('heroicon-o-paper-clip', 16) !!} {{ __('app.label.attachments') }}@if ($this->attachments()->isNotEmpty())<span class="rec-tab__c">{{ $this->attachments()->count() }}</span>@endif</button>
+            <button type="button" class="rec-tab" :class="tab === 'history' ? 'rec-tab--active' : ''" @click="go('history')">{!! $ic('heroicon-o-clock', 16) !!} {{ __('app.label.history') }}@if ($activities->isNotEmpty())<span class="rec-tab__c">{{ $activities->count() }}</span>@endif</button>
+            <span class="cw-pill cw-pill--{{ $statusColor }} cw-pill--lg rec-tabs__side">{{ $statusLabel }}</span>
         </div>
 
         @include('filament.resources.contracts.pages.view-contract.overview')

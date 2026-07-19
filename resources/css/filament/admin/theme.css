@@ -326,7 +326,7 @@
    invisible to anyone tabbing through. Filament's own controls keep
    their built-in ring; this adds one for ours. */
 .cw-btn:focus-visible,
-.cw-tab:focus-visible,
+.rec-tab:focus-visible,
 .cw-eye:focus-visible,
 .cw-row--link:focus-visible,
 .cw-modal__x:focus-visible,
@@ -788,7 +788,7 @@
 .ow-btn:focus-visible,
 .ow-show-more:focus-visible,
 .cw-btn:focus-visible,
-.cw-tab:focus-visible,
+.rec-tab:focus-visible,
 .cw-chip:focus-visible,
 .cw-eye:focus-visible,
 .cw-show-more:focus-visible,
@@ -803,57 +803,71 @@ button.cw-row:focus-visible {
     outline-offset: 2px;
     border-radius: .4rem;
 }
-/* Record sub-navigation tabs — mirror the contract page's tab bar, scrolls
-   horizontally on narrow screens instead of wrapping. */
+/* ─── Record sub-navigation tabs (shared) ───────────────────────────
+   ONE tab language for every record view (contract, project, …):
+   quiet buttons, the active one becomes a surface card ringed by a
+   hairline. Scrolls sideways on narrow screens; the 2px pad/margin
+   pair keeps the ring from being clipped by the scroll box. */
+.rec-tabs {
+    display: flex;
+    align-items: center;
+    gap: .15rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 2px;
+    margin: -2px;
+}
+.rec-tabs::-webkit-scrollbar {
+    display: none;
+}
+.rec-tabs__side {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.rec-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .7rem 1.15rem;
+    font-size: .92rem;
+    font-weight: 600;
+    color: var(--m);
+    background: transparent;
+    border: 0;
+    border-radius: .7rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all .15s;
+}
+.rec-tab:hover {
+    color: var(--t);
+    background: var(--soft);
+}
+/* :hover is more specific than the single --active class — restate the
+   active colours so the tab keeps its accent under the cursor. */
+.rec-tab--active,
+.rec-tab--active:hover {
+    color: var(--accent);
+    background: var(--s);
+    box-shadow: 0 0 0 1px var(--d);
+}
+.rec-tab__c {
+    font-size: .74rem;
+    font-weight: 700;
+    color: var(--m);
+    background: var(--soft);
+    border-radius: 999px;
+    padding: .12rem .5rem;
+}
+.rec-tab--active .rec-tab__c {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
 .pj-tabwrap {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-}
-.pj-tabs {
-    display: flex;
-    gap: .15rem;
-    border-bottom: 1px solid var(--d);
-    overflow-x: auto;
-    scrollbar-width: none;
-}
-.pj-tabs::-webkit-scrollbar {
-    display: none;
-}
-.pj-tab {
-    display: inline-flex;
-    align-items: center;
-    gap: .4rem;
-    padding: .6rem .9rem;
-    font-size: .85rem;
-    font-weight: 600;
-    color: var(--m);
-    background: none;
-    border: 0;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: color .12s ease;
-}
-.pj-tab:hover {
-    color: var(--t);
-}
-.pj-tab--active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-}
-.pj-tab__c {
-    font-size: .68rem;
-    font-weight: 700;
-    color: var(--m);
-    background: var(--soft);
-    padding: .05rem .4rem;
-    border-radius: 999px;
-}
-.pj-tab--active .pj-tab__c {
-    color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 15%, transparent);
 }
 .pj-panel {
     display: flex;
