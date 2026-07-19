@@ -79,6 +79,7 @@ it('keeps existing attachments and appends the new upload after them', function 
     $contract = Contract::factory()->create();
     attachmentManager($contract);
 
+    Storage::disk('local')->put('uploads/files/contract-attachments/old.pdf', 'x');
     $contract->attachments()->create([
         'file_path' => 'uploads/files/contract-attachments/old.pdf',
         'original_name' => 'old.pdf',
@@ -86,10 +87,16 @@ it('keeps existing attachments and appends the new upload after them', function 
         'sort' => 1,
     ]);
 
+    // The edit field prefills with the stored dossier — keeping the old path
+    // in the submitted state preserves it, the UploadedFile lands on top.
     Livewire::test(EditContract::class, ['record' => $contract->id])
+        ->assertFormSet(['attachment_files' => ['uploads/files/contract-attachments/old.pdf']])
         ->fillForm([
             ...validEditFormFill(),
-            'attachment_files' => [UploadedFile::fake()->create('new.pdf', 10, 'application/pdf')],
+            'attachment_files' => [
+                'uploads/files/contract-attachments/old.pdf',
+                UploadedFile::fake()->create('new.pdf', 10, 'application/pdf'),
+            ],
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -99,6 +106,36 @@ it('keeps existing attachments and appends the new upload after them', function 
     expect($attachments)->toHaveCount(2)
         ->and($attachments->first()->original_name)->toBe('old.pdf')
         ->and($attachments->last()->sort)->toBe(2);
+});
+
+it('deletes an attachment whose chip was removed on the edit form', function () {
+    Storage::fake('local');
+
+    $contract = Contract::factory()->create();
+    attachmentManager($contract);
+
+    Storage::disk('local')->put('uploads/files/contract-attachments/keep.pdf', 'k');
+    Storage::disk('local')->put('uploads/files/contract-attachments/drop.pdf', 'd');
+    $keep = $contract->attachments()->create([
+        'file_path' => 'uploads/files/contract-attachments/keep.pdf',
+        'original_name' => 'keep.pdf', 'size' => 1, 'sort' => 1,
+    ]);
+    $drop = $contract->attachments()->create([
+        'file_path' => 'uploads/files/contract-attachments/drop.pdf',
+        'original_name' => 'drop.pdf', 'size' => 1, 'sort' => 2,
+    ]);
+
+    Livewire::test(EditContract::class, ['record' => $contract->id])
+        ->fillForm([
+            ...validEditFormFill(),
+            'attachment_files' => [$keep->file_path],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($contract->attachments()->pluck('id')->all())->toBe([$keep->id]);
+    Storage::disk('local')->assertExists($keep->file_path);
+    Storage::disk('local')->assertMissing($drop->file_path);
 });
 
 it('deletes an attachment together with its file', function () {

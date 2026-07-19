@@ -126,11 +126,13 @@ it('lets the author fix fields on an approved legacy contract without losing the
     $author->givePermissionTo('update_approved_contract');
     actingAs($author->fresh());
 
-    // title is a reapproval-trigger field — without preserveApprovedOnNextSave
-    // the observer would bounce the contract to draft and build a junk chain.
+    // The switch prefills ON for an approved contract — a plain typo fix must
+    // keep the status without the author touching anything else. title is a
+    // reapproval-trigger field: without preserveApprovedOnNextSave the
+    // observer would bounce the contract to draft and build a junk chain.
     Livewire::test(EditContract::class, ['record' => $contract->id])
+        ->assertFormSet(['already_signed' => true])
         ->fillForm([
-            'already_signed' => true,
             'title' => 'Исправленное наименование',
         ])
         ->call('save')

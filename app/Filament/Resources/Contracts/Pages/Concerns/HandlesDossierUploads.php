@@ -35,11 +35,33 @@ trait HandlesDossierUploads
         return $data;
     }
 
+    /**
+     * Sync the dossier to the upload field's state. The edit form prefills
+     * the field with the stored files, so: a path missing from the submitted
+     * list means its chip was removed — the attachment goes (the model hook
+     * deletes the file too); a path without a record is a fresh upload.
+     */
     protected function storeFormAttachments(): void
     {
+        $submitted = array_map(strval(...), array_values($this->attachmentFiles));
+        $existing = $this->record->attachments()->get();
+
+        // Guard: FileUpload silently drops chips whose file is missing on
+        // disk, so a record with a lost file must not be mistaken for a
+        // deliberate removal.
+        $existing
+            ->reject(fn ($attachment) => in_array($attachment->file_path, $submitted, true))
+            ->filter(fn ($attachment) => Storage::disk('local')->exists($attachment->file_path))
+            ->each(fn ($attachment) => $attachment->delete());
+
+        $known = $existing->pluck('file_path')->all();
         $sort = (int) $this->record->attachments()->max('sort');
 
         foreach ($this->attachmentFiles as $key => $path) {
+            if (in_array((string) $path, $known, true)) {
+                continue;
+            }
+
             $this->record->attachments()->create([
                 'file_path' => $path,
                 // Filament keys the stored names by the stored PATH, not by

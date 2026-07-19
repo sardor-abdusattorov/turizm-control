@@ -21,6 +21,7 @@ use Closure;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
@@ -41,10 +42,14 @@ class ContractForm
         return $schema
             ->columns(1)
             ->components([
+                // The reset warning is pointless while the «already signed»
+                // switch is on — saving then KEEPS the approved status, so the
+                // banner reacts to the live toggle and steps aside.
                 Section::make()
                     ->hiddenLabel()
-                    ->visible(fn (?Contract $record): bool => $record !== null
-                        && in_array($record->status, [Contract::STATUS_IN_REVIEW, Contract::STATUS_APPROVED, Contract::STATUS_REJECTED], true))
+                    ->visible(fn (?Contract $record, Get $get): bool => $record !== null
+                        && in_array($record->status, [Contract::STATUS_IN_REVIEW, Contract::STATUS_APPROVED, Contract::STATUS_REJECTED], true)
+                        && ! $get('already_signed'))
                     ->schema([
                         TextEntry::make('edit_warning')
                             ->hiddenLabel()
@@ -202,9 +207,14 @@ class ContractForm
                                             ->columnSpan(['default' => 1, 'md' => 2]),
                                     ]),
 
-                                TextInput::make('title')
+                                // Real contract subjects are long official
+                                // phrases — a growing textarea instead of a
+                                // one-line input.
+                                Textarea::make('title')
                                     ->label(__('app.label.contract_title'))
                                     ->required()
+                                    ->rows(2)
+                                    ->autosize()
                                     ->maxLength(255)
                                     ->columnSpanFull(),
 
@@ -249,6 +259,10 @@ class ContractForm
                                     ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                                     ->maxSize(25600)
                                     ->storeFileNamesIn('attachment_names')
+                                    // On edit the field is prefilled with the
+                                    // stored dossier, so the files are visible
+                                    // and removable right here.
+                                    ->downloadable()
                                     ->columnSpanFull(),
                             ]),
 

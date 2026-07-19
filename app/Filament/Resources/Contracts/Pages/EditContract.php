@@ -55,7 +55,11 @@ class EditContract extends EditRecord
 
     protected function getSaveFormAction(): Action
     {
-        $isMidFlow = $this->record && in_array($this->record->status, [
+        // Evaluated when the modal opens, not when the page renders — the
+        // «already signed» switch is live, so the confirmation matches what
+        // saving will actually do right now.
+        $keepsLegacy = fn (): bool => (bool) ($this->data['already_signed'] ?? false);
+        $isMidFlow = fn (): bool => in_array($this->record?->status, [
             Contract::STATUS_IN_REVIEW,
             Contract::STATUS_APPROVED,
             Contract::STATUS_REJECTED,
@@ -65,12 +69,18 @@ class EditContract extends EditRecord
             ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
             ->keyBindings(['mod+s'])
             ->requiresConfirmation()
-            ->modalIcon($isMidFlow ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-question-mark-circle')
-            ->modalIconColor($isMidFlow ? 'warning' : 'primary')
+            ->modalIcon(fn (): string => $keepsLegacy()
+                ? 'heroicon-o-check-circle'
+                : ($isMidFlow() ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-question-mark-circle'))
+            ->modalIconColor(fn (): string => $keepsLegacy()
+                ? 'success'
+                : ($isMidFlow() ? 'warning' : 'primary'))
             ->modalHeading(__('app.label.save_changes'))
-            ->modalDescription($isMidFlow
-                ? __('app.message.save_warning_mid_flow')
-                : __('app.message.save_warning_draft'))
+            ->modalDescription(fn (): string => $keepsLegacy()
+                ? __('app.message.save_warning_legacy')
+                : ($isMidFlow()
+                    ? __('app.message.save_warning_mid_flow')
+                    : __('app.message.save_warning_draft')))
             ->modalSubmitActionLabel(__('app.action.save_anyway'))
             ->modalCancelActionLabel(__('app.action.keep_editing'))
             ->modalWidth('xl')
@@ -87,11 +97,18 @@ class EditContract extends EditRecord
 
         $data['approver_chain'] = $ids;
 
-        // The legacy switch always starts off — even on a reopened approved
-        // contract. Keeping it off means «send back through approval» and is
-        // never a silent default; the author flips it on deliberately to keep
-        // the contract filed (the record's signed_at prefills the date).
-        $data['already_signed'] = false;
+        // A reopened approved contract IS an already-signed paper one — the
+        // switch starts on so a typo fix keeps the status untouched. Flipping
+        // it off is the deliberate «send back through approval» move. Anyone
+        // reaching this page for an approved record holds the dedicated
+        // update_approved_contract permission (mount gates on it).
+        $data['already_signed'] = $this->record->status === Contract::STATUS_APPROVED;
+
+        // The dossier files show inside the upload field and sync on save: a
+        // chip removed here deletes its attachment, a new file files one.
+        $attachments = $this->record->attachments()->orderBy('sort')->get();
+        $data['attachment_files'] = $attachments->pluck('file_path')->all();
+        $data['attachment_names'] = $attachments->pluck('original_name', 'file_path')->all();
 
         return $data;
     }
