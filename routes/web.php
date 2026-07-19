@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContractAttachmentFileController;
 use App\Http\Controllers\ContractEditorController;
 use App\Http\Controllers\ContractPdfController;
 use App\Http\Controllers\ContractTemplateEditorController;
@@ -26,6 +27,9 @@ Route::post('/contract-templates/{template}/save-callback', [OnlyOfficeTemplateC
 
 Route::get('/orders/{order}/document', [OnlyOfficeOrderController::class, 'document'])
     ->name('orders.document');
+
+Route::get('/contract-attachments/{attachment}/document', [ContractAttachmentFileController::class, 'document'])
+    ->name('contract-attachments.document');
 
 Route::post('/orders/{order}/save-callback', [OnlyOfficeOrderController::class, 'callback'])
     ->name('orders.save-callback');
@@ -55,4 +59,10 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     Route::get('/orders/{order}/file', [OrderFileController::class, 'inline'])
         ->name('orders.file.inline');
+
+    Route::get('/contracts/{contract}/attachments/{attachment}/file', [ContractAttachmentFileController::class, 'inline'])
+        ->name('contracts.attachments.inline');
+
+    Route::get('/contracts/{contract}/attachments/{attachment}/viewer', [ContractAttachmentFileController::class, 'viewer'])
+        ->name('contracts.attachments.viewer');
 });

@@ -3,6 +3,7 @@
 namespace App\Services\OnlyOffice;
 
 use App\Models\Contract;
+use App\Models\ContractAttachment;
 use App\Models\ContractTemplate;
 use App\Models\Order;
 use App\Models\User;
@@ -89,6 +90,31 @@ class OnlyOfficeService
             callbackUrl: $this->internalRouteUrl('order', $order->id, 'callback', $order->document_key),
             permissions: $permissions,
             mode: $mode,
+            lang: app()->getLocale() ?: 'ru',
+            user: $user,
+            fileType: $extension,
+            documentType: $this->documentTypeForExtension($extension),
+        );
+    }
+
+    /**
+     * Read-only viewer for a dossier Word file: no editing, no callback —
+     * only viewing with download and print left on.
+     */
+    public function attachmentViewerConfig(ContractAttachment $attachment, User $user): array
+    {
+        $permissions = $this->permissionSet(edit: false, review: false, comment: false, download: true, print: true);
+        $extension = $attachment->extension() ?: 'docx';
+
+        return $this->buildConfig(
+            key: $attachment->documentKey(),
+            title: (string) $attachment->original_name,
+            documentUrl: $this->internalRouteUrl('contract-attachment', $attachment->id, 'document', $attachment->sharedKey()),
+            // View mode never saves, but the config shape requires a callback
+            // URL — pointing it at the document endpoint keeps it harmless.
+            callbackUrl: $this->internalRouteUrl('contract-attachment', $attachment->id, 'document', $attachment->sharedKey()),
+            permissions: $permissions,
+            mode: 'view',
             lang: app()->getLocale() ?: 'ru',
             user: $user,
             fileType: $extension,
@@ -320,6 +346,7 @@ class OnlyOfficeService
         $prefix = match ($subject) {
             'template' => "/contract-templates/{$id}/{$path}",
             'order' => "/orders/{$id}/{$path}",
+            'contract-attachment' => "/contract-attachments/{$id}/{$path}",
             default => "/contracts/{$id}/{$path}",
         };
 

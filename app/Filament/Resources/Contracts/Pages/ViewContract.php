@@ -321,7 +321,7 @@ class ViewContract extends ViewRecord
                     ->disk('local')
                     ->directory(fn (): string => 'uploads/files/contract-attachments/'.now()->format('Y/m'))
                     ->visibility('private')
-                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
+                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                     ->maxSize(25600)
                     ->storeFileNamesIn('original_names'),
             ])
@@ -435,6 +435,28 @@ class ViewContract extends ViewRecord
             'can_add' => $this->record->canAcceptPayment()
                 && (bool) auth()->user()?->can('create_payment'),
         ];
+    }
+
+    /**
+     * The in-browser or OnlyOffice view link for a dossier file — PDFs and
+     * images open in the browser's own viewer, Word files in the read-only
+     * OnlyOffice viewer. Null for anything else (download stays available).
+     */
+    public function attachmentOpenUrl(ContractAttachment $attachment): ?string
+    {
+        if (! $attachment->fileExists()) {
+            return null;
+        }
+
+        if ($attachment->isWordDocument()) {
+            return route('contracts.attachments.viewer', ['contract' => $this->record, 'attachment' => $attachment]);
+        }
+
+        if ($attachment->isBrowserViewable()) {
+            return route('contracts.attachments.inline', ['contract' => $this->record, 'attachment' => $attachment]);
+        }
+
+        return null;
     }
 
     /**

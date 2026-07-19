@@ -241,7 +241,7 @@ class ContractForm
                                     // DocumentUpload / ImageUpload use everywhere.
                                     ->directory(fn (): string => 'uploads/files/contract-attachments/'.now()->format('Y/m'))
                                     ->visibility('private')
-                                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
+                                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                                     ->maxSize(25600)
                                     ->storeFileNamesIn('attachment_names')
                                     ->columnSpanFull(),

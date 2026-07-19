@@ -572,7 +572,7 @@ return [
         'order_file_optional' => 'Majburiy emas — skanni keyinroq qo\'shish mumkin.',
         'template_optional' => 'Majburiy emas — faqat shablondan hujjat yaratish uchun kerak.',
         'already_signed' => 'Eski (qog\'oz) shartnomalar uchun: darhol «Kelishilgan» holatida saqlanadi, kelishuv zanjirisiz.',
-        'attachment_scans' => 'Shartnoma va hujjatlar skanlari — PDF/JPG/PNG, bir nechta faylni birdan yuklash mumkin.',
+        'attachment_scans' => 'Shartnoma va hujjatlar skanlari — PDF/Word/JPG/PNG, bir nechta faylni birdan yuklash mumkin.',
         'attachment_type_optional' => 'Majburiy emas — turini keyin ham belgilash mumkin.',
         'approval_enabled' => "O'chirilgan — shartnomalar kelishuv zanjirisiz, imzolangan holda kiritiladi.",
         'inn' => 'Yuridik shaxslar uchun 9 raqam',

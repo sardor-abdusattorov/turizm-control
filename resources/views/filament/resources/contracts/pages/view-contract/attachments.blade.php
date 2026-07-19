@@ -38,6 +38,12 @@
                             <span class="cw-pill cw-pill--gray">{{ $attachment->type->label() }}</span>
                         @endif
                         <div class="cw-doc__act">
+                            @if ($openUrl = $this->attachmentOpenUrl($attachment))
+                                <a class="cw-btn cw-btn--ghost" href="{{ $openUrl }}" target="_blank" rel="noopener"
+                                    title="{{ __('app.action.open_in_new_tab') }}">
+                                    {!! $ic('heroicon-o-eye', 15) !!}
+                                </a>
+                            @endif
                             @if ($url = $this->attachmentUrl($attachment))
                                 <a class="cw-btn cw-btn--ghost" href="{{ $url }}" target="_blank" rel="noopener"
                                     title="{{ __('app.action.download') }}">

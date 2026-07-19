@@ -577,7 +577,7 @@ return [
         'order_file_optional' => 'Optional — the scan can be added later.',
         'template_optional' => 'Optional — only needed to generate the document from a template.',
         'already_signed' => 'For legacy (paper) contracts: saved straight away as “Approved”, no approval chain.',
-        'attachment_scans' => 'Contract and document scans — PDF/JPG/PNG, several files at once.',
+        'attachment_scans' => 'Contract and document scans — PDF/Word/JPG/PNG, several files at once.',
         'attachment_type_optional' => 'Optional — the type can be set later.',
         'approval_enabled' => 'Off — contracts are filed as already signed, no approval chain.',
         'inn' => '9 digits for legal entities',
