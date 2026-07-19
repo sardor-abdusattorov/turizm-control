@@ -266,6 +266,9 @@ class Project extends Model
             ->get()
             ->groupBy(fn (Contract $contract): string => $contract->currency?->short_name ?? '')
             ->map(fn ($group): float => (float) $group->sum('amount'))
+            // Alphabetical keys keep the totals stable across DB engines —
+            // fetch order without it differs between platforms.
+            ->sortKeys()
             ->toArray();
     }
 
