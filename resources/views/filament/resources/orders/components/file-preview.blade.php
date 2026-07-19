@@ -47,11 +47,11 @@
             </div>
             <div class="of-meta__row">
                 <div class="of-meta__lb">{{ __('app.label.size') }}</div>
-                <div class="of-meta__vl">{{ $size ?? '—' }}</div>
+                <div class="of-meta__vl">{{ $size ?? __('app.label.not_set') }}</div>
             </div>
             <div class="of-meta__row">
                 <div class="of-meta__lb">{{ __('app.label.created_at') }}</div>
-                <div class="of-meta__vl">{{ $record->created_at?->translatedFormat('d M Y H:i') ?? '—' }}</div>
+                <div class="of-meta__vl">{{ $record->created_at?->translatedFormat('d M Y H:i') ?? __('app.label.not_set') }}</div>
             </div>
 
             {{-- Actions --}}

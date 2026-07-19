@@ -834,6 +834,9 @@ return [
         'pulse_title' => 'Project overview',
         'pulse_hint' => 'Pick a project — the card updates',
     ],
+    'count' => [
+        'contracts' => ':count contract|:count contracts',
+    ],
     'filter' => [
         'awaiting_my_approval' => 'Awaiting my approval',
         'my_contracts' => 'My contracts',

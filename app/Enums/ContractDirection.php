@@ -19,8 +19,8 @@ enum ContractDirection: string
     public function color(): string
     {
         return match ($this) {
-            self::Expense => 'info',
-            self::Income => 'warning',
+            self::Expense => 'gray',
+            self::Income => 'info',
         };
     }
 }

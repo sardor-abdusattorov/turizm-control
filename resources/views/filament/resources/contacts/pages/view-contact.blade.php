@@ -167,7 +167,7 @@
                                 @if ($p->project)
                                     <a class="pj-link" href="{{ BaseProjectResource::resourceFor($p->project)::getUrl('view', ['record' => $p->project]) }}">{{ $p->project->name }}</a>
                                 @else
-                                    —
+                                    <span style="opacity:.45;">{{ __('app.label.not_set') }}</span>
                                 @endif
                             </td>
                             <td class="pj-table__num">{{ $fmt($p->amount) }} {{ $p->currency?->short_name }}</td>

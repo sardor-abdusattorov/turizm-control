@@ -26,7 +26,7 @@
     // Summary semantics differ between draft (nothing submitted) and an
     // active workflow (X out of Y already approved).
     [$summary, $summaryColor] = match (true) {
-        $total === 0 => ['—', '#94a3b8'],
+        $total === 0 => [__('app.label.not_set'), '#94a3b8'],
         $isDraft => [__('app.label.not_submitted'), '#64748b'],
         $hasRejected => [__('app.contract_approver.status.rejected'), '#dc2626'],
         $approved === $total => [__('app.contract_approver.status.approved'), '#059669'],
@@ -172,7 +172,7 @@
 @endonce
 
 @if ($total === 0)
-    <span style="font-size:.82rem;color:currentColor;opacity:.45;">—</span>
+    <span style="font-size:.82rem;color:currentColor;opacity:.45;">{{ __('app.label.not_set') }}</span>
 @else
     <button
         type="button"
@@ -214,7 +214,7 @@
                             {{ $initials($a->user?->name) }}
                         @endif
                     </span>
-                    <span class="ca__nm" title="{{ $a->user?->name }}">{{ $a->user?->name ?? '—' }}</span>
+                    <span class="ca__nm" title="{{ $a->user?->name }}">{{ $a->user?->name ?? __('app.label.not_set') }}</span>
                     <span class="ca__ic" style="background:{{ $c['soft'] }};color:{{ $c['solid'] }};" title="{{ $statusLabel }}">
                         {!! svg($c['icon'], '', ['width' => 11, 'height' => 11])->toHtml() !!}
                     </span>

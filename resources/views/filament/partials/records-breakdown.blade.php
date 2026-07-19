@@ -81,8 +81,8 @@
                     @foreach ($totals as $t)
                         <tr>
                             <td colspan="{{ $hasMid ? 2 : 1 }}">
-                                {{ __('app.label.total') }} {{ $t['currency'] }}
-                                <span class="bkdt__cnt">· {{ $t['count'] }}</span>
+                                <div class="bkdt__nm">{{ __('app.label.total') }} {{ $t['currency'] }}</div>
+                                <div class="bkdt__sub">{{ trans_choice('app.count.contracts', $t['count']) }}</div>
                             </td>
                             <td class="bkdt__num">
                                 @if ($withPaid ?? false)

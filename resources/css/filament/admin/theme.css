@@ -527,6 +527,10 @@
     min-width: 26rem;
     border-collapse: collapse;
 }
+.bkdt th + th,
+.bkdt td + td {
+    border-left: 1px solid var(--d);
+}
 .bkdt th {
     font-size: .7rem;
     font-weight: 600;
@@ -586,10 +590,6 @@
 .bkdt tfoot td {
     background: var(--soft);
     font-weight: 600;
-}
-.bkdt__cnt {
-    color: var(--m2);
-    font-weight: 500;
 }
 
 /* ─── Approval-flow modal on a phone: rows become labelled cards ────────────

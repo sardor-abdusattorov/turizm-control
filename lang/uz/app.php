@@ -829,6 +829,9 @@ return [
         'pulse_title' => 'Loyiha ko‘rinishi',
         'pulse_hint' => 'Loyihani tanlang — karta yangilanadi',
     ],
+    'count' => [
+        'contracts' => ':count ta shartnoma',
+    ],
     'filter' => [
         'awaiting_my_approval' => 'Mening kelishuvimni kutmoqda',
         'my_contracts' => 'Mening shartnomalarim',

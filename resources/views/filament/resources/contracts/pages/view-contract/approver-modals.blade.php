@@ -123,14 +123,14 @@
                                             @if ($rec->comment)
                                                 <div class="cw-rt__cmt">{{ $rec->comment }}</div>
                                             @else
-                                                <div class="cw-rt__cmt cw-rt__cmt--muted">—</div>
+                                                <div class="cw-rt__cmt cw-rt__cmt--muted">{{ __('app.label.not_set') }}</div>
                                             @endif
                                         </td>
                                         <td>
                                             @if ($rec->system_comment)
                                                 <div class="cw-rt__sys">{{ $rec->systemNoteLabel() }}</div>
                                             @else
-                                                <div class="cw-rt__cmt cw-rt__cmt--muted">—</div>
+                                                <div class="cw-rt__cmt cw-rt__cmt--muted">{{ __('app.label.not_set') }}</div>
                                             @endif
                                         </td>
                                         <td>
@@ -139,7 +139,7 @@
                                             @elseif ($rec->due_at && $rec->status === ContractApprover::STATUS_PENDING)
                                                 <div class="cw-rt__date"><small>{{ __('app.label.due') }} {{ $rec->due_at->format('d.m.Y') }}</small></div>
                                             @else
-                                                <div class="cw-rt__date cw-rt__date--muted">—</div>
+                                                <div class="cw-rt__date cw-rt__date--muted">{{ __('app.label.not_set') }}</div>
                                             @endif
                                         </td>
                                     </tr>

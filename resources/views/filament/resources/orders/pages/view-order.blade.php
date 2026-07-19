@@ -60,11 +60,11 @@
                     </div>
                     <div class="ow-file__field">
                         <div class="ow-file__lb">{{ __('app.label.size') }}</div>
-                        <div class="ow-file__vl">{{ $fileSize ?? '—' }}</div>
+                        <div class="ow-file__vl">{{ $fileSize ?? __('app.label.not_set') }}</div>
                     </div>
                     <div class="ow-file__field">
                         <div class="ow-file__lb">{{ __('app.label.created_at') }}</div>
-                        <div class="ow-file__vl">{{ $record->created_at?->translatedFormat('d M Y H:i') ?? '—' }}</div>
+                        <div class="ow-file__vl">{{ $record->created_at?->translatedFormat('d M Y H:i') ?? __('app.label.not_set') }}</div>
                     </div>
                 </div>
             </div>

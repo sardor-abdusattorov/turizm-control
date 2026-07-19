@@ -93,7 +93,7 @@ class TelegramMessageLogResource extends Resource
                     ->description(fn (TelegramMessageLog $record): ?string => $record->telegramUser?->user?->name
                         ? $record->chat_id
                         : null)
-                    ->placeholder(fn (TelegramMessageLog $record): string => $record->chat_id ?? '—')
+                    ->placeholder(fn (TelegramMessageLog $record): string => $record->chat_id ?? __('app.label.not_set'))
                     ->searchable(),
 
                 TextColumn::make('cleanText')

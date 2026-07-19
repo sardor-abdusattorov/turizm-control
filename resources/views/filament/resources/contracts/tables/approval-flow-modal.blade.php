@@ -62,7 +62,7 @@
                         <div class="af-user">
                             <img class="af-user__av" src="{{ $avatarOf($a) }}" alt="">
                             <div style="min-width:0;">
-                                <div class="af-user__nm">{{ $a->user?->name ?? '—' }}<small>#{{ $a->order }}</small></div>
+                                <div class="af-user__nm">{{ $a->user?->name ?? __('app.label.not_set') }}<small>#{{ $a->order }}</small></div>
                                 @if ($a->user?->department?->name || $a->user?->position?->name)
                                     <div class="af-user__dp">{{ $a->user?->department?->name }}{{ $a->user?->position?->name ? ' · '.$a->user->position->name : '' }}</div>
                                 @endif
@@ -73,7 +73,7 @@
                         @if ($a->comment)
                             <div class="af-cmt">{{ $a->comment }}</div>
                         @else
-                            <div class="af-cmt af-cmt--muted">—</div>
+                            <div class="af-cmt af-cmt--muted">{{ __('app.label.not_set') }}</div>
                         @endif
                         @if ($a->system_comment)
                             <div class="af-sys"><b>{{ __('app.label.system_note') }}:</b> {{ $a->systemNoteLabel() }}</div>
@@ -99,7 +99,7 @@
                                 @endif
                             </div>
                         @else
-                            <div class="af-date af-date--muted">—</div>
+                            <div class="af-date af-date--muted">{{ __('app.label.not_set') }}</div>
                         @endif
                     </td>
                     <td data-label="{{ __('app.label.acted_at') }}">
@@ -109,7 +109,7 @@
                                 <small>{{ $a->acted_at->format('H:i') }}</small>
                             </div>
                         @else
-                            <div class="af-date af-date--muted">—</div>
+                            <div class="af-date af-date--muted">{{ __('app.label.not_set') }}</div>
                         @endif
                     </td>
                 </tr>

@@ -829,6 +829,9 @@ return [
         'pulse_title' => 'Обзор проекта',
         'pulse_hint' => 'Выберите проект — карточка обновится',
     ],
+    'count' => [
+        'contracts' => ':count договор|:count договора|:count договоров',
+    ],
     'filter' => [
         'awaiting_my_approval' => 'Ожидают моего согласования',
         'my_contracts' => 'Мои договоры',

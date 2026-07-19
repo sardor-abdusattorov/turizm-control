@@ -379,7 +379,7 @@ class ContractForm
             ->orderByDesc('issued_at')
             ->orderByDesc('id')
             ->get()
-            ->groupBy(fn (Order $order): string => $order->issued_at?->format('Y') ?? '—')
+            ->groupBy(fn (Order $order): string => $order->issued_at?->format('Y') ?? __('app.label.not_set'))
             ->map(fn ($group) => $group->mapWithKeys(fn (Order $order): array => [
                 $order->id => trim(($order->number ? $order->number.' · ' : '').$order->title),
             ])->toArray())
