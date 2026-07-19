@@ -869,6 +869,17 @@ button.cw-row:focus-visible {
     flex-direction: column;
     gap: 1rem;
 }
+
+/* Pulse empty state: the toolbar stays, the body politely asks for a pick. */
+.pj-prompt {
+    border: 1px dashed var(--d);
+    border-radius: .75rem;
+    background: var(--s);
+    padding: 2.25rem 1.5rem;
+    text-align: center;
+    color: var(--m);
+    font-size: .9rem;
+}
 .pj-panel {
     display: flex;
     flex-direction: column;

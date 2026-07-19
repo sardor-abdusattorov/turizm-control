@@ -69,37 +69,12 @@ class ProjectForm
                                             ->afterOrEqual('starts_on'),
                                     ]),
 
-                                // Local events (реестр локальных мероприятий):
-                                // plan/fact money, headcount and a photo-report
-                                // link. Exhibitions never fill these; their
-                                // buyruqs are linked on the contracts instead.
+                                // Local events keep only the photo-report link —
+                                // all money and participation figures come from
+                                // the project's contracts now.
                                 Grid::make(['default' => 1, 'md' => 2])
                                     ->visible(self::isInternal(...))
                                     ->schema([
-                                        TextInput::make('estimate_amount')
-                                            ->label(__('app.label.estimate_amount'))
-                                            ->numeric()
-                                            ->step(0.01)
-                                            ->minValue(0)
-                                            ->prefix('UZS'),
-
-                                        TextInput::make('final_amount')
-                                            ->label(__('app.label.final_amount'))
-                                            ->numeric()
-                                            ->step(0.01)
-                                            ->minValue(0)
-                                            ->prefix('UZS'),
-                                    ]),
-
-                                Grid::make(['default' => 1, 'md' => 2])
-                                    ->visible(self::isInternal(...))
-                                    ->schema([
-                                        TextInput::make('attendees_count')
-                                            ->label(__('app.label.attendees_count'))
-                                            ->numeric()
-                                            ->step(1)
-                                            ->minValue(0),
-
                                         TextInput::make('photo_report_url')
                                             ->label(__('app.label.photo_report_url'))
                                             ->url()

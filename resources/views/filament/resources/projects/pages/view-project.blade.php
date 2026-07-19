@@ -109,17 +109,7 @@
 
     {{-- METRIC TILES --}}
     <section class="pj-stats">
-        @if ($isInternalProject)
-            {{-- Local events budget: plan vs fact from the registry columns. --}}
-            <div class="pj-stat">
-                <span class="pj-stat__lb">{!! $ic('heroicon-o-calculator', 13) !!} {{ __('app.label.estimate_amount') }}</span>
-                <div class="pj-stat__vl">{{ $record->estimate_amount !== null ? $fmt($record->estimate_amount).' UZS' : '—' }}</div>
-            </div>
-            <div class="pj-stat">
-                <span class="pj-stat__lb">{!! $ic('heroicon-o-banknotes', 13) !!} {{ __('app.label.final_amount') }}</span>
-                <div class="pj-stat__vl">{{ $record->final_amount !== null ? $fmt($record->final_amount).' UZS' : '—' }}</div>
-            </div>
-        @else
+        @unless ($isInternalProject)
             <div class="pj-stat">
                 <span class="pj-stat__lb">{!! $ic('heroicon-o-square-3-stack-3d', 13) !!} {{ __('app.label.area_sqm') }}</span>
                 <div class="pj-stat__vl">{{ $record->area_sqm !== null ? $fmt($record->area_sqm).' м²' : '—' }}</div>
@@ -131,7 +121,7 @@
                 <span class="pj-stat__lb">{!! $ic('heroicon-o-building-storefront', 13) !!} {{ __('app.label.stand_cost') }}</span>
                 <div class="pj-stat__vl">{{ $money($record->stand_cost, $record->standCurrency?->short_name) }}</div>
             </div>
-        @endif
+        @endunless
         <div class="pj-stat">
             <span class="pj-stat__lb">{!! $ic('heroicon-o-arrow-trending-down', 13) !!} {{ __('app.contract.direction.expense') }} · {{ __('app.label.contracts') }}</span>
             <div class="pj-stat__vl" @if ($expenseTotals->count() > 1) style="font-size:1rem;" @endif>{{ $expenseTotals->isNotEmpty() ? $moneyLines($expenseTotals) : '—' }}</div>
@@ -141,7 +131,7 @@
         </div>
         <div class="pj-stat">
             <span class="pj-stat__lb">{!! $ic('heroicon-o-user-group', 13) !!} {{ __('app.label.participants') }}</span>
-            <div class="pj-stat__vl">{{ $isInternalProject && $record->attendees_count !== null ? $record->attendees_count : $members->count() }}</div>
+            <div class="pj-stat__vl">{{ $members->count() }}</div>
             <div class="pj-stat__sub">{{ __('app.label.sponsors') }}: {{ $sponsors->count() }}</div>
         </div>
     </section>

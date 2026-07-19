@@ -12,10 +12,54 @@
     $money = fn ($amount, ?string $cur) => $amount === null ? '—' : $fmt($amount).($cur ? ' '.$cur : '');
 @endphp
 
+@php
+    $projectUrl = $project
+        ? BaseProjectResource::resourceFor($project)::getUrl('view', ['record' => $project])
+        : null;
+@endphp
+
 <x-filament-widgets::widget>
+    {{-- The toolbar always renders — filters first, pick the project after:
+         the picker is the way out of the empty state, never hidden by it. --}}
+    <div class="pj pj-stack">
+        <div class="pj-toprow">
+            <div class="pj-picker">
+                {{ $this->form }}
+            </div>
+
+            <div class="pj-arrows">
+                <button type="button" class="pj-arrow" wire:click="stepProject(-1)" title="{{ __('app.action.previous_project') }}">
+                    {!! $ic('heroicon-m-chevron-left', 16) !!}
+                </button>
+                <button type="button" class="pj-arrow" wire:click="stepProject(1)" title="{{ __('app.action.next_project') }}">
+                    {!! $ic('heroicon-m-chevron-right', 16) !!}
+                </button>
+            </div>
+
+            <div class="pj-filterbox" x-data="{ open: false }" @click.outside="open = false">
+                <button type="button" class="pj-filterbtn" :class="open && 'pj-filterbtn--on'" @click="open = ! open">
+                    {!! $ic('heroicon-o-funnel', 15) !!}
+                    <span class="pj-open__lb">{{ __('app.label.filters') }}</span>
+                    @if ($this->hasActiveFilters())
+                        <span class="pj-filterbtn__dot"></span>
+                    @endif
+                </button>
+                <div x-show="open" x-cloak class="pj-filterbox__panel">
+                    {{ $this->filtersForm }}
+                </div>
+            </div>
+
+            @if ($project)
+                <a href="{{ $projectUrl }}" class="pj-open" wire:navigate title="{{ __('app.action.open_project') }}">
+                    {!! $ic('heroicon-m-arrow-top-right-on-square', 15) !!}
+                    <span class="pj-open__lb">{{ __('app.action.open_project') }}</span>
+                </a>
+            @endif
+        </div>
+
     @if (! $project)
-        <section class="pj" style="border:1px solid var(--d);border-radius:.75rem;background:var(--s);padding:1.5rem;">
-            <p class="pj-empty" style="padding:0;text-align:left;">{{ __('app.message.no_projects_yet') }}</p>
+        <section class="pj-prompt">
+            {{ \App\Models\Project::query()->exists() ? __('app.message.pulse_pick_project') : __('app.message.no_projects_yet') }}
         </section>
     @else
         @php
@@ -61,48 +105,12 @@
                 ? $project->starts_on->format('d.m.Y').($project->ends_on ? ' — '.$project->ends_on->format('d.m.Y') : '')
                 : '—';
 
-            $projectUrl = BaseProjectResource::resourceFor($project)::getUrl('view', ['record' => $project]);
             $topContracts = $visibleContracts->take(5);
             $topParticipants = $members->concat($sponsors)->sortByDesc('amount')->take(5)->values();
         @endphp
 
-        {{-- Three calm groups: a bare toolbar row, the project card (hero +
-             stat row joined), and the two lists as their own cards below.
-             No controls inside the data card, no cards nested in cards. --}}
-        <div class="pj pj-stack">
-            <div class="pj-toprow">
-                <div class="pj-picker">
-                    {{ $this->form }}
-                </div>
-
-                <div class="pj-arrows">
-                    <button type="button" class="pj-arrow" wire:click="stepProject(-1)" title="{{ __('app.action.previous_project') }}">
-                        {!! $ic('heroicon-m-chevron-left', 16) !!}
-                    </button>
-                    <button type="button" class="pj-arrow" wire:click="stepProject(1)" title="{{ __('app.action.next_project') }}">
-                        {!! $ic('heroicon-m-chevron-right', 16) !!}
-                    </button>
-                </div>
-
-                <div class="pj-filterbox" x-data="{ open: false }" @click.outside="open = false">
-                    <button type="button" class="pj-filterbtn" :class="open && 'pj-filterbtn--on'" @click="open = ! open">
-                        {!! $ic('heroicon-o-funnel', 15) !!}
-                        <span class="pj-open__lb">{{ __('app.label.filters') }}</span>
-                        @if ($this->hasActiveFilters())
-                            <span class="pj-filterbtn__dot"></span>
-                        @endif
-                    </button>
-                    <div x-show="open" x-cloak class="pj-filterbox__panel">
-                        {{ $this->filtersForm }}
-                    </div>
-                </div>
-
-                <a href="{{ $projectUrl }}" class="pj-open" wire:navigate title="{{ __('app.action.open_project') }}">
-                    {!! $ic('heroicon-m-arrow-top-right-on-square', 15) !!}
-                    <span class="pj-open__lb">{{ __('app.action.open_project') }}</span>
-                </a>
-            </div>
-
+        {{-- The project card (hero + stat row joined) and the two lists as
+             their own cards below. No controls inside the data card. --}}
             <div class="pj-body"
                  wire:loading.class="pj--loading" wire:target="data.projectId,filters.type,filters.year,stepProject">
                 <div class="pj-card">
@@ -135,19 +143,13 @@
 
                 {{-- Tiles --}}
                 <section class="pj-stats">
-                    @if ($isInternalProject)
-                        <div class="pj-stat">
-                            <span class="pj-stat__lb">{!! $ic('heroicon-o-calculator', 13) !!} {{ __('app.label.estimate_amount') }}</span>
-                            <div class="pj-stat__vl">{{ $project->estimate_amount !== null ? $fmt($project->estimate_amount).' UZS' : '—' }}</div>
-                            <div class="pj-stat__sub">{{ __('app.label.final_amount') }}: {{ $project->final_amount !== null ? $fmt($project->final_amount) : '—' }}</div>
-                        </div>
-                    @else
+                    @unless ($isInternalProject)
                         <div class="pj-stat">
                             <span class="pj-stat__lb">{!! $ic('heroicon-o-square-3-stack-3d', 13) !!} {{ __('app.label.area_sqm') }}</span>
                             <div class="pj-stat__vl">{{ $project->area_sqm !== null ? $fmt($project->area_sqm).' м²' : '—' }}</div>
                             <div class="pj-stat__sub">{{ __('app.label.stand_cost') }}: {{ $money($project->stand_cost, $project->standCurrency?->short_name) }}</div>
                         </div>
-                    @endif
+                    @endunless
                     <div class="pj-stat">
                         <span class="pj-stat__lb">{!! $ic('heroicon-o-arrow-trending-down', 13) !!} {{ __('app.contract.direction.expense') }} · {{ __('app.label.contracts') }}</span>
                         <div class="pj-stat__vl" @if ($expenseTotals->count() > 1) style="font-size:1rem;" @endif>{{ $expenseTotals->isNotEmpty() ? $moneyLines($expenseTotals) : '—' }}</div>
@@ -161,7 +163,7 @@
                     </div>
                     <div class="pj-stat">
                         <span class="pj-stat__lb">{!! $ic('heroicon-o-user-group', 13) !!} {{ __('app.label.participants') }}</span>
-                        <div class="pj-stat__vl">{{ $isInternalProject && $project->attendees_count !== null ? $project->attendees_count : $members->count() }}</div>
+                        <div class="pj-stat__vl">{{ $members->count() }}</div>
                         <div class="pj-stat__sub">{{ __('app.label.sponsors') }}: {{ $sponsors->count() }}</div>
                     </div>
                 </section>
@@ -188,11 +190,9 @@
                                             <td style="white-space:nowrap;font-weight:600;">
                                                 <a class="pj-link" href="{{ \App\Filament\Resources\Contracts\ContractResource::getUrl('view', ['record' => $contract]) }}">{{ $contract->number }}</a>
                                             </td>
-                                            <td>
-                                                @if ($contract->contractType)
-                                                    <span class="pj-pill pj-pill--{{ $contract->contractType->direction?->color() ?? 'gray' }}">{{ $contract->contractType->title }}</span>
-                                                @endif
-                                            </td>
+                                            {{-- The counterparty is the fact you scan the list for —
+                                                 the type is already visible on the contract itself. --}}
+                                            <td>{{ $contract->counterparty()?->name ?? '—' }}</td>
                                             <td class="pj-table__num">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</td>
                                             <td style="width:1%;"><span class="pj-pill pj-pill--{{ $contract->status->color() }}">{{ $contract->status->label() }}</span></td>
                                         </tr>
@@ -231,6 +231,6 @@
                     </section>
                 </div>
             </div>
-        </div>
     @endif
+    </div>
 </x-filament-widgets::widget>

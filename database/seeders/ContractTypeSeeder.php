@@ -39,11 +39,23 @@ class ContractTypeSeeder extends Seeder
                 'sort' => 2,
             ],
             [
+                // We render the service, the participant pays — the type the
+                // hand-entered national-stand contracts actually need.
                 'title' => ['ru' => 'Оказание услуг', 'uz' => "Xizmat ko'rsatish", 'en' => 'Services'],
                 'description' => [
-                    'ru' => 'Услуги по организации мероприятий: роудшоу, транспорт, оборудование',
-                    'uz' => 'Tadbirlarni tashkil etish xizmatlari: roudshou, transport, jihozlar',
-                    'en' => 'Event services: roadshows, transport, equipment',
+                    'ru' => 'Услуги участникам: организация участия на национальном стенде',
+                    'uz' => 'Ishtirokchilarga xizmatlar: milliy stendda ishtirokni tashkil etish',
+                    'en' => 'Services to participants: organising participation on the national stand',
+                ],
+                'direction' => ContractDirection::Income,
+                'sort' => 5,
+            ],
+            [
+                'title' => ['ru' => 'Услуги подрядчика', 'uz' => 'Pudratchi xizmatlari', 'en' => 'Contractor services'],
+                'description' => [
+                    'ru' => 'Услуги, которые оплачиваем мы: роудшоу, транспорт, оборудование',
+                    'uz' => "Biz to'laydigan xizmatlar: roudshou, transport, jihozlar",
+                    'en' => 'Services we pay for: roadshows, transport, equipment',
                 ],
                 'direction' => ContractDirection::Expense,
                 'sort' => 3,
@@ -66,7 +78,7 @@ class ContractTypeSeeder extends Seeder
                     'en' => "Tour operator's fee for participating on the national stand",
                 ],
                 'direction' => ContractDirection::Income,
-                'sort' => 5,
+                'sort' => 6,
             ],
             [
                 'title' => ['ru' => 'Спонсорство', 'uz' => 'Homiylik', 'en' => 'Sponsorship'],
@@ -77,12 +89,12 @@ class ContractTypeSeeder extends Seeder
                 ],
                 'direction' => ContractDirection::Income,
                 'counterparty_kind' => CounterpartyKind::Sponsor,
-                'sort' => 6,
+                'sort' => 7,
             ],
         ];
 
         foreach ($types as $data) {
-            ContractType::firstOrCreate(
+            ContractType::updateOrCreate(
                 ['title->ru' => $data['title']['ru']],
                 [
                     'title' => $data['title'],

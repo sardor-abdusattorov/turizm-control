@@ -113,15 +113,18 @@ class ProjectPulseWidget extends Widget implements HasSchemas
             ->statePath('filters');
     }
 
+    /**
+     * Strictly the picked project — no silent fallback: when the filters
+     * leave the selection empty, the widget shows the pick-a-project prompt
+     * instead of a project the filters never matched.
+     */
     public function project(): ?Project
     {
         $projectId = data_get($this->data, 'projectId');
 
-        $project = $projectId
+        return $projectId
             ? Project::query()->find($projectId)
             : null;
-
-        return $project ?? Project::dashboardDefault();
     }
 
     /**
@@ -157,8 +160,8 @@ class ProjectPulseWidget extends Widget implements HasSchemas
 
     /**
      * When a filter changes, keep the shown project if it still matches;
-     * otherwise jump to the first project in the narrowed set so the card
-     * never shows a project that falls outside the active filters.
+     * otherwise CLEAR the selection — filters first, then the user picks a
+     * project from the narrowed list. Nothing is auto-chosen for them.
      */
     protected function rehomeSelection(): void
     {
@@ -168,9 +171,8 @@ class ProjectPulseWidget extends Widget implements HasSchemas
             return;
         }
 
-        $next = $ids[0] ?? null;
-        $this->data['projectId'] = $next;
-        $this->persist($next);
+        $this->data['projectId'] = null;
+        $this->persist(null);
     }
 
     protected function persist(mixed $state): void

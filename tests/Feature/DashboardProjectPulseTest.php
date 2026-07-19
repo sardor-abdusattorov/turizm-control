@@ -103,16 +103,17 @@ it('narrows and rehomes the selection when the type filter changes', function ()
     actingAs(userWithPermission('view_any_project'));
 
     // Default lands on the nearest upcoming project (the international one);
-    // filtering to internal jumps the card to the only matching project.
+    // filtering to internal CLEARS the selection — filters first, then the
+    // user picks; nothing is auto-chosen. The prompt replaces the card.
     Livewire::test(ProjectPulseWidget::class)
         ->assertSet('data.projectId', $intl->id)
         ->assertSee('Берлин')
         ->set('filters.type', 'internal')
-        ->assertSet('data.projectId', $internal->id)
-        ->assertSee('Самарканд')
+        ->assertSet('data.projectId', null)
+        ->assertSee(__('app.message.pulse_pick_project'))
         ->assertDontSee('Берлин');
 
-    expect(session('dashboard.project_id'))->toBe($internal->id);
+    expect(session('dashboard.project_id'))->toBeNull();
 });
 
 it('keeps the selection when it still matches the changed filter', function () {
@@ -128,15 +129,19 @@ it('keeps the selection when it still matches the changed filter', function () {
         ->assertSee('Париж');
 });
 
-it('rehomes the selection when the year filter changes', function () {
+it('clears the selection when the year filter excludes it, arrows pick from the narrowed list', function () {
     $past = Project::factory()->international()->create(['name' => 'EXPO-PAST', 'starts_on' => now()->subYear(), 'status' => true, 'venue' => 'Токио']);
     $upcoming = Project::factory()->international()->create(['name' => 'EXPO-NEXT', 'starts_on' => now()->addWeek(), 'status' => true, 'venue' => 'Дубай']);
 
     actingAs(userWithPermission('view_any_project'));
 
+    // The old selection no longer matches → cleared; the arrow is an explicit
+    // pick, so stepping from the empty state lands on the filtered project.
     Livewire::test(ProjectPulseWidget::class)
         ->assertSet('data.projectId', $upcoming->id)
         ->set('filters.year', (string) now()->subYear()->year)
+        ->assertSet('data.projectId', null)
+        ->call('stepProject', 1)
         ->assertSet('data.projectId', $past->id)
         ->assertSee('Токио');
 });
@@ -171,10 +176,14 @@ it('steps only within the filtered project list', function () {
 
     actingAs(userWithPermission('view_any_project'));
 
-    // With the type filter narrowed to international, the arrows cycle
-    // between the two matching projects and never land on the internal one.
+    // Narrowing to international clears the (internal) selection; the arrows
+    // then cycle through the two matching projects, list head first, and never
+    // land on the internal one.
     Livewire::test(ProjectPulseWidget::class)
         ->set('filters.type', 'international')
+        ->assertSet('data.projectId', null)
+        ->call('stepProject', 1)
+        ->assertSet('data.projectId', $intl2->id)
         ->call('stepProject', 1)
         ->assertSet('data.projectId', $intl1->id)
         ->call('stepProject', 1)

@@ -154,7 +154,7 @@ class RealDossiers2025Seeder extends Seeder
 
         $rental = $kind('Аренда площади');
         $stand = $kind('Застройка стенда');
-        $services = $kind('Оказание услуг');
+        $services = $kind('Услуги подрядчика');
         $agency = $kind('Агентские услуги');
 
         if (! $rental || ! $stand) {

@@ -68,7 +68,6 @@ it('shows visible-contract expense totals and the photo report on the view page'
     $project = Project::factory()->create([
         'type' => ProjectType::Internal,
         'photo_report_url' => 'https://clck.ru/3UYYzh',
-        'attendees_count' => 165,
     ]);
 
     $expense = ContractType::factory()->create();
@@ -88,8 +87,7 @@ it('shows visible-contract expense totals and the photo report on the view page'
     Livewire::test(ViewInternalProject::class, ['record' => $project->id])
         ->assertOk()
         ->assertSee('https://clck.ru/3UYYzh')
-        ->assertSee('1 500 000')
-        ->assertSee('165');
+        ->assertSee('1 500 000');
 });
 
 it('saves the local-event fields through the internal project form', function () {
@@ -107,9 +105,6 @@ it('saves the local-event fields through the internal project form', function ()
             'name' => 'Orol dengiziga poyezd',
             'starts_on' => '2026-05-20',
             'ends_on' => '2026-05-24',
-            'estimate_amount' => 271000000,
-            'final_amount' => 265000000,
-            'attendees_count' => 165,
             'photo_report_url' => 'https://clck.ru/3UYYzh',
         ])
         ->call('create')
@@ -117,7 +112,6 @@ it('saves the local-event fields through the internal project form', function ()
 
     assertDatabaseHas(Project::class, [
         'name' => 'Orol dengiziga poyezd',
-        'attendees_count' => 165,
         'photo_report_url' => 'https://clck.ru/3UYYzh',
     ]);
 });

@@ -179,29 +179,6 @@ class ProjectsTable
                     ->alignEnd()
                     ->toggleable(),
 
-                TextColumn::make('estimate_amount')
-                    ->label(__('app.label.estimate_amount'))
-                    ->formatStateUsing(fn (?string $state): string => Money::format($state).' UZS')
-                    ->placeholder('—')
-                    ->alignEnd()
-                    ->visible(self::isInternalList(...))
-                    ->toggleable(),
-
-                TextColumn::make('final_amount')
-                    ->label(__('app.label.final_amount'))
-                    ->formatStateUsing(fn (?string $state): string => Money::format($state).' UZS')
-                    ->placeholder('—')
-                    ->alignEnd()
-                    ->visible(self::isInternalList(...))
-                    ->toggleable(),
-
-                TextColumn::make('attendees_count')
-                    ->label(__('app.label.attendees_count'))
-                    ->placeholder('—')
-                    ->alignCenter()
-                    ->visible(self::isInternalList(...))
-                    ->toggleable(),
-
                 TextColumn::make('creator.name')
                     ->label(__('app.label.created_by'))
                     ->placeholder('—')

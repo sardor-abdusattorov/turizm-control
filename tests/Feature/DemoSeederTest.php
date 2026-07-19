@@ -2,9 +2,11 @@
 
 use App\Enums\ProjectType;
 use App\Models\Contract;
+use App\Models\ContractType;
 use App\Models\Order;
 use App\Models\Project;
 use App\Models\Sponsor;
+use Database\Seeders\ContractTypeSeeder;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -52,13 +54,13 @@ it('seeds the exhibition sponsors as standalone entities', function () {
         ->and(Sponsor::count())->toBeGreaterThanOrEqual(4);
 });
 
-it('the five filled local events carry their estimates and photo reports', function () {
+it('the five filled local events carry their photo reports', function () {
     Storage::fake('local');
 
     $this->seed(DatabaseSeeder::class);
 
     expect(Project::query()->where('type', ProjectType::Internal->value)->count())->toBe(5)
-        ->and(Project::query()->firstWhere('attendees_count', 165)?->photo_report_url)->toBe('https://clck.ru/3UYYzh');
+        ->and(Project::query()->where('photo_report_url', 'https://clck.ru/3UYYzh')->exists())->toBeTrue();
 });
 
 it('re-seeding never duplicates the projects', function () {
@@ -70,4 +72,18 @@ it('re-seeding never duplicates the projects', function () {
     $this->seed(DatabaseSeeder::class);
 
     expect(Project::count())->toBe($before);
+});
+
+it('seeds services as income and contractor services as expense', function () {
+    $this->seed(ContractTypeSeeder::class);
+
+    $direction = fn (string $ru) => ContractType::query()
+        ->where('title->ru', $ru)->first()?->direction?->value;
+
+    // «Оказание услуг» is what the hand-entered national-stand contracts
+    // use — participants pay us, so it MUST be income or the dashboard
+    // participants, fee totals and the registry export all stay empty.
+    expect($direction('Оказание услуг'))->toBe('income')
+        ->and($direction('Услуги подрядчика'))->toBe('expense')
+        ->and($direction('Взнос участника'))->toBe('income');
 });

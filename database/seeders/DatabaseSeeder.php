@@ -33,6 +33,11 @@ class DatabaseSeeder extends Seeder
             Exhibitions2025Seeder::class,
             InternationalProjects2026Seeder::class,
             LocalEvents2026Seeder::class,
+            // Replays database/seeders/data/contracts-snapshot.json (written
+            // by `php artisan contracts:snapshot` BEFORE a rebuild) so the
+            // hand-entered contracts survive migrate:fresh verbatim. A no-op
+            // when no snapshot file exists.
+            HandEnteredContractsSeeder::class,
         ]);
     }
 }
