@@ -6,7 +6,6 @@ use App\Enums\OrderScope;
 use App\Models\Concerns\HasActiveStatus;
 use App\Models\Concerns\HasDocumentKey;
 use App\Observers\OrderObserver;
-use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +21,6 @@ class Order extends Model
 
     protected $fillable = [
         'number',
-        'order_type_id',
         'scope',
         'title',
         'description',
@@ -38,25 +36,6 @@ class Order extends Model
         'status' => 'boolean',
         'issued_at' => 'date',
     ];
-
-    public const NUMBER_PREFIX = 'ПРК';
-
-    public static function generateNumber(\DateTimeInterface|CarbonInterface|null $issuedAt = null): string
-    {
-        $year = $issuedAt ? (int) $issuedAt->format('Y') : now()->year;
-        $prefix = self::NUMBER_PREFIX;
-
-        $lastSeq = static::query()
-            ->where('number', 'like', "{$prefix}-{$year}-%")
-            ->orderByDesc('id')
-            ->value('number');
-
-        $next = $lastSeq
-            ? ((int) substr($lastSeq, strrpos($lastSeq, '-') + 1)) + 1
-            : 1;
-
-        return sprintf('%s-%d-%03d', $prefix, $year, $next);
-    }
 
     public function registerYear(): ?int
     {
@@ -119,11 +98,6 @@ class Order extends Model
             self::STATUS_ACTIVE => __('app.status.active'),
             self::STATUS_INACTIVE => __('app.status.inactive'),
         ];
-    }
-
-    public function orderType(): BelongsTo
-    {
-        return $this->belongsTo(OrderType::class);
     }
 
     public function creator(): BelongsTo

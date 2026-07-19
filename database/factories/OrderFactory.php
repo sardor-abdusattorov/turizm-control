@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Order;
-use App\Models\OrderType;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,7 +18,7 @@ class OrderFactory extends Factory
         $issued = fake()->dateTimeBetween('-6 months', 'now');
 
         return [
-            'order_type_id' => OrderType::factory(),
+            'number' => fake()->unique()->numberBetween(1, 999).'-АФ',
             'title' => fake()->sentence(3),
             'description' => fake()->paragraph(),
             'file_path' => 'uploads/files/orders/2026/06/order-'.fake()->uuid().'.docx',

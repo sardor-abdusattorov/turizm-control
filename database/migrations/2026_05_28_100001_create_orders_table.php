@@ -10,8 +10,9 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->string('number', 50)->nullable()->unique();
-            $table->foreignId('order_type_id')->constrained()->restrictOnDelete();
+            // Every real buyruq has an official number (06-АФ, 119-АФ…) —
+            // entered by hand, never generated.
+            $table->string('number', 50)->unique();
             $table->string('scope', 20)->default('internal');
             $table->string('title');
             $table->text('description')->nullable();

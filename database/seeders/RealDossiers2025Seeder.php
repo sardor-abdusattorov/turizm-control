@@ -9,7 +9,6 @@ use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Order;
-use App\Models\OrderType;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -49,9 +48,6 @@ class RealDossiers2025Seeder extends Seeder
      */
     protected function seedOrders(): array
     {
-        $production = OrderType::firstWhere('title->ru', 'Производственный')
-            ?? OrderType::query()->first();
-
         $rows = [
             ['06-АФ', '2025-01-06', 'Об участии в выставке «FITUR 2025» (Мадрид)', 'documents/Fitur/06-АФ Фитур.pdf'],
             ['34-АФ', '2025-02-07', 'Об участии в выставке «ITB Berlin 2025»', 'documents/ITB berlin/34-AF Берлин.pdf'],
@@ -75,7 +71,6 @@ class RealDossiers2025Seeder extends Seeder
             $order = Order::firstOrCreate(
                 ['number' => $number],
                 [
-                    'order_type_id' => $production?->id,
                     'scope' => 'external',
                     'title' => $title,
                     'description' => 'Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз.',

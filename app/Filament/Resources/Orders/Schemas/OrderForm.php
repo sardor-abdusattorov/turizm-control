@@ -3,9 +3,7 @@
 namespace App\Filament\Resources\Orders\Schemas;
 
 use App\Filament\Support\DocumentUpload;
-use App\Models\OrderType;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -24,21 +22,14 @@ class OrderForm
                     ->schema([
                         Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
-                                // Real buyruqs carry official numbers (06-АФ,
-                                // 74-АФ…) — enterable by hand; left blank, the
-                                // observer assigns the next ПРК-числo.
+                                // Every real buyruq carries its official
+                                // number (06-АФ, 119-АФ…) — entered by hand,
+                                // никакой автогенерации.
                                 TextInput::make('number')
                                     ->label(__('app.label.order_number'))
-                                    ->placeholder(__('app.label.order_number_auto'))
+                                    ->required()
                                     ->maxLength(50)
                                     ->unique('orders', 'number', ignoreRecord: true),
-
-                                Select::make('order_type_id')
-                                    ->label(__('app.label.order_type_single'))
-                                    ->options(OrderType::getActive())
-                                    ->required()
-                                    ->searchable()
-                                    ->preload(),
 
                                 DatePicker::make('issued_at')
                                     ->label(__('app.label.issued_at'))

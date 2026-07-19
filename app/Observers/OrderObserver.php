@@ -12,10 +12,6 @@ class OrderObserver
         if (! $order->document_key) {
             $order->document_key = Order::generateDocumentKey();
         }
-
-        if (! $order->number) {
-            $order->number = Order::generateNumber($order->issued_at);
-        }
     }
 
     public function deleting(Order $order): void

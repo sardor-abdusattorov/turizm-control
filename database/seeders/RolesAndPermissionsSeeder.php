@@ -54,7 +54,6 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('currency', ['view_any']),
             ...$this->resourcePermissions('department', ['view_any']),
             ...$this->resourcePermissions('position', ['view_any']),
-            ...$this->resourcePermissions('order_type', ['view_any']),
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
             ...$this->resourcePermissions('project', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('sponsor', ['view_any', 'view', 'create', 'update']),        ]);

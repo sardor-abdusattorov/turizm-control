@@ -20,7 +20,6 @@
     $details = [
         ['heroicon-o-hashtag',                __('app.label.order_number'),       $record->number],
         ['heroicon-o-bolt',                   __('app.label.status'),             $statusLabel, 'status'],
-        ['heroicon-o-tag',                    __('app.label.order_type_single'),  $record->orderType?->title],
         ['heroicon-o-calendar',               __('app.label.issued_at'),          $record->issued_at?->format('d.m.Y')],
         ['heroicon-o-calendar-days',          __('app.label.year'),               $record->registerYear()],
         ['heroicon-o-bars-3-bottom-left',     __('app.label.description'),        $record->description, 'wrap'],

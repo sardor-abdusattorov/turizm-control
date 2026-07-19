@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
             PositionSeeder::class,
             DepartmentSeeder::class,
             CurrencySeeder::class,
-            OrderTypeSeeder::class,
             ContractTypeSeeder::class,
             ContactSeeder::class,
             ForeignPartnerSeeder::class,

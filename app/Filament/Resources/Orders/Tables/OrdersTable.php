@@ -50,12 +50,6 @@ class OrdersTable
                         default => route('orders.file.inline', ['order' => $record]),
                     }, shouldOpenInNewTab: true),
 
-                TextColumn::make('orderType.title')
-                    ->label(__('app.label.order_type_single'))
-                    ->badge()
-                    ->searchable()
-                    ->sortable(),
-
                 TextColumn::make('issued_at')
                     ->label(__('app.label.issued_at'))
                     ->date('d.m.Y')
@@ -73,12 +67,6 @@ class OrdersTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('order_type_id')
-                    ->label(__('app.label.order_type_single'))
-                    ->relationship('orderType', 'title')
-                    ->searchable()
-                    ->preload(),
-
                 SelectFilter::make('issued_year')
                     ->label(__('app.label.year'))
                     ->options(fn (): array => Order::query()

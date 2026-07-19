@@ -16,7 +16,6 @@ use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
 use App\Models\Order;
-use App\Models\OrderType;
 use App\Models\Position;
 use App\Models\Project;
 use App\Models\Sponsor;
@@ -309,7 +308,6 @@ return [
             Contact::class,
             Department::class,
             Position::class,
-            OrderType::class,
             Currency::class,
             Order::class,
             Project::class,
