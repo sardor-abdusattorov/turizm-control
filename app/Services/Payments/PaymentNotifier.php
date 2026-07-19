@@ -116,9 +116,11 @@ class PaymentNotifier
     }
 
     /**
-     * The screenshot goes to the accounting department only — the people who
-     * reconcile bank money — never to a wider circle: the file lives on the
-     * private disk and payment sums are sensitive.
+     * The proof files go to the accounting department only — the people who
+     * reconcile bank money — never to a wider circle: the files live on the
+     * private disk and payment sums are sensitive. The first file carries the
+     * caption and the open-contract button; the rest follow bare. Images ride
+     * as photos, PDF payment orders as documents.
      */
     private function notifyAccounting(Payment $payment, Contract $contract): void
     {
@@ -140,12 +142,18 @@ class PaymentNotifier
                     ],
                 ]];
 
-                $this->telegram->queuePhoto(
-                    $recipient->telegram?->chat_id,
-                    $payment->screenshot,
-                    $caption,
-                    $keyboard,
-                );
+                $chatId = $recipient->telegram?->chat_id;
+
+                foreach (array_values($payment->screenshots ?? []) as $index => $path) {
+                    $fileCaption = $index === 0 ? $caption : '';
+                    $fileKeyboard = $index === 0 ? $keyboard : null;
+
+                    if (Payment::isPdf($path)) {
+                        $this->telegram->queueDocument($chatId, $path, $fileCaption, $fileKeyboard);
+                    } else {
+                        $this->telegram->queuePhoto($chatId, $path, $fileCaption, $fileKeyboard);
+                    }
+                }
             });
         }
     }

@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\Payments\Schemas;
 
-use App\Filament\Support\ImageUpload;
+use App\Filament\Support\PaymentFilesUpload;
 use App\Models\Contract;
-use App\Models\Payment;
 use App\Rules\PaymentWithinRemaining;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -65,9 +64,7 @@ class PaymentForm
                             ->native(false)
                             ->maxDate(now()),
 
-                        ImageUpload::make(Payment::SCREENSHOT_DIR, 'screenshot')
-                            ->label(__('app.label.screenshot'))
-                            ->required()
+                        PaymentFilesUpload::make()
                             ->columnSpanFull(),
                     ]),
             ]);

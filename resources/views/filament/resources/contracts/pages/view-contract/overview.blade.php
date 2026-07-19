@@ -169,7 +169,7 @@
                     @else
                         <div class="cw-chain" style="gap:.55rem;">
                             @foreach ($payments as $payment)
-                                @php $screenshotUrl = $this->paymentScreenshotUrl($payment); @endphp
+                                @php $paymentFiles = $this->paymentScreenshotFiles($payment); @endphp
                                 <div class="cw-step" style="align-items:center;">
                                     <div class="cw-node" style="background:rgba(34,197,94,.12);">
                                         <span class="cw-badge cw-badge--approved">{!! $ic('heroicon-s-check-circle', 13) !!}</span>
@@ -184,9 +184,9 @@
                                             · {{ $payment->created_at?->format('d.m.Y H:i') }}
                                         </div>
                                     </div>
-                                    @if ($screenshotUrl)
-                                        <a href="{{ $screenshotUrl }}" target="_blank" rel="noopener" class="cw-eye" title="{{ __('app.label.open_screenshot') }}">{!! $ic('heroicon-o-photo', 16) !!}</a>
-                                    @endif
+                                    @foreach ($paymentFiles as $file)
+                                        <a href="{{ $file['url'] }}" target="_blank" rel="noopener" class="cw-eye" title="{{ $file['pdf'] ? $file['name'] : __('app.label.open_screenshot') }}">{!! $ic($file['pdf'] ? 'heroicon-o-document-text' : 'heroicon-o-photo', 16) !!}</a>
+                                    @endforeach
                                 </div>
                             @endforeach
                         </div>

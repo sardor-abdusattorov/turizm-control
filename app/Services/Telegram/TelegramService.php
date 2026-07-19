@@ -2,6 +2,7 @@
 
 namespace App\Services\Telegram;
 
+use App\Jobs\SendTelegramDocument;
 use App\Jobs\SendTelegramMessage;
 use App\Jobs\SendTelegramPhoto;
 use App\Models\TelegramMessageLog;
@@ -151,6 +152,79 @@ class TelegramService
             Log::warning('Telegram sendPhoto failed', ['error' => $error]);
 
             $this->record('sendPhoto', ['chat_id' => $chatId, 'text' => $payload['caption']], false, null, $error);
+
+            return false;
+        }
+    }
+
+    /**
+     * Queue a document (path relative to the private `local` disk) with a
+     * caption — PDF payment orders ride this instead of sendPhoto.
+     *
+     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
+     */
+    public function queueDocument(?string $chatId, string $path, string $caption, ?array $inlineKeyboard = null): void
+    {
+        if (! $this->token() || ! $chatId) {
+            return;
+        }
+
+        SendTelegramDocument::dispatch($chatId, $path, $caption, $inlineKeyboard);
+    }
+
+    /**
+     * Send a file as a Telegram document with an HTML caption. Falls back to
+     * a text-only message when the file has vanished from disk, mirroring
+     * sendPhoto — the notification itself is never silently lost.
+     *
+     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
+     */
+    public function sendDocument(?string $chatId, string $path, string $caption, ?array $inlineKeyboard = null): bool
+    {
+        if (! $this->token() || ! $chatId) {
+            return false;
+        }
+
+        if (! Storage::disk('local')->exists($path)) {
+            return $this->send($chatId, $caption, $inlineKeyboard);
+        }
+
+        $payload = [
+            'chat_id' => $chatId,
+            'caption' => mb_substr($caption, 0, 1024),
+            'parse_mode' => 'HTML',
+        ];
+
+        if ($inlineKeyboard !== null) {
+            // Multipart fields must be scalar — the keyboard rides as JSON.
+            $payload['reply_markup'] = json_encode(['inline_keyboard' => $inlineKeyboard]);
+        }
+
+        try {
+            $response = Http::timeout(15)
+                ->attach('document', Storage::disk('local')->get($path), basename($path))
+                ->post("https://api.telegram.org/bot{$this->token()}/sendDocument", $payload);
+
+            if (! $response->successful()) {
+                Log::warning('Telegram sendDocument rejected', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                $this->markBlockedIfNeeded($response->status(), $chatId);
+            }
+
+            $this->record('sendDocument', ['chat_id' => $chatId, 'text' => $payload['caption']],
+                $response->successful(), $response->status(),
+                $response->successful() ? null : $response->body());
+
+            return $response->successful();
+        } catch (\Throwable $e) {
+            $error = $this->redactToken($e->getMessage());
+
+            Log::warning('Telegram sendDocument failed', ['error' => $error]);
+
+            $this->record('sendDocument', ['chat_id' => $chatId, 'text' => $payload['caption']], false, null, $error);
 
             return false;
         }

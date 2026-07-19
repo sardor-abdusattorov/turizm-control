@@ -22,12 +22,13 @@ class Payment extends Model
         'created_by',
         'percent',
         'paid_at',
-        'screenshot',
+        'screenshots',
     ];
 
     protected $casts = [
         'percent' => 'decimal:2',
         'paid_at' => 'date',
+        'screenshots' => 'array',
     ];
 
     public const SCREENSHOT_DIR = 'payments';
@@ -51,17 +52,35 @@ class Payment extends Model
         });
 
         static::deleting(function (self $payment): void {
-            if ($payment->screenshot && Storage::disk('local')->exists($payment->screenshot)) {
-                Storage::disk('local')->delete($payment->screenshot);
+            foreach ($payment->screenshots ?? [] as $path) {
+                if (Storage::disk('local')->exists($path)) {
+                    Storage::disk('local')->delete($path);
+                }
             }
         });
     }
 
-    public function screenshotUrl(): ?string
+    public static function isPdf(string $path): bool
     {
-        return $this->screenshot
-            ? Storage::disk('local')->temporaryUrl($this->screenshot, now()->addMinutes(30))
-            : null;
+        return str_ends_with(strtolower($path), '.pdf');
+    }
+
+    /**
+     * The proof files as signed expiring links, split by kind for the views:
+     * images go to thumbnails/lightboxes, PDFs to plain document links.
+     *
+     * @return list<array{url: string, name: string, pdf: bool}>
+     */
+    public function screenshotFiles(): array
+    {
+        return array_values(array_map(
+            fn (string $path): array => [
+                'url' => Storage::disk('local')->temporaryUrl($path, now()->addMinutes(30)),
+                'name' => basename($path),
+                'pdf' => self::isPdf($path),
+            ],
+            $this->screenshots ?? [],
+        ));
     }
 
     public function contract(): BelongsTo

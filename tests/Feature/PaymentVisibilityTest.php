@@ -29,7 +29,7 @@ function paymentForResponsible(User $responsible): Payment
         'created_by' => $responsible->id,
         'percent' => 20,
         'paid_at' => now(),
-        'screenshot' => 'payments/seed.png',
+        'screenshots' => ['payments/seed.png'],
     ]);
 }
 

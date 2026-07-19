@@ -286,7 +286,7 @@ return [
         'payment_plural' => 'Платежи',
         'percent' => 'Процент',
         'paid_at' => 'Дата оплаты',
-        'screenshot' => 'Скриншот',
+        'screenshot' => 'Подтверждения оплаты',
         'payment_status' => 'Статус оплаты',
         'paid_percent' => 'Оплачено',
         'total_paid' => 'Всего оплачено',

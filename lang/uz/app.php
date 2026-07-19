@@ -286,7 +286,7 @@ return [
         'payment_plural' => 'To‘lovlar',
         'percent' => 'Foiz',
         'paid_at' => 'To‘lov sanasi',
-        'screenshot' => 'Skrinshot',
+        'screenshot' => "To'lov tasdiqlari",
         'payment_status' => 'To‘lov holati',
         'paid_percent' => 'To‘langan',
         'total_paid' => 'Jami to‘langan',

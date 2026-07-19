@@ -31,7 +31,7 @@ it('marks a contract as partially paid after the first payment', function () {
         'created_by' => $user->id,
         'percent' => 30,
         'paid_at' => now(),
-        'screenshot' => 'payments/test.png',
+        'screenshots' => ['payments/test.png'],
     ]);
 
     expect($contract->fresh()->payment_status)->toBe(PaymentStatus::PartiallyPaid)
@@ -47,7 +47,7 @@ it('marks a contract as fully paid when payments reach 100 percent', function ()
         'created_by' => $user->id,
         'percent' => 40,
         'paid_at' => now(),
-        'screenshot' => 'payments/a.png',
+        'screenshots' => ['payments/a.png'],
     ]);
 
     Payment::create([
@@ -55,7 +55,7 @@ it('marks a contract as fully paid when payments reach 100 percent', function ()
         'created_by' => $user->id,
         'percent' => 60,
         'paid_at' => now(),
-        'screenshot' => 'payments/b.png',
+        'screenshots' => ['payments/b.png'],
     ]);
 
     expect($contract->fresh()->payment_status)->toBe(PaymentStatus::FullyPaid)
@@ -71,7 +71,7 @@ it('falls back to not paid after every payment is deleted', function () {
         'created_by' => $user->id,
         'percent' => 25,
         'paid_at' => now(),
-        'screenshot' => 'payments/x.png',
+        'screenshots' => ['payments/x.png'],
     ]);
 
     expect($contract->fresh()->payment_status)->toBe(PaymentStatus::PartiallyPaid);
@@ -87,16 +87,18 @@ it('deletes the screenshot file from disk when the payment is deleted', function
     $user = User::factory()->create();
 
     $path = UploadedFile::fake()->image('proof.png')->storeAs(Payment::SCREENSHOT_DIR, 'proof.png', 'local');
+    $pdf = UploadedFile::fake()->create('order.pdf', 5, 'application/pdf')->storeAs(Payment::SCREENSHOT_DIR, 'order.pdf', 'local');
 
     $payment = Payment::create([
         'contract_id' => $contract->id,
         'created_by' => $user->id,
         'percent' => 10,
         'paid_at' => now(),
-        'screenshot' => $path,
+        'screenshots' => [$path, $pdf],
     ]);
 
     Storage::disk('local')->assertExists($path);
+    Storage::disk('local')->assertExists($pdf);
 
     $payment->delete();
 
@@ -112,7 +114,7 @@ it('cascades delete: removing a contract removes its payments', function () {
         'created_by' => $user->id,
         'percent' => 20,
         'paid_at' => now(),
-        'screenshot' => 'payments/c.png',
+        'screenshots' => ['payments/c.png'],
     ]);
 
     $contract->delete();
@@ -129,7 +131,7 @@ it('reports remaining percent and cannot accept payment once fully paid', functi
         'created_by' => $user->id,
         'percent' => 80,
         'paid_at' => now(),
-        'screenshot' => 'payments/big.png',
+        'screenshots' => ['payments/big.png'],
     ]);
 
     expect($contract->fresh()->remainingPercent())->toBe(20.0)
@@ -140,7 +142,7 @@ it('reports remaining percent and cannot accept payment once fully paid', functi
         'created_by' => $user->id,
         'percent' => 20,
         'paid_at' => now(),
-        'screenshot' => 'payments/done.png',
+        'screenshots' => ['payments/done.png'],
     ]);
 
     expect($contract->fresh()->canAcceptPayment())->toBeFalse();

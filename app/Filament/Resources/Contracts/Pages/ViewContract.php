@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Contracts\Pages;
 use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Support\ExportPermission;
-use App\Filament\Support\ImageUpload;
+use App\Filament\Support\PaymentFilesUpload;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\ContractAttachment;
@@ -226,9 +226,7 @@ class ViewContract extends ViewRecord
                         ->maxDate(now())
                         ->default(now()),
 
-                    ImageUpload::make(Payment::SCREENSHOT_DIR, 'screenshot')
-                        ->label(__('app.label.screenshot'))
-                        ->required(),
+                    PaymentFilesUpload::make(),
                 ])
                 ->action(function (array $data): void {
                     if (! app(RecordPayment::class)->record($this->record, $data)) {
@@ -437,9 +435,12 @@ class ViewContract extends ViewRecord
         ];
     }
 
-    public function paymentScreenshotUrl(Payment $payment): ?string
+    /**
+     * @return list<array{url: string, name: string, pdf: bool}>
+     */
+    public function paymentScreenshotFiles(Payment $payment): array
     {
-        return $payment->screenshotUrl();
+        return $payment->screenshotFiles();
     }
 
     public function approverAvatar(ContractApprover $approver): string

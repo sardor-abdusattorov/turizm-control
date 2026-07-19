@@ -4,7 +4,7 @@
 
     $percent = format_percent((float) $record->percent);
     $contractUrl = $this->contractUrl();
-    $shotUrl = $this->screenshotUrl();
+    $shotFiles = $this->screenshotFiles();
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
@@ -63,17 +63,27 @@
         </div>
     </section>
 
-    {{-- SCREENSHOT --}}
-    @if ($shotUrl)
+    {{-- PROOF FILES --}}
+    @if ($shotFiles !== [])
         <section class="pv-card">
             <div class="pv-hd">
                 <span class="pv-hd__ic">{!! $ic('heroicon-o-photo') !!}</span>
                 <h2 class="pv-hd__t">{{ __('app.label.screenshot') }}</h2>
+                <span class="pj-count">{{ count($shotFiles) }}</span>
             </div>
             <div class="pv-shot">
-                <a href="{{ $shotUrl }}" target="_blank" rel="noopener" title="{{ __('app.label.open_screenshot') }}">
-                    <img src="{{ $shotUrl }}" alt="{{ __('app.label.screenshot') }}">
-                </a>
+                @foreach ($shotFiles as $file)
+                    @if ($file['pdf'])
+                        <a href="{{ $file['url'] }}" target="_blank" rel="noopener" class="pv-shot__pdf" title="{{ $file['name'] }}">
+                            {!! $ic('heroicon-o-document-text', 18) !!}
+                            <span>{{ $file['name'] }}</span>
+                        </a>
+                    @else
+                        <a href="{{ $file['url'] }}" target="_blank" rel="noopener" title="{{ __('app.label.open_screenshot') }}">
+                            <img src="{{ $file['url'] }}" alt="{{ $file['name'] }}">
+                        </a>
+                    @endif
+                @endforeach
             </div>
         </section>
     @endif
@@ -196,9 +206,13 @@
         text-decoration: underline;
     }
 
-    /* SCREENSHOT */
+    /* PROOF FILES — image thumbnails side by side, PDFs as document rows. */
     .pv-shot {
         padding: 1.25rem 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: .75rem;
+        align-items: flex-start;
     }
     .pv-shot a {
         display: inline-block;
@@ -210,8 +224,23 @@
     .pv-shot img {
         display: block;
         max-width: 100%;
-        max-height: 32rem;
+        max-height: 22rem;
         height: auto;
+    }
+    .pv-shot__pdf {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .6rem .9rem;
+        font-size: .8125rem;
+        font-weight: 500;
+        color: var(--t);
+        text-decoration: none;
+        background: var(--soft);
+        transition: border-color .12s ease;
+    }
+    .pv-shot__pdf:hover {
+        border-color: color-mix(in srgb, var(--t) 22%, transparent);
     }
 </style>
 </x-filament-panels::page>

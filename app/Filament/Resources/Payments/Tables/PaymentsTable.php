@@ -64,11 +64,19 @@ class PaymentsTable
                     ->date('d.m.Y')
                     ->sortable(),
 
-                ImageColumn::make('screenshot')
+                ImageColumn::make('screenshots')
                     ->label(__('app.label.screenshot'))
+                    // Thumbnails render images only — a PDF payment order has
+                    // no preview and would show as a broken tile.
+                    ->state(fn (Payment $record): array => array_values(array_filter(
+                        $record->screenshots ?? [],
+                        fn (string $path): bool => ! Payment::isPdf($path),
+                    )))
                     ->disk('local')
                     ->imageHeight(40)
-                    ->square(),
+                    ->square()
+                    ->stacked()
+                    ->limit(3),
 
                 TextColumn::make('creator.name')
                     ->label(__('app.label.created_by'))

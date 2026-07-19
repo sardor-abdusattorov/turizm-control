@@ -44,13 +44,42 @@ it('records a payment when the form is submitted with valid data', function () {
             'contract_id' => $contract->id,
             'percent' => 35,
             'paid_at' => now()->toDateString(),
-            'screenshot' => UploadedFile::fake()->image('proof.png'),
+            'screenshots' => [UploadedFile::fake()->image('proof.png')],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     expect(Payment::query()->where('contract_id', $contract->id)->count())->toBe(1)
         ->and((float) $contract->fresh()->paid_percent)->toBe(35.00);
+});
+
+it('stores several proof files on one payment, a PDF payment order included', function () {
+    $user = userWithPermission('view_any_payment', 'create_payment', 'view_all_contracts');
+    actingAs($user);
+
+    $contract = Contract::factory()->create(['status' => Contract::STATUS_APPROVED]);
+
+    Livewire::test(CreatePayment::class)
+        ->fillForm([
+            'contract_id' => $contract->id,
+            'percent' => 20,
+            'paid_at' => now()->toDateString(),
+            'screenshots' => [
+                UploadedFile::fake()->image('proof.png'),
+                UploadedFile::fake()->create('platezhka.pdf', 12, 'application/pdf'),
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $payment = Payment::query()->where('contract_id', $contract->id)->firstOrFail();
+
+    expect($payment->screenshots)->toHaveCount(2)
+        ->and(collect($payment->screenshots)->filter(fn (string $p) => Payment::isPdf($p)))->toHaveCount(1);
+
+    foreach ($payment->screenshots as $path) {
+        Storage::disk('local')->assertExists($path);
+    }
 });
 
 it('refuses to accept a payment that would exceed the remaining percent', function () {
@@ -64,7 +93,7 @@ it('refuses to accept a payment that would exceed the remaining percent', functi
         'created_by' => $user->id,
         'percent' => 90,
         'paid_at' => now(),
-        'screenshot' => 'payments/seed.png',
+        'screenshots' => ['payments/seed.png'],
     ]);
 
     Livewire::test(CreatePayment::class)
@@ -72,7 +101,7 @@ it('refuses to accept a payment that would exceed the remaining percent', functi
             'contract_id' => $contract->id,
             'percent' => 25,
             'paid_at' => now()->toDateString(),
-            'screenshot' => UploadedFile::fake()->image('proof.png'),
+            'screenshots' => [UploadedFile::fake()->image('proof.png')],
         ])
         ->call('create')
         ->assertHasFormErrors(['percent']);
@@ -88,7 +117,7 @@ it('edits an existing payment and resyncs the contract paid percent', function (
         'created_by' => $user->id,
         'percent' => 30,
         'paid_at' => now(),
-        'screenshot' => 'payments/seed.png',
+        'screenshots' => ['payments/seed.png'],
     ]);
 
     expect((float) $contract->fresh()->paid_percent)->toBe(30.00);
@@ -96,7 +125,7 @@ it('edits an existing payment and resyncs the contract paid percent', function (
     Livewire::test(EditPayment::class, ['record' => $payment->id])
         ->fillForm([
             'percent' => 55,
-            'screenshot' => UploadedFile::fake()->image('updated.png'),
+            'screenshots' => [UploadedFile::fake()->image('updated.png')],
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -118,7 +147,7 @@ it('forbids the edit page for users without update_payment', function () {
         'created_by' => $user->id,
         'percent' => 30,
         'paid_at' => now(),
-        'screenshot' => 'payments/seed.png',
+        'screenshots' => ['payments/seed.png'],
     ]);
 
     Livewire::test(EditPayment::class, ['record' => $payment->id])->assertForbidden();
@@ -135,7 +164,7 @@ it('refuses to record a payment against a contract that is not approved', functi
             'contract_id' => $contract->id,
             'percent' => 10,
             'paid_at' => now()->toDateString(),
-            'screenshot' => UploadedFile::fake()->image('proof.png'),
+            'screenshots' => [UploadedFile::fake()->image('proof.png')],
         ])
         ->call('create')
         ->assertHasFormErrors(['contract_id']);

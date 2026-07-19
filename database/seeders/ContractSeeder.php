@@ -222,12 +222,12 @@ class ContractSeeder extends Seeder
                 'created_by' => $author->id,
                 'percent' => $percent,
                 'paid_at' => $paidAt,
-                'screenshot' => DemoMedia::paymentReceipt(
+                'screenshots' => [DemoMedia::paymentReceipt(
                     $contract->number,
                     $amountLabel,
                     $percent.'%',
                     $paidAt->format('d.m.Y'),
-                ),
+                )],
             ]);
         }
     }

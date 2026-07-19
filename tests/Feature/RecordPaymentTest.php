@@ -20,7 +20,7 @@ it('records a payment against an approved contract', function () {
     $payment = app(RecordPayment::class)->record($contract, [
         'percent' => 30,
         'paid_at' => now(),
-        'screenshot' => 'payments/test.png',
+        'screenshots' => ['payments/test.png'],
     ]);
 
     expect($payment)->toBeInstanceOf(Payment::class);
@@ -35,7 +35,7 @@ it('refuses to record against a contract that cannot accept payment', function (
     $result = app(RecordPayment::class)->record($contract, [
         'percent' => 10,
         'paid_at' => now(),
-        'screenshot' => 'payments/test.png',
+        'screenshots' => ['payments/test.png'],
     ]);
 
     expect($result)->toBeNull();

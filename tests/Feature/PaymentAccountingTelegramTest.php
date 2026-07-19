@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\SendTelegramDocument;
 use App\Jobs\SendTelegramPhoto;
 use App\Models\Contract;
 use App\Models\Department;
@@ -35,16 +36,23 @@ function accountingUser(string $chatId): User
     ]);
 }
 
-function paymentWithScreenshot(Contract $contract, User $creator): Payment
+/**
+ * @param  list<string>|null  $paths
+ */
+function paymentWithScreenshot(Contract $contract, User $creator, ?array $paths = null): Payment
 {
-    Storage::disk('local')->put('payments/shot.png', 'png');
+    $paths ??= ['payments/shot.png'];
+
+    foreach ($paths as $path) {
+        Storage::disk('local')->put($path, 'bytes');
+    }
 
     return Payment::query()->create([
         'contract_id' => $contract->id,
         'created_by' => $creator->id,
         'percent' => 40,
         'paid_at' => now()->toDateString(),
-        'screenshot' => 'payments/shot.png',
+        'screenshots' => $paths,
     ]);
 }
 
@@ -65,6 +73,39 @@ it('sends the payment screenshot to the accounting department', function () {
             && $job->path === 'payments/shot.png'
             && str_contains($job->caption, (string) $contract->number);
     });
+});
+
+it('sends every proof file: images as photos, PDFs as documents, caption on the first only', function () {
+    Queue::fake();
+
+    $accountant = accountingUser('7009');
+    $contract = Contract::factory()->create();
+    $payment = paymentWithScreenshot($contract, User::factory()->create(), [
+        'payments/first.png',
+        'payments/platezhka.pdf',
+    ]);
+
+    app(PaymentNotifier::class)->notifyPaymentRecorded($payment);
+
+    Queue::assertPushed(SendTelegramPhoto::class, function (SendTelegramPhoto $job) use ($contract) {
+        return $job->path === 'payments/first.png'
+            && str_contains($job->caption, (string) $contract->number)
+            && $job->inlineKeyboard !== null;
+    });
+
+    Queue::assertPushed(SendTelegramDocument::class, function (SendTelegramDocument $job) {
+        return $job->path === 'payments/platezhka.pdf'
+            && $job->caption === ''
+            && $job->inlineKeyboard === null;
+    });
+});
+
+it('sendDocument uploads the file as multipart when it exists', function () {
+    Storage::disk('local')->put('payments/order.pdf', 'pdf-bytes');
+
+    app(TelegramService::class)->sendDocument('55', 'payments/order.pdf', 'caption');
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/sendDocument'));
 });
 
 it('never sends the screenshot to the person who recorded the payment', function () {

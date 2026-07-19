@@ -350,7 +350,7 @@ class Project extends Model
 
     /**
      * Signed temporary URLs for the gallery, mirroring
-     * Payment::screenshotUrl() — the private disk serves files only through
+     * Payment::screenshotFiles() — the private disk serves files only through
      * expiring links.
      *
      * @return list<string>

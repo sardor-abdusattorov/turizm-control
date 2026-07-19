@@ -14,7 +14,9 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users')->restrictOnDelete();
             $table->decimal('percent', 5, 2);
             $table->date('paid_at');
-            $table->string('screenshot');
+            // One payment can carry several proof files (screenshots, PDF
+            // payment orders) — stored as an array of private-disk paths.
+            $table->json('screenshots');
             $table->timestamps();
 
             $table->index('contract_id');

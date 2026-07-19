@@ -24,7 +24,7 @@ it('transitions through partially paid back to not paid as payments are removed'
         'created_by' => $user->id,
         'percent' => 40,
         'paid_at' => now(),
-        'screenshot' => 'payments/1.png',
+        'screenshots' => ['payments/1.png'],
     ]);
 
     expect($contract->fresh()->payment_status)->toBe(PaymentStatus::PartiallyPaid);
@@ -34,7 +34,7 @@ it('transitions through partially paid back to not paid as payments are removed'
         'created_by' => $user->id,
         'percent' => 60,
         'paid_at' => now(),
-        'screenshot' => 'payments/2.png',
+        'screenshots' => ['payments/2.png'],
     ]);
 
     expect($contract->fresh()->payment_status)->toBe(PaymentStatus::FullyPaid);
@@ -56,7 +56,7 @@ it('moves the cached total when a payment is reassigned between contracts', func
         'created_by' => $user->id,
         'percent' => 30,
         'paid_at' => now(),
-        'screenshot' => 'payments/move.png',
+        'screenshots' => ['payments/move.png'],
     ]);
 
     expect((float) $source->fresh()->paid_percent)->toBe(30.00)

@@ -286,7 +286,7 @@ return [
         'payment_plural' => 'Payments',
         'percent' => 'Percent',
         'paid_at' => 'Paid on',
-        'screenshot' => 'Screenshot',
+        'screenshot' => 'Payment proofs',
         'payment_status' => 'Payment status',
         'paid_percent' => 'Paid',
         'total_paid' => 'Total paid',
