@@ -108,6 +108,36 @@ it('keeps existing attachments and appends the new upload after them', function 
         ->and($attachments->last()->sort)->toBe(2);
 });
 
+it('replaces a file on the edit form: the old attachment and its file are gone', function () {
+    Storage::fake('local');
+
+    $contract = Contract::factory()->create();
+    attachmentManager($contract);
+
+    Storage::disk('local')->put('uploads/files/contract-attachments/old-scan.pdf', 'old');
+    $old = $contract->attachments()->create([
+        'file_path' => 'uploads/files/contract-attachments/old-scan.pdf',
+        'original_name' => 'old-scan.pdf', 'size' => 3, 'sort' => 1,
+    ]);
+
+    // Submitting only the fresh upload = the old chip was removed → replace.
+    Livewire::test(EditContract::class, ['record' => $contract->id])
+        ->fillForm([
+            ...validEditFormFill(),
+            'attachment_files' => [UploadedFile::fake()->create('new-scan.pdf', 10, 'application/pdf')],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $attachments = $contract->attachments()->get();
+
+    expect($attachments)->toHaveCount(1)
+        ->and($attachments->first()->id)->not->toBe($old->id)
+        ->and($attachments->first()->original_name)->toBe('new-scan.pdf');
+    Storage::disk('local')->assertMissing('uploads/files/contract-attachments/old-scan.pdf');
+    Storage::disk('local')->assertExists($attachments->first()->file_path);
+});
+
 it('deletes an attachment whose chip was removed on the edit form', function () {
     Storage::fake('local');
 
