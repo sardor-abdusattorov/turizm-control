@@ -133,6 +133,10 @@ class ContractForm
                                         : __('app.label.select_option'))
                                     ->helperText(__('app.helper.template_optional'))
                                     ->searchable()
+                                    // A legacy paper contract is already written and
+                                    // signed — there is nothing to generate from a
+                                    // template, so don't offer one.
+                                    ->visible(fn (Get $get): bool => ! $get('already_signed'))
                                     ->columnSpanFull(),
 
                                 Select::make('order_id')

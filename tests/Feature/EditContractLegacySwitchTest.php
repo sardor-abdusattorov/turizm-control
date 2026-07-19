@@ -9,6 +9,7 @@ use App\Models\ContractApprover;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\User;
+use App\Services\OnlyOffice\OnlyOfficeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
@@ -110,6 +111,42 @@ it('keeps decided verdicts as audit when an in-review contract is switched to le
         ->and($decided->fresh()->status)->toBe(ContractApprover::STATUS_APPROVED)
         ->and($decided->fresh()->comment)->toBe('Проверено юристом')
         ->and($contract->approvers()->where('status', ContractApprover::STATUS_PENDING)->count())->toBe(0);
+});
+
+it('lets the author fix fields on an approved legacy contract without losing the status', function () {
+    Storage::fake('local');
+
+    $contract = legacySwitchContract(Contract::STATUS_APPROVED);
+    $contract->forceFill(['signed_at' => '2024-05-20'])->saveQuietly();
+    legacySwitchAuthor($contract);
+
+    // title is a reapproval-trigger field — without preserveApprovedOnNextSave
+    // the observer would bounce the contract to draft and build a junk chain.
+    Livewire::test(EditContract::class, ['record' => $contract->id])
+        ->fillForm([
+            'already_signed' => true,
+            'title' => 'Исправленное наименование',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $contract->refresh();
+
+    expect($contract->status)->toBe(Contract::STATUS_APPROVED)
+        ->and($contract->title)->toBe('Исправленное наименование')
+        ->and($contract->signed_at?->format('Y-m-d'))->toBe('2024-05-20')
+        ->and($contract->approvers()->count())->toBe(0);
+});
+
+it('keeps the signed document read-only even for the author who can reopen the form', function () {
+    $contract = legacySwitchContract(Contract::STATUS_APPROVED);
+    $author = $contract->responsible;
+
+    expect($contract->canBeEditedBy($author))->toBeTrue();
+
+    $permissions = app(OnlyOfficeService::class)->resolvePermissions($contract, $author);
+
+    expect($permissions['edit'])->toBeFalse();
 });
 
 it('never lets a fresh contract inherit files from a recycled id', function () {

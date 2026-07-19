@@ -166,14 +166,13 @@ it('uploads dossier scans from the view page too', function () {
 it('keeps uploading open after full approval — SWIFT and act arrive later', function () {
     Storage::fake('local');
 
-    // A finalized contract can no longer be edited, yet its dossier must still
-    // accept the signed scan, SWIFT slip and act that arrive post-approval.
+    // The dossier accepts the signed scan, SWIFT slip and act that arrive
+    // post-approval — independently of the edit page (which the author may
+    // also reopen for legacy typo fixes).
     $contract = Contract::factory()->create();
     $contract->forceFill(['status' => Contract::STATUS_APPROVED])->saveQuietly();
 
     attachmentManager($contract);
-
-    expect($contract->fresh()->canBeEditedBy())->toBeFalse();
 
     Livewire::test(ViewContract::class, ['record' => $contract->id])
         ->callAction('uploadAttachments', [

@@ -205,7 +205,7 @@
                         @php
                             $ext = 'DOCX';
                             $createdLabel = $record->created_at?->translatedFormat('d M Y H:i');
-                            $editUrl = $this->editorUrl($record->canBeEditedBy() ? 'edit' : 'view');
+                            $editUrl = $this->editorUrl($record->documentEditableBy() ? 'edit' : 'view');
                             $previewUrl = $this->pdfPreviewUrl();
                         @endphp
                         <div class="cw-file">

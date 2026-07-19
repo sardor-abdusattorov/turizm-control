@@ -189,7 +189,10 @@ class OnlyOfficeService
         // Anyone allowed to edit the contract — the author while it is a
         // draft / in review / rejected, plus the current approver — edits the
         // document directly. Track changes / review mode is never used.
-        if ($contract->canBeEditedBy($user)) {
+        // An APPROVED contract can be reopened on the edit FORM (field fixes
+        // on legacy paper contracts), but its signed document stays locked:
+        // changing the document must go through the honest re-approval path.
+        if ($contract->documentEditableBy($user)) {
             return $this->permissionSet(edit: true, review: false, comment: true, download: $canExport, print: $canExport);
         }
 

@@ -505,23 +505,22 @@ class Contract extends Model
             return false;
         }
 
-        // A finalized contract is immutable — once it is fully approved the
-        // signed document is locked for everyone, administrators included.
-        if ($this->status === self::STATUS_APPROVED) {
-            return false;
-        }
-
         if ($user->hasRole('super_admin')) {
             return true;
         }
 
         // The responsible manager owns the document while it is a draft, in
-        // review, or has come back rejected.
+        // review, or has come back rejected — and may also reopen an approved
+        // one (archive entries of paper contracts need typo fixes). Saving a
+        // reopened contract either keeps it filed via the «already signed»
+        // switch or honestly sends it back through approval; the signed
+        // OnlyOffice document itself stays read-only either way.
         if ($this->responsible_id === $user->id
             && in_array($this->status, [
                 self::STATUS_DRAFT,
                 self::STATUS_IN_REVIEW,
                 self::STATUS_REJECTED,
+                self::STATUS_APPROVED,
             ], true)) {
             return true;
         }
@@ -529,6 +528,16 @@ class Contract extends Model
         // The approver whose turn it is may tweak the document before
         // approving it.
         return $this->currentApprover()?->user_id === $user->id;
+    }
+
+    /**
+     * Whether the user may edit the DOCUMENT (OnlyOffice), not just the form:
+     * an approved contract can be reopened for field fixes, but its signed
+     * document stays read-only — document changes go through re-approval.
+     */
+    public function documentEditableBy(?User $user = null): bool
+    {
+        return $this->status !== self::STATUS_APPROVED && $this->canBeEditedBy($user);
     }
 
     public function canBeDeletedBy(?User $user = null): bool

@@ -87,8 +87,10 @@ class EditContract extends EditRecord
 
         $data['approver_chain'] = $ids;
 
-        // Editable contracts are never approved (mount aborts otherwise), so
-        // the legacy switch always starts off.
+        // The legacy switch always starts off — even on a reopened approved
+        // contract. Keeping it off means «send back through approval» and is
+        // never a silent default; the author flips it on deliberately to keep
+        // the contract filed (the record's signed_at prefills the date).
         $data['already_signed'] = false;
 
         return $data;
@@ -97,10 +99,16 @@ class EditContract extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         // The legacy switch flipped on mid-life: the contract is converted to
-        // an already-signed paper one in afterSave, chain and all.
+        // an already-signed paper one in afterSave, chain and all. The
+        // observer must not fight that by resetting a reopened approved
+        // contract to draft and rebuilding a junk chain mid-save.
         $this->markAsSigned = (bool) ($data['already_signed'] ?? false);
         $this->legacySignedAt = $data['signed_at'] ?? now();
         unset($data['already_signed'], $data['signed_at']);
+
+        if ($this->markAsSigned) {
+            $this->record->preserveApprovedOnNextSave();
+        }
 
         $this->originalStatus = $this->record->status;
         $this->originalChain = $this->liveChainIds();
@@ -204,7 +212,7 @@ class EditContract extends EditRecord
                 ->color('primary')
                 ->url(fn () => route('contracts.editor', [
                     'contract' => $this->record,
-                    'mode' => 'edit',
+                    'mode' => $this->record->documentEditableBy() ? 'edit' : 'view',
                 ]))
                 ->visible(fn () => $this->record?->documentExists()),
 
