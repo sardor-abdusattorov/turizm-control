@@ -543,7 +543,6 @@ return [
         'invalidated_on_edit' => 'Bekor qilindi — shartnoma tahrirlandi.',
         'invalidated_on_document_save' => 'Bekor qilindi — hujjat muharrirda o‘zgartirildi.',
         'save_warning_mid_flow' => 'Saqlash joriy kelishuv zanjirini bekor qiladi. Xuddi shu kelishuvchilar bilan yangi zanjir navbatga qo‘yiladi va shartnomani qayta kelishuvga yuborishingiz kerak bo‘ladi. Davom etilsinmi?',
-        'save_warning_legacy' => 'Shartnoma qog‘ozda imzolangan sifatida «Kelishilgan» holatida saqlanadi. Navbatdagi kelishuv zanjiri (bo‘lsa) bekor qilinadi. Davom etilsinmi?',
         'editor_reset_warning' => 'Bu shartnoma kelishuvda. Hujjatni tahrirlash barcha kelishuvlarni bekor qiladi va muharrirni yopganingizdan so‘ng uni qoralamaga qaytaradi. Baribir ochilsinmi?',
         'save_warning_draft' => 'Shartnomadagi o‘zgarishlar saqlansinmi?',
         'edit_invalidates_approvals' => 'O‘zgarishlarni saqlash barcha joriy kelishuvlarni bekor qiladi. Shartnoma "Qoralama" holatiga qaytadi va uni qayta kelishuvga yuborishingiz kerak bo‘ladi.',

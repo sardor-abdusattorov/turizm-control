@@ -68,19 +68,16 @@ class EditContract extends EditRecord
         return Action::make('save')
             ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
             ->keyBindings(['mod+s'])
+            // A legacy save keeps the approved status — nothing destructive
+            // to confirm, so the modal steps aside and saving is one click.
+            ->modal(fn (): bool => ! $keepsLegacy())
             ->requiresConfirmation()
-            ->modalIcon(fn (): string => $keepsLegacy()
-                ? 'heroicon-o-check-circle'
-                : ($isMidFlow() ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-question-mark-circle'))
-            ->modalIconColor(fn (): string => $keepsLegacy()
-                ? 'success'
-                : ($isMidFlow() ? 'warning' : 'primary'))
+            ->modalIcon(fn (): string => $isMidFlow() ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-question-mark-circle')
+            ->modalIconColor(fn (): string => $isMidFlow() ? 'warning' : 'primary')
             ->modalHeading(__('app.label.save_changes'))
-            ->modalDescription(fn (): string => $keepsLegacy()
-                ? __('app.message.save_warning_legacy')
-                : ($isMidFlow()
-                    ? __('app.message.save_warning_mid_flow')
-                    : __('app.message.save_warning_draft')))
+            ->modalDescription(fn (): string => $isMidFlow()
+                ? __('app.message.save_warning_mid_flow')
+                : __('app.message.save_warning_draft'))
             ->modalSubmitActionLabel(__('app.action.save_anyway'))
             ->modalCancelActionLabel(__('app.action.keep_editing'))
             ->modalWidth('xl')
