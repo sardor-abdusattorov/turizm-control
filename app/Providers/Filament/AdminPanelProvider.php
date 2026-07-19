@@ -46,6 +46,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('3rem')
             ->login()
             ->defaultThemeMode(ThemeMode::Light)
+            ->font('Inter')
             ->colors([
                 'primary' => Color::Blue,
                 'success' => Color::Emerald,

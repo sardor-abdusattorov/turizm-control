@@ -24,6 +24,9 @@ class ProjectStatsWidget extends StatsOverviewWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    // Two money cards → 50% each, not squeezed into a four-column grid.
+    protected int|array|null $columns = 2;
+
     protected ?string $pollingInterval = null;
 
     public static function canView(): bool
