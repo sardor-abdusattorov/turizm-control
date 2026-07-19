@@ -78,20 +78,21 @@ class ContractForm
 
                                 // Legacy import switch: a signed paper contract is
                                 // filed as approved straight away — no chain, just
-                                // the signing date and the scans below.
+                                // the signing date and the scans below. On edit it
+                                // converts a mistakenly-normal contract the same
+                                // way, invalidating whatever chain was queued.
                                 Toggle::make('already_signed')
                                     ->label(__('app.label.already_signed'))
                                     ->helperText(__('app.helper.already_signed'))
-                                    ->visible(fn (?Contract $record): bool => $record === null)
                                     ->live()
                                     ->columnSpanFull(),
 
                                 DatePicker::make('signed_at')
                                     ->label(__('app.label.signed_date'))
-                                    ->visible(fn (Get $get, ?Contract $record): bool => $record === null && (bool) $get('already_signed'))
+                                    ->visible(fn (Get $get): bool => (bool) $get('already_signed'))
                                     ->default(now())
                                     ->maxDate(now())
-                                    ->required(fn (Get $get, ?Contract $record): bool => $record === null && (bool) $get('already_signed'))
+                                    ->required(fn (Get $get): bool => (bool) $get('already_signed'))
                                     ->columnSpanFull(),
 
                                 TextInput::make('number')

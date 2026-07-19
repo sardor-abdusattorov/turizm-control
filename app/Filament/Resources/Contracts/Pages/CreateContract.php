@@ -6,6 +6,7 @@ use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Contracts\Pages\Concerns\HandlesDossierUploads;
 use App\Models\Contract;
 use App\Services\Contracts\ApprovalChain;
+use App\Services\Contracts\ContractFiles;
 use App\Services\Contracts\ContractWorkflow;
 use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
@@ -45,6 +46,11 @@ class CreateContract extends CreateRecord
 
     protected function afterCreate(): void
     {
+        // A rebuilt database can hand a new contract the id of a deleted one
+        // whose folder survived on disk — without this sweep the fresh
+        // contract would "inherit" a stranger's draft.docx.
+        app(ContractFiles::class)->purge($this->record);
+
         $this->storeFormAttachments();
 
         $this->record->buildDocumentFromTemplate(

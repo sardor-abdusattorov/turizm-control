@@ -7,6 +7,7 @@ use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Contracts\Pages\Concerns\HandlesDossierUploads;
 use App\Filament\Resources\Contracts\Schemas\ContractForm;
 use App\Models\Contract;
+use App\Models\ContractApprover;
 use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractWorkflow;
 use Filament\Actions\Action;
@@ -35,6 +36,10 @@ class EditContract extends EditRecord
     protected bool $syncChain = false;
 
     protected ?ContractStatus $originalStatus = null;
+
+    protected bool $markAsSigned = false;
+
+    protected mixed $legacySignedAt = null;
 
     public function mount(int|string $record): void
     {
@@ -82,11 +87,21 @@ class EditContract extends EditRecord
 
         $data['approver_chain'] = $ids;
 
+        // Editable contracts are never approved (mount aborts otherwise), so
+        // the legacy switch always starts off.
+        $data['already_signed'] = false;
+
         return $data;
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        // The legacy switch flipped on mid-life: the contract is converted to
+        // an already-signed paper one in afterSave, chain and all.
+        $this->markAsSigned = (bool) ($data['already_signed'] ?? false);
+        $this->legacySignedAt = $data['signed_at'] ?? now();
+        unset($data['already_signed'], $data['signed_at']);
+
         $this->originalStatus = $this->record->status;
         $this->originalChain = $this->liveChainIds();
         $this->syncChain = array_key_exists('approver_chain', $data);
@@ -105,6 +120,26 @@ class EditContract extends EditRecord
     protected function afterSave(): void
     {
         $this->storeFormAttachments();
+
+        if ($this->markAsSigned) {
+            // Converting to a legacy paper contract: every live chain row
+            // becomes audit (same shape resyncOnEdit writes), decided rows
+            // keep their verdicts, and the contract files as approved.
+            $this->record->approvers()
+                ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
+                ->update([
+                    'status' => ContractApprover::STATUS_INVALIDATED,
+                    'system_comment' => 'invalidated_on_edit',
+                    'acted_at' => now(),
+                ]);
+
+            $this->record->forceFill([
+                'status' => Contract::STATUS_APPROVED,
+                'signed_at' => $this->legacySignedAt,
+            ])->saveQuietly();
+
+            return;
+        }
 
         $startedMidFlow = $this->originalStatus !== null
             && $this->originalStatus !== Contract::STATUS_DRAFT;
