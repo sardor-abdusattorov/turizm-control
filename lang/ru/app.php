@@ -106,6 +106,7 @@ return [
         'contract_title' => 'Наименование',
         'signing_place' => 'Место подписания',
         'amount' => 'Сумма',
+        'counterparty' => 'Контрагент',
         'responsible' => 'Ответственный',
 
         // Contract editor

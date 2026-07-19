@@ -106,6 +106,7 @@ return [
         'contract_title' => 'Title',
         'signing_place' => 'Place of signing',
         'amount' => 'Amount',
+        'counterparty' => 'Counterparty',
         'responsible' => 'Responsible',
 
         // Contract editor

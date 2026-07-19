@@ -106,6 +106,7 @@ return [
         'contract_title' => 'Nomi',
         'signing_place' => 'Imzolash joyi',
         'amount' => 'Summa',
+        'counterparty' => 'Kontragent',
         'responsible' => 'Mas’ul',
 
         // Shartnoma muharriri
