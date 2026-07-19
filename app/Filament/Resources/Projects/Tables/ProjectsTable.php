@@ -72,7 +72,7 @@ class ProjectsTable
                     ->searchable()
                     ->sortable()
                     ->limit(24)
-                    ->placeholder('—')
+                    ->placeholder(__('app.label.not_set'))
                     ->toggleable(),
 
                 TextColumn::make('starts_on')
@@ -91,7 +91,7 @@ class ProjectsTable
                 TextColumn::make('area_sqm')
                     ->label(__('app.label.area_sqm'))
                     ->formatStateUsing(fn (?string $state): string => Money::format($state).' м²')
-                    ->placeholder('—')
+                    ->placeholder(__('app.label.not_set'))
                     ->alignEnd()
                     ->sortable()
                     ->toggleable(),
@@ -187,7 +187,7 @@ class ProjectsTable
 
                 TextColumn::make('creator.name')
                     ->label(__('app.label.created_by'))
-                    ->placeholder('—')
+                    ->placeholder(__('app.label.not_set'))
                     ->sortable()
                     ->toggleable(),
 

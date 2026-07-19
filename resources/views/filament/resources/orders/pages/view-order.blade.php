@@ -19,6 +19,7 @@
     // (rendered as a wrap row so paragraphs survive intact).
     $details = [
         ['heroicon-o-hashtag',                __('app.label.order_number'),       $record->number],
+        ['heroicon-o-document-text',          __('app.label.title'),              $record->title, 'wrap'],
         ['heroicon-o-bolt',                   __('app.label.status'),             $statusLabel, 'status'],
         ['heroicon-o-calendar',               __('app.label.issued_at'),          $record->issued_at?->format('d.m.Y')],
         ['heroicon-o-calendar-days',          __('app.label.year'),               $record->registerYear()],
@@ -31,26 +32,6 @@
 
 <x-filament-panels::page>
 <div class="ow">
-    {{-- HERO --}}
-    <section class="ow-hero ow-hero--{{ $heroVariant }}">
-        <div class="ow-hero__l">
-            <div class="ow-hero__meta">
-                @if ($record->number)
-                    <span class="ow-num">{{ $record->number }}</span>
-                @endif
-            </div>
-            <h2 class="ow-hero__title">{{ $record->title }}</h2>
-            @if ($record->issued_at)
-                <div class="ow-hero__dates">
-                    <span class="ow-hero__date">
-                        {!! $ic('heroicon-o-calendar', 14) !!}
-                        {{ __('app.label.issued_at') }}: <b>{{ $record->issued_at->translatedFormat('d M Y') }}</b>
-                    </span>
-                </div>
-            @endif
-        </div>
-        <span class="ow-pill ow-pill--{{ $heroVariant }}">{{ $statusLabel }}</span>
-    </section>
 
     {{-- FILE CARD — FULL WIDTH --}}
     @if ($record->fileExists())

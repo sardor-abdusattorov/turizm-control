@@ -42,7 +42,7 @@ class OrdersTable
                     ->badge()
                     ->color(fn (Order $record): string => $record->documentColor())
                     ->icon(fn (Order $record): string => $record->documentIcon())
-                    ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : '—')
+                    ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : __('app.label.not_set'))
                     ->limit(35)
                     ->url(fn (Order $record): ?string => match (true) {
                         ! $record->fileExists() => null,

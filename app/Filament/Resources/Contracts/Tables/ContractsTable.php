@@ -59,7 +59,7 @@ class ContractsTable
                     ->label(__('app.label.contract_type_single'))
                     ->badge()
                     ->color(fn (Contract $record): string => $record->contractType?->direction?->color() ?? 'gray')
-                    ->placeholder('—')
+                    ->placeholder(__('app.label.not_set'))
                     ->sortable()
                     ->toggleable(),
 
@@ -84,7 +84,7 @@ class ContractsTable
                 TextColumn::make('contact.name')
                     ->label(__('app.label.counterparty'))
                     ->state(fn (Contract $record): ?string => $record->contact?->name ?? $record->sponsor?->name)
-                    ->placeholder('—')
+                    ->placeholder(__('app.label.not_set'))
                     ->searchable()
                     ->sortable()
                     ->limit(40)
@@ -93,7 +93,7 @@ class ContractsTable
                 TextColumn::make('project.name')
                     ->label(__('app.label.project_single'))
                     ->limit(30)
-                    ->placeholder('—')
+                    ->placeholder(__('app.label.not_set'))
                     ->sortable()
                     ->toggleable(),
 

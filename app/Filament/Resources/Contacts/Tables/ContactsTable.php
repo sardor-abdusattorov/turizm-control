@@ -59,7 +59,7 @@ class ContactsTable
                     ])))
                     ->formatStateUsing(fn (string $state): string => __('app.label.role_'.$state))
                     ->color(fn (string $state): string => $state === 'supplier' ? 'warning' : 'success')
-                    ->placeholder('—'),
+                    ->placeholder(__('app.label.not_set')),
 
                 TextColumn::make('contracts_count')
                     ->label(__('app.label.contracts'))

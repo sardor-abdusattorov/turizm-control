@@ -54,7 +54,7 @@ class ProjectContractsTableWidget extends TableWidget
                         ->where(fn (Builder $q) => $q
                             ->whereHas('contact', fn (Builder $c) => $c->where('name', 'like', "%{$search}%"))
                             ->orWhereHas('sponsor', fn (Builder $c) => $c->where('name', 'like', "%{$search}%"))))
-                    ->state(fn (Contract $record): string => $record->counterparty()?->name ?? '—'),
+                    ->state(fn (Contract $record): string => $record->counterparty()?->name ?? __('app.label.not_set')),
 
                 TextColumn::make('amount')
                     ->label(__('app.label.amount'))

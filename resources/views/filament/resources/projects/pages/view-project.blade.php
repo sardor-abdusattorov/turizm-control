@@ -15,7 +15,7 @@
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
     $fmt = fn ($n) => \App\Support\Money::format($n);
-    $money = fn ($amount, ?string $cur) => $amount === null ? '—' : $fmt($amount).($cur ? ' '.$cur : '');
+    $money = fn ($amount, ?string $cur) => $amount === null ? __('app.label.not_set') : $fmt($amount).($cur ? ' '.$cur : '');
 
     // Money the viewer is allowed to see, split by direction and currency —
     // deliberately built from the visibleTo() set so a manager's tiles never
@@ -33,7 +33,7 @@
 
     $period = $record->starts_on
         ? $record->starts_on->format('d.m.Y').($record->ends_on ? ' — '.$record->ends_on->format('d.m.Y') : '')
-        : '—';
+        : __('app.label.not_set');
 
     // «Участники» / «Спонсоры» are derived from the project's income contracts:
     // participant-fee contracts (a Contact, no sponsor) vs sponsorship contracts
@@ -112,7 +112,7 @@
         @unless ($isInternalProject)
             <div class="pj-stat">
                 <span class="pj-stat__lb">{!! $ic('heroicon-o-square-3-stack-3d', 13) !!} {{ __('app.label.area_sqm') }}</span>
-                <div class="pj-stat__vl">{{ $record->area_sqm !== null ? $fmt($record->area_sqm).' м²' : '—' }}</div>
+                <div class="pj-stat__vl">{{ $record->area_sqm !== null ? $fmt($record->area_sqm).' м²' : __('app.label.not_set') }}</div>
                 <div class="pj-stat__sub">
                     {{ $record->area_is_free ? __('app.label.area_is_free') : $money($record->area_cost, $record->areaCurrency?->short_name) }}
                 </div>
@@ -124,7 +124,7 @@
         @endunless
         <div class="pj-stat">
             <span class="pj-stat__lb">{!! $ic('heroicon-o-arrow-trending-down', 13) !!} {{ __('app.contract.direction.expense') }} · {{ __('app.label.contracts') }}</span>
-            <div class="pj-stat__vl" @if ($expenseTotals->count() > 1) style="font-size:1rem;" @endif>{{ $expenseTotals->isNotEmpty() ? $moneyLines($expenseTotals) : '—' }}</div>
+            <div class="pj-stat__vl" @if ($expenseTotals->count() > 1) style="font-size:1rem;" @endif>{{ $expenseTotals->isNotEmpty() ? $moneyLines($expenseTotals) : __('app.label.not_set') }}</div>
             @if ($incomeTotals->isNotEmpty())
                 <div class="pj-stat__sub">{{ __('app.contract.direction.income') }}: {{ $moneyLines($incomeTotals) }}</div>
             @endif
@@ -169,7 +169,7 @@
                 <div class="ow-dets">
                     <div class="ow-row">
                         <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-map-pin') !!}</span><span class="ow-row__lb">{{ __('app.label.venue') }}</span></div>
-                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->venue ?: '—' }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->venue ?: __('app.label.not_set') }}</span></div>
                     </div>
                     <div class="ow-row">
                         <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-calendar-days') !!}</span><span class="ow-row__lb">{{ __('app.label.period') }}</span></div>
@@ -197,7 +197,7 @@
                     @endif
                     <div class="ow-row">
                         <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-user') !!}</span><span class="ow-row__lb">{{ __('app.label.created_by') }}</span></div>
-                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator?->name ?? '—' }}</span></div>
+                        <div class="ow-row__v"><span class="ow-row__vl">{{ $record->creator?->name ?? __('app.label.not_set') }}</span></div>
                     </div>
                     @if ($record->description)
                         <div class="ow-row">

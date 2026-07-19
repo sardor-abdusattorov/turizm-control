@@ -98,14 +98,14 @@ class TelegramMessageLogResource extends Resource
 
                 TextColumn::make('cleanText')
                     ->label(__('app.label.message'))
-                    ->placeholder('—')
+                    ->placeholder(__('app.label.not_set'))
                     ->limit(60)
                     ->wrap()
                     ->tooltip(fn (TelegramMessageLog $record): ?string => $record->cleanText),
 
                 TextColumn::make('humanError')
                     ->label(__('app.label.error'))
-                    ->placeholder('—')
+                    ->placeholder(__('app.label.not_set'))
                     ->badge()
                     ->color('danger')
                     ->limit(60)
@@ -150,22 +150,22 @@ class TelegramMessageLogResource extends Resource
 
                                         TextEntry::make('status')
                                             ->label(__('app.label.telegram_log_http'))
-                                            ->placeholder('—'),
+                                            ->placeholder(__('app.label.not_set')),
 
                                         TextEntry::make('telegramUser.user.name')
                                             ->label(__('app.label.recipient'))
-                                            ->placeholder('—'),
+                                            ->placeholder(__('app.label.not_set')),
 
                                         TextEntry::make('chat_id')
                                             ->label('chat_id')
                                             ->copyable()
                                             ->fontFamily('mono')
-                                            ->placeholder('—'),
+                                            ->placeholder(__('app.label.not_set')),
                                     ]),
 
                                 TextEntry::make('cleanText')
                                     ->label(__('app.label.message'))
-                                    ->placeholder('—')
+                                    ->placeholder(__('app.label.not_set'))
                                     ->prose()
                                     ->columnSpanFull(),
 

@@ -78,12 +78,12 @@ class TelegramBroadcast extends Page implements HasTable
 
                 TextColumn::make('username')
                     ->label(__('app.label.telegram_handle'))
-                    ->formatStateUsing(fn (?string $state): string => $state ? '@'.$state : '—')
+                    ->formatStateUsing(fn (?string $state): string => $state ? '@'.$state : __('app.label.not_set'))
                     ->color('primary'),
 
                 TextColumn::make('user.department.name')
                     ->label(__('app.label.department'))
-                    ->placeholder('—')
+                    ->placeholder(__('app.label.not_set'))
                     ->toggleable(),
 
                 TextColumn::make('locale')
@@ -102,7 +102,7 @@ class TelegramBroadcast extends Page implements HasTable
                 TextColumn::make('last_seen_at')
                     ->label(__('app.label.last_active'))
                     ->since()
-                    ->placeholder('—')
+                    ->placeholder(__('app.label.not_set'))
                     ->sortable(),
             ])
             ->emptyStateHeading(__('app.label.broadcast_intro'))

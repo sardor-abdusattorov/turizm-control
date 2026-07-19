@@ -34,7 +34,7 @@ class ContractTemplatesTable
                     ->badge()
                     ->color('primary')
                     ->icon('heroicon-o-document-text')
-                    ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : '—')
+                    ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : __('app.label.not_set'))
                     ->limit(35)
                     ->url(fn (ContractTemplate $record) => $record->templateExists()
                         ? route('contract-templates.editor', ['template' => $record, 'mode' => 'view'])
@@ -46,7 +46,7 @@ class ContractTemplatesTable
                     ->sortable()
                     ->label(__('app.label.contract_type_single'))
                     ->badge()
-                    ->placeholder('—'),
+                    ->placeholder(__('app.label.not_set')),
 
                 TextColumn::make('sort')
                     ->label(__('app.label.sort'))

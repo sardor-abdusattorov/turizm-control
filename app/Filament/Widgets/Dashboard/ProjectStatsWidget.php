@@ -65,13 +65,13 @@ class ProjectStatsWidget extends StatsOverviewWidget
         // Two money cards only (counts live on the project strip above), each
         // with the demo-style trend line: monthly totals of its direction.
         return [
-            Stat::make(__('app.label.fees_total'), $income->isNotEmpty() ? $moneyLines($income) : '—')
+            Stat::make(__('app.label.fees_total'), $income->isNotEmpty() ? $moneyLines($income) : __('app.label.not_set'))
                 ->description(__('app.label.paid').': '.Money::format($paidTotal).' · '.$paidPercent.'%')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->chart($this->monthlyTotals($contracts, ContractDirection::Income))
                 ->color('success'),
 
-            Stat::make(__('app.contract.direction.expense').' · '.__('app.label.contracts'), $expense->isNotEmpty() ? $moneyLines($expense) : '—')
+            Stat::make(__('app.contract.direction.expense').' · '.__('app.label.contracts'), $expense->isNotEmpty() ? $moneyLines($expense) : __('app.label.not_set'))
                 ->description($project->stand_cost !== null
                     ? __('app.label.stand_cost').': '.Money::format($project->stand_cost).' '.($project->standCurrency?->short_name ?? '')
                     : null)
