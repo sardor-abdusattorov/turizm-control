@@ -31,43 +31,6 @@ class ProjectStatsWidget extends StatsOverviewWidget
         return auth()->user()?->can('view_any_project') ?? false;
     }
 
-    protected function getHeading(): ?string
-    {
-        $project = $this->project();
-
-        if (! $project) {
-            return __('app.label.project_single');
-        }
-
-        return $project->name;
-    }
-
-    protected function getDescription(): ?string
-    {
-        $project = $this->project();
-
-        if (! $project) {
-            return __('app.message.pulse_pick_project');
-        }
-
-        $parts = [];
-
-        if ($project->starts_on) {
-            $parts[] = $project->starts_on->format('d.m.Y')
-                .($project->ends_on ? ' — '.$project->ends_on->format('d.m.Y') : '');
-        }
-
-        if ($project->venue) {
-            $parts[] = $project->venue;
-        }
-
-        if ($project->area_sqm !== null) {
-            $parts[] = Money::format($project->area_sqm).' м²';
-        }
-
-        return implode(' · ', $parts) ?: null;
-    }
-
     protected function getStats(): array
     {
         $project = $this->project();
@@ -95,13 +58,7 @@ class ProjectStatsWidget extends StatsOverviewWidget
         $paidTotal = $project->paidTotal();
         $paidPercent = $feesTotal > 0 ? round($paidTotal / $feesTotal * 100) : 0;
 
-        $members = $project->feeContracts()->visibleTo()
-            ->where('status', '!=', Contract::STATUS_REJECTED->value)
-            ->count();
-        $sponsors = $project->sponsorshipContracts()->visibleTo()
-            ->where('status', '!=', Contract::STATUS_REJECTED->value)
-            ->count();
-
+        // Two money cards only — the counts live on the project strip above.
         return [
             Stat::make(__('app.label.fees_total'), $income->isNotEmpty() ? $moneyLines($income) : '—')
                 ->description(__('app.label.paid').': '.Money::format($paidTotal).' · '.$paidPercent.'%')
@@ -114,15 +71,6 @@ class ProjectStatsWidget extends StatsOverviewWidget
                     : null)
                 ->descriptionIcon('heroicon-m-arrow-trending-down')
                 ->color('gray'),
-
-            Stat::make(__('app.label.contracts'), $contracts->count())
-                ->descriptionIcon('heroicon-m-document-text')
-                ->color('info'),
-
-            Stat::make(__('app.label.participants'), $members)
-                ->description(__('app.label.sponsors').': '.$sponsors)
-                ->descriptionIcon('heroicon-m-user-group')
-                ->color('info'),
         ];
     }
 

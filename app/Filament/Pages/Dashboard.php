@@ -9,6 +9,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Illuminate\Contracts\View\View;
 
 /**
  * The dashboard is a plain Filament widget stack: the greeting card, the
@@ -75,6 +76,16 @@ class Dashboard extends BaseDashboard
     public function getColumns(): int|array
     {
         return 2;
+    }
+
+    /**
+     * No page header at all — the greeting widget is the top of the page and
+     * the «Фильтры» trigger lives on the project strip. The FilterAction
+     * stays registered in getHeaderActions() so the strip can mount it.
+     */
+    public function getHeader(): ?View
+    {
+        return view('filament.pages.dashboard-blank-header');
     }
 
     /** @return array<string, string> */

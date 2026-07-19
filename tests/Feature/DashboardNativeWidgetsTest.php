@@ -2,6 +2,7 @@
 
 use App\Filament\Pages\Dashboard;
 use App\Filament\Widgets\Dashboard\ProjectContractsTableWidget;
+use App\Filament\Widgets\Dashboard\ProjectOverviewWidget;
 use App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget;
 use App\Filament\Widgets\Dashboard\ProjectStatsWidget;
 use App\Models\Contact;
@@ -49,22 +50,33 @@ it('lands on the nearest upcoming project through the page filters', function ()
         ->assertSet('filters.type', Dashboard::ALL);
 });
 
-it('shows the picked project numbers in the stats widget', function () {
+it('shows the picked project money in the two stat cards', function () {
     [$project, $viewer] = dashboardProject();
     actingAs($viewer);
 
     Livewire::test(ProjectStatsWidget::class, ['pageFilters' => ['projectId' => $project->id]])
+        ->assertSee('10 000 000 UZS')
+        ->assertSee(__('app.label.fees_total'));
+});
+
+it('carries the project name, dates and counts on the overview strip', function () {
+    [$project, $viewer] = dashboardProject();
+    actingAs($viewer);
+
+    Livewire::test(ProjectOverviewWidget::class, ['pageFilters' => ['projectId' => $project->id]])
         ->assertSee('ATM 25')
         ->assertSee('Дубай')
-        ->assertSee('10 000 000 UZS');
+        ->assertSee(__('app.label.participants'))
+        ->assertSee(__('app.label.filters'));
 });
 
 it('asks to pick a project when the filters leave the selection empty', function () {
     [, $viewer] = dashboardProject();
     actingAs($viewer);
 
-    Livewire::test(ProjectStatsWidget::class, ['pageFilters' => ['projectId' => null]])
-        ->assertSee(__('app.message.pulse_pick_project'));
+    Livewire::test(ProjectOverviewWidget::class, ['pageFilters' => ['projectId' => null]])
+        ->assertSee(__('app.message.pulse_pick_project'))
+        ->assertSee(__('app.label.filters'));
 });
 
 it('lists the project contracts with counterparties in the native table', function () {
@@ -99,6 +111,7 @@ it('hides every dashboard project widget without the projects permission', funct
     actingAs(User::factory()->create(['status' => User::STATUS_ACTIVE]));
 
     expect(ProjectStatsWidget::canView())->toBeFalse()
+        ->and(ProjectOverviewWidget::canView())->toBeFalse()
         ->and(ProjectContractsTableWidget::canView())->toBeFalse()
         ->and(ProjectParticipantsTableWidget::canView())->toBeFalse();
 });

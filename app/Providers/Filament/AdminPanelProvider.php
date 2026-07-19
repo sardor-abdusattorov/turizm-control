@@ -6,6 +6,7 @@ use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use App\Filament\Widgets\Dashboard\ProjectContractsTableWidget;
+use App\Filament\Widgets\Dashboard\ProjectOverviewWidget;
 use App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget;
 use App\Filament\Widgets\Dashboard\ProjectStatsWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
@@ -54,7 +55,6 @@ class AdminPanelProvider extends PanelProvider
                 '*/editor',
                 '*/editor?*',
             ])
-            ->font('Inter')
             ->navigationItems([
 
             ])
@@ -98,6 +98,7 @@ class AdminPanelProvider extends PanelProvider
                 // card, the picked project's stats, and two native tables —
                 // all driven by the page FilterAction (type / year / project).
                 DashboardHeaderWidget::class,
+                ProjectOverviewWidget::class,
                 ProjectStatsWidget::class,
                 ProjectContractsTableWidget::class,
                 ProjectParticipantsTableWidget::class,
