@@ -83,7 +83,8 @@ class ContactsTable
                             ))
                             ->modalSubmitAction(false)
                             ->modalCancelAction(false),
-                    ),
+                    )
+                    ->sortable(),
 
                 TextColumn::make('income_contracts_count')
                     ->label(__('app.label.projects'))
@@ -112,11 +113,13 @@ class ContactsTable
                             ->modalSubmitAction(false)
                             ->modalCancelAction(false),
                     )
+                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('inn')
                     ->label(__('app.label.inn'))
                     ->searchable()
+                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('pinfl')
@@ -127,14 +130,17 @@ class ContactsTable
                 TextColumn::make('contact_person')
                     ->label(__('app.label.contact_person'))
                     ->searchable()
+                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('phone')
                     ->label(__('app.label.phone'))
+                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('email')
                     ->label(__('app.label.email'))
+                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('website')
@@ -142,7 +148,8 @@ class ContactsTable
                     ->url(fn (Contact $record): ?string => $record->website, shouldOpenInNewTab: true)
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                StatusToggleColumn::make(),
+                StatusToggleColumn::make()
+                    ->sortable(),
 
                 CreatedAtColumn::make()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -60,6 +60,7 @@ class ContractsTable
                     ->badge()
                     ->color(fn (Contract $record): string => $record->contractType?->direction?->color() ?? 'gray')
                     ->placeholder('—')
+                    ->sortable()
                     ->toggleable(),
 
                 ViewColumn::make('status')
@@ -70,6 +71,7 @@ class ContractsTable
                 TextColumn::make('title')
                     ->label(__('app.label.contract_title'))
                     ->searchable()
+                    ->sortable()
                     ->wrap()
                     ->limit(50),
 
@@ -81,6 +83,7 @@ class ContractsTable
                     ->state(fn (Contract $record): ?string => $record->contact?->name ?? $record->sponsor?->name)
                     ->placeholder('—')
                     ->searchable()
+                    ->sortable()
                     ->limit(40)
                     ->toggleable(),
 
@@ -88,6 +91,7 @@ class ContractsTable
                     ->label(__('app.label.project_single'))
                     ->limit(30)
                     ->placeholder('—')
+                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('amount')
@@ -112,6 +116,7 @@ class ContractsTable
 
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))
+                    ->sortable()
                     ->toggleable(),
 
                 ViewColumn::make('payment_status')

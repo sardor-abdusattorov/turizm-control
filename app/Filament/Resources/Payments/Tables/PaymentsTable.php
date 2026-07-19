@@ -46,6 +46,7 @@ class PaymentsTable
                 TextColumn::make('contract.title')
                     ->label(__('app.label.contract_title'))
                     ->searchable()
+                    ->sortable()
                     ->limit(40)
                     ->wrap(),
 
@@ -80,6 +81,7 @@ class PaymentsTable
 
                 TextColumn::make('creator.name')
                     ->label(__('app.label.created_by'))
+                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('created_at')

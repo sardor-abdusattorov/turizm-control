@@ -45,7 +45,8 @@ class ProjectContractsTableWidget extends TableWidget
                 TextColumn::make('number')
                     ->label(__('app.label.contract_number'))
                     ->weight('semibold')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('counterparty')
                     ->label(__('app.label.counterparty'))

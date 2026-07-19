@@ -10,6 +10,7 @@ use App\Support\Money;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Collection;
 
 /**
  * The numbers of the project picked in the dashboard FilterAction: fees,
@@ -61,11 +62,13 @@ class ProjectStatsWidget extends StatsOverviewWidget
         $paidTotal = $project->paidTotal();
         $paidPercent = $feesTotal > 0 ? round($paidTotal / $feesTotal * 100) : 0;
 
-        // Two money cards only — the counts live on the project strip above.
+        // Two money cards only (counts live on the project strip above), each
+        // with the demo-style trend line: monthly totals of its direction.
         return [
             Stat::make(__('app.label.fees_total'), $income->isNotEmpty() ? $moneyLines($income) : '—')
                 ->description(__('app.label.paid').': '.Money::format($paidTotal).' · '.$paidPercent.'%')
                 ->descriptionIcon('heroicon-m-banknotes')
+                ->chart($this->monthlyTotals($contracts, ContractDirection::Income))
                 ->color('success'),
 
             Stat::make(__('app.contract.direction.expense').' · '.__('app.label.contracts'), $expense->isNotEmpty() ? $moneyLines($expense) : '—')
@@ -73,8 +76,32 @@ class ProjectStatsWidget extends StatsOverviewWidget
                     ? __('app.label.stand_cost').': '.Money::format($project->stand_cost).' '.($project->standCurrency?->short_name ?? '')
                     : null)
                 ->descriptionIcon('heroicon-m-arrow-trending-down')
-                ->color('gray'),
+                ->chart($this->monthlyTotals($contracts, ContractDirection::Expense))
+                ->color('warning'),
         ];
+    }
+
+    /**
+     * Monthly contract totals for the sparkline. Currency-blind by design:
+     * the line draws the shape of activity, the exact figures live in the
+     * value above it.
+     *
+     * @param  Collection<int, Contract>  $contracts
+     * @return list<float>
+     */
+    protected function monthlyTotals($contracts, ContractDirection $direction): array
+    {
+        $points = $contracts
+            ->filter(fn (Contract $contract): bool => $contract->contractType?->direction === $direction
+                && $contract->status !== Contract::STATUS_REJECTED)
+            ->groupBy(fn (Contract $contract): string => ($contract->signed_at ?? $contract->created_at)->format('Y-m'))
+            ->sortKeys()
+            ->map(fn ($group): float => (float) $group->sum('amount'))
+            ->values()
+            ->all();
+
+        // A flat baseline still draws a line — one lone point would not.
+        return count($points) > 1 ? $points : [0, ...($points ?: [0])];
     }
 
     protected function project(): ?Project

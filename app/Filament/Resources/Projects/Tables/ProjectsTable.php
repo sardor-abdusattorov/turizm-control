@@ -69,6 +69,8 @@ class ProjectsTable
 
                 TextColumn::make('venue')
                     ->label(__('app.label.venue'))
+                    ->searchable()
+                    ->sortable()
                     ->limit(24)
                     ->placeholder('—')
                     ->toggleable(),
@@ -120,6 +122,7 @@ class ProjectsTable
                         true,
                         'heroicon-o-star',
                     ))
+                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('contracts_count')
@@ -145,6 +148,7 @@ class ProjectsTable
                             ->modalSubmitAction(false)
                             ->modalCancelAction(false),
                     )
+                    ->sortable()
                     ->toggleable(),
 
                 ImageColumn::make('gallery')
@@ -182,6 +186,7 @@ class ProjectsTable
                 TextColumn::make('creator.name')
                     ->label(__('app.label.created_by'))
                     ->placeholder('—')
+                    ->sortable()
                     ->toggleable(),
 
                 StatusToggleColumn::make()

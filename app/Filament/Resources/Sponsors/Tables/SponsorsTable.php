@@ -70,6 +70,7 @@ class SponsorsTable
                 TextColumn::make('inn')
                     ->label(__('app.label.inn'))
                     ->searchable()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('contact_person')

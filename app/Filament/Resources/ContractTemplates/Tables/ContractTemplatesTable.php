@@ -43,6 +43,7 @@ class ContractTemplatesTable
                     ),
 
                 TextColumn::make('contractType.title')
+                    ->sortable()
                     ->label(__('app.label.contract_type_single'))
                     ->badge()
                     ->placeholder('—'),
@@ -51,7 +52,8 @@ class ContractTemplatesTable
                     ->label(__('app.label.sort'))
                     ->sortable(),
 
-                StatusToggleColumn::make(),
+                StatusToggleColumn::make()
+                    ->sortable(),
 
                 CreatedAtColumn::make()
                     ->toggleable(isToggledHiddenByDefault: true),

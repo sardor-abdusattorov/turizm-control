@@ -38,6 +38,7 @@ class ContractTypesTable
                     ->label(__('app.label.contracts'))
                     ->counts('contracts')
                     ->badge()
+                    ->sortable()
                     ->color('gray'),
 
                 TextColumn::make('sort')
