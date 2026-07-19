@@ -95,9 +95,7 @@ it('stores scans uploaded on the create form as dossier attachments', function (
     $attachment = $contract->attachments()->first();
 
     expect($contract->attachments()->count())->toBe(1)
-        // The Livewire test transport does not map original names, so assert
-        // the stored file instead (the pattern ContractAttachmentsTest set).
-        ->and($attachment->original_name)->toEndWith('.pdf')
+        ->and($attachment->original_name)->toBe('scan-dogovor.pdf')
         ->and($attachment->uploaded_by)->toBe($creator->id)
         ->and(Storage::disk('local')->exists($attachment->file_path))->toBeTrue();
 });

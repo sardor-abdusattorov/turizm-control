@@ -66,10 +66,8 @@ it('uploads dossier files through the edit form', function () {
 
     $attachment = $contract->attachments()->first();
 
-    // The exact original name flows in through storeFileNamesIn() in the real
-    // UI; the test transport only guarantees a stored .pdf with a fallback name.
     expect($attachment)->not->toBeNull()
-        ->and($attachment->original_name)->toEndWith('.pdf')
+        ->and($attachment->original_name)->toBe('SWIFT MT103.pdf')
         ->and($attachment->uploaded_by)->toBe($contract->responsible_id);
 
     Storage::disk('local')->assertExists($attachment->file_path);
