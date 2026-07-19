@@ -74,6 +74,10 @@ class ContractsTable
                     ->sortable()
                     // Never cut the official phrase — wrap it, but clamp the
                     // row at two lines; the tooltip carries the full text.
+                    // Auto table layout starves wrapped columns, so pin a
+                    // readable width: two lines fit a sentence, not a
+                    // словосочетание. The table scrolls sideways if tight.
+                    ->extraCellAttributes(['style' => 'min-width: 22rem'])
                     ->wrap()
                     ->lineClamp(2)
                     ->tooltip(fn (Contract $record): ?string => $record->title),
