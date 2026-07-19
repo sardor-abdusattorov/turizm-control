@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Filament\Widgets\Dashboard;
+
+use App\Enums\ContractStatus;
+use App\Filament\Pages\Dashboard;
+use App\Filament\Resources\Contracts\ContractResource;
+use App\Models\Contract;
+use App\Support\Money;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Filament\Widgets\TableWidget;
+use Illuminate\Database\Eloquent\Builder;
+
+/**
+ * The picked project's contracts as a stock Filament table — search,
+ * sorting and pagination for free; the same visibleTo() scoping as
+ * everywhere else.
+ */
+class ProjectContractsTableWidget extends TableWidget
+{
+    use InteractsWithPageFilters;
+
+    protected static ?int $sort = 1;
+
+    protected int|string|array $columnSpan = 1;
+
+    public static function canView(): bool
+    {
+        return auth()->user()?->can('view_any_project') ?? false;
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->heading(__('app.label.contracts'))
+            ->query(fn (): Builder => Contract::query()
+                ->visibleTo()
+                ->where('project_id', $this->projectId() ?? 0)
+                ->with(['contact', 'sponsor', 'currency']))
+            ->defaultSort('id', 'desc')
+            ->recordUrl(fn (Contract $record): string => ContractResource::getUrl('view', ['record' => $record]))
+            ->columns([
+                TextColumn::make('number')
+                    ->label(__('app.label.contract_number'))
+                    ->weight('semibold')
+                    ->searchable(),
+
+                TextColumn::make('counterparty')
+                    ->label(__('app.label.counterparty'))
+                    ->state(fn (Contract $record): string => $record->counterparty()?->name ?? '—'),
+
+                TextColumn::make('amount')
+                    ->label(__('app.label.amount'))
+                    ->formatStateUsing(fn (Contract $record): string => Money::format($record->amount).' '.($record->currency?->short_name ?? ''))
+                    ->alignEnd()
+                    ->sortable(),
+
+                TextColumn::make('status')
+                    ->label(__('app.label.status'))
+                    ->badge()
+                    ->formatStateUsing(fn (ContractStatus $state): string => $state->label())
+                    ->color(fn (ContractStatus $state): string => $state->color()),
+            ])
+            ->paginated([5, 10, 25])
+            ->defaultPaginationPageOption(5)
+            ->emptyStateHeading($this->projectId()
+                ? __('app.message.no_contracts')
+                : __('app.message.pulse_pick_project'));
+    }
+
+    protected function projectId(): ?string
+    {
+        return Dashboard::filterValue($this->pageFilters['projectId'] ?? null);
+    }
+}

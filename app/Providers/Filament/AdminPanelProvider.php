@@ -5,7 +5,9 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
-use App\Filament\Widgets\Dashboard\ProjectPulseWidget;
+use App\Filament\Widgets\Dashboard\ProjectContractsTableWidget;
+use App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget;
+use App\Filament\Widgets\Dashboard\ProjectStatsWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
@@ -92,11 +94,13 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
-                // The dashboard is deliberately lean: the header card
-                // (greeting + Telegram prompt) and the director's project
-                // pulse, driven by the page's project filter.
+                // The dashboard is a stock Filament stack: the greeting
+                // card, the picked project's stats, and two native tables —
+                // all driven by the page FilterAction (type / year / project).
                 DashboardHeaderWidget::class,
-                ProjectPulseWidget::class,
+                ProjectStatsWidget::class,
+                ProjectContractsTableWidget::class,
+                ProjectParticipantsTableWidget::class,
             ])
             ->resources([
 
