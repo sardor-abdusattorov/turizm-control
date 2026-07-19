@@ -153,22 +153,16 @@
                                 <span>{{ __('app.label.approver_activity') }}</span>
                                 <span class="cw-sub__c">{{ $apActs->count() }}</span>
                             </div>
-                            <div class="cw-act" x-data="{ all: false }">
+                            <div class="cw-act">
                                 @foreach ($apActs as $a)
                                     @php $v = $this->activityVisual($a->event ?? ''); $al = $this->activityLabel($a->event ?? '', $a->description); @endphp
-                                    <div class="cw-act__row" @if ($loop->index >= 4) x-show="all" x-cloak @endif>
+                                    <div class="cw-act__row">
                                         <span class="cw-act__time">{{ $a->created_at?->format('H:i') }}</span>
                                         <span class="cw-act__ic cw-act__ic--{{ $v['color'] }}">{!! $ic($v['icon'], 13) !!}</span>
                                         <span class="cw-act__ds" title="{{ $al }}">{{ $al }}</span>
                                         <span class="cw-act__rel" title="{{ $a->created_at?->format('d.m.Y H:i') }}">{{ $a->created_at?->diffForHumans() }}</span>
                                     </div>
                                 @endforeach
-                                @if ($apActs->count() > 4)
-                                    <button type="button" class="cw-act__toggle" @click="all = !all">
-                                        <span x-show="!all">{{ __('app.label.show_all') }} ({{ $apActs->count() - 4 }})</span>
-                                        <span x-show="all" x-cloak>{{ __('app.label.collapse') }}</span>
-                                    </button>
-                                @endif
                             </div>
                         @endif
                     </div>

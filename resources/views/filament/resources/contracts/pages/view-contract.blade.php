@@ -76,23 +76,20 @@
         return $c->translatedFormat('d F Y');
     };
 
-    // Core info visible by default; everything else lives behind "Show more".
-    // No status row — the status pill already rides on the tab strip.
+    // Every fact in full — no status row (the pill rides on the tab strip).
     $details = [
-        ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number, null, false],
-        ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name, $record->contact ? 'contact' : null, false],
-        ['heroicon-o-tag', __('app.label.contract_type_single'), $record->contractType?->title, null, false],
-        ['heroicon-o-presentation-chart-bar', __('app.label.project_single'), $record->project?->name, null, false],
-        ['heroicon-o-document-text', __('app.label.order_basis'), $record->order ? trim(($record->order->number ? $record->order->number.' · ' : '').$record->order->title) : null, null, false],
-        ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name, null, false],
-        ['heroicon-o-banknotes', __('app.label.amount'), \App\Support\Money::format($record->amount).' '.($record->currency?->short_name ?? ''), null, false],
-
-        // Extra rows — collapsed by default.
-        ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name, null, true],
-        ['heroicon-o-paper-airplane', __('app.label.submitted'), $this->submittedAt()?->format('d.m.Y H:i'), null, true],
-        ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y'), null, true],
-        ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i'), null, true],
-        ['heroicon-o-pencil', __('app.label.updated_at'), $record->updated_at?->format('d.m.Y H:i'), null, true],
+        ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number, null],
+        ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name, $record->contact ? 'contact' : null],
+        ['heroicon-o-tag', __('app.label.contract_type_single'), $record->contractType?->title, null],
+        ['heroicon-o-presentation-chart-bar', __('app.label.project_single'), $record->project?->name, null],
+        ['heroicon-o-document-text', __('app.label.order_basis'), $record->order ? trim(($record->order->number ? $record->order->number.' · ' : '').$record->order->title) : null, null],
+        ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name, null],
+        ['heroicon-o-banknotes', __('app.label.amount'), \App\Support\Money::format($record->amount).' '.($record->currency?->short_name ?? ''), null],
+        ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name, null],
+        ['heroicon-o-paper-airplane', __('app.label.submitted'), $this->submittedAt()?->format('d.m.Y H:i'), null],
+        ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y'), null],
+        ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i'), null],
+        ['heroicon-o-pencil', __('app.label.updated_at'), $record->updated_at?->format('d.m.Y H:i'), null],
     ];
 
     $contact = $record->contact;
@@ -141,7 +138,7 @@
     @include('filament.resources.contracts.pages.view-contract.styles')
 
     <div class="cw"
-        x-data="{ approver: null, contactOpen: false, basicExpanded: false, tab: 'overview', historyShown: 8, historyFilter: 'all', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }"
+        x-data="{ approver: null, contactOpen: false, tab: 'overview', historyFilter: 'all', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }"
         x-effect="document.documentElement.classList.toggle('cw-noscroll', approver !== null || contactOpen)"
         @keydown.escape.window="approver = null; contactOpen = false">
         @php

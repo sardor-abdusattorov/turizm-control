@@ -608,30 +608,6 @@
             align-items: center;
             gap: .35rem;
         }
-        .cw-show-more {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: .4rem;
-            width: 100%;
-            padding: .85rem 1.5rem;
-            background: transparent;
-            border: 0;
-            border-top: 1px solid var(--d);
-            color: var(--accent);
-            font-size: .815rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background .12s ease;
-        }
-        .cw-show-more:hover {
-            background: var(--accent-softer);
-        }
-        .cw-show-more > span {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-        }
 
         /* combined card — file block */
         .cw-file {
@@ -826,23 +802,6 @@
         }
         .dark .cw-chip__c {
             background: rgba(255,255,255,.10);
-        }
-        .cw-loadmore {
-            width: 100%;
-            padding: .7rem;
-            margin-top: .5rem;
-            font-size: 0.805rem;
-            font-weight: 600;
-            color: var(--accent);
-            background: var(--soft);
-            border: 1px dashed var(--d);
-            border-radius: .7rem;
-            cursor: pointer;
-            transition: all .15s;
-        }
-        .cw-loadmore:hover {
-            background: var(--accent-softer);
-            border-style: solid;
         }
         .cw-day__hd {
             display: inline-flex;
@@ -1154,21 +1113,6 @@
             font-size: 0.7rem;
             color: var(--m2);
             white-space: nowrap;
-        }
-        .cw-act__toggle {
-            width: 100%;
-            padding: .55rem;
-            font-size: 0.74rem;
-            font-weight: 600;
-            color: var(--accent);
-            background: var(--soft);
-            border: 0;
-            border-top: 1px solid var(--d);
-            cursor: pointer;
-            transition: background .15s;
-        }
-        .cw-act__toggle:hover {
-            background: var(--accent-softer);
         }
         .cw-modal__empty {
             font-size: 0.825rem;

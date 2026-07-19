@@ -28,13 +28,13 @@
                     <div class="cw-bd"><p style="font-size:0.854rem;color:var(--m)">{{ __('app.label.no_history') }}</p></div>
                 @else
                     <div class="cw-filters">
-                        <button type="button" class="cw-chip" :class="historyFilter === 'all' ? 'cw-chip--active' : ''" @click="historyFilter = 'all'; historyShown = 8">
+                        <button type="button" class="cw-chip" :class="historyFilter === 'all' ? 'cw-chip--active' : ''" @click="historyFilter = 'all'">
                             {{ __('app.label.all') }} <span class="cw-chip__c">{{ $totalCount }}</span>
                         </button>
-                        <button type="button" class="cw-chip" :class="historyFilter === 'workflow' ? 'cw-chip--active' : ''" @click="historyFilter = 'workflow'; historyShown = 8">
+                        <button type="button" class="cw-chip" :class="historyFilter === 'workflow' ? 'cw-chip--active' : ''" @click="historyFilter = 'workflow'">
                             {!! $ic('heroicon-o-arrows-right-left', 13) !!} {{ __('app.label.workflow_events') }} <span class="cw-chip__c">{{ $workflowCount }}</span>
                         </button>
-                        <button type="button" class="cw-chip" :class="historyFilter === 'edit' ? 'cw-chip--active' : ''" @click="historyFilter = 'edit'; historyShown = 8">
+                        <button type="button" class="cw-chip" :class="historyFilter === 'edit' ? 'cw-chip--active' : ''" @click="historyFilter = 'edit'">
                             {!! $ic('heroicon-o-pencil-square', 13) !!} {{ __('app.label.edit_events') }} <span class="cw-chip__c">{{ $editCount }}</span>
                         </button>
                     </div>
@@ -43,7 +43,7 @@
                         @php $lastDay = null; @endphp
                         @foreach ($flat as $row)
                             @php $v = $this->activityVisual($row->event); $dayHd = $row->day !== $lastDay ? $dayLabel($row->day) : null; $lastDay = $row->day; @endphp
-                            <div x-show="(historyFilter === 'all' || historyFilter === '{{ $row->group }}') && {{ $row->idx }} < historyShown">
+                            <div x-show="historyFilter === 'all' || historyFilter === '{{ $row->group }}'">
                                 @if ($dayHd)
                                     <div class="cw-day__hd" style="padding-top: {{ $loop->first ? '0' : '.6rem' }};">{{ $dayHd }}</div>
                                 @endif
@@ -59,11 +59,6 @@
                             </div>
                         @endforeach
 
-                        <button type="button" class="cw-loadmore"
-                                x-show="historyShown < {{ $totalCount }}"
-                                @click="historyShown = historyShown + 8">
-                            {{ __('app.label.load_more') }}
-                        </button>
                     </div>
                 @endif
             </section>

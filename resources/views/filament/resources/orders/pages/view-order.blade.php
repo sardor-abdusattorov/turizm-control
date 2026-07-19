@@ -24,21 +24,17 @@
         ['heroicon-o-calendar-days',          __('app.label.year'),               $record->registerYear()],
         ['heroicon-o-bars-3-bottom-left',     __('app.label.description'),        $record->description, 'wrap'],
         ['heroicon-o-user',                   __('app.label.created_by'),         $record->creator?->name],
-        ['heroicon-o-clock',                  __('app.label.created_at'),         $record->created_at?->format('d.m.Y H:i'), null, true],
-        ['heroicon-o-pencil',                 __('app.label.updated_at'),         $record->updated_at?->format('d.m.Y H:i'), null, true],
+        ['heroicon-o-clock',                  __('app.label.created_at'),         $record->created_at?->format('d.m.Y H:i')],
+        ['heroicon-o-pencil',                 __('app.label.updated_at'),         $record->updated_at?->format('d.m.Y H:i')],
     ];
 @endphp
 
 <x-filament-panels::page>
-<div class="ow" x-data="{ basicExpanded: false }">
+<div class="ow">
     {{-- HERO --}}
     <section class="ow-hero ow-hero--{{ $heroVariant }}">
         <div class="ow-hero__l">
             <div class="ow-hero__meta">
-                <span class="ow-chip">
-                    {!! $ic('heroicon-o-clipboard-document-list', 14) !!}
-                    {{ $record->orderType?->title ?? __('app.label.no_category') }}
-                </span>
                 @if ($record->number)
                     <span class="ow-num">{{ $record->number }}</span>
                 @endif
@@ -119,11 +115,10 @@
         <div class="ow-dets">
             @foreach ($details as $row)
                 @php
-                    [$icon, $label, $value, $type, $extra] = array_pad($row, 5, null);
+                    [$icon, $label, $value, $type] = array_pad($row, 4, null);
                     $hasValue = filled($value);
                 @endphp
-                <div class="ow-row {{ $type === 'wrap' ? 'ow-row--wrap' : '' }}"
-                     @if ($extra) x-show="basicExpanded" x-cloak @endif>
+                <div class="ow-row {{ $type === 'wrap' ? 'ow-row--wrap' : '' }}">
                     <span class="ow-row__k">
                         <span class="ow-row__ic">{!! $ic($icon, 14) !!}</span>
                         <span class="ow-row__lb">{{ $label }}</span>
@@ -142,10 +137,6 @@
                 </div>
             @endforeach
         </div>
-        <button type="button" class="ow-show-more" @click="basicExpanded = ! basicExpanded">
-            <span x-show="! basicExpanded">{!! $ic('heroicon-m-chevron-down', 13) !!} {{ __('app.label.show_more') }}</span>
-            <span x-show="basicExpanded" x-cloak>{!! $ic('heroicon-m-chevron-up', 13) !!} {{ __('app.label.show_less') }}</span>
-        </button>
     </section>
 </div>
 
@@ -400,30 +391,6 @@
         overflow: visible;
         text-overflow: clip;
         font-weight: 500;
-    }
-    .ow-show-more {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: .4rem;
-        width: 100%;
-        padding: .8rem 1.5rem;
-        background: transparent;
-        border: 0;
-        border-top: 1px solid var(--d);
-        color: var(--accent);
-        font-size: .8125rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background .12s ease;
-    }
-    .ow-show-more:hover {
-        background: var(--accent-softer);
-    }
-    .ow-show-more > span {
-        display: inline-flex;
-        align-items: center;
-        gap: .35rem;
     }
 
     /* ───── Mobile (< 640px) ─────────────────────────────────────────────── */

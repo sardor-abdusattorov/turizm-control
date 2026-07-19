@@ -249,20 +249,20 @@
                     @endif
 
                     <div class="cw-dets">
-                        @foreach ($details as [$icon, $label, $value, $type, $extra])
+                        @foreach ($details as [$icon, $label, $value, $type])
                             @php $hasValue = ! empty($value); @endphp
                             @if ($type === 'contact' && $hasValue)
-                                <button type="button" class="cw-row cw-row--link" @click="contactOpen = true" @if ($extra) x-show="basicExpanded" x-cloak @endif>
+                                <button type="button" class="cw-row cw-row--link" @click="contactOpen = true">
                                     <span class="cw-row__k"><span class="cw-row__ic">{!! $ic($icon, 16) !!}</span><span class="cw-row__lb">{{ $label }}</span></span>
                                     <span class="cw-row__v"><span class="cw-row__vl">{{ $value }} {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}</span></span>
                                 </button>
                             @elseif ($type === 'status')
-                                <div class="cw-row" @if ($extra) x-show="basicExpanded" x-cloak @endif>
+                                <div class="cw-row">
                                     <span class="cw-row__k"><span class="cw-row__ic">{!! $ic($icon, 16) !!}</span><span class="cw-row__lb">{{ $label }}</span></span>
                                     <span class="cw-row__v"><span class="cw-pill cw-pill--{{ $statusColor }}" style="padding:.32rem .7rem .32rem .55rem;font-size:.8rem;">{{ $value }}</span></span>
                                 </div>
                             @else
-                                <div class="cw-row" @if ($extra) x-show="basicExpanded" x-cloak @endif>
+                                <div class="cw-row">
                                     <span class="cw-row__k"><span class="cw-row__ic">{!! $ic($icon, 16) !!}</span><span class="cw-row__lb">{{ $label }}</span></span>
                                     <span class="cw-row__v">
                                         @if ($hasValue)
@@ -275,10 +275,6 @@
                             @endif
                         @endforeach
                     </div>
-                    <button type="button" class="cw-show-more" @click="basicExpanded = ! basicExpanded">
-                        <span x-show="! basicExpanded">{!! $ic('heroicon-m-chevron-down', 14) !!} {{ __('app.label.show_more') }}</span>
-                        <span x-show="basicExpanded" x-cloak>{!! $ic('heroicon-m-chevron-up', 14) !!} {{ __('app.label.show_less') }}</span>
-                    </button>
                 </section>
             </div>
         </div>
