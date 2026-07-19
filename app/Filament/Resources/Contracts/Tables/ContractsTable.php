@@ -72,10 +72,11 @@ class ContractsTable
                     ->label(__('app.label.contract_title'))
                     ->searchable()
                     ->sortable()
-                    // One tidy line — the full official phrase lives in the
-                    // tooltip and on the contract page itself.
-                    ->limit(60)
-                    ->tooltip(fn (Contract $record): ?string => mb_strlen((string) $record->title) > 60 ? $record->title : null),
+                    // Never cut the official phrase — wrap it, but clamp the
+                    // row at two lines; the tooltip carries the full text.
+                    ->wrap()
+                    ->lineClamp(2)
+                    ->tooltip(fn (Contract $record): ?string => $record->title),
 
                 // Counterparty: the contact on most contracts, the sponsor on
                 // «Спонсорство». Search still targets the contact name (the

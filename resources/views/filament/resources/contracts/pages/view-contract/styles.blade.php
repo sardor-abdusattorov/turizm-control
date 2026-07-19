@@ -36,11 +36,13 @@
             border-radius: .75rem;
             overflow: hidden;
         }
+        /* Same metrics as .ow-hd/.pv-hd — every view page's section header
+           reads identically. */
         .cw-hd {
             display: flex;
             align-items: center;
-            gap: .6rem;
-            padding: 1.15rem 1.5rem;
+            gap: .65rem;
+            padding: 1rem 1.25rem;
             border-bottom: 1px solid var(--d);
         }
         .cw-hd__ic {
@@ -48,12 +50,11 @@
             display: inline-flex;
         }
         .cw-hd__t {
-            font-size: 0.9rem;
-            font-weight: 650;
+            font-size: .9375rem;
+            font-weight: 600;
             color: var(--t);
             margin: 0;
             flex: 1;
-            letter-spacing: -.005em;
         }
         .cw-hd__c {
             font-size: 0.724rem;
@@ -577,15 +578,15 @@
         .cw-row__k {
             display: flex;
             align-items: center;
-            gap: .6rem;
-            padding: .85rem 1.25rem;
+            gap: .55rem;
+            padding: .8rem 1.25rem;
             background: var(--soft);
             border-right: 1px solid var(--d);
         }
         .cw-row__v {
             display: flex;
             align-items: center;
-            padding: .85rem 1.25rem;
+            padding: .8rem 1.25rem;
             min-width: 0;
             transition: background .12s ease;
         }
