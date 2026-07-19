@@ -118,7 +118,13 @@ it('lets the author fix fields on an approved legacy contract without losing the
 
     $contract = legacySwitchContract(Contract::STATUS_APPROVED);
     $contract->forceFill(['signed_at' => '2024-05-20'])->saveQuietly();
-    legacySwitchAuthor($contract);
+    $author = legacySwitchAuthor($contract);
+
+    // Reopening a filed contract takes the dedicated permission on top of
+    // the usual update rights.
+    Permission::findOrCreate('update_approved_contract', 'web');
+    $author->givePermissionTo('update_approved_contract');
+    actingAs($author->fresh());
 
     // title is a reapproval-trigger field — without preserveApprovedOnNextSave
     // the observer would bounce the contract to draft and build a junk chain.
@@ -138,15 +144,27 @@ it('lets the author fix fields on an approved legacy contract without losing the
         ->and($contract->approvers()->count())->toBe(0);
 });
 
-it('keeps the signed document read-only even for the author who can reopen the form', function () {
+it('keeps the signed document read-only even for a user who can reopen the form', function () {
     $contract = legacySwitchContract(Contract::STATUS_APPROVED);
     $author = $contract->responsible;
+
+    Permission::findOrCreate('update_approved_contract', 'web');
+    $author->givePermissionTo('update_approved_contract');
+    $author = $author->fresh();
 
     expect($contract->canBeEditedBy($author))->toBeTrue();
 
     $permissions = app(OnlyOfficeService::class)->resolvePermissions($contract, $author);
 
     expect($permissions['edit'])->toBeFalse();
+});
+
+it('refuses the edit page for the author without the reopen permission', function () {
+    $contract = legacySwitchContract(Contract::STATUS_APPROVED);
+    legacySwitchAuthor($contract);
+
+    Livewire::test(EditContract::class, ['record' => $contract->id])
+        ->assertForbidden();
 });
 
 it('never lets a fresh contract inherit files from a recycled id', function () {

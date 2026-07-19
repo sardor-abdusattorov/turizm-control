@@ -69,18 +69,21 @@ it('freezes editing while the director is reviewing', function () {
     expect($contract->canBeEditedBy($responsible))->toBeFalse();
 });
 
-it('reopens an approved contract for its author and super_admin, nobody else', function () {
+it('reopens an approved contract only with the dedicated permission', function () {
     [$contract, $responsible] = permissionContext(Contract::STATUS_APPROVED);
     $admin = User::factory()->create();
     Role::findOrCreate('super_admin', 'web');
     $admin->assignRole('super_admin');
-    $outsider = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
-    // Archive entries of paper contracts need typo fixes — the edit page then
-    // either keeps them filed (legacy switch) or sends them back to approval.
-    expect($contract->canBeEditedBy($responsible))->toBeTrue()
-        ->and($contract->canBeEditedBy($admin->fresh()))->toBeTrue()
-        ->and($contract->canBeEditedBy($outsider))->toBeFalse();
+    // Archive entries of paper contracts need typo fixes, but authorship
+    // alone is not enough — the admin grants the right per role.
+    expect($contract->canBeEditedBy($responsible))->toBeFalse()
+        ->and($contract->canBeEditedBy($admin->fresh()))->toBeTrue();
+
+    Permission::findOrCreate('update_approved_contract', 'web');
+    $responsible->givePermissionTo('update_approved_contract');
+
+    expect($contract->canBeEditedBy($responsible->fresh()))->toBeTrue();
 });
 
 it('lets the current approver edit while it is their turn', function () {

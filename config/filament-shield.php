@@ -258,6 +258,12 @@ return [
         // …) may participate in approvals without touching code.
         'approve_contracts',
 
+        // Contract-scoped: lets a role reopen an APPROVED contract on the
+        // edit page (typo fixes on mass-entered legacy paper contracts).
+        // Authorship alone is not enough — the admin decides who may touch
+        // filed contracts. The signed document itself stays read-only.
+        'update_approved_contract',
+
         // Contract-scoped: gates the PDF download / export action so that
         // someone who can view a contract isn't automatically able to leak
         // the rendered PDF.

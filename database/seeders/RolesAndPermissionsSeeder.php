@@ -14,6 +14,13 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
+        // Custom (non-resource) permissions come from the Shield config —
+        // ensure they exist even when shield:generate hasn't been re-run, so
+        // the role editor can offer them and super_admin picks them up below.
+        foreach ((array) config('filament-shield.custom_permissions') as $customPermission) {
+            Permission::findOrCreate($customPermission, 'web');
+        }
+
         $superAdmin = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
         $superAdmin->syncPermissions(Permission::where('guard_name', 'web')->pluck('name'));
 
