@@ -188,6 +188,7 @@ return [
         'all_years' => 'All years',
         'count_short' => 'Count',
         'total_amount' => 'Total amount',
+        'total' => 'Total',
         'paid_of_total' => 'Paid / Total',
         'photo_report_url' => 'Photo report link',
         'project_costs' => 'Costs',

@@ -7,6 +7,7 @@ use App\Exports\ProjectsRegistryExport;
 use App\Filament\Resources\Projects\BaseProjectResource;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
+use App\Filament\Support\ExportXlsxAction;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Contract;
 use App\Models\Project;
@@ -140,6 +141,7 @@ class ProjectsTable
                         Action::make('projectContractsBreakdown')
                             ->modalHeading(fn (Project $record): string => $record->name)
                             ->modalIcon('heroicon-o-document-text')
+                            ->modalWidth('3xl')
                             ->modalContent(fn (Project $record) => view(
                                 'filament.resources.projects.tables.contracts-breakdown',
                                 [
@@ -218,10 +220,7 @@ class ProjectsTable
             ->filtersFormColumns(2)
             ->recordUrl(fn (Project $record) => BaseProjectResource::resourceFor($record)::getUrl('view', ['record' => $record]))
             ->headerActions([
-                Action::make('exportXlsx')
-                    ->label(__('app.action.export_xlsx'))
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('gray')
+                ExportXlsxAction::make()
                     ->visible(fn (): bool => ExportPermission::allows('export_project'))
                     ->action(fn ($livewire) => Excel::download(
                         new ProjectsRegistryExport(
@@ -259,6 +258,7 @@ class ProjectsTable
         return Action::make($name)
             ->modalHeading(fn (Project $record): string => $record->name)
             ->modalIcon($icon)
+            ->modalWidth('2xl')
             ->modalContent(fn (Project $record) => view(
                 'filament.resources.projects.tables.participants-breakdown',
                 [

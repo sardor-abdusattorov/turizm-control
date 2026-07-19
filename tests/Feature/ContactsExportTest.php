@@ -7,11 +7,58 @@ use App\Models\Contact;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
+
+function actAsContactExporter(): void
+{
+    Permission::findOrCreate('view_any_contact', 'web');
+    Permission::findOrCreate('export_contact', 'web');
+
+    $user = User::factory()->create();
+    $user->givePermissionTo('view_any_contact', 'export_contact');
+    actingAs($user->fresh());
+}
+
+it('disables the export button while the filtered table has nothing to export', function () {
+    actAsContactExporter();
+
+    Livewire::test(ListContacts::class)->assertTableActionDisabled('exportXlsx');
+
+    Contact::factory()->create(['type' => Contact::TYPE_LEGAL]);
+
+    Livewire::test(ListContacts::class)
+        ->assertTableActionEnabled('exportXlsx')
+        // An active filter that matches nothing greys the button out again.
+        ->filterTable('type', Contact::TYPE_INDIVIDUAL)
+        ->assertTableActionDisabled('exportXlsx');
+});
+
+it('exports only the rows the active filter leaves on screen', function () {
+    actAsContactExporter();
+    seedMixedContacts();
+
+    Excel::fake();
+
+    Livewire::test(ListContacts::class)
+        ->filterTable('type', Contact::TYPE_LEGAL)
+        ->callTableAction('exportXlsx');
+
+    Excel::assertDownloaded(
+        'contacts-'.now()->format('Y-m-d').'.xlsx',
+        function (ContactsExport $export): bool {
+            $rows = collect($export->sheets())
+                ->flatMap(fn (ContactsSheet $sheet) => $sheet->query()->get());
+
+            return $rows->count() === 1
+                && $rows->first()->type === Contact::TYPE_LEGAL;
+        },
+    );
+});
 
 it('shows the contacts export action only to permission holders', function () {
     Permission::findOrCreate('view_any_contact', 'web');

@@ -204,7 +204,7 @@ class Project extends Model
     {
         return $this->contracts()
             ->visibleTo($user)
-            ->with(['currency', 'contractType'])
+            ->with(['currency', 'contractType', 'contact', 'sponsor'])
             ->latest('id')
             ->get();
     }

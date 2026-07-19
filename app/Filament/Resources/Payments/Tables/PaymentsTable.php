@@ -7,6 +7,7 @@ use App\Exports\PaymentsExport;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Payments\PaymentResource;
 use App\Filament\Support\ExportPermission;
+use App\Filament\Support\ExportXlsxAction;
 use App\Models\Payment;
 use App\Models\User;
 use Filament\Actions\Action;
@@ -131,10 +132,7 @@ class PaymentsTable
             ->filtersFormColumns(2)
             ->recordUrl(fn (Payment $record) => PaymentResource::getUrl('view', ['record' => $record]))
             ->headerActions([
-                Action::make('exportXlsx')
-                    ->label(__('app.action.export_xlsx'))
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('gray')
+                ExportXlsxAction::make()
                     ->visible(fn (): bool => ExportPermission::allows('export_payment'))
                     ->action(fn ($livewire) => Excel::download(
                         new PaymentsExport($livewire->getFilteredTableQuery()),

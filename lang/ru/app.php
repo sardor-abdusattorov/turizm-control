@@ -188,6 +188,7 @@ return [
         'all_years' => 'Все годы',
         'count_short' => 'Кол-во',
         'total_amount' => 'Общая сумма',
+        'total' => 'Итого',
         'paid_of_total' => 'Оплачено / Сумма',
         'photo_report_url' => 'Ссылка на фотоотчёт',
         'project_costs' => 'Затраты',

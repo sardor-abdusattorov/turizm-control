@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Sponsors\Tables;
 use App\Exports\SponsorsExport;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
+use App\Filament\Support\ExportXlsxAction;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Contract;
 use App\Models\Sponsor;
@@ -51,6 +52,7 @@ class SponsorsTable
                         Action::make('projectsBreakdown')
                             ->modalHeading(fn (Sponsor $record): string => $record->name)
                             ->modalIcon('heroicon-o-presentation-chart-bar')
+                            ->modalWidth('2xl')
                             ->modalContent(fn (Sponsor $record) => view(
                                 'filament.resources.sponsors.tables.projects-breakdown',
                                 [
@@ -102,10 +104,7 @@ class SponsorsTable
                     ->options(Sponsor::getStatuses()),
             ])
             ->headerActions([
-                Action::make('exportXlsx')
-                    ->label(__('app.action.export_xlsx'))
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('gray')
+                ExportXlsxAction::make()
                     ->visible(fn (): bool => ExportPermission::allows('export_sponsor'))
                     ->action(fn ($livewire) => Excel::download(
                         new SponsorsExport($livewire->getFilteredTableQuery()),

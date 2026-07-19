@@ -7,6 +7,7 @@ use App\Exports\ContactsExport;
 use App\Filament\Resources\Contacts\ContactResource;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
+use App\Filament\Support\ExportXlsxAction;
 use App\Filament\Support\StatusToggleColumn;
 use App\Models\Contact;
 use App\Models\Contract;
@@ -74,6 +75,7 @@ class ContactsTable
                         Action::make('contractsBreakdown')
                             ->modalHeading(fn (Contact $record): string => $record->name)
                             ->modalIcon('heroicon-o-document-text')
+                            ->modalWidth('3xl')
                             ->modalContent(fn (Contact $record) => view(
                                 'filament.resources.contacts.contracts-breakdown',
                                 [
@@ -99,6 +101,7 @@ class ContactsTable
                         Action::make('projectsBreakdown')
                             ->modalHeading(fn (Contact $record): string => $record->name)
                             ->modalIcon('heroicon-o-presentation-chart-bar')
+                            ->modalWidth('2xl')
                             ->modalContent(fn (Contact $record) => view(
                                 'filament.resources.contacts.projects-breakdown',
                                 [
@@ -200,10 +203,7 @@ class ContactsTable
                     ->icon('heroicon-m-ellipsis-vertical'),
             ])
             ->headerActions([
-                Action::make('exportXlsx')
-                    ->label(__('app.action.export_xlsx'))
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('gray')
+                ExportXlsxAction::make()
                     ->visible(fn (): bool => ExportPermission::allows('export_contact'))
                     ->action(fn ($livewire) => Excel::download(
                         new ContactsExport($livewire->getFilteredTableQuery()),

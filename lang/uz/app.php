@@ -188,6 +188,7 @@ return [
         'all_years' => 'Barcha yillar',
         'count_short' => 'Soni',
         'total_amount' => 'Umumiy summa',
+        'total' => 'Jami',
         'paid_of_total' => 'To\'langan / Summa',
         'photo_report_url' => 'Fotohisobot havolasi',
         'project_costs' => 'Xarajatlar',

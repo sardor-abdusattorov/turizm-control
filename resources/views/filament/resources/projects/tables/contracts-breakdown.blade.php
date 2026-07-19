@@ -6,9 +6,14 @@
     $line = function (\App\Models\Contract $contract) use ($fmt): array {
         return [
             'title' => $contract->number,
+            'titleUrl' => \App\Filament\Resources\Contracts\ContractResource::getUrl('view', ['record' => $contract]),
             'sub' => $contract->contractType?->title ?? $contract->title,
+            'mid' => $contract->counterparty()?->name,
             'amount' => $fmt($contract->amount).' '.$contract->currency?->short_name,
-            'amountSub' => $contract->status->label(),
+            'badge' => [
+                'label' => $contract->status->label(),
+                'color' => $contract->status->color(),
+            ],
         ];
     };
 @endphp
@@ -17,8 +22,9 @@
     'rows' => $contracts,
     'empty' => __('app.message.no_contracts'),
     'line' => $line,
+    'titleHeading' => __('app.label.contract_single'),
+    'midHeading' => __('app.label.counterparty'),
+    'statusHeading' => __('app.label.status'),
     'totals' => $totals,
-    'amountHeading' => __('app.label.total_amount'),
     'withPaid' => false,
-    'subEllipsis' => true,
 ])

@@ -511,64 +511,23 @@
     text-align: center;
 }
 
-/* ─── Breakdown modals (record list + per-currency summary) ─────────────────
+/* ─── Breakdown modals: one structured table ────────────────────────────────
    Shared by the participants/sponsors/contracts badges on the lists and the
-   contact/sponsor breakdowns. Rendered inside Filament modals, so they rely on
-   the :root tokens. */
-.bkd {
+   contact/sponsor breakdowns: a header row, one record per row and the
+   per-currency totals in the footer. Rendered inside Filament modals, so it
+   relies on the :root tokens. */
+.bkdt {
     border: 1px solid var(--d);
     border-radius: .625rem;
-    overflow: hidden;
+    overflow-x: auto;
     font-size: .875rem;
 }
-.bkd-row {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    padding: .6rem .9rem;
-    color: var(--t);
-}
-.bkd-row + .bkd-row {
-    border-top: 1px solid var(--d);
-}
-.bkd-row__l {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-.bkd-row__nm {
-    font-weight: 600;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.bkd-row__sub {
-    font-size: .72rem;
-    color: var(--m2);
-    margin-top: .1rem;
-}
-.bkd-row__r {
-    flex: 0 0 auto;
-    text-align: right;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-}
-.bkd-empty {
-    font-size: .875rem;
-    color: var(--m);
-}
-
-.cst {
-    margin-top: 1rem;
-    border: 1px solid var(--d);
-    border-radius: .625rem;
-    overflow: hidden;
-    font-size: .875rem;
-}
-.cst table {
+.bkdt table {
     width: 100%;
+    min-width: 26rem;
     border-collapse: collapse;
 }
-.cst th {
+.bkdt th {
     font-size: .7rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -577,29 +536,60 @@
     background: var(--soft);
     padding: .55rem .9rem;
     text-align: left;
+    white-space: nowrap;
 }
-.cst th + th {
-    text-align: center;
-}
-.cst th:last-child {
-    text-align: right;
-}
-.cst td {
-    padding: .55rem .9rem;
+.bkdt td {
+    padding: .6rem .9rem;
     border-top: 1px solid var(--d);
     color: var(--t);
+    vertical-align: top;
 }
-.cst td:first-child {
+.bkdt__nm {
     font-weight: 600;
 }
-.cst td + td {
-    text-align: center;
+.bkdt__sub {
+    font-size: .72rem;
+    color: var(--m2);
+    margin-top: .1rem;
 }
-.cst td:last-child {
+.bkdt th.bkdt__num,
+.bkdt td.bkdt__num {
     text-align: right;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+}
+.bkdt__amt {
     font-weight: 600;
+}
+.bkdt th.bkdt__st,
+.bkdt td.bkdt__st {
+    text-align: right;
+    white-space: nowrap;
+}
+/* Filament's badge truncates itself under table auto-layout pressure; inside
+   this table the status is the cell's only content, so let it claim its
+   natural width instead of ellipsizing. */
+.bkdt td.bkdt__st .fi-badge,
+.bkdt td.bkdt__st .fi-badge .fi-badge-label {
+    overflow: visible;
+    text-overflow: clip;
+}
+.bkdt__lnk {
+    color: inherit;
+    text-decoration: none;
+}
+.bkdt__lnk:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.bkdt tfoot td {
+    background: var(--soft);
+    font-weight: 600;
+}
+.bkdt__cnt {
+    color: var(--m2);
+    font-weight: 500;
 }
 
 /* ─── Approval-flow modal on a phone: rows become labelled cards ────────────
@@ -781,6 +771,7 @@
 /* Keyboard focus on the custom interactive elements — the same visible ring
    Filament's own controls get, so tab-navigation never goes dark. */
 .pj-link:focus-visible,
+.bkdt__lnk:focus-visible,
 .ca:focus-visible,
 .ow-btn:focus-visible,
 .cw-btn:focus-visible,
