@@ -797,18 +797,20 @@ button.cw-row:focus-visible {
     border-radius: .4rem;
 }
 /* ─── Record sub-navigation tabs (shared) ───────────────────────────
-   ONE tab language for every record view (contract, project, …):
-   quiet buttons, the active one becomes a surface card ringed by a
-   hairline. Scrolls sideways on narrow screens; the 2px pad/margin
-   pair keeps the ring from being clipped by the scroll box. */
+   ONE tab language for every record view (contract, project, …): a
+   segmented control — one hairline container, the active segment gets
+   the soft accent fill. Unmistakably navigation, never a card. Scrolls
+   sideways on narrow screens. */
 .rec-tabs {
     display: flex;
     align-items: center;
-    gap: .15rem;
+    gap: .25rem;
+    padding: .3rem;
+    background: var(--s);
+    border: 1px solid var(--d);
+    border-radius: .75rem;
     overflow-x: auto;
     scrollbar-width: none;
-    padding: 2px;
-    margin: -2px;
 }
 .rec-tabs::-webkit-scrollbar {
     display: none;
@@ -816,18 +818,19 @@ button.cw-row:focus-visible {
 .rec-tabs__side {
     margin-left: auto;
     flex-shrink: 0;
+    padding-right: .35rem;
 }
 .rec-tab {
     display: inline-flex;
     align-items: center;
     gap: .45rem;
-    padding: .7rem 1.15rem;
-    font-size: .92rem;
+    padding: .55rem 1rem;
+    font-size: .875rem;
     font-weight: 600;
     color: var(--m);
     background: transparent;
     border: 0;
-    border-radius: .7rem;
+    border-radius: .5rem;
     white-space: nowrap;
     cursor: pointer;
     transition: all .15s;
@@ -840,21 +843,20 @@ button.cw-row:focus-visible {
    active colours so the tab keeps its accent under the cursor. */
 .rec-tab--active,
 .rec-tab--active:hover {
-    color: var(--accent);
-    background: var(--s);
-    box-shadow: 0 0 0 1px var(--d);
+    color: var(--accent-strong);
+    background: var(--accent-soft);
 }
 .rec-tab__c {
-    font-size: .74rem;
+    font-size: .72rem;
     font-weight: 700;
     color: var(--m);
     background: var(--soft);
     border-radius: 999px;
-    padding: .12rem .5rem;
+    padding: .1rem .45rem;
 }
 .rec-tab--active .rec-tab__c {
-    background: var(--accent-soft);
-    color: var(--accent);
+    background: var(--s);
+    color: var(--accent-strong);
 }
 
 .pj-tabwrap {

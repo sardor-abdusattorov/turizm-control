@@ -78,11 +78,13 @@ class ProjectsTable
                 TextColumn::make('starts_on')
                     ->label(__('app.label.starts_on'))
                     ->date('d.m.Y')
+                    ->alignCenter()
                     ->sortable(),
 
                 TextColumn::make('ends_on')
                     ->label(__('app.label.ends_on'))
                     ->date('d.m.Y')
+                    ->alignCenter()
                     ->sortable()
                     ->toggleable(),
 

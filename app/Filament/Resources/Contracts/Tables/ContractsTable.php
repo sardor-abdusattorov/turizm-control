@@ -72,8 +72,10 @@ class ContractsTable
                     ->label(__('app.label.contract_title'))
                     ->searchable()
                     ->sortable()
-                    ->wrap()
-                    ->limit(50),
+                    // One tidy line — the full official phrase lives in the
+                    // tooltip and on the contract page itself.
+                    ->limit(60)
+                    ->tooltip(fn (Contract $record): ?string => mb_strlen((string) $record->title) > 60 ? $record->title : null),
 
                 // Counterparty: the contact on most contracts, the sponsor on
                 // «Спонсорство». Search still targets the contact name (the

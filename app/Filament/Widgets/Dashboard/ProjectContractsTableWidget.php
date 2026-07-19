@@ -50,6 +50,10 @@ class ProjectContractsTableWidget extends TableWidget
 
                 TextColumn::make('counterparty')
                     ->label(__('app.label.counterparty'))
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query
+                        ->where(fn (Builder $q) => $q
+                            ->whereHas('contact', fn (Builder $c) => $c->where('name', 'like', "%{$search}%"))
+                            ->orWhereHas('sponsor', fn (Builder $c) => $c->where('name', 'like', "%{$search}%"))))
                     ->state(fn (Contract $record): string => $record->counterparty()?->name ?? '—'),
 
                 TextColumn::make('amount')
