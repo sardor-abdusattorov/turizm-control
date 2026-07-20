@@ -171,7 +171,7 @@
                     </div>
                     @if ($basisOrders->isNotEmpty())
                         <div class="ow-row">
-                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_plural') }}</span></div>
+                            <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><span class="ow-row__lb">{{ __('app.label.order_basis') }}</span></div>
                             <div class="ow-row__v">
                                 <span class="ow-row__vl">
                                     @foreach ($basisOrders as $basisOrder)
