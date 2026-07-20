@@ -195,6 +195,8 @@ return [
         'starts_on' => 'Start date',
         'ends_on' => 'End date',
         'area_sqm' => 'Area, m²',
+        'area_sqm_short' => ':sqm m²',
+        'free' => 'free',
         'area_cost' => 'Area cost',
         'area_currency' => 'Area currency',
         'area_is_free' => 'Area free of charge',

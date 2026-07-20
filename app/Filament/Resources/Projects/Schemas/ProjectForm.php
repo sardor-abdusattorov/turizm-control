@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Projects\Schemas;
 use App\Enums\ProjectType;
 use App\Filament\Support\MediaGalleryUpload;
 use App\Models\Currency;
+use App\Models\Order;
 use App\Models\Project;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -49,6 +50,17 @@ class ProjectForm
                                     ->label(__('app.label.venue'))
                                     ->placeholder('Madrid, Spain')
                                     ->maxLength(255)
+                                    ->columnSpanFull(),
+
+                                // The buyruq the participation rests on — its
+                                // contracts inherit the basis from here, so it
+                                // is picked once per project, not per deal.
+                                Select::make('order_id')
+                                    ->label(__('app.label.order_basis'))
+                                    ->options(fn (): array => Order::basisOptions())
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable()
                                     ->columnSpanFull(),
 
                                 Grid::make(['default' => 1, 'md' => 2])

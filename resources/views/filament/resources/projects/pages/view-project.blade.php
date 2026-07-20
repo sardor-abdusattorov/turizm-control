@@ -57,7 +57,6 @@
     // Per-currency income-contract totals for the finance card and the panel
     // footers — mixed currencies stay apart, never converted.
     $feeTotalsByCurrency = $record->incomeTotalsByCurrency(false);
-    $sponsorTotalsByCurrency = $record->incomeTotalsByCurrency(true);
 
     // A single fee currency is shown only when every income contract shares it;
     // mixed-currency projects drop the suffix rather than mislead.
@@ -72,11 +71,6 @@
 
     $heroVariant = $record->status ? 'success' : 'gray';
     $typeIcon = $record->type === \App\Enums\ProjectType::International ? 'heroicon-o-globe-alt' : 'heroicon-o-building-office-2';
-
-    $participantBlocks = [
-        ['title' => __('app.label.participants'), 'rows' => $members, 'totals' => $feeTotalsByCurrency, 'pill' => 'info', 'icon' => 'heroicon-o-user-group', 'empty' => __('app.message.no_participants')],
-        ['title' => __('app.label.sponsors'), 'rows' => $sponsors, 'totals' => $sponsorTotalsByCurrency, 'pill' => 'warning', 'icon' => 'heroicon-o-star', 'empty' => __('app.message.no_sponsors')],
-    ];
 @endphp
 
 <x-filament-panels::page>
@@ -165,7 +159,7 @@
                     <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
                 </header>
                 {{-- The same row-per-fact table the order view uses. --}}
-                @php $basisOrders = $record->ordersViaContracts(); @endphp
+                @php $basisOrders = collect([$record->order])->filter(); @endphp
                 <div class="ow-dets">
                     <div class="ow-row">
                         <div class="ow-row__k"><span class="ow-row__ic">{!! $ic('heroicon-o-map-pin') !!}</span><span class="ow-row__lb">{{ __('app.label.venue') }}</span></div>
@@ -257,113 +251,15 @@
             @endif
         </div>
 
-        {{-- ---------- CONTRACTS (visibility-scoped) ---------- --}}
+        {{-- ---------- CONTRACTS: the same stock Filament table the dashboard
+             embeds — search, sorting and pagination for free. ---------- --}}
         <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
-            <section class="ow-card">
-                <header class="ow-hd">
-                    <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text', 18) !!}</span>
-                    <h2 class="ow-hd__t">{{ __('app.label.contracts') }}</h2>
-                    <span class="pj-count">{{ $visibleContracts->count() }}</span>
-                </header>
-                @if ($visibleContracts->isEmpty())
-                    <p class="pj-empty">{{ __('app.message.no_contracts') }}</p>
-                @else
-                    <div class="pj-table-wrap">
-                        <table class="pj-table">
-                            <thead>
-                            <tr>
-                                <th>{{ __('app.label.contract_number') }}</th>
-                                <th>{{ __('app.label.contract_type_single') }}</th>
-                                <th>{{ __('app.label.contact_single') }}</th>
-                                <th class="pj-table__num">{{ __('app.label.amount') }}</th>
-                                <th>{{ __('app.label.status') }}</th>
-                                <th class="pj-table__num">{{ __('app.label.paid') }}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($visibleContracts as $contract)
-                                <tr>
-                                    <td>
-                                        <a class="pj-link" href="{{ \App\Filament\Resources\Contracts\ContractResource::getUrl('view', ['record' => $contract]) }}">
-                                            {{ $contract->number }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        @if ($contract->contractType)
-                                            <span class="pj-pill pj-pill--{{ $contract->contractType->direction?->color() ?? 'gray' }}">{{ $contract->contractType->title }}</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $contract->contact?->name }}</td>
-                                    <td class="pj-table__num">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</td>
-                                    <td><span class="pj-pill pj-pill--{{ $contract->status->color() }}">{{ $contract->status->label() }}</span></td>
-                                    <td class="pj-table__num">{{ number_format((float) $contract->paid_percent, 0) }}%</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </section>
+            @livewire(\App\Filament\Widgets\Dashboard\ProjectContractsTableWidget::class, ['pageFilters' => ['projectId' => $record->id]], key('project-contracts-'.$record->id))
         </div>
 
-        {{-- ---------- PARTICIPANTS (derived from income contracts) ---------- --}}
+        {{-- ---------- PARTICIPANTS (income counterparties, native table) ---------- --}}
         <div x-show="tab === 'participants'" x-cloak class="pj-panel">
-            @foreach ($participantBlocks as $block)
-                <section class="ow-card">
-                    <header class="ow-hd">
-                        <span class="ow-hd__ic">{!! $ic($block['icon'], 18) !!}</span>
-                        <h2 class="ow-hd__t">{{ $block['title'] }}</h2>
-                        <span class="pj-count">{{ $block['rows']->count() }}</span>
-                    </header>
-
-                    @if ($block['rows']->isEmpty())
-                        <p class="pj-empty">{{ $block['empty'] }}</p>
-                    @else
-                        <div class="pj-table-wrap">
-                            <table class="pj-table">
-                                <thead>
-                                <tr>
-                                    <th>№</th>
-                                    <th>{{ __('app.label.participant_name') }}</th>
-                                    <th>{{ __('app.label.contract_number') }}</th>
-                                    <th class="pj-table__num">{{ __('app.label.amount') }}</th>
-                                    <th class="pj-table__num">{{ __('app.label.paid') }}</th>
-                                    <th>{{ __('app.label.status') }}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @foreach ($block['rows'] as $c)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $c->counterparty()?->name }}</td>
-                                        <td>
-                                            <a class="pj-link" href="{{ \App\Filament\Resources\Contracts\ContractResource::getUrl('view', ['record' => $c]) }}">
-                                                {{ $c->number }}
-                                            </a>
-                                        </td>
-                                        <td class="pj-table__num">{{ $fmt($c->amount) }} {{ $c->currency?->short_name }}</td>
-                                        <td class="pj-table__num">{{ $fmt($c->paidAmount()) }} {{ $c->currency?->short_name }}</td>
-                                        <td><span class="pj-pill pj-pill--{{ $c->payment_status->color() }}">{{ $c->payment_status->label() }}</span></td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                                @if ($block['totals']->isNotEmpty())
-                                    <tfoot>
-                                    @foreach ($block['totals'] as $t)
-                                        <tr>
-                                            <td colspan="3">{{ $t['currency'] }}</td>
-                                            <td class="pj-table__num">{{ $fmt($t['total']) }}</td>
-                                            <td class="pj-table__num">{{ $fmt($t['paid']) }}</td>
-                                            <td></td>
-                                        </tr>
-                                    @endforeach
-                                    </tfoot>
-                                @endif
-                            </table>
-                        </div>
-                    @endif
-                </section>
-            @endforeach
+            @livewire(\App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget::class, ['pageFilters' => ['projectId' => $record->id]], key('project-participants-'.$record->id))
         </div>
 
         {{-- ---------- GALLERY ---------- --}}

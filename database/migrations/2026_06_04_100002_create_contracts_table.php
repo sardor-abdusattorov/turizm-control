@@ -13,9 +13,6 @@ return new class extends Migration
             $table->string('number', 50)->unique();
             $table->foreignId('contract_template_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('contract_type_id')->nullable()->constrained()->nullOnDelete();
-            // The buyruq this contract was concluded under («на основании
-            // приказа № 74-АФ»); many contracts may share one order.
-            $table->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
             // A contract faces exactly one counterparty: a Contact OR a
             // Sponsor, chosen by its type's counterparty_kind.
             $table->foreignId('contact_id')->nullable()->constrained()->restrictOnDelete();

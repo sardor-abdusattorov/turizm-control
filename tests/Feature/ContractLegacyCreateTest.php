@@ -156,10 +156,8 @@ it('groups project and order options by type and year', function () {
         ContractForm::class,
         'projectOptionsGrouped',
     );
-    $orderGroups = invokeProtectedStatic(
-        ContractForm::class,
-        'orderOptions',
-    );
+    // The basis-order picker lives on the project form now.
+    $orderGroups = Order::basisOptions();
 
     // Every group key carries the type · year context; options nest inside.
     expect(collect($projectGroups)->keys()->filter(fn ($k) => str_contains($k, '2026'))->count())->toBeGreaterThan(0)

@@ -195,6 +195,8 @@ return [
         'starts_on' => 'Boshlanish sanasi',
         'ends_on' => 'Tugash sanasi',
         'area_sqm' => 'Maydon, m²',
+        'area_sqm_short' => ':sqm m²',
+        'free' => 'bepul',
         'area_cost' => 'Maydon narxi',
         'area_currency' => 'Maydon valyutasi',
         'area_is_free' => 'Maydon bepul',

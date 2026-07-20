@@ -23,6 +23,7 @@ class Project extends Model
     protected $fillable = [
         'type',
         'name',
+        'order_id',
         'venue',
         'starts_on',
         'ends_on',
@@ -225,22 +226,12 @@ class Project extends Model
     }
 
     /**
-     * Buyruqs this project rests on, collected through its contracts (each
-     * contract names its basis order) — a project may span several: the
-     * annual 74-АФ plus the per-exhibition delegation order.
-     *
-     * @return Collection<int, Order>
+     * The buyruq (приказ) the participation rests on — «на основании приказа
+     * № 119-АФ». Lives on the project; its contracts inherit the basis.
      */
-    public function ordersViaContracts(): Collection
+    public function order(): BelongsTo
     {
-        return $this->contracts()
-            ->whereNotNull('order_id')
-            ->with('order')
-            ->get()
-            ->pluck('order')
-            ->filter()
-            ->unique('id')
-            ->values();
+        return $this->belongsTo(Order::class);
     }
 
     /**

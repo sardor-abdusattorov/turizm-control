@@ -144,14 +144,6 @@ class ContractForm
                                     ->visible(fn (Get $get): bool => ! $get('already_signed'))
                                     ->columnSpanFull(),
 
-                                Select::make('order_id')
-                                    ->label(__('app.label.order_basis'))
-                                    ->options(fn (): array => self::orderOptions())
-                                    ->searchable()
-                                    ->preload()
-                                    ->nullable()
-                                    ->columnSpanFull(),
-
                                 // Counterparty — a Contact on most kinds, a
                                 // Sponsor on «Спонсорство». The type's
                                 // counterparty_kind toggles which picker shows;
@@ -363,27 +355,6 @@ class ContractForm
     protected static function projectOptionsGrouped(?string $year = null): array
     {
         return Project::groupedOptions($year);
-    }
-
-    /**
-     * Active buyruqs the contract can name as its basis, grouped into
-     * optgroups by issue year (newest first), labelled by number (falling
-     * back to the title for unnumbered drafts).
-     *
-     * @return array<string, array<int, string>>
-     */
-    protected static function orderOptions(): array
-    {
-        return Order::query()
-            ->where('status', true)
-            ->orderByDesc('issued_at')
-            ->orderByDesc('id')
-            ->get()
-            ->groupBy(fn (Order $order): string => $order->issued_at?->format('Y') ?? __('app.label.not_set'))
-            ->map(fn ($group) => $group->mapWithKeys(fn (Order $order): array => [
-                $order->id => trim(($order->number ? $order->number.' · ' : '').$order->title),
-            ])->toArray())
-            ->toArray();
     }
 
     public static function validateRequiredApproverDepartments(mixed $value, Closure $fail): void

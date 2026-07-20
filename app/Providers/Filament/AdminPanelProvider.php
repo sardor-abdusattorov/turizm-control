@@ -7,7 +7,6 @@ use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use App\Filament\Widgets\Dashboard\ProjectContractsTableWidget;
 use App\Filament\Widgets\Dashboard\ProjectOverviewWidget;
-use App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget;
 use App\Filament\Widgets\Dashboard\ProjectStatsWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
@@ -102,7 +101,6 @@ class AdminPanelProvider extends PanelProvider
                 ProjectOverviewWidget::class,
                 ProjectStatsWidget::class,
                 ProjectContractsTableWidget::class,
-                ProjectParticipantsTableWidget::class,
             ])
             ->resources([
 

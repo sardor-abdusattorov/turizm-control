@@ -4,6 +4,7 @@ use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Currency;
+use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Project;
 use App\Models\User;
@@ -105,6 +106,25 @@ it('replays a snapshot after a wipe: contracts, contacts, attachments and paymen
         ->and($restored->payments()->first()?->screenshots)->toBe(['uploads/images/payments/2026/07/proof.png'])
         // No approval chain is conjured for a replayed contract.
         ->and($restored->approvers()->count())->toBe(0);
+});
+
+it('hands the basis order to the project on replay', function () {
+    Storage::fake('local');
+
+    $order = Order::factory()->create(['number' => '119-AF']);
+    $project = Project::factory()->international()->create(['name' => 'ATM 25', 'order_id' => $order->id]);
+    $currency = Currency::factory()->create(['short_name' => 'UZS', 'status' => true]);
+    Contract::factory()->create(['number' => 'А-9', 'currency_id' => $currency->id, 'project_id' => $project->id]);
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
+
+    // The rebuild wipes the link; the replayed contract carries it back.
+    $project->forceFill(['order_id' => null])->saveQuietly();
+    Contract::query()->delete();
+
+    $this->seed(HandEnteredContractsSeeder::class);
+
+    expect($project->fresh()->order?->number)->toBe('119-AF');
 });
 
 it('replaying the same snapshot twice never duplicates anything', function () {

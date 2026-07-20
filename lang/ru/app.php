@@ -195,6 +195,8 @@ return [
         'starts_on' => 'Дата начала',
         'ends_on' => 'Дата окончания',
         'area_sqm' => 'Площадь, м²',
+        'area_sqm_short' => ':sqm м²',
+        'free' => 'бесплатно',
         'area_cost' => 'Стоимость площади',
         'area_currency' => 'Валюта площади',
         'area_is_free' => 'Площадь бесплатно',

@@ -10,6 +10,11 @@
                     @if ($project->venue)
                         <span>{{ $project->venue }}</span>
                     @endif
+                    @if ($project->area_sqm !== null)
+                        <span>
+                            {{ __('app.label.area_sqm_short', ['sqm' => rtrim(rtrim(number_format((float) $project->area_sqm, 2, ',', ' '), '0'), ',')]) }}@if ($project->area_is_free) · {{ __('app.label.free') }}@elseif ($project->area_cost !== null) · {{ \App\Support\Money::format($project->area_cost) }} {{ $project->areaCurrency?->short_name }}@endif
+                        </span>
+                    @endif
                     @foreach ($counts as $label => $count)
                         <span>{{ $label }}: <b>{{ $count }}</b></span>
                     @endforeach

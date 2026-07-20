@@ -42,6 +42,27 @@ class Order extends Model
         return ($this->issued_at ?? $this->created_at)?->year;
     }
 
+    /**
+     * Active buyruqs a project can name as its basis, grouped into optgroups
+     * by issue year (newest first), labelled by number (falling back to the
+     * title for unnumbered drafts).
+     *
+     * @return array<string, array<int, string>>
+     */
+    public static function basisOptions(): array
+    {
+        return static::query()
+            ->where('status', true)
+            ->orderByDesc('issued_at')
+            ->orderByDesc('id')
+            ->get()
+            ->groupBy(fn (Order $order): string => $order->issued_at?->format('Y') ?? __('app.label.not_set'))
+            ->map(fn ($group) => $group->mapWithKeys(fn (Order $order): array => [
+                $order->id => trim(($order->number ? $order->number.' · ' : '').$order->title),
+            ])->toArray())
+            ->toArray();
+    }
+
     public function fileAbsolutePath(): ?string
     {
         if (! $this->file_path) {

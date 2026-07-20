@@ -74,5 +74,6 @@ it('keeps the template optional while requiring the contract type', function () 
     Livewire::test(CreateContract::class)
         ->assertFormFieldExists('contract_type_id', fn ($field): bool => $field->isRequired())
         ->assertFormFieldExists('contract_template_id', fn ($field): bool => ! $field->isRequired())
-        ->assertFormFieldExists('order_id', fn ($field): bool => ! $field->isRequired());
+        // The basis order moved to the project form — the contract no longer asks.
+        ->assertFormFieldDoesNotExist('order_id');
 });

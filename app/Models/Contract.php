@@ -28,7 +28,6 @@ class Contract extends Model
         'number',
         'contract_template_id',
         'contract_type_id',
-        'order_id',
         'contact_id',
         'sponsor_id',
         'project_id',
@@ -239,14 +238,6 @@ class Contract extends Model
     public function contractType(): BelongsTo
     {
         return $this->belongsTo(ContractType::class);
-    }
-
-    /**
-     * The buyruq (приказ) this contract was concluded under.
-     */
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(Order::class);
     }
 
     public function contact(): BelongsTo

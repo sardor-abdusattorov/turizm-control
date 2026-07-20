@@ -27,7 +27,7 @@ class SnapshotContracts extends Command
         $contracts = Contract::query()
             ->with([
                 'contact.bankAccounts.currency', 'sponsor', 'contractType', 'currency',
-                'project', 'order', 'responsible', 'attachments', 'payments.creator',
+                'project.order', 'responsible', 'attachments', 'payments.creator',
             ])
             ->orderBy('id')
             ->get()
@@ -40,7 +40,7 @@ class SnapshotContracts extends Command
                 'signed_at' => $contract->signed_at?->toDateString(),
                 'contract_type' => $contract->contractType?->getTranslation('title', 'ru'),
                 'project' => $contract->project?->name,
-                'order_number' => $contract->order?->number,
+                'order_number' => $contract->project?->order?->number,
                 'responsible_email' => $contract->responsible?->email,
                 'contact' => $contract->contact ? [
                     'name' => $contract->contact->getTranslations('name'),

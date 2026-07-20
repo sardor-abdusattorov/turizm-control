@@ -12,6 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('type', 20)->default('international');
             $table->string('name');
+            // The buyruq the participation rests on («на основании приказа
+            // № 119-АФ») — one per project; its contracts inherit the basis.
+            $table->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
             $table->string('venue')->nullable();
             $table->date('starts_on')->nullable();
             $table->date('ends_on')->nullable();

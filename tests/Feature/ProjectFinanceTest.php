@@ -41,20 +41,15 @@ it('splits contract totals by direction and currency', function () {
         ->toBe(['USD' => 38000.0]);
 });
 
-it('collects the basis orders of its contracts without duplicates', function () {
-    $project = Project::factory()->create();
+it('carries its basis order directly and hands it to its contracts', function () {
+    $delegation = Order::factory()->create(['title' => 'Командировочный 119-АФ']);
+    $project = Project::factory()->create(['order_id' => $delegation->id]);
     $type = ContractType::factory()->create();
 
-    $annual = Order::factory()->create(['title' => 'Годовой 74-АФ']);
-    $delegation = Order::factory()->create(['title' => 'Командировочный 119-АФ']);
+    $contract = Contract::factory()->create(['project_id' => $project->id, 'contract_type_id' => $type->id]);
 
-    Contract::factory()->create(['project_id' => $project->id, 'contract_type_id' => $type->id, 'order_id' => $annual->id]);
-    Contract::factory()->create(['project_id' => $project->id, 'contract_type_id' => $type->id, 'order_id' => $annual->id]);
-    Contract::factory()->create(['project_id' => $project->id, 'contract_type_id' => $type->id, 'order_id' => $delegation->id]);
-    Contract::factory()->create(['project_id' => $project->id, 'contract_type_id' => $type->id]);
-
-    expect($project->ordersViaContracts()->pluck('id')->sort()->values()->all())
-        ->toBe([$annual->id, $delegation->id]);
+    expect($project->order->id)->toBe($delegation->id)
+        ->and($contract->project->order->id)->toBe($delegation->id);
 });
 
 it('shows visible-contract expense totals and the photo report on the view page', function () {

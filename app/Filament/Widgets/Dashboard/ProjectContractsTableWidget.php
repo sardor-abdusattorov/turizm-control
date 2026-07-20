@@ -14,9 +14,10 @@ use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * The picked project's contracts as a stock Filament table — search,
- * sorting and pagination for free; the same visibleTo() scoping as
- * everywhere else.
+ * The picked project's contracts as a stock Filament table — the same
+ * columns the contracts index leads with (type, counterparty, money,
+ * status, paid share), the same visibleTo() scoping as everywhere else.
+ * Doubles as the «Контракты» tab table on the project view page.
  */
 class ProjectContractsTableWidget extends TableWidget
 {
@@ -24,7 +25,7 @@ class ProjectContractsTableWidget extends TableWidget
 
     protected static ?int $sort = 1;
 
-    protected int|string|array $columnSpan = 1;
+    protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
     {
@@ -38,7 +39,7 @@ class ProjectContractsTableWidget extends TableWidget
             ->query(fn (): Builder => Contract::query()
                 ->visibleTo()
                 ->where('project_id', $this->projectId() ?? 0)
-                ->with(['contact', 'sponsor', 'currency']))
+                ->with(['contact', 'sponsor', 'currency', 'contractType']))
             ->defaultSort('id', 'desc')
             ->recordUrl(fn (Contract $record): string => ContractResource::getUrl('view', ['record' => $record]))
             ->columns([
@@ -46,6 +47,13 @@ class ProjectContractsTableWidget extends TableWidget
                     ->label(__('app.label.contract_number'))
                     ->weight('semibold')
                     ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('contractType.title')
+                    ->label(__('app.label.contract_type_single'))
+                    ->badge()
+                    ->color(fn (Contract $record): string => $record->contractType?->direction?->color() ?? 'gray')
+                    ->placeholder(__('app.label.not_set'))
                     ->sortable(),
 
                 TextColumn::make('counterparty')
@@ -67,6 +75,12 @@ class ProjectContractsTableWidget extends TableWidget
                     ->badge()
                     ->formatStateUsing(fn (ContractStatus $state): string => $state->label())
                     ->color(fn (ContractStatus $state): string => $state->color()),
+
+                TextColumn::make('paid_percent')
+                    ->label(__('app.label.paid'))
+                    ->formatStateUsing(fn (?string $state): string => round((float) $state).'%')
+                    ->alignEnd()
+                    ->sortable(),
             ])
             ->paginated([5, 10, 25])
             ->defaultPaginationPageOption(5)

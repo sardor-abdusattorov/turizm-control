@@ -14,16 +14,16 @@ use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Participants of the picked project — the counterparties of its income
- * contracts (fees + sponsorship), with the payment state of each deal.
+ * Participants of a project — the counterparties of its income contracts
+ * (fees + sponsorship), with the payment state of each deal. Lives on the
+ * project view page's «Участники» tab; the dashboard folds the same rows
+ * into its single contracts table.
  */
 class ProjectParticipantsTableWidget extends TableWidget
 {
     use InteractsWithPageFilters;
 
-    protected static ?int $sort = 2;
-
-    protected int|string|array $columnSpan = 1;
+    protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
     {

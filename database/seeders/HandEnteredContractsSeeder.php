@@ -61,7 +61,6 @@ class HandEnteredContractsSeeder extends Seeder
                     'currency_id' => Currency::query()->firstWhere('short_name', $data['currency'])?->id,
                     'contract_type_id' => ContractType::query()->firstWhere('title->ru', $data['contract_type'])?->id,
                     'project_id' => $data['project'] ? Project::query()->firstWhere('name', $data['project'])?->id : null,
-                    'order_id' => $data['order_number'] ? Order::query()->firstWhere('number', $data['order_number'])?->id : null,
                     'contact_id' => $this->restoreContact($data['contact'] ?? null),
                     'sponsor_id' => $data['sponsor'] ? Sponsor::query()->firstWhere('name', $data['sponsor'])?->id : null,
                     'responsible_id' => $this->userId($data['responsible_email'] ?? null),
@@ -74,6 +73,19 @@ class HandEnteredContractsSeeder extends Seeder
                 'status' => $data['status'],
                 'signed_at' => $data['signed_at'],
             ])->saveQuietly();
+
+            // The basis buyruq lives on the project now; the first contract
+            // naming one hands it over, the rest confirm it.
+            if (($data['order_number'] ?? null) && $contract->project_id) {
+                $orderId = Order::query()->firstWhere('number', $data['order_number'])?->id;
+
+                if ($orderId) {
+                    Project::query()
+                        ->whereKey($contract->project_id)
+                        ->whereNull('order_id')
+                        ->update(['order_id' => $orderId]);
+                }
+            }
 
             foreach ($data['attachments'] ?? [] as $sort => $attachment) {
                 $contract->attachments()->firstOrCreate(
