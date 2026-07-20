@@ -7,7 +7,7 @@ use App\Exports\Concerns\StyledExportSheet;
 use App\Models\Contact;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -21,8 +21,12 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
  * column only ever appears where it applies: legal entities carry their
  * requisites (legal form, INN, OKED, director, bank details), individuals only
  * their PINFL. Shares the blue registry look with its sibling sheet.
+ *
+ * Fixed column widths (not ShouldAutoSize): auto-sizing stretched a column to
+ * its longest value, so one long address blew the sheet up to unreadable
+ * widths — wrapText inside a fixed grid reads far better.
  */
-class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadings, WithMapping, WithStyles, WithTitle
+class ContactsSheet implements FromQuery, WithColumnWidths, WithEvents, WithHeadings, WithMapping, WithStyles, WithTitle
 {
     use FormatsLocalizedValue;
     use StyledExportSheet;
@@ -40,7 +44,7 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
     {
         return (clone $this->query)
             ->where('type', $this->type)
-            ->with('bankAccounts')
+            ->with('bankAccounts.currency')
             ->reorder('id');
     }
 
@@ -69,7 +73,7 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
                 __('app.label.director_name'),
                 __('app.label.bank_account'),
                 __('app.label.bank_name'),
-                __('app.label.mfo'),
+                __('app.label.mfo').' / SWIFT',
                 __('app.label.status'),
                 __('app.label.created_at'),
             ];
@@ -96,7 +100,7 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
         $createdAt = $row->created_at?->format('d.m.Y H:i');
 
         if ($this->isLegal()) {
-            $account = $row->bankAccountFor();
+            [$accounts, $banks, $codes] = $this->bankAccountColumns($row);
 
             return [
                 $number,
@@ -110,9 +114,9 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
                 $row->website,
                 $row->contact_person,
                 $row->director_name,
-                $account?->account_number,
-                $account?->bank_name,
-                $account?->mfo,
+                $accounts,
+                $banks,
+                $codes,
                 $status,
                 $createdAt,
             ];
@@ -128,6 +132,60 @@ class ContactsSheet implements FromQuery, ShouldAutoSize, WithEvents, WithHeadin
             $row->website,
             $status,
             $createdAt,
+        ];
+    }
+
+    /**
+     * All bank accounts of a contact as three line-aligned multi-line cells
+     * (account / bank / МФО-SWIFT): line N of each cell describes the same
+     * account, prefixed with its currency so a company with UZS, USD and EUR
+     * accounts exports every requisite instead of a single arbitrary one.
+     *
+     * @return array{0: ?string, 1: ?string, 2: ?string}
+     */
+    private function bankAccountColumns(Contact $contact): array
+    {
+        $accounts = $contact->bankAccounts;
+
+        if ($accounts->isEmpty()) {
+            return [null, null, null];
+        }
+
+        $prefix = fn ($account): string => $accounts->count() > 1 && $account->currency
+            ? $account->currency->short_name.': '
+            : '';
+
+        // One bank serving every account collapses to a single line; different
+        // banks stay per-line so line N still matches account line N.
+        $banks = $accounts->map(fn ($a) => (string) $a->bank_name);
+        $banks = $banks->unique()->count() === 1 ? $banks->take(1) : $banks;
+
+        return [
+            $accounts->map(fn ($a) => $prefix($a).$a->account_number)->implode("\n"),
+            $banks->implode("\n"),
+            $accounts->map(fn ($a) => $prefix($a).($a->mfo ?: $a->swift))->implode("\n"),
+        ];
+    }
+
+    /**
+     * Fixed grid: long values (addresses, bank names) wrap inside their column
+     * instead of dragging the whole sheet into an unreadable width.
+     *
+     * @return array<string, int>
+     */
+    public function columnWidths(): array
+    {
+        if ($this->isLegal()) {
+            return [
+                'A' => 6, 'B' => 34, 'C' => 12, 'D' => 12, 'E' => 10,
+                'F' => 34, 'G' => 18, 'H' => 26, 'I' => 22, 'J' => 20,
+                'K' => 22, 'L' => 32, 'M' => 28, 'N' => 16, 'O' => 12, 'P' => 17,
+            ];
+        }
+
+        return [
+            'A' => 6, 'B' => 34, 'C' => 17, 'D' => 34, 'E' => 18,
+            'F' => 26, 'G' => 22, 'H' => 12, 'I' => 17,
         ];
     }
 

@@ -290,13 +290,16 @@ class ViewContract extends ViewRecord
      * editing the contract's terms, this stays open AFTER full approval: the
      * signed scan, the SWIFT slip, the act and the bank fees all arrive once
      * the contract is already approved, and filing them is not an edit of the
-     * terms — so it never touches the approval chain.
+     * terms — so it never touches the approval chain. While the contract is
+     * mid-approval, though, the dossier freezes: approvers must review a
+     * fixed set of files, not a moving target.
      */
     public function canManageAttachments(): bool
     {
         $user = auth()->user();
 
         return $user !== null
+            && ! $this->record->documentEditWouldResetApprovals()
             && ($user->hasRole('super_admin') || $user->can('update_contract'));
     }
 

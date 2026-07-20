@@ -144,6 +144,33 @@ it('sends the Telegram step-approved message in the recipient locale, not the se
     expect(App::getLocale())->toBe('en');
 });
 
+it('renders the bell notification in the recipient saved panel locale, not the sender locale', function () {
+    // The manager works in Uzbek; the lawyer approves while browsing in
+    // English. The bell must land in Uzbek — and the sender's locale must
+    // be restored afterwards.
+    $manager = User::factory()->create(['locale' => 'uz']);
+    $lawyer = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE]));
+
+    $contract = Contract::factory()->withDocument()->create([
+        'responsible_id' => $manager->id,
+        'status' => Contract::STATUS_IN_REVIEW,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $lawyer->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+
+    App::setLocale('en');
+    actingAs($lawyer);
+    app(ContractWorkflow::class)->approve($contract->fresh(), $lawyer);
+
+    $expected = trans('app.notification.contract_approved.title', [], 'uz');
+
+    expect($manager->fresh()->notifications->pluck('data.title'))->toContain($expected)
+        ->and($expected)->not->toBe(trans('app.notification.contract_approved.title', [], 'en'))
+        ->and(App::getLocale())->toBe('en');
+});
+
 it('names the sender in the approval-requested notification', function () {
     $manager = User::factory()->create(['name' => 'Sardor Abdusattorov']);
     $approver = User::factory()->create(['status' => User::STATUS_ACTIVE]);

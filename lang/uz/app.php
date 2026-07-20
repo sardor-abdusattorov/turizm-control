@@ -667,6 +667,11 @@ return [
         'fully_paid' => 'To‘liq to‘langan',
     ],
     'unit' => [
+        // Countdown pill units — glued right after the number ('1'.'д').
+        'day_short' => ' kun',
+        'hour_short' => ' soat',
+        'minute_short' => ' daq',
+        'second_short' => ' son',
         'thousand_short' => 'ming',
         'million_short' => 'mln',
         'billion_short' => 'mlrd',

@@ -29,18 +29,20 @@ class ContractNotifier
             return;
         }
 
-        Notification::make()
-            ->title(__('app.notification.approval_requested.title'))
-            ->body(__('app.notification.approval_requested.body', [
-                'number' => $contract->number,
-                'sender' => $contract->responsible?->name ?? '—',
-            ]))
-            ->icon('heroicon-o-paper-airplane')
-            ->warning()
-            ->actions([
-                $this->openContractAction($contract),
-            ])
-            ->sendToDatabase($recipient, isEventDispatched: true);
+        $this->inRecipientPanelLocale($recipient, function () use ($recipient, $contract): void {
+            Notification::make()
+                ->title(__('app.notification.approval_requested.title'))
+                ->body(__('app.notification.approval_requested.body', [
+                    'number' => $contract->number,
+                    'sender' => $contract->responsible?->name ?? '—',
+                ]))
+                ->icon('heroicon-o-paper-airplane')
+                ->warning()
+                ->actions([
+                    $this->openContractAction($contract),
+                ])
+                ->sendToDatabase($recipient, isEventDispatched: true);
+        });
 
         // Rich Telegram card (amount + responsible + Approve/Reject/Open),
         // built by the bot menu builder so the format stays in sync with
@@ -66,21 +68,21 @@ class ContractNotifier
             return;
         }
 
-        $body = __('app.notification.contract_approved.body', [
-            'number' => $contract->number,
-            'name' => $finalApprover ? $this->approverLabel($finalApprover) : '—',
-            'time' => $finalApprover ? $this->actedAt($finalApprover) : now()->format('d.m.Y H:i'),
-        ]);
-
-        Notification::make()
-            ->title(__('app.notification.contract_approved.title'))
-            ->body($body)
-            ->icon('heroicon-o-check-circle')
-            ->success()
-            ->actions([
-                $this->openContractAction($contract),
-            ])
-            ->sendToDatabase($recipient, isEventDispatched: true);
+        $this->inRecipientPanelLocale($recipient, function () use ($recipient, $contract, $finalApprover): void {
+            Notification::make()
+                ->title(__('app.notification.contract_approved.title'))
+                ->body(__('app.notification.contract_approved.body', [
+                    'number' => $contract->number,
+                    'name' => $finalApprover ? $this->approverLabel($finalApprover) : '—',
+                    'time' => $finalApprover ? $this->actedAt($finalApprover) : now()->format('d.m.Y H:i'),
+                ]))
+                ->icon('heroicon-o-check-circle')
+                ->success()
+                ->actions([
+                    $this->openContractAction($contract),
+                ])
+                ->sendToDatabase($recipient, isEventDispatched: true);
+        });
 
         $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $finalApprover): void {
             $this->sendTelegram($recipient, $contract,
@@ -112,46 +114,41 @@ class ContractNotifier
         $fresh = $contract->fresh();
         $who = $this->approverLabel($approver);
         $when = $this->actedAt($approver);
-
-        $body = __('app.notification.step_approved.body', [
-            'number' => $contract->number,
-            'name' => $who,
-            'time' => $when,
-        ]);
-
-        $tail = match (true) {
-            $fresh?->status === Contract::STATUS_PENDING_DIRECTOR => __('app.notification.step_ready_director'),
-            $fresh?->currentApprover()?->user !== null => __('app.notification.step_next', [
-                'name' => $fresh->currentApprover()->user->name,
-            ]),
-            default => '',
-        };
-
         $comment = trim((string) $approver->comment);
-        $commentLine = $comment !== ''
-            ? __('app.notification.step_comment', ['comment' => $comment])
-            : '';
 
-        $dbBody = $body
-            .($tail !== '' ? ' '.$tail : '')
-            .($commentLine !== '' ? ' '.$commentLine : '');
+        $this->inRecipientPanelLocale($recipient, function () use ($recipient, $contract, $fresh, $who, $when, $comment): void {
+            $tail = $this->stepTail($fresh);
+            $commentLine = $comment !== ''
+                ? __('app.notification.step_comment', ['comment' => $comment])
+                : '';
 
-        Notification::make()
-            ->title(__('app.notification.step_approved.title'))
-            ->body($dbBody)
-            ->icon('heroicon-o-check')
-            ->color('info')
-            ->actions([
-                $this->openContractAction($contract),
+            $dbBody = __('app.notification.step_approved.body', [
+                'number' => $contract->number,
+                'name' => $who,
+                'time' => $when,
             ])
-            ->sendToDatabase($recipient, isEventDispatched: true);
+                .($tail !== '' ? ' '.$tail : '')
+                .($commentLine !== '' ? ' '.$commentLine : '');
 
-        $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $who, $when, $tail, $comment): void {
+            Notification::make()
+                ->title(__('app.notification.step_approved.title'))
+                ->body($dbBody)
+                ->icon('heroicon-o-check')
+                ->color('info')
+                ->actions([
+                    $this->openContractAction($contract),
+                ])
+                ->sendToDatabase($recipient, isEventDispatched: true);
+        });
+
+        $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $fresh, $who, $when, $comment): void {
             $tgBody = __('app.notification.step_approved.body', [
                 'number' => $contract->number,
                 'name' => $who,
                 'time' => $when,
             ]);
+
+            $tail = $this->stepTail($fresh);
 
             if ($tail !== '') {
                 $tgBody .= ' '.$tail;
@@ -170,6 +167,21 @@ class ContractNotifier
         });
     }
 
+    /**
+     * "Next it goes to the director / to <name>" — translated at CALL time so
+     * each locale wrapper renders it in its own language.
+     */
+    private function stepTail(?Contract $fresh): string
+    {
+        return match (true) {
+            $fresh?->status === Contract::STATUS_PENDING_DIRECTOR => __('app.notification.step_ready_director'),
+            $fresh?->currentApprover()?->user !== null => __('app.notification.step_next', [
+                'name' => $fresh->currentApprover()->user->name,
+            ]),
+            default => '',
+        };
+    }
+
     public function notifyRejected(Contract $contract, ?string $reason = null, ?ContractApprover $rejecter = null): void
     {
         $recipient = $contract->responsible;
@@ -181,20 +193,22 @@ class ContractNotifier
         $who = $rejecter ? $this->approverLabel($rejecter) : '—';
         $when = $rejecter ? $this->actedAt($rejecter) : now()->format('d.m.Y H:i');
 
-        Notification::make()
-            ->title(__('app.notification.contract_rejected.title'))
-            ->body(__('app.notification.contract_rejected.body', [
-                'number' => $contract->number,
-                'name' => $who,
-                'time' => $when,
-                'reason' => $reason ?? '—',
-            ]))
-            ->icon('heroicon-o-x-circle')
-            ->danger()
-            ->actions([
-                $this->openContractAction($contract),
-            ])
-            ->sendToDatabase($recipient, isEventDispatched: true);
+        $this->inRecipientPanelLocale($recipient, function () use ($recipient, $contract, $who, $when, $reason): void {
+            Notification::make()
+                ->title(__('app.notification.contract_rejected.title'))
+                ->body(__('app.notification.contract_rejected.body', [
+                    'number' => $contract->number,
+                    'name' => $who,
+                    'time' => $when,
+                    'reason' => $reason ?? '—',
+                ]))
+                ->icon('heroicon-o-x-circle')
+                ->danger()
+                ->actions([
+                    $this->openContractAction($contract),
+                ])
+                ->sendToDatabase($recipient, isEventDispatched: true);
+        });
 
         $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $who, $when, $reason): void {
             $this->sendTelegram($recipient, $contract,
@@ -221,15 +235,17 @@ class ContractNotifier
         $overdue = $approver->isOverdue();
         $key = $overdue ? 'approval_overdue' : 'approval_due_soon';
 
-        Notification::make()
-            ->title(__("app.notification.{$key}.title"))
-            ->body(__("app.notification.{$key}.body", ['number' => $contract->number]))
-            ->icon($overdue ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-clock')
-            ->color($overdue ? 'danger' : 'warning')
-            ->actions([
-                $this->openContractAction($contract),
-            ])
-            ->sendToDatabase($recipient, isEventDispatched: true);
+        $this->inRecipientPanelLocale($recipient, function () use ($recipient, $contract, $overdue, $key): void {
+            Notification::make()
+                ->title(__("app.notification.{$key}.title"))
+                ->body(__("app.notification.{$key}.body", ['number' => $contract->number]))
+                ->icon($overdue ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-clock')
+                ->color($overdue ? 'danger' : 'warning')
+                ->actions([
+                    $this->openContractAction($contract),
+                ])
+                ->sendToDatabase($recipient, isEventDispatched: true);
+        });
 
         $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $overdue, $key): void {
             $this->sendTelegram($recipient, $contract,

@@ -3,7 +3,9 @@
 use App\Exports\ContactsExport;
 use App\Exports\ContactsSheet;
 use App\Filament\Resources\Contacts\Pages\ListContacts;
+use App\Models\BankAccount;
 use App\Models\Contact;
+use App\Models\Currency;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -99,13 +101,13 @@ it('keeps individual-only fields out of the legal sheet and vice versa', functio
 
     // Legal sheet carries requisites but never the PINFL.
     expect($legal->headings())
-        ->toContain(__('app.label.inn'), __('app.label.mfo'), __('app.label.director_name'))
+        ->toContain(__('app.label.inn'), __('app.label.mfo').' / SWIFT', __('app.label.director_name'))
         ->not->toContain(__('app.label.pinfl'));
 
     // Individual sheet carries PINFL but none of the legal-only columns.
     expect($individual->headings())
         ->toContain(__('app.label.pinfl'))
-        ->not->toContain(__('app.label.inn'), __('app.label.director_name'), __('app.label.mfo'));
+        ->not->toContain(__('app.label.inn'), __('app.label.director_name'), __('app.label.mfo').' / SWIFT');
 });
 
 it('emits only the legal sheet when the query is filtered to legal entities', function () {
@@ -135,4 +137,42 @@ it('still emits both sheets when there are no contacts to export', function () {
     $sheets = (new ContactsExport(Contact::query()))->sheets();
 
     expect($sheets)->toHaveCount(2);
+});
+
+it('exports EVERY bank account of a company, prefixed with its currency', function () {
+    $legal = Contact::factory()->create(['type' => Contact::TYPE_LEGAL]);
+    $usd = Currency::factory()->create(['short_name' => 'USD']);
+
+    BankAccount::factory()->create([
+        'contact_id' => $legal->id, 'currency_id' => null, 'sort' => 0,
+        'account_number' => '20208000900123456001', 'bank_name' => 'Ипак Йули', 'mfo' => '00444',
+    ]);
+    BankAccount::factory()->create([
+        'contact_id' => $legal->id, 'currency_id' => $usd->id, 'sort' => 1,
+        'account_number' => '20208840900123456002', 'bank_name' => 'Ипак Йули', 'mfo' => null, 'swift' => 'INIPUZ22',
+    ]);
+
+    $sheet = new ContactsSheet(Contact::query(), Contact::TYPE_LEGAL);
+    $row = $sheet->map($sheet->query()->first());
+
+    // Both accounts land in the cell, the USD one labelled; the shared bank
+    // collapses to one line; SWIFT fills in where a foreign account has no MFO.
+    expect($row[11])->toBe("20208000900123456001\nUSD: 20208840900123456002")
+        ->and($row[12])->toBe('Ипак Йули')
+        ->and($row[13])->toBe("00444\nUSD: INIPUZ22");
+});
+
+it('keeps a single account bare — no currency prefix noise', function () {
+    $legal = Contact::factory()->create(['type' => Contact::TYPE_LEGAL]);
+
+    BankAccount::factory()->create([
+        'contact_id' => $legal->id, 'currency_id' => null,
+        'account_number' => '20208000900123456001', 'bank_name' => 'Капиталбанк', 'mfo' => '01088',
+    ]);
+
+    $sheet = new ContactsSheet(Contact::query(), Contact::TYPE_LEGAL);
+    $row = $sheet->map($sheet->query()->first());
+
+    expect($row[11])->toBe('20208000900123456001')
+        ->and($row[13])->toBe('01088');
 });

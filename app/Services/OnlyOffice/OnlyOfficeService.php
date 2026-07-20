@@ -52,12 +52,17 @@ class OnlyOfficeService
     }
 
     /**
-     * UI language for the editor — follows the panel's active locale, but
-     * falls back to Russian because OnlyOffice has no Uzbek interface.
+     * UI language for the editor — follows the locale the user picked in the
+     * panel. The editor routes live outside the panel, so the language-switch
+     * middleware never runs here and app()->getLocale() would fall back to the
+     * .env default; read the plugin's session key directly instead. Uzbek maps
+     * to Russian because OnlyOffice has no Uzbek interface.
      */
     private static function editorLocale(): string
     {
-        return app()->getLocale() === 'uz' ? 'ru' : app()->getLocale();
+        $locale = session('locale') ?? app()->getLocale();
+
+        return $locale === 'uz' ? 'ru' : $locale;
     }
 
     public function templateEditorConfig(ContractTemplate $template, User $user, ?string $forceMode = null): array
@@ -90,7 +95,7 @@ class OnlyOfficeService
             callbackUrl: $this->internalRouteUrl('order', $order->id, 'callback', $order->document_key),
             permissions: $permissions,
             mode: $mode,
-            lang: app()->getLocale() ?: 'ru',
+            lang: self::editorLocale(),
             user: $user,
             fileType: $extension,
             documentType: $this->documentTypeForExtension($extension),
@@ -115,7 +120,7 @@ class OnlyOfficeService
             callbackUrl: $this->internalRouteUrl('contract-attachment', $attachment->id, 'document', $attachment->sharedKey()),
             permissions: $permissions,
             mode: 'view',
-            lang: app()->getLocale() ?: 'ru',
+            lang: self::editorLocale(),
             user: $user,
             fileType: $extension,
             documentType: $this->documentTypeForExtension($extension),

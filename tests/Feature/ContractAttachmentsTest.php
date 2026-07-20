@@ -261,3 +261,21 @@ it('hides the upload action from users without the update permission', function 
     Livewire::test(ViewContract::class, ['record' => $contract->id])
         ->assertActionHidden('uploadAttachments');
 });
+
+it('freezes the dossier while the contract is under approval', function (mixed $status) {
+    Storage::fake('local');
+
+    // Approvers must review a fixed set of files — no uploads or deletes may
+    // change the dossier mid-approval, even for users who normally manage it.
+    $contract = Contract::factory()->create();
+    $contract->forceFill(['status' => $status])->saveQuietly();
+
+    attachmentManager($contract);
+
+    Livewire::test(ViewContract::class, ['record' => $contract->id])
+        ->assertActionHidden('uploadAttachments');
+})->with([
+    'regular chain review' => [Contract::STATUS_IN_REVIEW],
+    'awaiting director' => [Contract::STATUS_PENDING_DIRECTOR],
+    'director reviewing' => [Contract::STATUS_IN_REVIEW_DIRECTOR],
+]);

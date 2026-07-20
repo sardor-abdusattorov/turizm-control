@@ -52,20 +52,22 @@ class PaymentNotifier
         $paid = format_percent($contract->paidPercent());
         $remaining = format_percent($contract->remainingPercent());
 
-        Notification::make()
-            ->title(__('app.notification.payment_overdue.title'))
-            ->body(__('app.notification.payment_overdue.body', [
-                'number' => $contract->number,
-                'days' => $daysSinceApproval,
-                'paid' => $paid,
-                'remaining' => $remaining,
-            ]))
-            ->icon('heroicon-o-banknotes')
-            ->warning()
-            ->actions([
-                $this->openContractAction($contract),
-            ])
-            ->sendToDatabase($recipient, isEventDispatched: true);
+        $this->inRecipientPanelLocale($recipient, function () use ($recipient, $contract, $daysSinceApproval, $paid, $remaining): void {
+            Notification::make()
+                ->title(__('app.notification.payment_overdue.title'))
+                ->body(__('app.notification.payment_overdue.body', [
+                    'number' => $contract->number,
+                    'days' => $daysSinceApproval,
+                    'paid' => $paid,
+                    'remaining' => $remaining,
+                ]))
+                ->icon('heroicon-o-banknotes')
+                ->warning()
+                ->actions([
+                    $this->openContractAction($contract),
+                ])
+                ->sendToDatabase($recipient, isEventDispatched: true);
+        });
 
         $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $daysSinceApproval, $paid, $remaining): void {
             $this->sendTelegram($recipient, $contract,
@@ -92,18 +94,20 @@ class PaymentNotifier
         $key = $contract->isFullyPaid() ? 'payment_completed' : 'payment_recorded';
         $icon = $contract->isFullyPaid() ? 'heroicon-o-check-badge' : 'heroicon-o-banknotes';
 
-        Notification::make()
-            ->title(__("app.notification.{$key}.title"))
-            ->body(__("app.notification.{$key}.body", [
-                'number' => $contract->number,
-                'percent' => $percent,
-            ]))
-            ->icon($icon)
-            ->success()
-            ->actions([
-                $this->openContractAction($contract),
-            ])
-            ->sendToDatabase($recipient, isEventDispatched: true);
+        $this->inRecipientPanelLocale($recipient, function () use ($recipient, $contract, $key, $icon, $percent): void {
+            Notification::make()
+                ->title(__("app.notification.{$key}.title"))
+                ->body(__("app.notification.{$key}.body", [
+                    'number' => $contract->number,
+                    'percent' => $percent,
+                ]))
+                ->icon($icon)
+                ->success()
+                ->actions([
+                    $this->openContractAction($contract),
+                ])
+                ->sendToDatabase($recipient, isEventDispatched: true);
+        });
 
         $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract, $key, $percent): void {
             $this->sendTelegram(

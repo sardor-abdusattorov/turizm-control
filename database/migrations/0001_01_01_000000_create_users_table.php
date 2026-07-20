@@ -19,6 +19,8 @@ return new class extends Migration
             $table->unsignedBigInteger('department_id')->nullable();
             $table->unsignedBigInteger('position_id')->nullable();
             $table->boolean('status')->default(true);
+            // Panel language the user last picked — notifications render in it.
+            $table->string('locale', 5)->nullable();
             $table->rememberToken();
             $table->timestamps();
 

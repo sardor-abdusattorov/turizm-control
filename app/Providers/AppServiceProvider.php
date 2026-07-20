@@ -4,10 +4,12 @@ namespace App\Providers;
 
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
 use App\Models\Contract;
+use App\Models\User;
 use App\Policies\ActivityPolicy;
 use App\Policies\ContractAccessPolicy;
 use App\Services\Dashboard\DashboardContext;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
+use BezhanSalleh\LanguageSwitch\Events\LocaleChanged;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
@@ -21,6 +23,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
@@ -223,7 +226,21 @@ class AppServiceProvider extends ServiceProvider
                     'uz' => __('app.label.uz'),
                     'en' => __('app.label.en'),
                 ])
+                // A fresh session (new browser, other device) opens in the
+                // language the user last picked, not the .env default.
+                ->userPreferredLocale(fn () => auth()->user()?->locale)
                 ->visible(outsidePanels: true);
+        });
+
+        // Remember the picked language on the profile: notifications are
+        // rendered per RECIPIENT, and their saved locale is the only way to
+        // know which language to use when someone ELSE triggers the send.
+        Event::listen(LocaleChanged::class, function (LocaleChanged $event): void {
+            $user = auth()->user();
+
+            if ($user instanceof User && $user->locale !== $event->locale) {
+                $user->forceFill(['locale' => $event->locale])->saveQuietly();
+            }
         });
     }
 

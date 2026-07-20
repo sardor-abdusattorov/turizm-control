@@ -45,7 +45,17 @@
 </span>
 
 @assets
+    @php
+        $slaCountdownUnits = [
+            'd' => __('app.unit.day_short'),
+            'h' => __('app.unit.hour_short'),
+            'm' => __('app.unit.minute_short'),
+            's' => __('app.unit.second_short'),
+        ];
+    @endphp
     <script>
+        window.slaCountdownUnits = @json($slaCountdownUnits);
+
         window.slaCountdown = (iso) => ({
             due: new Date(iso),
             overdue: false,
@@ -74,15 +84,16 @@
                 const h = Math.floor((diff % 86400) / 3600);
                 const m = Math.floor((diff % 3600) / 60);
                 const s = diff % 60;
+                const u = window.slaCountdownUnits;
 
                 // Show seconds only inside the last hour; days+hours otherwise.
                 let pretty;
                 if (d > 0) {
-                    pretty = `${d}d ${h}h ${m}m`;
+                    pretty = `${d}${u.d} ${h}${u.h} ${m}${u.m}`;
                 } else if (h > 0) {
-                    pretty = `${h}h ${m}m`;
+                    pretty = `${h}${u.h} ${m}${u.m}`;
                 } else {
-                    pretty = `${m}m ${s}s`;
+                    pretty = `${m}${u.m} ${s}${u.s}`;
                 }
 
                 this.label = this.overdue

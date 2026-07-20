@@ -1,7 +1,18 @@
+    @php
+        $countdownUnits = [
+            'd' => __('app.unit.day_short'),
+            'h' => __('app.unit.hour_short'),
+            'm' => __('app.unit.minute_short'),
+            's' => __('app.unit.second_short'),
+        ];
+    @endphp
     <script>
         // Live SLA countdown for the current approver's due_at. Re-ticks every
-        // second so the meta-strip pill reads "1d 12h 04m" / "3h 22m" / "12m".
-        // Switches to a red "Overdue · X ago" once the deadline passes.
+        // second so the meta-strip pill reads "1д 12ч 04м" / "3ч 22м" / "12м"
+        // in the panel's language. Switches to a red "Overdue · X ago" once
+        // the deadline passes.
+        window.contractCountdownUnits = @json($countdownUnits);
+
         window.contractCountdown = (iso) => ({
             due: new Date(iso),
             overdue: false,
@@ -27,14 +38,15 @@
                 const h = Math.floor((diff % 86400) / 3600);
                 const m = Math.floor((diff % 3600) / 60);
                 const s = diff % 60;
+                const u = window.contractCountdownUnits;
 
                 let pretty;
                 if (d > 0) {
-                    pretty = `${d}d ${h}h ${m}m`;
+                    pretty = `${d}${u.d} ${h}${u.h} ${m}${u.m}`;
                 } else if (h > 0) {
-                    pretty = `${h}h ${m}m ${s}s`;
+                    pretty = `${h}${u.h} ${m}${u.m} ${s}${u.s}`;
                 } else {
-                    pretty = `${m}m ${s}s`;
+                    pretty = `${m}${u.m} ${s}${u.s}`;
                 }
 
                 this.label = this.overdue

@@ -667,6 +667,11 @@ return [
         'fully_paid' => 'Полностью оплачен',
     ],
     'unit' => [
+        // Countdown pill units — glued right after the number ('1'.'д').
+        'day_short' => 'д',
+        'hour_short' => 'ч',
+        'minute_short' => 'м',
+        'second_short' => 'с',
         'thousand_short' => 'тыс.',
         'million_short' => 'млн',
         'billion_short' => 'млрд',

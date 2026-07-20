@@ -31,6 +31,32 @@ function editorPermissions(Contract $contract, User $user): array
     return app(OnlyOfficeService::class)->editorConfig($contract, $user)['document']['permissions'];
 }
 
+it('opens the editor in the language picked in the panel, not the .env default', function () {
+    // The editor routes live outside the panel, so the language-switch
+    // middleware never sets app locale there — the service must read the
+    // plugin's session key itself.
+    $responsible = User::factory()->create();
+    $contract = Contract::factory()->create(['responsible_id' => $responsible->id]);
+
+    app()->setLocale('en');
+    session(['locale' => 'ru']);
+
+    $config = app(OnlyOfficeService::class)->editorConfig($contract, $responsible);
+
+    expect($config['editorConfig']['lang'])->toBe('ru');
+});
+
+it('maps Uzbek to Russian in the editor — OnlyOffice has no Uzbek interface', function () {
+    $responsible = User::factory()->create();
+    $contract = Contract::factory()->create(['responsible_id' => $responsible->id]);
+
+    session(['locale' => 'uz']);
+
+    $config = app(OnlyOfficeService::class)->editorConfig($contract, $responsible);
+
+    expect($config['editorConfig']['lang'])->toBe('ru');
+});
+
 it('locks download and print while a draft contract is still in progress', function () {
     $responsible = User::factory()->create();
     $contract = Contract::factory()->create([
