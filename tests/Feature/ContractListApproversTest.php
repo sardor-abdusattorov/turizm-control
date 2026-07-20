@@ -1,6 +1,7 @@
 <?php
 
 use App\Filament\Resources\Contracts\Pages\ListContracts;
+use App\Filament\Resources\Contracts\Widgets\ContractApproversTableWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
@@ -66,16 +67,13 @@ it('renders the approval flow modal as a stepper of the active chain', function 
         'status' => ContractApprover::STATUS_PENDING,
     ]);
 
-    $html = view('filament.resources.contracts.tables.approval-flow-modal', [
-        'contract' => $contract->fresh(),
-    ])->render();
-
-    expect($html)
-        ->toContain('Madina Accountant')
-        ->toContain('Olim Reviewer')
-        ->toContain('Looks fine to me')
-        ->toContain(__('app.contract_approver.status.approved'))
-        ->toContain(__('app.contract_approver.status.pending'));
+    Livewire::test(ContractApproversTableWidget::class, ['contractId' => $contract->id])
+        ->assertSuccessful()
+        ->assertSee('Madina Accountant')
+        ->assertSee('Olim Reviewer')
+        ->assertSee('Looks fine to me')
+        ->assertSee(__('app.contract_approver.status.approved'))
+        ->assertSee(__('app.contract_approver.status.pending'));
 });
 
 it('lists invalidated attempts under previous attempts with comments preserved', function () {
@@ -103,14 +101,10 @@ it('lists invalidated attempts under previous attempts with comments preserved',
         'status' => ContractApprover::STATUS_PENDING,
     ]);
 
-    $html = view('filament.resources.contracts.tables.approval-flow-modal', [
-        'contract' => $contract->fresh(),
-    ])->render();
-
-    expect($html)
-        ->toContain('Olim Repeated')
-        ->toContain('Approved on first pass')
-        ->toContain(__('app.message.invalidated_on_edit'))
-        ->toContain('is-inactive')
-        ->toContain(__('app.contract_approver.status.invalidated'));
+    Livewire::test(ContractApproversTableWidget::class, ['contractId' => $contract->id])
+        ->assertSuccessful()
+        ->assertSee('Olim Repeated')
+        ->assertSee('Approved on first pass')
+        ->assertSee(__('app.message.invalidated_on_edit'))
+        ->assertSee(__('app.contract_approver.status.invalidated'));
 });

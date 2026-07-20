@@ -1,6 +1,7 @@
 <?php
 
 use App\Filament\Resources\Sponsors\Pages\ListSponsors;
+use App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget;
 use App\Models\Contract;
 use App\Models\Currency;
 use App\Models\Project;
@@ -52,11 +53,11 @@ it('aggregates a sponsor sponsorship contracts by currency', function () {
         ->and($uzsRow['paid'])->toBe(35_000_000.0);
 });
 
-it('renders the breakdown view with the project, its date and currency', function () {
+it('renders the sponsor breakdown as a native Filament table widget', function () {
     $project = Project::factory()->create(['name' => 'BITF-2026 Bishkek', 'starts_on' => '2026-04-30']);
     $uzs = Currency::factory()->create(['short_name' => 'UZS']);
     $sponsor = Sponsor::factory()->create();
-    $viewer = userWithPermission('view_any_sponsor', 'view_all_contracts');
+    actingAs(userWithPermission('view_any_sponsor', 'view_contract', 'view_all_contracts'));
 
     Contract::factory()->sponsorship()->create([
         'sponsor_id' => $sponsor->id,
@@ -67,35 +68,19 @@ it('renders the breakdown view with the project, its date and currency', functio
         'status' => Contract::STATUS_APPROVED,
     ]);
 
-    $html = view('filament.resources.sponsors.tables.projects-breakdown', [
-        'participations' => $sponsor->sponsorshipContracts()
-            ->visibleTo($viewer)
-            ->where('status', '!=', Contract::STATUS_REJECTED->value)
-            ->with(['project', 'currency'])
-            ->get(),
-        'totals' => $sponsor->projectTotalsByCurrency($viewer),
-    ])->render();
-
-    expect($html)
-        ->toContain('BITF-2026 Bishkek')
-        ->toContain('30.04.2026')
-        ->toContain('UZS');
+    Livewire::test(CounterpartyProjectsTableWidget::class, ['sponsorId' => $sponsor->id])
+        ->assertSuccessful()
+        ->assertSee('BITF-2026 Bishkek')
+        ->assertSee('UZS');
 });
 
-it('shows the empty note when the sponsor has no sponsorship contracts', function () {
+it('shows the empty state when the sponsor has no sponsorship contracts', function () {
     $sponsor = Sponsor::factory()->create();
-    $viewer = userWithPermission('view_any_sponsor', 'view_all_contracts');
+    actingAs(userWithPermission('view_any_sponsor', 'view_contract', 'view_all_contracts'));
 
-    $html = view('filament.resources.sponsors.tables.projects-breakdown', [
-        'participations' => $sponsor->sponsorshipContracts()
-            ->visibleTo($viewer)
-            ->where('status', '!=', Contract::STATUS_REJECTED->value)
-            ->with(['project', 'currency'])
-            ->get(),
-        'totals' => $sponsor->projectTotalsByCurrency($viewer),
-    ])->render();
-
-    expect($html)->toContain(__('app.message.no_projects_for_sponsor'));
+    Livewire::test(CounterpartyProjectsTableWidget::class, ['sponsorId' => $sponsor->id])
+        ->assertSuccessful()
+        ->assertSee(__('app.message.no_projects_for_contact'));
 });
 
 it('lists sponsors with the project-count badge without error', function () {

@@ -9,6 +9,8 @@ use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\ExportXlsxAction;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget;
+use App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget;
 use App\Models\Contact;
 use App\Models\Contract;
 use Filament\Actions\Action;
@@ -75,14 +77,12 @@ class ContactsTable
                         Action::make('contractsBreakdown')
                             ->modalHeading(fn (Contact $record): string => $record->name)
                             ->modalIcon('heroicon-o-document-text')
-                            ->modalWidth('3xl')
-                            ->modalContent(fn (Contact $record) => view(
-                                'filament.resources.contacts.contracts-breakdown',
-                                [
-                                    'contracts' => $record->visibleContracts(),
-                                    'totals' => $record->contractTotalsByCurrency(),
-                                ],
-                            ))
+                            ->modalWidth('4xl')
+                            ->modalContent(fn (Contact $record) => view('filament.partials.embedded-table', [
+                                'widget' => CounterpartyContractsTableWidget::class,
+                                'params' => ['contactId' => $record->id],
+                                'key' => 'contact-contracts-modal-'.$record->id,
+                            ]))
                             ->modalSubmitAction(false)
                             ->modalCancelAction(false),
                     )
@@ -101,18 +101,12 @@ class ContactsTable
                         Action::make('projectsBreakdown')
                             ->modalHeading(fn (Contact $record): string => $record->name)
                             ->modalIcon('heroicon-o-presentation-chart-bar')
-                            ->modalWidth('2xl')
-                            ->modalContent(fn (Contact $record) => view(
-                                'filament.resources.contacts.projects-breakdown',
-                                [
-                                    'participations' => $record->incomeContracts()
-                                        ->visibleTo()
-                                        ->where('status', '!=', Contract::STATUS_REJECTED->value)
-                                        ->with(['project', 'currency', 'contractType'])
-                                        ->get(),
-                                    'totals' => $record->projectTotalsByCurrency(),
-                                ],
-                            ))
+                            ->modalWidth('4xl')
+                            ->modalContent(fn (Contact $record) => view('filament.partials.embedded-table', [
+                                'widget' => CounterpartyProjectsTableWidget::class,
+                                'params' => ['contactId' => $record->id],
+                                'key' => 'contact-projects-modal-'.$record->id,
+                            ]))
                             ->modalSubmitAction(false)
                             ->modalCancelAction(false),
                     )

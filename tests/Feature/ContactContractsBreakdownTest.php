@@ -1,6 +1,7 @@
 <?php
 
 use App\Filament\Resources\Contacts\Pages\ListContacts;
+use App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\Currency;
@@ -97,10 +98,10 @@ it('scopes the visible contracts list to what the viewer may see', function () {
         ->and($visible->first()->number)->toBe('MINE-001');
 });
 
-it('renders the contracts breakdown view with number, currency and totals', function () {
+it('renders the contracts breakdown as a native Filament table widget', function () {
     $eur = Currency::factory()->create(['short_name' => 'EUR']);
     $contact = Contact::factory()->create();
-    $viewer = userWithPermission('view_any_contact', 'view_all_contracts');
+    actingAs(userWithPermission('view_any_contact', 'view_contract', 'view_all_contracts'));
 
     Contract::factory()->create([
         'contact_id' => $contact->id,
@@ -110,15 +111,11 @@ it('renders the contracts breakdown view with number, currency and totals', func
         'status' => Contract::STATUS_APPROVED,
     ]);
 
-    $html = view('filament.resources.contacts.contracts-breakdown', [
-        'contracts' => $contact->visibleContracts($viewer),
-        'totals' => $contact->contractTotalsByCurrency($viewer),
-    ])->render();
-
-    expect($html)
-        ->toContain('L-01-105')
-        ->toContain('EUR')
-        ->toContain('64 000');
+    Livewire::test(CounterpartyContractsTableWidget::class, ['contactId' => $contact->id])
+        ->assertSuccessful()
+        ->assertSee('L-01-105')
+        ->assertSee('EUR')
+        ->assertSee('64 000');
 });
 
 it('renders the contracts-count column on the contacts list without error', function () {

@@ -9,6 +9,8 @@ use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\ExportXlsxAction;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Widgets\Dashboard\ProjectContractsTableWidget;
+use App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget;
 use App\Models\Contract;
 use App\Models\Project;
 use App\Support\Money;
@@ -141,14 +143,12 @@ class ProjectsTable
                         Action::make('projectContractsBreakdown')
                             ->modalHeading(fn (Project $record): string => $record->name)
                             ->modalIcon('heroicon-o-document-text')
-                            ->modalWidth('3xl')
-                            ->modalContent(fn (Project $record) => view(
-                                'filament.resources.projects.tables.contracts-breakdown',
-                                [
-                                    'contracts' => $record->visibleContracts(),
-                                    'totals' => $record->visibleContractTotalsByCurrency(),
-                                ],
-                            ))
+                            ->modalWidth('5xl')
+                            ->modalContent(fn (Project $record) => view('filament.partials.embedded-table', [
+                                'widget' => ProjectContractsTableWidget::class,
+                                'params' => ['pageFilters' => ['projectId' => $record->id]],
+                                'key' => 'project-contracts-modal-'.$record->id,
+                            ]))
                             ->modalSubmitAction(false)
                             ->modalCancelAction(false),
                     )
@@ -250,29 +250,23 @@ class ProjectsTable
 
     /**
      * Role-scoped breakdown behind the participants / sponsors count badge —
-     * the record-list modal the sponsor and contact lists set as the
-     * pattern: one income contract per row, per-currency totals at the foot.
+     * a stock Filament table (ProjectParticipantsTableWidget) scoped to one
+     * income kind, the same table the project view page's tab embeds.
      */
     private static function participantBreakdownAction(string $name, bool $sponsors, string $icon): Action
     {
         return Action::make($name)
             ->modalHeading(fn (Project $record): string => $record->name)
             ->modalIcon($icon)
-            ->modalWidth('2xl')
-            ->modalContent(fn (Project $record) => view(
-                'filament.resources.projects.tables.participants-breakdown',
-                [
-                    'rows' => $record->{$sponsors ? 'sponsorshipContracts' : 'feeContracts'}()
-                        ->visibleTo()
-                        ->where('status', '!=', Contract::STATUS_REJECTED->value)
-                        ->with(['contact', 'sponsor', 'currency'])
-                        ->get(),
-                    'totals' => $record->incomeTotalsByCurrency($sponsors),
-                    'empty' => $sponsors
-                        ? __('app.message.no_sponsors')
-                        : __('app.message.no_participants'),
+            ->modalWidth('5xl')
+            ->modalContent(fn (Project $record) => view('filament.partials.embedded-table', [
+                'widget' => ProjectParticipantsTableWidget::class,
+                'params' => [
+                    'pageFilters' => ['projectId' => $record->id],
+                    'kind' => $sponsors ? 'sponsors' : 'participants',
                 ],
-            ))
+                'key' => $name.'-'.$record->id,
+            ]))
             ->modalSubmitAction(false)
             ->modalCancelAction(false);
     }

@@ -193,7 +193,7 @@ class ContractsTable
                     ->modalHeading(fn (Contract $record): string => trim(($record->number ? $record->number.' · ' : '').($record->title ?? '')) ?: __('app.label.approval_chain'))
                     ->modalContent(fn (Contract $record) => view(
                         'filament.resources.contracts.tables.approval-flow-modal',
-                        ['contract' => $record],
+                        ['contractId' => $record->id],
                     ))
                     ->extraAttributes(['class' => 'is-action-hidden']),
 

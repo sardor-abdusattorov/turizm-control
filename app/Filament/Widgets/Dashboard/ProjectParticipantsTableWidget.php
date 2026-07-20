@@ -24,6 +24,13 @@ class ProjectParticipantsTableWidget extends TableWidget
 {
     use InteractsWithPageFilters;
 
+    /**
+     * Which income deals to show: 'participants' (fee contracts with a
+     * Contact), 'sponsors' (sponsorship contracts), or null for both. The
+     * project view tab shows both; the list-page count badges split them.
+     */
+    public ?string $kind = null;
+
     protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
@@ -34,12 +41,18 @@ class ProjectParticipantsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading(__('app.label.participants'))
+            ->heading(match ($this->kind) {
+                'sponsors' => __('app.label.sponsors'),
+                'participants' => __('app.label.participants'),
+                default => __('app.label.participants'),
+            })
             ->query(fn (): Builder => Contract::query()
                 ->visibleTo()
                 ->where('project_id', $this->projectId() ?? 0)
                 ->where('status', '!=', Contract::STATUS_REJECTED->value)
                 ->whereHas('contractType', fn (Builder $query) => $query->where('direction', 'income'))
+                ->when($this->kind === 'sponsors', fn (Builder $query) => $query->whereNotNull('sponsor_id'))
+                ->when($this->kind === 'participants', fn (Builder $query) => $query->whereNull('sponsor_id'))
                 ->with(['contact', 'sponsor', 'currency', 'contractType']))
             ->defaultSort('amount', 'desc')
             ->recordUrl(fn (Contract $record): string => ContractResource::getUrl('view', ['record' => $record]))
@@ -91,7 +104,7 @@ class ProjectParticipantsTableWidget extends TableWidget
             ->paginated([5, 10, 25])
             ->defaultPaginationPageOption(5)
             ->emptyStateHeading($this->projectId()
-                ? __('app.message.no_participants')
+                ? ($this->kind === 'sponsors' ? __('app.message.no_sponsors') : __('app.message.no_participants'))
                 : __('app.message.pulse_pick_project'));
     }
 

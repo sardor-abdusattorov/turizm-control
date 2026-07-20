@@ -7,6 +7,7 @@ use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\ExportXlsxAction;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget;
 use App\Models\Contract;
 use App\Models\Sponsor;
 use Filament\Actions\Action;
@@ -52,18 +53,12 @@ class SponsorsTable
                         Action::make('projectsBreakdown')
                             ->modalHeading(fn (Sponsor $record): string => $record->name)
                             ->modalIcon('heroicon-o-presentation-chart-bar')
-                            ->modalWidth('2xl')
-                            ->modalContent(fn (Sponsor $record) => view(
-                                'filament.resources.sponsors.tables.projects-breakdown',
-                                [
-                                    'participations' => $record->sponsorshipContracts()
-                                        ->visibleTo()
-                                        ->where('status', '!=', Contract::STATUS_REJECTED->value)
-                                        ->with(['project', 'currency'])
-                                        ->get(),
-                                    'totals' => $record->projectTotalsByCurrency(),
-                                ],
-                            ))
+                            ->modalWidth('4xl')
+                            ->modalContent(fn (Sponsor $record) => view('filament.partials.embedded-table', [
+                                'widget' => CounterpartyProjectsTableWidget::class,
+                                'params' => ['sponsorId' => $record->id],
+                                'key' => 'sponsor-projects-modal-'.$record->id,
+                            ]))
                             ->modalSubmitAction(false)
                             ->modalCancelAction(false),
                     )
