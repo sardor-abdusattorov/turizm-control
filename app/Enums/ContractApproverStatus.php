@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasOptions;
+
 enum ContractApproverStatus: string
 {
+    use HasOptions;
+
     case Queued = 'queued';
     case Pending = 'pending';
     case Approved = 'approved';

@@ -108,3 +108,62 @@ it('lists invalidated attempts under previous attempts with comments preserved',
         ->assertSee(__('app.message.invalidated_on_edit'))
         ->assertSee(__('app.contract_approver.status.invalidated'));
 });
+
+it('filters the chain by status', function () {
+    listOversight();
+
+    $pending = User::factory()->create(['name' => 'Approver Pending']);
+    $approved = User::factory()->create(['name' => 'Approver Approved']);
+    $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
+
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $pending->id,
+        'order' => 1,
+        'status' => ContractApprover::STATUS_PENDING,
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $approved->id,
+        'order' => 2,
+        'status' => ContractApprover::STATUS_APPROVED,
+        'acted_at' => now(),
+    ]);
+
+    Livewire::test(ContractApproversTableWidget::class, ['contractId' => $contract->id])
+        ->filterTable('status', ContractApprover::STATUS_APPROVED->value)
+        ->assertCanSeeTableRecords(ContractApprover::where('user_id', $approved->id)->get())
+        ->assertCanNotSeeTableRecords(ContractApprover::where('user_id', $pending->id)->get());
+});
+
+it('filters an invalidated row under the verdict it actually shows, not "invalidated"', function () {
+    listOversight();
+
+    $approver = User::factory()->create(['name' => 'Kept Verdict']);
+    $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
+
+    // The Статус column renders this row's displayStatus() — the preserved
+    // "approved" verdict, not the raw "invalidated" status — so the filter
+    // must follow the same rule or it silently disagrees with what's on screen.
+    $keptVerdict = ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $approver->id,
+        'order' => 1,
+        'status' => ContractApprover::STATUS_INVALIDATED,
+        'original_status' => ContractApprover::STATUS_APPROVED,
+        'acted_at' => now()->subDay(),
+    ]);
+
+    $bareInvalidated = ContractApprover::factory()->create([
+        'contract_id' => $contract->id,
+        'user_id' => $approver->id,
+        'order' => 2,
+        'status' => ContractApprover::STATUS_INVALIDATED,
+        'original_status' => null,
+    ]);
+
+    Livewire::test(ContractApproversTableWidget::class, ['contractId' => $contract->id])
+        ->filterTable('status', ContractApprover::STATUS_APPROVED->value)
+        ->assertCanSeeTableRecords([$keptVerdict])
+        ->assertCanNotSeeTableRecords([$bareInvalidated]);
+});

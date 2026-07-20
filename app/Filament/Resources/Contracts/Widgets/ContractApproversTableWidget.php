@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Contracts\Widgets;
 
+use App\Enums\ContractApproverStatus;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
@@ -76,6 +78,29 @@ class ContractApproversTableWidget extends TableWidget
                     ->label(__('app.label.acted_at'))
                     ->dateTime('d.m.Y H:i')
                     ->placeholder(__('app.label.not_set')),
+            ])
+            ->filters([
+                // Matches what the Статус column actually shows (displayStatus):
+                // an invalidated row with a preserved original verdict filters
+                // under that verdict, not under "Отменено".
+                SelectFilter::make('status')
+                    ->label(__('app.label.status'))
+                    ->options(ContractApproverStatus::options())
+                    ->query(function (Builder $query, array $data) {
+                        $status = $data['value'] ?? null;
+
+                        if (! $status) {
+                            return $query;
+                        }
+
+                        return $query->where(function (Builder $query) use ($status): void {
+                            $query->where('status', $status)
+                                ->orWhere(function (Builder $query) use ($status): void {
+                                    $query->where('status', ContractApproverStatus::Invalidated->value)
+                                        ->where('original_status', $status);
+                                });
+                        });
+                    }),
             ])
             ->paginated(false)
             ->emptyStateHeading(__('app.helper.approval_chain_empty'))
