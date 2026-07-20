@@ -29,7 +29,8 @@ class ContractAttachmentsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading(__('app.label.attachments'))
+            // No heading: the tab label already names it.
+            ->heading(null)
             ->query(fn (): Builder => ContractAttachment::query()
                 ->where('contract_id', $this->contractId)
                 ->with('uploader')

@@ -476,21 +476,52 @@ button.cw-row:focus-visible {
 /* ─── Record sub-navigation tabs (shared) ───────────────────────────
    Native Filament <x-filament::tabs> everywhere; this row only lays the
    strip out next to an optional status pill on the right. */
+/* Record sub-navigation (contract / project / contact / sponsor views).
+   Native Filament <x-filament::tabs>, but re-laid-out: the segmented control
+   is TRULY centered (balanced 1fr | auto | 1fr grid — an empty left column
+   mirrors the status pill on the right, so the tabs sit dead-centre whether
+   or not a pill is present), and flattened to match the app's shadowless
+   cards (Filament ships the tab bar with a drop shadow that clashed here). */
 .rec-tabs-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: .75rem;
 }
 .rec-tabs-row .fi-tabs {
+    grid-column: 2;
+    margin-inline: auto;
     overflow-x: auto;
     scrollbar-width: none;
+    box-shadow: none;
+    --tw-ring-shadow: 0 0 #0000;
+    border: 1px solid var(--d);
+    background: var(--s);
 }
 .rec-tabs-row .fi-tabs::-webkit-scrollbar {
     display: none;
 }
+/* Active segment gets the accent fill (the app's language), not Filament's
+   near-invisible gray-50 — the current tab must read at a glance. */
+.rec-tabs-row .fi-tabs-item.fi-active {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+}
 .rec-tabs-row__side {
-    margin-left: auto;
+    grid-column: 3;
+    justify-self: end;
     flex-shrink: 0;
+}
+@media (max-width: 720px) {
+    .rec-tabs-row {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+    .rec-tabs-row .fi-tabs,
+    .rec-tabs-row__side {
+        grid-column: 1;
+        justify-self: center;
+    }
 }
 
 .pj-tabwrap {
@@ -504,39 +535,6 @@ button.cw-row:focus-visible {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-}
-.pj-table-wrap {
-    overflow-x: auto;
-}
-.pj-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: .84rem;
-}
-.pj-table thead th {
-    text-align: left;
-    font-size: .7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    color: var(--m2);
-    padding: .6rem 1.25rem;
-    border-bottom: 1px solid var(--d);
-    white-space: nowrap;
-}
-.pj-table tbody td {
-    padding: .65rem 1.25rem;
-    border-bottom: 1px solid var(--d);
-    color: var(--t);
-}
-.pj-table tbody td .pj-pill {
-    margin-left: .4rem;
-}
-.pj-table tfoot td {
-    padding: .7rem 1.25rem;
-    font-weight: 700;
-    color: var(--t);
-    background: var(--soft);
 }
 /* Horizontal filmstrip rendered by the image-gallery plugin component —
    the card supplies the side padding the component itself lacks. */

@@ -37,23 +37,25 @@
 
     {{-- Native Filament tabs — bank requisites, contracts and participations
          each get their own panel, so the overview stays a single short card. --}}
-    <x-filament::tabs>
-        <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
-            {{ __('app.label.overview') }}
-        </x-filament::tabs.item>
-        @if ($isLegal)
-            <x-filament::tabs.item icon="heroicon-o-building-library" alpine-active="tab === 'bank'" x-on:click="go('bank')"
-                :badge="$accounts->count() ?: null">
-                {{ __('app.label.bank_requisites') }}
+    <div class="rec-tabs-row">
+        <x-filament::tabs>
+            <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
+                {{ __('app.label.overview') }}
             </x-filament::tabs.item>
-        @endif
-        <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')">
-            {{ __('app.label.contracts') }}
-        </x-filament::tabs.item>
-        <x-filament::tabs.item icon="heroicon-o-presentation-chart-bar" alpine-active="tab === 'projects'" x-on:click="go('projects')">
-            {{ __('app.label.projects') }}
-        </x-filament::tabs.item>
-    </x-filament::tabs>
+            @if ($isLegal)
+                <x-filament::tabs.item icon="heroicon-o-building-library" alpine-active="tab === 'bank'" x-on:click="go('bank')"
+                    :badge="$accounts->count() ?: null">
+                    {{ __('app.label.bank_requisites') }}
+                </x-filament::tabs.item>
+            @endif
+            <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')">
+                {{ __('app.label.contracts') }}
+            </x-filament::tabs.item>
+            <x-filament::tabs.item icon="heroicon-o-presentation-chart-bar" alpine-active="tab === 'projects'" x-on:click="go('projects')">
+                {{ __('app.label.projects') }}
+            </x-filament::tabs.item>
+        </x-filament::tabs>
+    </div>
 
     {{-- ---------- OVERVIEW ---------- --}}
     <div x-show="tab === 'overview'" x-cloak class="pj-panel">
@@ -80,41 +82,7 @@
     {{-- ---------- BANK ACCOUNTS ---------- --}}
     @if ($isLegal)
         <div x-show="tab === 'bank'" x-cloak class="pj-panel">
-            <section class="ow-card">
-                <header class="ow-hd">
-                    <span class="ow-hd__ic">{!! $ic('heroicon-o-building-library', 18) !!}</span>
-                    <h2 class="ow-hd__t">{{ __('app.label.bank_requisites') }}</h2>
-                    <span class="pj-count">{{ $accounts->count() }}</span>
-                </header>
-                @if ($accounts->isEmpty())
-                    <p class="pj-empty">{{ __('app.message.no_bank_accounts') }}</p>
-                @else
-                    <div class="pj-table-wrap">
-                        <table class="pj-table">
-                            <thead>
-                                <tr>
-                                    <th>{{ __('app.label.currency_single') }}</th>
-                                    <th>{{ __('app.label.bank_account') }}</th>
-                                    <th>{{ __('app.label.bank_name') }}</th>
-                                    <th>{{ __('app.label.mfo') }}</th>
-                                    <th>{{ __('app.label.swift') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($accounts as $account)
-                                <tr>
-                                    <td>{{ $account->currency?->short_name ?? __('app.label.bank_account_any_currency') }}</td>
-                                    <td style="font-variant-numeric:tabular-nums;white-space:nowrap;">{{ $account->account_number }}</td>
-                                    <td>{{ $account->bank_name }}@if ($account->bank_address)<br><span style="color:var(--m);font-size:.78rem;">{{ $account->bank_address }}</span>@endif</td>
-                                    <td>{{ $account->mfo }}</td>
-                                    <td>{{ $account->swift }}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </section>
+            @livewire(\App\Filament\Resources\Contacts\Widgets\ContactBankAccountsTableWidget::class, ['contactId' => $record->id], key('contact-bank-'.$record->id))
         </div>
     @endif
 

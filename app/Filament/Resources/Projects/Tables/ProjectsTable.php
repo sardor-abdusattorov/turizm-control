@@ -146,7 +146,7 @@ class ProjectsTable
                             ->modalWidth('5xl')
                             ->modalContent(fn (Project $record) => view('filament.partials.embedded-table', [
                                 'widget' => ProjectContractsTableWidget::class,
-                                'params' => ['pageFilters' => ['projectId' => $record->id]],
+                                'params' => ['pageFilters' => ['projectId' => $record->id], 'hideHeading' => true],
                                 'key' => 'project-contracts-modal-'.$record->id,
                             ]))
                             ->modalSubmitAction(false)

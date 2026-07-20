@@ -27,7 +27,8 @@ class CounterpartyContractsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading(__('app.label.contracts'))
+            // No heading: the tab label / modal title already names it.
+            ->heading(null)
             ->query(fn (): Builder => $this->scopeCounterparty(Contract::query()
                 ->visibleTo()
                 ->with(['contractType', 'currency', 'project'])))

@@ -41,11 +41,8 @@ class ProjectParticipantsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading(match ($this->kind) {
-                'sponsors' => __('app.label.sponsors'),
-                'participants' => __('app.label.participants'),
-                default => __('app.label.participants'),
-            })
+            // No heading: the tab label / modal title already names it.
+            ->heading(null)
             ->query(fn (): Builder => Contract::query()
                 ->visibleTo()
                 ->where('project_id', $this->projectId() ?? 0)

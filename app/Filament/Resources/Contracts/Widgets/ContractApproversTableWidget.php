@@ -27,7 +27,10 @@ class ContractApproversTableWidget extends TableWidget
         $isDraft = $contract?->status === Contract::STATUS_DRAFT;
 
         return $table
-            ->heading(__('app.label.approval_chain'))
+            // No heading (the modal title carries the contract name) and no
+            // column-manager toolbar — a read-only audit log, not configurable.
+            ->heading(null)
+            ->columnManager(false)
             ->query(fn (): Builder => ContractApprover::query()
                 ->where('contract_id', $this->contractId)
                 ->with(['user.department', 'user.position'])

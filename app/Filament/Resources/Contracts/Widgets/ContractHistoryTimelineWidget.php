@@ -26,7 +26,8 @@ class ContractHistoryTimelineWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading(__('app.label.execution_history'))
+            // No heading: the tab label already names it.
+            ->heading(null)
             ->query(fn (): Builder => Activity::query()
                 ->where('subject_type', (new Contract)->getMorphClass())
                 ->where('subject_id', $this->contractId)

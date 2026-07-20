@@ -23,6 +23,9 @@ class ProjectContractsTableWidget extends TableWidget
 {
     use InteractsWithPageFilters;
 
+    /** Suppress the table heading when embedded in a tab/modal that already names it. */
+    public bool $hideHeading = false;
+
     protected static ?int $sort = 1;
 
     protected int|string|array $columnSpan = 'full';
@@ -35,7 +38,7 @@ class ProjectContractsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading(__('app.label.contracts'))
+            ->heading($this->hideHeading ? null : __('app.label.contracts'))
             ->query(fn (): Builder => Contract::query()
                 ->visibleTo()
                 ->where('project_id', $this->projectId() ?? 0)

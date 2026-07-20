@@ -24,17 +24,19 @@
      x-data="{ tab: 'overview', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }">
 
     {{-- Native Filament tabs — the same layout the contact page uses. --}}
-    <x-filament::tabs>
-        <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
-            {{ __('app.label.overview') }}
-        </x-filament::tabs.item>
-        <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')">
-            {{ __('app.label.contracts') }}
-        </x-filament::tabs.item>
-        <x-filament::tabs.item icon="heroicon-o-presentation-chart-bar" alpine-active="tab === 'projects'" x-on:click="go('projects')">
-            {{ __('app.label.projects') }}
-        </x-filament::tabs.item>
-    </x-filament::tabs>
+    <div class="rec-tabs-row">
+        <x-filament::tabs>
+            <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
+                {{ __('app.label.overview') }}
+            </x-filament::tabs.item>
+            <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')">
+                {{ __('app.label.contracts') }}
+            </x-filament::tabs.item>
+            <x-filament::tabs.item icon="heroicon-o-presentation-chart-bar" alpine-active="tab === 'projects'" x-on:click="go('projects')">
+                {{ __('app.label.projects') }}
+            </x-filament::tabs.item>
+        </x-filament::tabs>
+    </div>
 
     {{-- ---------- OVERVIEW ---------- --}}
     <div x-show="tab === 'overview'" x-cloak class="pj-panel">
