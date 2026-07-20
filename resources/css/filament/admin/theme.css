@@ -519,13 +519,18 @@
 .bkdt {
     border: 1px solid var(--d);
     border-radius: .625rem;
-    overflow-x: auto;
+    /* Long lists scroll inside the frame instead of stretching the modal;
+       the column header and the single-currency total stay pinned. */
+    overflow: auto;
+    max-height: min(30rem, 60vh);
     font-size: .875rem;
 }
 .bkdt table {
     width: 100%;
     min-width: 26rem;
-    border-collapse: collapse;
+    /* Separate borders: collapsed ones scroll away from sticky cells. */
+    border-collapse: separate;
+    border-spacing: 0;
 }
 .bkdt th + th,
 .bkdt td + td {
@@ -537,16 +542,25 @@
     text-transform: uppercase;
     letter-spacing: .04em;
     color: var(--m2);
-    background: var(--soft);
+    /* Solid surface under the translucent tint — rows must not ghost
+       through the pinned cells in dark mode. */
+    background: linear-gradient(var(--soft), var(--soft)) var(--s);
     padding: .55rem .9rem;
     text-align: left;
     white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-bottom: 1px solid var(--d);
 }
 .bkdt td {
     padding: .6rem .9rem;
     border-top: 1px solid var(--d);
     color: var(--t);
     vertical-align: top;
+}
+.bkdt tbody tr:first-child td {
+    border-top: 0;
 }
 .bkdt__nm {
     font-weight: 600;
@@ -588,8 +602,13 @@
     text-underline-offset: 2px;
 }
 .bkdt tfoot td {
-    background: var(--soft);
+    background: linear-gradient(var(--soft), var(--soft)) var(--s);
     font-weight: 600;
+}
+.bkdt tfoot.bkdt__foot--pin td {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
 }
 
 /* ─── Approval-flow modal on a phone: rows become labelled cards ────────────

@@ -77,7 +77,10 @@
                 @endforeach
                 </tbody>
                 @if ($totals->isNotEmpty())
-                    <tfoot>
+                    {{-- A single-currency total pins to the bottom edge while the rows
+                         scroll; several currency rows would stack over each other, so
+                         they stay in the normal flow. --}}
+                    <tfoot @class(['bkdt__foot--pin' => $totals->count() === 1])>
                     @foreach ($totals as $t)
                         <tr>
                             <td colspan="{{ $hasMid ? 2 : 1 }}">
