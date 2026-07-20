@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Dashboard;
 
+use App\Enums\ContractStatus;
 use App\Enums\PaymentStatus;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\Contracts\ContractResource;
@@ -39,7 +40,7 @@ class ProjectParticipantsTableWidget extends TableWidget
                 ->where('project_id', $this->projectId() ?? 0)
                 ->where('status', '!=', Contract::STATUS_REJECTED->value)
                 ->whereHas('contractType', fn (Builder $query) => $query->where('direction', 'income'))
-                ->with(['contact', 'sponsor', 'currency']))
+                ->with(['contact', 'sponsor', 'currency', 'contractType']))
             ->defaultSort('amount', 'desc')
             ->recordUrl(fn (Contract $record): string => ContractResource::getUrl('view', ['record' => $record]))
             ->columns([
@@ -52,9 +53,26 @@ class ProjectParticipantsTableWidget extends TableWidget
                             ->orWhereHas('sponsor', fn (Builder $c) => $c->where('name', 'like', "%{$search}%"))))
                     ->state(fn (Contract $record): string => $record->counterparty()?->name ?? __('app.label.not_set')),
 
+                TextColumn::make('number')
+                    ->label(__('app.label.contract_number'))
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('contractType.title')
+                    ->label(__('app.label.contract_type_single'))
+                    ->badge()
+                    ->color(fn (Contract $record): string => $record->contractType?->direction?->color() ?? 'gray')
+                    ->placeholder(__('app.label.not_set')),
+
                 TextColumn::make('amount')
                     ->label(__('app.label.amount'))
                     ->formatStateUsing(fn (Contract $record): string => Money::format($record->amount).' '.($record->currency?->short_name ?? ''))
+                    ->alignEnd()
+                    ->sortable(),
+
+                TextColumn::make('paid_percent')
+                    ->label(__('app.label.paid'))
+                    ->formatStateUsing(fn (?string $state): string => round((float) $state).'%')
                     ->alignEnd()
                     ->sortable(),
 
@@ -63,6 +81,12 @@ class ProjectParticipantsTableWidget extends TableWidget
                     ->badge()
                     ->formatStateUsing(fn (PaymentStatus $state): string => $state->label())
                     ->color(fn (PaymentStatus $state): string => $state->color()),
+
+                TextColumn::make('status')
+                    ->label(__('app.label.status'))
+                    ->badge()
+                    ->formatStateUsing(fn (ContractStatus $state): string => $state->label())
+                    ->color(fn (ContractStatus $state): string => $state->color()),
             ])
             ->paginated([5, 10, 25])
             ->defaultPaginationPageOption(5)

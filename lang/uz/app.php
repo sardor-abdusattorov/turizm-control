@@ -212,6 +212,10 @@ return [
         'user' => 'Foydalanuvchi',
         'attached_document' => 'Biriktirilgan hujjat',
         'size' => 'Hajmi',
+        'file' => 'Fayl',
+        'uploaded_by' => 'Yuklagan',
+        'event_kind' => 'Hodisa turi',
+        'date' => 'Sana',
         'file_name' => 'Fayl nomi',
         'document' => 'Hujjat',
         'current_step' => 'Joriy bosqich',
@@ -356,6 +360,7 @@ return [
     'action' => [
         'mark_signed' => 'Imzolangan deb belgilash',
         'upload_files' => 'Fayllarni yuklash',
+        'open' => 'Ochish',
         'download' => 'Yuklab olish',
         'delete' => "O'chirish",
         'update' => 'Yangilash',

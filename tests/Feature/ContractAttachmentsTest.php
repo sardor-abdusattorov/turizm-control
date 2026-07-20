@@ -2,11 +2,12 @@
 
 use App\Enums\ContractAttachmentType;
 use App\Filament\Resources\Contracts\Pages\EditContract;
-use App\Filament\Resources\Contracts\Pages\ViewContract;
+use App\Filament\Resources\Contracts\Widgets\ContractAttachmentsTableWidget;
 use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Department;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -185,8 +186,8 @@ it('deletes an attachment together with its file', function () {
         'sort' => 1,
     ]);
 
-    Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->callAction('deleteAttachment', arguments: ['attachment' => $attachment->id]);
+    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
+        ->callAction(TestAction::make('delete')->table($attachment));
 
     expect($contract->attachments()->count())->toBe(0);
     Storage::disk('local')->assertMissing($path);
@@ -212,14 +213,14 @@ it('removes attachment files when the contract itself is deleted', function () {
     Storage::disk('local')->assertMissing($path);
 });
 
-it('uploads dossier scans from the view page too', function () {
+it('uploads dossier scans from the view page widget too', function () {
     Storage::fake('local');
 
     $contract = Contract::factory()->create();
     attachmentManager($contract);
 
-    Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->callAction('uploadAttachments', [
+    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
+        ->callAction(TestAction::make('uploadAttachments')->table(), [
             'files' => [UploadedFile::fake()->create('proposal.pdf', 40, 'application/pdf')],
         ])
         ->assertHasNoActionErrors();
@@ -241,8 +242,8 @@ it('keeps uploading open after full approval — SWIFT and act arrive later', fu
 
     attachmentManager($contract);
 
-    Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->callAction('uploadAttachments', [
+    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
+        ->callAction(TestAction::make('uploadAttachments')->table(), [
             'files' => [UploadedFile::fake()->create('SWIFT MT103.pdf', 60, 'application/pdf')],
         ])
         ->assertHasNoActionErrors();
@@ -258,8 +259,8 @@ it('hides the upload action from users without the update permission', function 
     $contract = Contract::factory()->create();
     attachmentManager($contract, ['view_any_contract', 'view_contract']);
 
-    Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->assertActionHidden('uploadAttachments');
+    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
+        ->assertActionHidden(TestAction::make('uploadAttachments')->table());
 });
 
 it('freezes the dossier while the contract is under approval', function (mixed $status) {
@@ -272,8 +273,8 @@ it('freezes the dossier while the contract is under approval', function (mixed $
 
     attachmentManager($contract);
 
-    Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->assertActionHidden('uploadAttachments');
+    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
+        ->assertActionHidden(TestAction::make('uploadAttachments')->table());
 })->with([
     'regular chain review' => [Contract::STATUS_IN_REVIEW],
     'awaiting director' => [Contract::STATUS_PENDING_DIRECTOR],

@@ -18,7 +18,6 @@ use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -285,88 +284,42 @@ class ViewContract extends ViewRecord
 
     private ?Collection $cachedAttachments = null;
 
-    /**
-     * Whoever may edit contract data may also curate its dossier. Unlike
-     * editing the contract's terms, this stays open AFTER full approval: the
-     * signed scan, the SWIFT slip, the act and the bank fees all arrive once
-     * the contract is already approved, and filing them is not an edit of the
-     * terms — so it never touches the approval chain. While the contract is
-     * mid-approval, though, the dossier freezes: approvers must review a
-     * fixed set of files, not a moving target.
-     */
     public function canManageAttachments(): bool
     {
-        $user = auth()->user();
-
-        return $user !== null
-            && ! $this->record->documentEditWouldResetApprovals()
-            && ($user->hasRole('super_admin') || $user->can('update_contract'));
+        return $this->record->attachmentsManageableBy();
     }
 
-    public function attachmentUrl(ContractAttachment $attachment): ?string
+    /**
+     * Per-approver detail as a NATIVE Filament modal — the same chrome the
+     * breakdown modals use, replacing the old hand-rolled Alpine overlay.
+     * Mounted with { user: <user_id> }; shows every record that person has
+     * on the contract (current + invalidated attempts).
+     */
+    public function approverDetailsAction(): Action
     {
-        return $attachment->url();
-    }
+        $user = fn (array $arguments): ?User => User::query()
+            ->with(['department', 'position'])
+            ->find((int) ($arguments['user'] ?? 0));
 
-    public function uploadAttachmentsAction(): Action
-    {
-        return Action::make('uploadAttachments')
-            ->label(__('app.action.upload_files'))
-            ->icon('heroicon-o-paper-clip')
-            ->visible(fn (): bool => $this->canManageAttachments())
-            ->modalHeading(__('app.action.upload_files'))
-            ->schema([
-                FileUpload::make('files')
-                    ->hiddenLabel()
-                    ->helperText(__('app.helper.attachment_scans'))
-                    ->multiple()
-                    ->required()
-                    ->disk('local')
-                    ->directory(fn (): string => 'uploads/files/contract-attachments/'.now()->format('Y/m'))
-                    ->visibility('private')
-                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
-                    ->maxSize(25600)
-                    ->storeFileNamesIn('original_names'),
-            ])
-            ->action(function (array $data): void {
-                $names = (array) ($data['original_names'] ?? []);
-                $sort = (int) $this->record->attachments()->max('sort');
+        return Action::make('approverDetails')
+            ->modalHeading(fn (array $arguments): string => $user($arguments)?->name ?? '')
+            ->modalDescription(function (array $arguments) use ($user): ?string {
+                $u = $user($arguments);
 
-                foreach ((array) ($data['files'] ?? []) as $key => $path) {
-                    $this->record->attachments()->create([
-                        'file_path' => $path,
-                        // Filament keys the stored names by the stored PATH,
-                        // not by the upload uuid — $key alone always missed.
-                        'original_name' => $names[$path] ?? $names[$key] ?? basename((string) $path),
-                        'size' => Storage::disk('local')->exists($path) ? Storage::disk('local')->size($path) : 0,
-                        'uploaded_by' => auth()->id(),
-                        'sort' => ++$sort,
-                    ]);
-                }
-
-                $this->cachedAttachments = null;
-
-                Notification::make()->title(__('app.message.attachments_uploaded'))->success()->send();
-            });
-    }
-
-    public function deleteAttachmentAction(): Action
-    {
-        return Action::make('deleteAttachment')
-            ->label(__('app.action.delete'))
-            ->requiresConfirmation()
-            ->color('danger')
-            ->visible(fn (): bool => $this->canManageAttachments())
-            ->action(function (array $arguments): void {
-                $attachment = $this->record->attachments()
-                    ->whereKey($arguments['attachment'] ?? 0)
-                    ->first();
-
-                $attachment?->delete();
-                $this->cachedAttachments = null;
-
-                Notification::make()->title(__('app.message.attachment_deleted'))->success()->send();
-            });
+                return $u ? trim(($u->department?->name ?? '').($u->position?->name ? ' · '.$u->position->name : ''), ' ·') ?: null : null;
+            })
+            ->modalIcon('heroicon-o-user-circle')
+            ->modalWidth('3xl')
+            ->modalContent(fn (array $arguments) => view(
+                'filament.resources.contracts.pages.view-contract.approver-details',
+                [
+                    'record' => $this->record,
+                    'page' => $this,
+                    'userId' => (int) ($arguments['user'] ?? 0),
+                ],
+            ))
+            ->modalSubmitAction(false)
+            ->modalCancelAction(false);
     }
 
     public static function userCanExportContract(): bool
@@ -438,28 +391,6 @@ class ViewContract extends ViewRecord
             'can_add' => $this->record->canAcceptPayment()
                 && (bool) auth()->user()?->can('create_payment'),
         ];
-    }
-
-    /**
-     * The in-browser or OnlyOffice view link for a dossier file — PDFs and
-     * images open in the browser's own viewer, Word files in the read-only
-     * OnlyOffice viewer. Null for anything else (download stays available).
-     */
-    public function attachmentOpenUrl(ContractAttachment $attachment): ?string
-    {
-        if (! $attachment->fileExists()) {
-            return null;
-        }
-
-        if ($attachment->isWordDocument()) {
-            return route('contracts.attachments.viewer', ['contract' => $this->record, 'attachment' => $attachment]);
-        }
-
-        if ($attachment->isBrowserViewable()) {
-            return route('contracts.attachments.inline', ['contract' => $this->record, 'attachment' => $attachment]);
-        }
-
-        return null;
     }
 
     /**
@@ -554,62 +485,5 @@ class ViewContract extends ViewRecord
             $this->isCurrentApprover($approver) => 'current',
             default => 'queued',
         };
-    }
-
-    /**
-     * @return array{icon: string, color: string}
-     */
-    public function activityVisual(string $event): array
-    {
-        return match ($event) {
-            'Contract Submitted' => ['icon' => 'heroicon-o-paper-airplane', 'color' => 'info'],
-            'Contract Sent To Director' => ['icon' => 'heroicon-o-arrow-up-circle', 'color' => 'primary'],
-            'Contract Step Approved', 'Contract Approved', 'Contract Awaiting Director' => ['icon' => 'heroicon-o-check-circle', 'color' => 'success'],
-            'Contract Rejected' => ['icon' => 'heroicon-o-x-circle', 'color' => 'danger'],
-            'Contract Document Saved', 'Contract Document Forcesave' => ['icon' => 'heroicon-o-document-text', 'color' => 'info'],
-            'Contract Edit Invalidated' => ['icon' => 'heroicon-o-no-symbol', 'color' => 'warning'],
-            default => match (strtolower($event)) {
-                'created' => ['icon' => 'heroicon-o-sparkles', 'color' => 'info'],
-                'updated' => ['icon' => 'heroicon-o-pencil-square', 'color' => 'gray'],
-                'deleted' => ['icon' => 'heroicon-o-trash', 'color' => 'danger'],
-                default => ['icon' => 'heroicon-o-information-circle', 'color' => 'gray'],
-            },
-        };
-    }
-
-    public function activityGroup(string $event): string
-    {
-        return match ($event) {
-            'Contract Submitted', 'Contract Sent To Director', 'Contract Step Approved',
-            'Contract Approved', 'Contract Rejected', 'Contract Awaiting Director' => 'workflow',
-            default => 'edit',
-        };
-    }
-
-    /**
-     * Human, localized label for a timeline row — the stored description is a
-     * raw English event string ("Contract Awaiting Director"), which reads as
-     * gibberish to a ru/uz user and hides that an approver actually approved.
-     */
-    public function activityLabel(string $event, ?string $description = null): string
-    {
-        $key = match ($event) {
-            'Contract Submitted' => 'submitted',
-            'Contract Step Approved' => 'step_approved',
-            'Contract Awaiting Director' => 'awaiting_director',
-            'Contract Approved' => 'approved',
-            'Contract Sent To Director' => 'sent_to_director',
-            'Contract Rejected' => 'rejected',
-            'Contract Document Saved', 'Contract Document Forcesave' => 'document_saved',
-            'Contract Edit Invalidated' => 'edit_invalidated',
-            default => match (strtolower($event)) {
-                'created' => 'created',
-                'updated' => 'updated',
-                'deleted' => 'deleted',
-                default => null,
-            },
-        };
-
-        return $key !== null ? __("app.activity.{$key}") : ($description ?: $event);
     }
 }

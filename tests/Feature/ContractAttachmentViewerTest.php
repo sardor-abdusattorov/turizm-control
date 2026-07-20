@@ -1,9 +1,10 @@
 <?php
 
-use App\Filament\Resources\Contracts\Pages\ViewContract;
+use App\Filament\Resources\Contracts\Widgets\ContractAttachmentsTableWidget;
 use App\Models\Contract;
 use App\Models\ContractAttachment;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -121,11 +122,16 @@ it('maps the open link per type: browser for pdf, OnlyOffice for docx, none for 
     $docx = dossierFile($contract, 'b.docx', 'b.docx');
     $zip = dossierFile($contract, 'c.zip', 'c.zip');
 
-    $page = Livewire::test(ViewContract::class, ['record' => $contract->id])->instance();
-
-    expect($page->attachmentOpenUrl($pdf))->toContain('/attachments/'.$pdf->id.'/file')
-        ->and($page->attachmentOpenUrl($docx))->toContain('/attachments/'.$docx->id.'/viewer')
-        ->and($page->attachmentOpenUrl($zip))->toBeNull();
+    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
+        ->assertActionHasUrl(
+            TestAction::make('open')->table($pdf),
+            route('contracts.attachments.inline', ['contract' => $contract->id, 'attachment' => $pdf]),
+        )
+        ->assertActionHasUrl(
+            TestAction::make('open')->table($docx),
+            route('contracts.attachments.viewer', ['contract' => $contract->id, 'attachment' => $docx]),
+        )
+        ->assertActionHidden(TestAction::make('open')->table($zip));
 });
 
 it('accepts a Word file into the dossier upload', function () {
@@ -137,8 +143,8 @@ it('accepts a Word file into the dossier upload', function () {
     $user->givePermissionTo('update_contract');
     actingAs($user->fresh());
 
-    Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->callAction('uploadAttachments', [
+    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
+        ->callAction(TestAction::make('uploadAttachments')->table(), [
             'files' => [UploadedFile::fake()->create('proekt-dogovora.docx', 30, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')],
         ])
         ->assertHasNoActionErrors();

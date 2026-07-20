@@ -136,20 +136,23 @@
          offset and the page appears to jump. --}}
     <div class="pj-tabwrap"
          x-data="{ tab: 'overview', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }">
-        <div class="rec-tabs" role="tablist">
-            <button type="button" class="rec-tab" :class="tab === 'overview' ? 'rec-tab--active' : ''" @click="go('overview')">
-                {!! $ic('heroicon-o-rectangle-group', 16) !!} {{ __('app.label.overview') }}
-            </button>
-            <button type="button" class="rec-tab" :class="tab === 'contracts' ? 'rec-tab--active' : ''" @click="go('contracts')">
-                {!! $ic('heroicon-o-document-text', 16) !!} {{ __('app.label.contracts') }}@if ($visibleContracts->isNotEmpty())<span class="rec-tab__c">{{ $visibleContracts->count() }}</span>@endif
-            </button>
-            <button type="button" class="rec-tab" :class="tab === 'participants' ? 'rec-tab--active' : ''" @click="go('participants')">
-                {!! $ic('heroicon-o-user-group', 16) !!} {{ __('app.label.participants') }}@if ($participantCount)<span class="rec-tab__c">{{ $participantCount }}</span>@endif
-            </button>
-            <button type="button" class="rec-tab" :class="tab === 'gallery' ? 'rec-tab--active' : ''" @click="go('gallery')">
-                {!! $ic('heroicon-o-photo', 16) !!} {{ __('app.label.gallery') }}@if ($galleryCount)<span class="rec-tab__c">{{ $galleryCount }}</span>@endif
-            </button>
-        </div>
+        <x-filament::tabs>
+            <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
+                {{ __('app.label.overview') }}
+            </x-filament::tabs.item>
+            <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')"
+                :badge="$visibleContracts->count() ?: null">
+                {{ __('app.label.contracts') }}
+            </x-filament::tabs.item>
+            <x-filament::tabs.item icon="heroicon-o-user-group" alpine-active="tab === 'participants'" x-on:click="go('participants')"
+                :badge="$participantCount ?: null">
+                {{ __('app.label.participants') }}
+            </x-filament::tabs.item>
+            <x-filament::tabs.item icon="heroicon-o-photo" alpine-active="tab === 'gallery'" x-on:click="go('gallery')"
+                :badge="$galleryCount ?: null">
+                {{ __('app.label.gallery') }}
+            </x-filament::tabs.item>
+        </x-filament::tabs>
 
         {{-- ---------- OVERVIEW ---------- --}}
         <div x-show="tab === 'overview'" x-cloak class="pj-panel">
@@ -269,6 +272,9 @@
                     <span class="ow-hd__ic">{!! $ic('heroicon-o-photo', 18) !!}</span>
                     <h2 class="ow-hd__t">{{ __('app.label.gallery') }}</h2>
                     <span class="pj-count">{{ $galleryCount }}</span>
+                    @if (auth()->user()?->can('update', $record))
+                        <span style="margin-left:auto">{{ $this->uploadGalleryAction }}</span>
+                    @endif
                 </header>
 
                 @if ($galleryCount === 0)

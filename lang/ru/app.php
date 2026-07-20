@@ -212,6 +212,10 @@ return [
         'user' => 'Пользователь',
         'attached_document' => 'Прикреплённый документ',
         'size' => 'Размер',
+        'file' => 'Файл',
+        'uploaded_by' => 'Загрузил',
+        'event_kind' => 'Тип события',
+        'date' => 'Дата',
         'file_name' => 'Имя файла',
         'document' => 'Документ',
         'current_step' => 'Текущий этап',
@@ -356,6 +360,7 @@ return [
     'action' => [
         'mark_signed' => 'Отметить подписанным',
         'upload_files' => 'Загрузить файлы',
+        'open' => 'Открыть',
         'download' => 'Скачать',
         'delete' => 'Удалить',
         'update' => 'Обновить',

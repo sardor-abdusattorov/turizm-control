@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Contacts\Widgets;
+namespace App\Filament\Widgets\Counterparty;
 
 use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
@@ -13,13 +13,16 @@ use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * The counterparty's project participations — its income contracts across
- * exhibitions with the payment state of each. A row opens the project; the
- * contract number cell opens the contract.
+ * A counterparty's project participations (contact OR sponsor) — its income
+ * contracts across exhibitions with the payment state of each. A row opens
+ * the project; the contract number cell opens the contract. Pass exactly one
+ * of the two ids.
  */
-class ContactProjectsTableWidget extends TableWidget
+class CounterpartyProjectsTableWidget extends TableWidget
 {
-    public int $contactId;
+    public ?int $contactId = null;
+
+    public ?int $sponsorId = null;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -27,12 +30,11 @@ class ContactProjectsTableWidget extends TableWidget
     {
         return $table
             ->heading(__('app.label.projects'))
-            ->query(fn (): Builder => Contract::query()
+            ->query(fn (): Builder => $this->scopeCounterparty(Contract::query()
                 ->visibleTo()
-                ->where('contact_id', $this->contactId)
                 ->where('status', '!=', Contract::STATUS_REJECTED->value)
                 ->whereHas('contractType', fn (Builder $query) => $query->where('direction', 'income'))
-                ->with(['project', 'currency']))
+                ->with(['project', 'currency'])))
             ->defaultSort('id', 'desc')
             ->recordUrl(fn (Contract $record): ?string => $record->project
                 ? BaseProjectResource::resourceFor($record->project)::getUrl('view', ['record' => $record->project])
@@ -71,5 +73,12 @@ class ContactProjectsTableWidget extends TableWidget
             ->paginated([5, 10, 25])
             ->defaultPaginationPageOption(5)
             ->emptyStateHeading(__('app.message.no_projects_for_contact'));
+    }
+
+    private function scopeCounterparty(Builder $query): Builder
+    {
+        return $this->sponsorId !== null
+            ? $query->where('sponsor_id', $this->sponsorId)
+            : $query->where('contact_id', $this->contactId ?? 0);
     }
 }

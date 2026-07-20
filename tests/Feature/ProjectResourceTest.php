@@ -16,6 +16,7 @@ use App\Models\Project;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
@@ -110,6 +111,37 @@ it('renders the gallery through the image-gallery component', function () {
     Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
         ->assertSuccessful()
         ->assertSee('data-viewer-gallery', false);
+});
+
+it('uploads gallery files straight from the view page, appending to the set', function () {
+    Storage::disk('local')->put('uploads/images/projects/2025/01/old.jpg', 'stub');
+
+    $project = Project::factory()->international()->create([
+        'gallery' => ['uploads/images/projects/2025/01/old.jpg'],
+    ]);
+
+    actingAs(userWithPermission('view_any_project', 'view_project', 'update_project'));
+
+    Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
+        ->callAction('uploadGallery', [
+            'gallery' => [UploadedFile::fake()->image('new.jpg')],
+        ])
+        ->assertHasNoActionErrors();
+
+    $gallery = $project->fresh()->gallery;
+
+    // The old file survives, the new upload lands after it.
+    expect($gallery)->toHaveCount(2)
+        ->and($gallery[0])->toBe('uploads/images/projects/2025/01/old.jpg');
+});
+
+it('hides the gallery upload from users without update_project', function () {
+    $project = Project::factory()->international()->create();
+
+    actingAs(userWithPermission('view_any_project', 'view_project'));
+
+    Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
+        ->assertActionHidden('uploadGallery');
 });
 
 it('splits gallery urls into images and videos', function () {

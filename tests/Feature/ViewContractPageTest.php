@@ -106,13 +106,26 @@ it('keeps a cancelled approval verdict and comment in the per-approver modal', f
 
     actingAs($user);
 
-    $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
+    $page = Livewire::test(ViewContract::class, ['record' => $contract->id]);
 
-    expect($html)->toContain('Looks good, ship it.')           // their own comment
-        ->and($html)->toContain('is-past')                      // cancelled row, dimmed in the table
-        ->and($html)->toContain(__('app.message.invalidated_on_edit'))
-        // The standalone history button/modal is gone — history lives in the eye.
-        ->and($html)->not->toContain('cw-history-btn');
+    // The standalone history button/modal is gone — details live behind the
+    // eye's native Filament modal.
+    expect($page->html())->not->toContain('cw-history-btn');
+
+    // The per-approver modal keeps the cancelled verdict, the comment and
+    // the system note explaining WHY the row was cancelled.
+    $component = app(ViewContract::class);
+    $component->record = $contract->fresh()->loadMissing(['approvers.user', 'activeApprovers']);
+
+    $modal = view('filament.resources.contracts.pages.view-contract.approver-details', [
+        'record' => $component->record,
+        'page' => $component,
+        'userId' => $approver->id,
+    ])->render();
+
+    expect($modal)->toContain('Looks good, ship it.')  // their own comment
+        ->and($modal)->toContain('is-past')            // cancelled row, dimmed
+        ->and($modal)->toContain(__('app.message.invalidated_on_edit'));
 });
 
 it('shows a single open action on the document card instead of an embedded pdf iframe', function () {
@@ -203,13 +216,13 @@ it('shows a per-approver detail modal trigger and renders queued steps distinctl
 
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
-    // Eye-modal wiring + Alpine state + tabs.
-    expect($html)->toContain('approver: null')
-        ->and($html)->toContain("tab: 'overview'")
-        ->and($html)->toContain('rec-tabs')
+    // Native Filament tabs + Alpine state + the eye that mounts the modal.
+    expect($html)->toContain("tab: 'overview'")
+        ->and($html)->toContain('fi-tabs')
+        ->and($html)->toContain('rec-tabs-row')
         ->and($html)->toContain('cw-eye')
         // Status pill now rides on the tab bar instead of a separate strip.
-        ->and($html)->toContain('rec-tabs__side')
+        ->and($html)->toContain('rec-tabs-row__side')
         ->and($html)->not->toContain('cw-meta')
         // Progress band: a single continuous fill track + status legend + the
         // "Awaiting" tile (the old per-step segmented bar was replaced).
@@ -217,12 +230,10 @@ it('shows a per-approver detail modal trigger and renders queued steps distinctl
         ->and($html)->toContain('cw-prog__fill')
         ->and($html)->toContain('cw-prog__legend')
         ->and($html)->toContain('cw-prog__await')
-        // Modals are keyed by user_id so one opener covers all of a person's records.
-        ->and($html)->toContain('approver = '.$contract->approvers()->where('order', 1)->first()->user_id)
-        ->and($html)->toContain('approver === '.$contract->approvers()->where('order', 1)->first()->user_id)
+        // The eye mounts the NATIVE approver-details modal, keyed by user_id
+        // so one opener covers all of a person's records.
+        ->and($html)->toContain("mountAction('approverDetails', { user: ".$contract->approvers()->where('order', 1)->first()->user_id.' }')
         // Queued step shows the "In queue" pill, current shows "Reviewing".
         ->and($html)->toContain(__('app.contract_approver.status.queued'))
-        ->and($html)->toContain(__('app.contract_approver.status.pending'))
-        // Timeline day grouping container.
-        ->and($html)->toContain('cw-day');
+        ->and($html)->toContain(__('app.contract_approver.status.pending'));
 });

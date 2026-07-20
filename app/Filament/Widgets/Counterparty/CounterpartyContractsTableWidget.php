@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Contacts\Widgets;
+namespace App\Filament\Widgets\Counterparty;
 
 use App\Enums\ContractStatus;
 use App\Filament\Resources\Contracts\ContractResource;
@@ -12,12 +12,15 @@ use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Every contract of the counterparty as a stock Filament table — embedded on
- * the contact view page with the same visibleTo() scoping as the count badge.
+ * Every contract of a counterparty (contact OR sponsor) as a stock Filament
+ * table — embedded on the contact and sponsor view pages with the same
+ * visibleTo() scoping as the count badges. Pass exactly one of the two ids.
  */
-class ContactContractsTableWidget extends TableWidget
+class CounterpartyContractsTableWidget extends TableWidget
 {
-    public int $contactId;
+    public ?int $contactId = null;
+
+    public ?int $sponsorId = null;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -25,10 +28,9 @@ class ContactContractsTableWidget extends TableWidget
     {
         return $table
             ->heading(__('app.label.contracts'))
-            ->query(fn (): Builder => Contract::query()
+            ->query(fn (): Builder => $this->scopeCounterparty(Contract::query()
                 ->visibleTo()
-                ->where('contact_id', $this->contactId)
-                ->with(['contractType', 'currency', 'project']))
+                ->with(['contractType', 'currency', 'project'])))
             ->defaultSort('id', 'desc')
             ->recordUrl(fn (Contract $record): string => ContractResource::getUrl('view', ['record' => $record]))
             ->columns([
@@ -66,5 +68,12 @@ class ContactContractsTableWidget extends TableWidget
             ->paginated([5, 10, 25])
             ->defaultPaginationPageOption(5)
             ->emptyStateHeading(__('app.message.no_contracts_for_contact'));
+    }
+
+    private function scopeCounterparty(Builder $query): Builder
+    {
+        return $this->sponsorId !== null
+            ? $query->where('sponsor_id', $this->sponsorId)
+            : $query->where('contact_id', $this->contactId ?? 0);
     }
 }

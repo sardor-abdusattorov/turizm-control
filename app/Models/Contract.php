@@ -559,6 +559,22 @@ class Contract extends Model
         ], true);
     }
 
+    /**
+     * Whoever may edit contract data may also curate its dossier. Unlike
+     * editing the contract's terms, this stays open AFTER full approval — the
+     * signed scan, SWIFT slip and act arrive once the contract is already
+     * approved. While the contract is mid-approval the dossier freezes:
+     * approvers must review a fixed set of files, not a moving target.
+     */
+    public function attachmentsManageableBy(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        return $user !== null
+            && ! $this->documentEditWouldResetApprovals()
+            && ($user->hasRole('super_admin') || $user->can('update_contract'));
+    }
+
     public function scopeAwaitingApprovalBy(Builder $query, ?User $user = null): Builder
     {
         $user ??= auth()->user();

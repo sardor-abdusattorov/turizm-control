@@ -20,32 +20,57 @@
 @endphp
 
 <x-filament-panels::page>
-<div class="pj" style="display:flex;flex-direction:column;gap:1rem;">
-    {{-- No separate near-empty hero: тип + статус ride in the card header (the
-         name is already the page H1), the data lives in the bordered card. --}}
-    <section class="ow-card">
-        <header class="ow-hd">
-            <span class="ow-hd__ic">{!! $ic('heroicon-o-clipboard-document-list', 18) !!}</span>
-            <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
-            <span class="pj-hd-tags">
-                <span class="pj-chip">{!! $ic('heroicon-o-sparkles', 14) !!} {{ __('app.label.sponsor_single') }}</span>
-                <span class="pj-pill pj-pill--{{ $heroVariant }}">{{ $record->status ? __('app.status.active') : __('app.status.inactive') }}</span>
-            </span>
-        </header>
-        <div class="ow-dets">
-            @foreach ($details as [$icon, $label, $value, $type])
-                <div class="ow-row {{ $type === 'wrap' ? 'ow-row--wrap' : '' }}">
-                    <span class="ow-row__k"><span class="ow-row__ic">{!! $ic($icon, 14) !!}</span><span class="ow-row__lb">{{ $label }}</span></span>
-                    <span class="ow-row__v">
-                        @if ($type === 'wrap')
-                            <span class="ow-row__vl ow-row__vl--wrap">{!! nl2br(e($value)) !!}</span>
-                        @else
-                            <span class="ow-row__vl">{{ $value }}</span>
-                        @endif
-                    </span>
-                </div>
-            @endforeach
-        </div>
-    </section>
+<div class="pj pj-tabwrap"
+     x-data="{ tab: 'overview', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }">
+
+    {{-- Native Filament tabs — the same layout the contact page uses. --}}
+    <x-filament::tabs>
+        <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
+            {{ __('app.label.overview') }}
+        </x-filament::tabs.item>
+        <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')">
+            {{ __('app.label.contracts') }}
+        </x-filament::tabs.item>
+        <x-filament::tabs.item icon="heroicon-o-presentation-chart-bar" alpine-active="tab === 'projects'" x-on:click="go('projects')">
+            {{ __('app.label.projects') }}
+        </x-filament::tabs.item>
+    </x-filament::tabs>
+
+    {{-- ---------- OVERVIEW ---------- --}}
+    <div x-show="tab === 'overview'" x-cloak class="pj-panel">
+        <section class="ow-card">
+            <header class="ow-hd">
+                <span class="ow-hd__ic">{!! $ic('heroicon-o-clipboard-document-list', 18) !!}</span>
+                <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
+                <span class="pj-hd-tags">
+                    <span class="pj-chip">{!! $ic('heroicon-o-sparkles', 14) !!} {{ __('app.label.sponsor_single') }}</span>
+                    <span class="pj-pill pj-pill--{{ $heroVariant }}">{{ $record->status ? __('app.status.active') : __('app.status.inactive') }}</span>
+                </span>
+            </header>
+            <div class="ow-dets">
+                @foreach ($details as [$icon, $label, $value, $type])
+                    <div class="ow-row {{ $type === 'wrap' ? 'ow-row--wrap' : '' }}">
+                        <span class="ow-row__k"><span class="ow-row__ic">{!! $ic($icon, 14) !!}</span><span class="ow-row__lb">{{ $label }}</span></span>
+                        <span class="ow-row__v">
+                            @if ($type === 'wrap')
+                                <span class="ow-row__vl ow-row__vl--wrap">{!! nl2br(e($value)) !!}</span>
+                            @else
+                                <span class="ow-row__vl">{{ $value }}</span>
+                            @endif
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    </div>
+
+    {{-- ---------- CONTRACTS / PROJECTS: stock Filament tables ---------- --}}
+    <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
+        @livewire(\App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget::class, ['sponsorId' => $record->id], key('sponsor-contracts-'.$record->id))
+    </div>
+
+    <div x-show="tab === 'projects'" x-cloak class="pj-panel">
+        @livewire(\App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget::class, ['sponsorId' => $record->id], key('sponsor-projects-'.$record->id))
+    </div>
 </div>
 </x-filament-panels::page>

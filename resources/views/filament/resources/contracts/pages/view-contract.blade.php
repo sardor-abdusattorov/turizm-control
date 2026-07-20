@@ -27,12 +27,7 @@
     $activeUserIds = $active->pluck('user_id')->all();
     $historicalOnly = $historical->whereNotIn('user_id', $activeUserIds)->unique('user_id')->values();
 
-    // One detail-modal per person (active first), keyed by user_id — each
-    // modal shows every record that user has on the contract.
-    $allApprovers = $active->concat($historicalOnly)->values();
-
     $pillFor = fn (ContractApproverStatus $status): string => $status->color();
-    $statusName = fn (ContractApproverStatus $status): string => $status->label();
 
     // Before a contract is submitted the approvers are technically "queued",
     // but the review hasn't started — so show "Not submitted" instead of
@@ -44,37 +39,9 @@
 
     $ic = fn (string $name, int $size = 18) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
-    // SLA window (days an approver gets once it's their turn) and the saturated
-    // dot colour per Filament status token — used to tint the per-approver modal.
-    $slaDays = (int) settings('approval.sla_days', 2);
-    $ringFor = [
-        'success' => '#10b981',
-        'danger' => '#ef4444',
-        'info' => '#3b82f6',
-        'warning' => '#fb923c',
-        'primary' => '#60a5fa',
-        'gray' => '#cbd5e1',
-    ];
-
     $activities = $this->getActivities()
         ->unique(fn ($a) => ($a->description ?? '').'|'.$a->created_at?->format('YmdHi'))
         ->values();
-    $activityDays = $activities->groupBy(fn ($a) => $a->created_at?->format('Y-m-d'));
-
-    $dayLabel = function (?string $date): string {
-        if (! $date) {
-            return '';
-        }
-        $c = Carbon::parse($date);
-        if ($c->isToday()) {
-            return __('app.label.today');
-        }
-        if ($c->isYesterday()) {
-            return __('app.label.yesterday');
-        }
-
-        return $c->translatedFormat('d F Y');
-    };
 
     // Every fact in full — no status row (the pill rides on the tab strip).
     $details = [
@@ -138,20 +105,30 @@
     @include('filament.resources.contracts.pages.view-contract.styles')
 
     <div class="cw"
-        x-data="{ approver: null, contactOpen: false, tab: 'overview', historyFilter: 'all', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }"
-        x-effect="document.documentElement.classList.toggle('cw-noscroll', approver !== null || contactOpen)"
-        @keydown.escape.window="approver = null; contactOpen = false">
+        x-data="{ contactOpen: false, tab: 'overview', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }"
+        x-effect="document.documentElement.classList.toggle('cw-noscroll', contactOpen)"
+        @keydown.escape.window="contactOpen = false">
         @php
             $submittedAt = $this->submittedAt();
         @endphp
 
-        {{-- Tabs — overall status pill rides on the right so it stays visible
-             on both tabs without a redundant full-width strip up top. --}}
-        <div class="rec-tabs" role="tablist">
-            <button type="button" class="rec-tab" :class="tab === 'overview' ? 'rec-tab--active' : ''" @click="go('overview')">{!! $ic('heroicon-o-rectangle-group', 16) !!} {{ __('app.label.overview') }}</button>
-            <button type="button" class="rec-tab" :class="tab === 'attachments' ? 'rec-tab--active' : ''" @click="go('attachments')">{!! $ic('heroicon-o-paper-clip', 16) !!} {{ __('app.label.attachments') }}@if ($this->attachments()->isNotEmpty())<span class="rec-tab__c">{{ $this->attachments()->count() }}</span>@endif</button>
-            <button type="button" class="rec-tab" :class="tab === 'history' ? 'rec-tab--active' : ''" @click="go('history')">{!! $ic('heroicon-o-clock', 16) !!} {{ __('app.label.history') }}@if ($activities->isNotEmpty())<span class="rec-tab__c">{{ $activities->count() }}</span>@endif</button>
-            <span class="cw-pill cw-pill--{{ $statusColor }} cw-pill--lg rec-tabs__side">{{ $statusLabel }}</span>
+        {{-- Native Filament tabs — overall status pill rides on the right so
+             it stays visible on every tab without a redundant strip up top. --}}
+        <div class="rec-tabs-row">
+            <x-filament::tabs>
+                <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
+                    {{ __('app.label.overview') }}
+                </x-filament::tabs.item>
+                <x-filament::tabs.item icon="heroicon-o-paper-clip" alpine-active="tab === 'attachments'" x-on:click="go('attachments')"
+                    :badge="$this->attachments()->count() ?: null">
+                    {{ __('app.label.attachments') }}
+                </x-filament::tabs.item>
+                <x-filament::tabs.item icon="heroicon-o-clock" alpine-active="tab === 'history'" x-on:click="go('history')"
+                    :badge="$activities->count() ?: null">
+                    {{ __('app.label.history') }}
+                </x-filament::tabs.item>
+            </x-filament::tabs>
+            <span class="cw-pill cw-pill--{{ $statusColor }} cw-pill--lg rec-tabs-row__side">{{ $statusLabel }}</span>
         </div>
 
         @include('filament.resources.contracts.pages.view-contract.overview')
@@ -161,8 +138,6 @@
         @include('filament.resources.contracts.pages.view-contract.history')
 
         @include('filament.resources.contracts.pages.view-contract.contact-modal')
-
-        @include('filament.resources.contracts.pages.view-contract.approver-modals')
     </div>
 
     @include('filament.resources.contracts.pages.view-contract.scripts')

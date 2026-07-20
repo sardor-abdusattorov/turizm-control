@@ -212,6 +212,10 @@ return [
         'user' => 'User',
         'attached_document' => 'Attached document',
         'size' => 'Size',
+        'file' => 'File',
+        'uploaded_by' => 'Uploaded by',
+        'event_kind' => 'Event kind',
+        'date' => 'Date',
         'file_name' => 'File name',
         'document' => 'Document',
         'current_step' => 'Current step',
@@ -361,6 +365,7 @@ return [
     'action' => [
         'mark_signed' => 'Mark as signed',
         'upload_files' => 'Upload files',
+        'open' => 'Open',
         'download' => 'Download',
         'delete' => 'Delete',
         'update' => 'Update',

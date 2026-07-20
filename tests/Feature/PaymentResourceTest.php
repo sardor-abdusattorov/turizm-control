@@ -3,6 +3,7 @@
 use App\Filament\Resources\Payments\Pages\CreatePayment;
 use App\Filament\Resources\Payments\Pages\EditPayment;
 use App\Filament\Resources\Payments\Pages\ListPayments;
+use App\Filament\Resources\Payments\Pages\ViewPayment;
 use App\Models\Contract;
 use App\Models\Payment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,6 +25,27 @@ it('lists payments for users who can view any payment', function () {
     actingAs($user);
 
     Livewire::test(ListPayments::class)->assertSuccessful();
+});
+
+it('renders the payment view as a native infolist with the contract link and proof files', function () {
+    $user = userWithPermission('view_any_payment', 'view_payment', 'view_all_contracts');
+    actingAs($user);
+
+    $contract = Contract::factory()->approved()->create(['title' => 'Аренда площади']);
+    Storage::disk('local')->put('uploads/files/payments/proof.png', 'png');
+    Storage::disk('local')->put('uploads/files/payments/order.pdf', 'pdf');
+
+    $payment = Payment::factory()->create([
+        'contract_id' => $contract->id,
+        'percent' => 35,
+        'screenshots' => ['uploads/files/payments/proof.png', 'uploads/files/payments/order.pdf'],
+    ]);
+
+    Livewire::test(ViewPayment::class, ['record' => $payment->id])
+        ->assertSuccessful()
+        ->assertSee($contract->number)
+        ->assertSee(__('app.label.screenshot'))
+        ->assertSee('order.pdf');
 });
 
 it('forbids the create page for users without create_payment', function () {

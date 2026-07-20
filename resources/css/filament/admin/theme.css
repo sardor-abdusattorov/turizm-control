@@ -326,7 +326,6 @@
    invisible to anyone tabbing through. Filament's own controls keep
    their built-in ring; this adds one for ours. */
 .cw-btn:focus-visible,
-.rec-tab:focus-visible,
 .cw-eye:focus-visible,
 .cw-row--link:focus-visible,
 .cw-modal__x:focus-visible,
@@ -785,8 +784,6 @@
 .ca:focus-visible,
 .ow-btn:focus-visible,
 .cw-btn:focus-visible,
-.rec-tab:focus-visible,
-.cw-chip:focus-visible,
 .cw-eye:focus-visible,
 .cw-modal__x:focus-visible,
 .dh__cta:focus-visible,
@@ -798,66 +795,23 @@ button.cw-row:focus-visible {
     border-radius: .4rem;
 }
 /* ─── Record sub-navigation tabs (shared) ───────────────────────────
-   ONE tab language for every record view (contract, project, …): a
-   segmented control — one hairline container, the active segment gets
-   the soft accent fill. Unmistakably navigation, never a card. Scrolls
-   sideways on narrow screens. */
-.rec-tabs {
+   Native Filament <x-filament::tabs> everywhere; this row only lays the
+   strip out next to an optional status pill on the right. */
+.rec-tabs-row {
     display: flex;
     align-items: center;
-    gap: .25rem;
-    padding: .3rem;
-    background: var(--s);
-    border: 1px solid var(--d);
-    border-radius: .75rem;
+    gap: .75rem;
+}
+.rec-tabs-row .fi-tabs {
     overflow-x: auto;
     scrollbar-width: none;
 }
-.rec-tabs::-webkit-scrollbar {
+.rec-tabs-row .fi-tabs::-webkit-scrollbar {
     display: none;
 }
-.rec-tabs__side {
+.rec-tabs-row__side {
     margin-left: auto;
     flex-shrink: 0;
-    padding-right: .35rem;
-}
-.rec-tab {
-    display: inline-flex;
-    align-items: center;
-    gap: .45rem;
-    padding: .55rem 1rem;
-    font-size: .875rem;
-    font-weight: 600;
-    color: var(--m);
-    background: transparent;
-    border: 0;
-    border-radius: .5rem;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: all .15s;
-}
-.rec-tab:hover {
-    color: var(--t);
-    background: var(--soft);
-}
-/* :hover is more specific than the single --active class — restate the
-   active colours so the tab keeps its accent under the cursor. */
-.rec-tab--active,
-.rec-tab--active:hover {
-    color: var(--accent-strong);
-    background: var(--accent-soft);
-}
-.rec-tab__c {
-    font-size: .72rem;
-    font-weight: 700;
-    color: var(--m);
-    background: var(--soft);
-    border-radius: 999px;
-    padding: .1rem .45rem;
-}
-.rec-tab--active .rec-tab__c {
-    background: var(--s);
-    color: var(--accent-strong);
 }
 
 .pj-tabwrap {

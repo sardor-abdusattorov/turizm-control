@@ -104,7 +104,7 @@
                                         @if ($ap->comment)<div class="cw-cmt">{{ $ap->comment }}</div>@endif
                                         @if ($ap->system_comment)<div class="cw-cmt" style="background:rgba(251,146,60,.10);border-color:rgba(251,146,60,.32);color:#c2410c;font-weight:550;">{{ $ap->systemNoteLabel() }}</div>@endif
                                     </div>
-                                    <button type="button" class="cw-eye" title="{{ __('app.label.view_history') }}" @click="approver = {{ $ap->user_id }}">{!! $ic('heroicon-o-eye', 16) !!}</button>
+                                    <button type="button" class="cw-eye" title="{{ __('app.label.view_history') }}" x-on:click="$wire.mountAction('approverDetails', { user: {{ $ap->user_id }} })">{!! $ic('heroicon-o-eye', 16) !!}</button>
                                 </div>
                             @endforeach
 
@@ -123,7 +123,7 @@
                                             <span class="cw-pill cw-pill--gray">{{ __('app.label.no_longer_in_chain') }}</span>
                                         </div>
                                     </div>
-                                    <button type="button" class="cw-eye" title="{{ __('app.label.view_history') }}" @click="approver = {{ $h->user_id }}">{!! $ic('heroicon-o-eye', 16) !!}</button>
+                                    <button type="button" class="cw-eye" title="{{ __('app.label.view_history') }}" x-on:click="$wire.mountAction('approverDetails', { user: {{ $h->user_id }} })">{!! $ic('heroicon-o-eye', 16) !!}</button>
                                 </div>
                             @endforeach
                         </div>

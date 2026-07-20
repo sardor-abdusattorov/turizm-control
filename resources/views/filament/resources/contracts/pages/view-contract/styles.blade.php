@@ -765,45 +765,6 @@
             text-align: right;
         }
 
-        /* execution timeline */
-        .cw-filters {
-            display: flex;
-            gap: .3rem;
-            padding: .95rem 1.25rem;
-            border-bottom: 1px solid var(--d);
-            flex-wrap: wrap;
-        }
-        .cw-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: .35rem;
-            padding: .34rem .7rem;
-            font-size: 0.744rem;
-            font-weight: 600;
-            color: var(--m);
-            background: var(--soft);
-            border: 0;
-            border-radius: 999px;
-            cursor: pointer;
-            transition: all .15s;
-        }
-        .cw-chip:hover {
-            color: var(--t);
-        }
-        .cw-chip--active {
-            background: var(--accent-soft);
-            color: var(--accent);
-        }
-        .cw-chip__c {
-            font-size: 0.664rem;
-            font-weight: 700;
-            padding: .02rem .35rem;
-            border-radius: 999px;
-            background: rgba(0,0,0,.07);
-        }
-        .dark .cw-chip__c {
-            background: rgba(255,255,255,.10);
-        }
         .cw-day__hd {
             display: inline-flex;
             align-items: center;
@@ -1233,18 +1194,6 @@
         .cw-rt__date--muted {
             opacity: .4;
         }
-        /* status colour bar at the very top of the eye-modal card */
-        .cw-modal__bar {
-            height: .3rem;
-            width: 100%;
-            flex-shrink: 0;
-        }
-        .cw-modal__hd-pill {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-        }
 
         /* metric tiles strip (step / timing / reminders) */
         .cw-stats {
@@ -1372,9 +1321,6 @@
             .cw-modal__hd {
                 flex-wrap: wrap;
                 padding: 1rem 3rem 1rem 1rem;
-            }
-            .cw-modal__hd-pill {
-                margin-left: 0;
             }
             /* keep the close button pinned to the top-right corner instead of
                dropping it onto its own row */
