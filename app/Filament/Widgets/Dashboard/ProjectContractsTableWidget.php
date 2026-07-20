@@ -38,7 +38,7 @@ class ProjectContractsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading($this->hideHeading ? null : __('app.label.contracts'))
+            ->heading(null)
             ->query(fn (): Builder => Contract::query()
                 ->visibleTo()
                 ->where('project_id', $this->projectId() ?? 0)
