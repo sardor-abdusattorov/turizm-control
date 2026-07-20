@@ -1,13 +1,10 @@
 @php
-    use App\Filament\Resources\Contracts\ContractResource;
-    use App\Filament\Resources\Projects\BaseProjectResource;
     use App\Models\Contact;
 
     /** @var \App\Models\Contact $record */
     $record = $this->record;
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
-    $fmt = fn ($n) => \App\Support\Money::format($n);
     $loc = fn ($v) => is_array($v) ? ($v[app()->getLocale()] ?? $v['ru'] ?? reset($v) ?: null) : $v;
 
     $isLegal = $record->type === Contact::TYPE_LEGAL;
@@ -15,8 +12,6 @@
     $heroVariant = $record->status ? 'success' : 'gray';
 
     $accounts = $record->bankAccounts;
-    $contracts = $this->contracts();
-    $participations = $this->participations();
 
     // Every column the contact carries — «выводим всё, что есть».
     $details = array_values(array_filter([
@@ -98,91 +93,9 @@
         </section>
     @endif
 
-    {{-- Contracts (visibleTo-scoped) --}}
-    <section class="ow-card">
-        <header class="ow-hd">
-            <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text', 18) !!}</span>
-            <h2 class="ow-hd__t">{{ __('app.label.contracts') }}</h2>
-            <span class="pj-count">{{ $contracts->count() }}</span>
-        </header>
-        @if ($contracts->isEmpty())
-            <p class="pj-empty">{{ __('app.message.no_contracts_for_contact') }}</p>
-        @else
-            <div class="pj-table-wrap">
-                <table class="pj-table">
-                    <thead>
-                        <tr>
-                            <th>{{ __('app.label.contract_number') }}</th>
-                            <th>{{ __('app.label.contract_type_single') }}</th>
-                            <th class="pj-table__num">{{ __('app.label.amount') }}</th>
-                            <th>{{ __('app.label.status') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach ($contracts as $contract)
-                        <tr>
-                            <td style="white-space:nowrap;font-weight:600;">
-                                <a class="pj-link" href="{{ ContractResource::getUrl('view', ['record' => $contract]) }}">{{ $contract->number }}</a>
-                            </td>
-                            <td>
-                                @if ($contract->contractType)
-                                    <span class="pj-pill pj-pill--{{ $contract->contractType->direction?->color() ?? 'gray' }}">{{ $contract->contractType->title }}</span>
-                                @endif
-                            </td>
-                            <td class="pj-table__num">{{ $fmt($contract->amount) }} {{ $contract->currency?->short_name }}</td>
-                            <td><span class="pj-pill pj-pill--{{ $contract->status->color() }}">{{ $contract->status->label() }}</span></td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    </section>
-
-    {{-- Project participations --}}
-    <section class="ow-card">
-        <header class="ow-hd">
-            <span class="ow-hd__ic">{!! $ic('heroicon-o-briefcase', 18) !!}</span>
-            <h2 class="ow-hd__t">{{ __('app.label.projects') }}</h2>
-            <span class="pj-count">{{ $participations->count() }}</span>
-        </header>
-        @if ($participations->isEmpty())
-            <p class="pj-empty">{{ __('app.message.no_projects_for_contact') }}</p>
-        @else
-            <div class="pj-table-wrap">
-                <table class="pj-table">
-                    <thead>
-                        <tr>
-                            <th>{{ __('app.label.project_single') }}</th>
-                            <th class="pj-table__num">{{ __('app.label.participant_amount') }}</th>
-                            <th class="pj-table__num">{{ __('app.label.paid') }}</th>
-                            <th>{{ __('app.label.status') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach ($participations as $p)
-                        @php $pay = $p->payment_status; @endphp
-                        <tr>
-                            <td>
-                                @if ($p->project)
-                                    <a class="pj-link" href="{{ BaseProjectResource::resourceFor($p->project)::getUrl('view', ['record' => $p->project]) }}">{{ $p->project->name }}</a>
-                                @else
-                                    <span style="opacity:.45;">{{ __('app.label.not_set') }}</span>
-                                @endif
-                            </td>
-                            <td class="pj-table__num">{{ $fmt($p->amount) }} {{ $p->currency?->short_name }}</td>
-                            <td class="pj-table__num">{{ $fmt($p->paidAmount()) }}</td>
-                            <td>
-                                @if ((float) $p->amount > 0)
-                                    <span class="pj-pill pj-pill--{{ $pay->color() }}">{{ $pay->label() }}</span>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    </section>
+    {{-- Contracts + project participations: the same stock Filament tables
+         the project page embeds — search, sorting and pagination for free. --}}
+    @livewire(\App\Filament\Resources\Contacts\Widgets\ContactContractsTableWidget::class, ['contactId' => $record->id], key('contact-contracts-'.$record->id))
+    @livewire(\App\Filament\Resources\Contacts\Widgets\ContactProjectsTableWidget::class, ['contactId' => $record->id], key('contact-projects-'.$record->id))
 </div>
 </x-filament-panels::page>
