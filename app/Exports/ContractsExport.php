@@ -23,6 +23,8 @@ class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHead
     use FormatsLocalizedValue;
     use StyledExportSheet;
 
+    private int $rowNumber = 0;
+
     /**
      * @param  Builder<Contract>  $query  Already-filtered query straight off
      *                                    the Filament table — keeps the export
@@ -32,7 +34,8 @@ class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHead
 
     public function query(): Builder
     {
-        return $this->query->with(['contact', 'currency', 'responsible']);
+        return (clone $this->query)
+            ->with(['contact', 'sponsor', 'currency', 'responsible', 'contractType', 'project']);
     }
 
     public function title(): string
@@ -46,7 +49,9 @@ class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHead
             '№',
             __('app.label.contract_number'),
             __('app.label.contract_title'),
-            __('app.label.contact_single'),
+            __('app.label.contract_type_single'),
+            __('app.label.project_single'),
+            __('app.label.counterparty'),
             __('app.label.amount'),
             __('app.label.currency_single'),
             __('app.label.status'),
@@ -62,10 +67,12 @@ class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHead
     public function map($row): array
     {
         return [
-            $row->id,
+            ++$this->rowNumber,
             $row->number,
             $row->title,
-            self::localized($row->contact?->name),
+            $row->contractType?->title,
+            $row->project?->name,
+            self::localized($row->counterparty()?->name),
             (float) $row->amount,
             $row->currency?->short_name,
             $row->status?->label(),
