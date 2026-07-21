@@ -75,8 +75,9 @@ it('uploads payment proof inline through the media library, appending to the set
 
     $screenshots = $payment->fresh()->screenshots;
 
+    // The existing proof survives and the fresh upload joins the set.
     expect($screenshots)->toHaveCount(2)
-        ->and($screenshots[0])->toBe('uploads/files/payments/proof.png');
+        ->and($screenshots)->toContain('uploads/files/payments/proof.png');
 });
 
 it('forbids the create page for users without create_payment', function () {

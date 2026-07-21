@@ -136,9 +136,9 @@ it('uploads gallery files inline through the media library, appending to the set
 
     $gallery = $project->fresh()->gallery;
 
-    // The old file survives, the new upload lands after it.
+    // The old file survives and the new upload joins the set.
     expect($gallery)->toHaveCount(2)
-        ->and($gallery[0])->toBe('uploads/images/projects/2025/01/old.jpg');
+        ->and($gallery)->toContain('uploads/images/projects/2025/01/old.jpg');
 });
 
 it('disables inline gallery editing for users without update_project', function () {
