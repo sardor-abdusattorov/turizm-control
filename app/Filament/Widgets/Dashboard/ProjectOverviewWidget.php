@@ -62,9 +62,9 @@ class ProjectOverviewWidget extends Widget
             'project' => $project,
             'projectUrl' => BaseProjectResource::resourceFor($project)::getUrl('view', ['record' => $project]),
             'counts' => [
-                __('app.label.contracts') => $project->contracts()->visibleTo()->count(),
-                __('app.label.participants') => $active($project->feeContracts())->count(),
-                __('app.label.sponsors') => $active($project->sponsorshipContracts())->count(),
+                ['icon' => 'heroicon-m-document-text', 'label' => __('app.label.contracts'), 'value' => $project->contracts()->visibleTo()->count()],
+                ['icon' => 'heroicon-m-user-group', 'label' => __('app.label.participants'), 'value' => $active($project->feeContracts())->count()],
+                ['icon' => 'heroicon-m-star', 'label' => __('app.label.sponsors'), 'value' => $active($project->sponsorshipContracts())->count()],
             ],
         ];
     }

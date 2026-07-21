@@ -75,7 +75,7 @@ class ProjectStatsWidget extends StatsOverviewWidget
                 ->description($project->stand_cost !== null
                     ? __('app.label.stand_cost').': '.Money::format($project->stand_cost).' '.($project->standCurrency?->short_name ?? '')
                     : null)
-                ->descriptionIcon('heroicon-m-arrow-trending-down')
+                ->descriptionIcon('heroicon-m-building-storefront')
                 ->chart($this->monthlyTotals($contracts, ContractDirection::Expense))
                 ->color('warning'),
         ];

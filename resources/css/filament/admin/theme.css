@@ -640,16 +640,21 @@ button.cw-row:focus-visible {
 /* ─── Dashboard project strip: name + counts left, «Фильтры» right. ─── */
 .pjo {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: .9rem 1rem;
     background: var(--s);
     border: 1px solid var(--d);
     border-radius: .75rem;
-    padding: .9rem 1.25rem;
+    padding: 1rem 1.25rem;
+}
+.pjo__l {
+    flex: 1 1 18rem;
+    min-width: 0;
 }
 .pjo__name {
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 600;
     color: var(--t);
     text-decoration: none;
@@ -661,13 +666,57 @@ a.pjo__name:hover {
     display: flex;
     flex-wrap: wrap;
     gap: .3rem 1rem;
-    margin-top: .25rem;
+    margin-top: .35rem;
     font-size: .8rem;
     color: var(--m);
 }
-.pjo__sub b {
-    font-weight: 600;
+.pjo__sub span {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+.pjo__sub-ic {
+    width: 13px;
+    height: 13px;
+    color: var(--m2);
+    flex-shrink: 0;
+}
+
+/* The picked project's counts — pill-shaped so they read at a glance,
+   not buried in the muted meta line above them. */
+.pjo__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .45rem;
+    margin-top: .65rem;
+}
+.pjo__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .3rem .65rem;
+    border: 1px solid var(--d);
+    border-radius: .6rem;
+    background: var(--accent-softer);
+    font-size: .8rem;
+    color: var(--m);
+}
+.pjo__chip-ic {
+    width: 14px;
+    height: 14px;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+.pjo__chip b {
+    font-weight: 700;
     color: var(--t);
+    font-variant-numeric: tabular-nums;
+}
+.pjo__chip--muted {
+    background: var(--soft);
+}
+.pjo__chip--muted .pjo__chip-ic {
+    color: var(--m2);
 }
 .pjo__filters {
     display: inline-flex;

@@ -5,18 +5,22 @@
                 <a href="{{ $projectUrl }}" class="pjo__name" wire:navigate>{{ $project->name }}</a>
                 <div class="pjo__sub">
                     @if ($project->starts_on)
-                        <span>{{ $project->starts_on->format('d.m.Y') }}{{ $project->ends_on ? ' — '.$project->ends_on->format('d.m.Y') : '' }}</span>
+                        <span>@svg('heroicon-m-calendar-days', 'pjo__sub-ic'){{ $project->starts_on->format('d.m.Y') }}{{ $project->ends_on ? ' — '.$project->ends_on->format('d.m.Y') : '' }}</span>
                     @endif
                     @if ($project->venue)
-                        <span>{{ $project->venue }}</span>
+                        <span>@svg('heroicon-m-map-pin', 'pjo__sub-ic'){{ $project->venue }}</span>
                     @endif
                     @if ($project->area_sqm !== null)
-                        <span>
-                            {{ __('app.label.area_sqm_short', ['sqm' => rtrim(rtrim(number_format((float) $project->area_sqm, 2, ',', ' '), '0'), ',')]) }}@if ($project->area_is_free) · {{ __('app.label.free') }}@elseif ($project->area_cost !== null) · {{ \App\Support\Money::format($project->area_cost) }} {{ $project->areaCurrency?->short_name }}@endif
-                        </span>
+                        <span>@svg('heroicon-m-square-3-stack-3d', 'pjo__sub-ic'){{ __('app.label.area_sqm_short', ['sqm' => rtrim(rtrim(number_format((float) $project->area_sqm, 2, ',', ' '), '0'), ',')]) }}@if ($project->area_is_free) · {{ __('app.label.free') }}@elseif ($project->area_cost !== null) · {{ \App\Support\Money::format($project->area_cost) }} {{ $project->areaCurrency?->short_name }}@endif</span>
                     @endif
-                    @foreach ($counts as $label => $count)
-                        <span>{{ $label }}: <b>{{ $count }}</b></span>
+                </div>
+                <div class="pjo__chips">
+                    @foreach ($counts as $count)
+                        <span class="pjo__chip @if (! $count['value']) pjo__chip--muted @endif">
+                            @svg($count['icon'], 'pjo__chip-ic')
+                            <span class="pjo__chip-lb">{{ $count['label'] }}</span>
+                            <b>{{ $count['value'] }}</b>
+                        </span>
                     @endforeach
                 </div>
             @else
