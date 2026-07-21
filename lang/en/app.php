@@ -601,42 +601,6 @@ return [
     'validation' => [
         'approver_chain_required_departments' => 'The approval chain must include at least one Legal approver and one Accounting approver.',
     ],
-    'placeholder' => [
-        'logo' => 'Organization logo (image)',
-        'organization_name' => 'Organization name',
-        'contract_number' => 'Contract / document number',
-        'amount' => 'Total amount, formatted',
-        'currency_code' => 'Currency short code (USD, UZS, ...)',
-        'currency_name' => 'Currency full name in current language',
-        'contact_name' => 'Counterparty name',
-        'contact_inn' => 'Counterparty INN',
-        'contact_pinfl' => 'Counterparty PINFL',
-        'contact_address' => 'Counterparty address',
-        'contact_phone' => 'Counterparty phone',
-        'contact_email' => 'Counterparty email',
-        'contact_person' => 'Counterparty contact person',
-        'manager_name' => 'Manager (responsible user) full name',
-        'manager_position' => 'Manager department / position',
-        'deadline' => 'Deadline, formatted dd.mm.yyyy',
-        'signed_at' => 'Signed date, formatted dd.mm.yyyy',
-        'created_at' => 'Created date, formatted dd.mm.yyyy',
-        'today' => 'Today, formatted dd.mm.yyyy',
-        'approvers_block' => 'Approval signature table (rendered automatically)',
-        'purchase_items' => 'Items / purchase specification table (rendered automatically)',
-    ],
-    'approvers_block' => [
-        'submitted_by' => 'Submitted',
-        'agreed_by' => 'Agreed',
-        'role_initiator' => 'initiator',
-        'signature' => 'signature',
-        'signed_on' => 'Signed on :date',
-    ],
-    'items_table' => [
-        'specification' => 'Item / service specification',
-        'amount' => 'Total amount',
-        'counterparty' => 'Counterparty',
-        'agreement_ref' => 'Agreement no. and date',
-    ],
     'status' => [
         'active' => 'Active',
         'inactive' => 'Inactive',
@@ -760,11 +724,6 @@ return [
             'invalidated' => 'Cancelled (after edit)',
             'not_submitted' => 'Not submitted for approval',
         ],
-        'signature' => [
-            'pending' => 'Pending',
-            'approved' => 'Approved by',
-            'rejected' => 'Rejected by',
-        ],
     ],
     'contact' => [
         'type' => [
@@ -815,10 +774,6 @@ return [
         'type' => [
             'internal' => 'Internal',
             'international' => 'International',
-        ],
-        'participant_role' => [
-            'participant' => 'Participant',
-            'sponsor' => 'Sponsor',
         ],
     ],
     'tab' => [

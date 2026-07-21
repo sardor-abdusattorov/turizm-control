@@ -596,42 +596,6 @@ return [
     'validation' => [
         'approver_chain_required_departments' => 'Kelishuv zanjiri kamida bittadan yuridik bo‘lim va buxgalteriya kelishuvchisini o‘z ichiga olishi kerak.',
     ],
-    'placeholder' => [
-        'logo' => 'Tashkilot logotipi (rasm)',
-        'organization_name' => 'Tashkilot nomi',
-        'contract_number' => 'Shartnoma / hujjat raqami',
-        'amount' => 'Umumiy summa, formatlangan',
-        'currency_code' => 'Valyutaning qisqa kodi (USD, UZS, ...)',
-        'currency_name' => 'Joriy tildagi valyutaning to‘liq nomi',
-        'contact_name' => 'Kontragent nomi',
-        'contact_inn' => 'Kontragent INN',
-        'contact_pinfl' => 'Kontragent JSHSHIR',
-        'contact_address' => 'Kontragent manzili',
-        'contact_phone' => 'Kontragent telefoni',
-        'contact_email' => 'Kontragent emaili',
-        'contact_person' => 'Kontragentning aloqa shaxsi',
-        'manager_name' => 'Menejerning (mas’ul foydalanuvchi) F.I.Sh.',
-        'manager_position' => 'Menejer bo‘limi / lavozimi',
-        'deadline' => 'Muddat, format kk.oo.yyyy',
-        'signed_at' => 'Imzolangan sana, format kk.oo.yyyy',
-        'created_at' => 'Yaratilgan sana, format kk.oo.yyyy',
-        'today' => 'Bugun, format kk.oo.yyyy',
-        'approvers_block' => 'Kelishuv imzolari jadvali (avtomatik shakllantiriladi)',
-        'purchase_items' => 'Pozitsiyalar / xarid spetsifikatsiyasi jadvali (avtomatik shakllantiriladi)',
-    ],
-    'approvers_block' => [
-        'submitted_by' => 'Kiritdi',
-        'agreed_by' => 'Kelishdi',
-        'role_initiator' => 'tashabbuskor',
-        'signature' => 'imzo',
-        'signed_on' => ':date da imzolangan',
-    ],
-    'items_table' => [
-        'specification' => 'Tovar / xizmat spetsifikatsiyasi',
-        'amount' => 'Umumiy summa',
-        'counterparty' => 'Kontragent',
-        'agreement_ref' => 'Shartnoma № va sanasi',
-    ],
     'status' => [
         'active' => 'Faol',
         'inactive' => 'Nofaol',
@@ -755,11 +719,6 @@ return [
             'invalidated' => 'Bekor qilingan (tahrirdan keyin)',
             'not_submitted' => 'Kelishuvga yuborilmagan',
         ],
-        'signature' => [
-            'pending' => 'Kutilmoqda',
-            'approved' => 'Kelishdi',
-            'rejected' => 'Rad etdi',
-        ],
     ],
     'contact' => [
         'type' => [
@@ -810,10 +769,6 @@ return [
         'type' => [
             'internal' => 'Ichki',
             'international' => 'Xalqaro',
-        ],
-        'participant_role' => [
-            'participant' => 'Ishtirokchi',
-            'sponsor' => 'Homiy',
         ],
     ],
     'tab' => [
