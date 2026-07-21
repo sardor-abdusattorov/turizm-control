@@ -273,6 +273,9 @@
         align-items: center;
         justify-content: center;
         box-shadow: inset 0 0 0 1px var(--d);
+        /* The decorative document SVG is sized by width; clip it so it can
+           never spill past the tile regardless of the tile's dimensions. */
+        overflow: hidden;
     }
     .ow-file__thumb svg {
         width: 60%;
@@ -399,14 +402,16 @@
             word-break: break-all;
         }
 
-        /* File-card row: stack thumb + body, drop the fixed thumb width. */
+        /* File-card row: keep thumb + body side by side, just a touch tighter.
+           (Stacking the thumb to full width blew the SVG up to ~250px tall and
+           it burst out over the card heading — the row layout stays compact.) */
         .ow-file {
-            flex-direction: column;
-            gap: .75rem;
+            gap: .9rem;
+            padding: 1.1rem 1.1rem .25rem;
         }
         .ow-file__thumb {
-            width: 100%;
-            height: 4rem;
+            width: 3.5rem;
+            height: 4.5rem;
         }
         .ow-file__field {
             flex-wrap: wrap;
