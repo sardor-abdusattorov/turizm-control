@@ -535,6 +535,34 @@ button.cw-row:focus-visible {
     font-size: .85rem;
 }
 
+/* Avatar next to a name in one table cell (approval chain, contracts list) —
+   a face beside the label instead of a standalone avatar column. */
+.tbl-person {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+.tbl-person__ava {
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.tbl-person__meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.tbl-person__name {
+    font-weight: 600;
+    color: var(--t);
+}
+.tbl-person__sub {
+    font-size: .78rem;
+    color: var(--m);
+}
+
 /* ─── Modals: full-width on phones ───────────────────────────────────────────
    The fi-width-* classes cap the modal at a desktop max-width, which on a
    narrow screen leaves it floating with side gaps while a wide table inside

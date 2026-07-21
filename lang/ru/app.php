@@ -134,7 +134,6 @@ return [
         'contract_data' => 'Поля документа',
         'approval_chain' => 'Цепочка согласования',
         'approver' => 'Согласующий',
-        'photo' => 'Фото',
         'new_approver' => 'Новый согласующий',
         'actions' => 'Действия',
         'more' => 'Ещё',

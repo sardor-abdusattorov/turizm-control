@@ -134,7 +134,6 @@ return [
         'contract_data' => 'Document fields',
         'approval_chain' => 'Approval chain',
         'approver' => 'Approver',
-        'photo' => 'Photo',
         'new_approver' => 'New approver',
         'actions' => 'Actions',
         'more' => 'More',

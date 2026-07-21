@@ -5,8 +5,8 @@ namespace App\Filament\Resources\Contracts\Widgets;
 use App\Enums\ContractApproverStatus;
 use App\Models\Contract;
 use App\Models\ContractApprover;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -39,20 +39,16 @@ class ContractApproversTableWidget extends TableWidget
                 ->with(['user.department', 'user.position'])
                 ->orderBy('id'))
             ->columns([
-                ImageColumn::make('avatar')
-                    ->label(__('app.label.photo'))
-                    ->state(fn (ContractApprover $record): ?string => $record->user?->avatarUrl())
-                    ->circular()
-                    ->size(38),
-
-                TextColumn::make('user.name')
+                ViewColumn::make('approver')
                     ->label(__('app.label.approver'))
-                    ->weight('semibold')
-                    ->placeholder(__('app.label.not_set'))
-                    ->formatStateUsing(fn (?string $state, ContractApprover $record): string => ($state ?? __('app.label.not_set')).' · #'.$record->order)
-                    ->description(fn (ContractApprover $record): ?string => $record->user
-                        ? trim(($record->user->department?->name ?? '').($record->user->position?->name ? ' · '.$record->user->position->name : ''), ' ·') ?: null
-                        : null),
+                    ->state(fn (ContractApprover $record): array => [
+                        'avatar' => $record->user?->avatarUrl(),
+                        'name' => ($record->user?->name ?? __('app.label.not_set')).' · #'.$record->order,
+                        'sub' => $record->user
+                            ? (trim(($record->user->department?->name ?? '').($record->user->position?->name ? ' · '.$record->user->position->name : ''), ' ·') ?: null)
+                            : null,
+                    ])
+                    ->view('filament.tables.columns.person'),
 
                 TextColumn::make('comment')
                     ->label(__('app.label.comment'))

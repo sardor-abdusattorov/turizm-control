@@ -134,7 +134,6 @@ return [
         'contract_data' => 'Hujjat maydonlari',
         'approval_chain' => 'Kelishuv zanjiri',
         'approver' => 'Kelishuvchi',
-        'photo' => 'Foto',
         'new_approver' => 'Yangi kelishuvchi',
         'actions' => 'Amallar',
         'more' => 'Yana',
