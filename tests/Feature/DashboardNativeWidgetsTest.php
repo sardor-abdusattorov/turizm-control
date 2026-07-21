@@ -57,6 +57,15 @@ it('defaults the dashboard to an international project, even when an internal on
     expect(Project::dashboardDefault()?->id)->toBe($international->id);
 });
 
+it('opens on an international project that has contracts, not a newer empty one', function () {
+    Project::factory()->international()->create(['starts_on' => now(), 'status' => true]);
+    $withContracts = Project::factory()->international()->create(['starts_on' => now()->subYear(), 'status' => true]);
+    $currency = Currency::factory()->create();
+    Contract::factory()->create(['project_id' => $withContracts->id, 'currency_id' => $currency->id]);
+
+    expect(Project::dashboardDefault()?->id)->toBe($withContracts->id);
+});
+
 it('shows the picked project money in the two stat cards', function () {
     [$project, $viewer] = dashboardProject();
     actingAs($viewer);

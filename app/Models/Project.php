@@ -62,10 +62,11 @@ class Project extends Model
     }
 
     /**
-     * The project the dashboard opens on before the user picks one: an
-     * international project first (nearest upcoming, else latest), since the
-     * dashboard leads with international exhibitions; only when none exist does
-     * it fall back to the latest active project of any type.
+     * The project the dashboard opens on before the user picks one: the most
+     * recent international project that already has contracts, so the dashboard
+     * leads with a populated international exhibition rather than an empty
+     * upcoming shell. Falls back to the latest international project, then to
+     * any active project, when none qualify.
      */
     public static function dashboardDefault(): ?self
     {
@@ -73,7 +74,7 @@ class Project extends Model
             ->active()
             ->where('type', ProjectType::International->value);
 
-        return $international()->whereDate('starts_on', '>=', today())->orderBy('starts_on')->first()
+        return $international()->has('contracts')->orderByDesc('starts_on')->first()
             ?? $international()->orderByDesc('starts_on')->first()
             ?? static::query()->active()->orderByDesc('starts_on')->first();
     }
