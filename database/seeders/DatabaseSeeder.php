@@ -24,8 +24,11 @@ class DatabaseSeeder extends Seeder
             ForeignPartnerSeeder::class,
             SponsorsSeeder::class,
             RolesAndPermissionsSeeder::class,
+            // Only the administrator (Sardor Abdusattorov) is seeded as a user;
+            // real staff are added in the app. TestUsersSeeder (the demo team
+            // for workflow showcases) stays runnable on its own but is out of
+            // the default seed.
             UserSeeder::class,
-            TestUsersSeeder::class,
             SettingsSeeder::class,
             // Project shells from the exhibition / local-event registries —
             // venue, dates and costs only. Participation income is entered by
