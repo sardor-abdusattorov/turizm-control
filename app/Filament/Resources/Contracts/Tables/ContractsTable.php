@@ -34,10 +34,6 @@ class ContractsTable
     public static function configure(Table $table): Table
     {
         return $table
-            // Every visible column reads from a relation (status, chain,
-            // contact, currency, responsible, payments). Without eager
-            // loading the listing fires hundreds of queries per page; this
-            // keeps it to a flat handful.
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
                 'contact',
                 'sponsor',
@@ -72,19 +68,11 @@ class ContractsTable
                     ->label(__('app.label.contract_title'))
                     ->searchable()
                     ->sortable()
-                    // Never cut the official phrase — wrap it, but clamp the
-                    // row at two lines; the tooltip carries the full text.
-                    // Auto table layout starves wrapped columns, so pin a
-                    // readable width: two lines fit a sentence, not a
-                    // словосочетание. The table scrolls sideways if tight.
                     ->extraCellAttributes(['style' => 'min-width: 22rem'])
                     ->wrap()
                     ->lineClamp(2)
                     ->tooltip(fn (Contract $record): ?string => $record->title),
 
-                // Counterparty: the contact on most contracts, the sponsor on
-                // «Спонсорство». Search still targets the contact name (the
-                // common case); the state() falls back to the sponsor.
                 TextColumn::make('contact.name')
                     ->label(__('app.label.counterparty'))
                     ->state(fn (Contract $record): ?string => $record->contact?->name ?? $record->sponsor?->name)
@@ -194,8 +182,6 @@ class ContractsTable
                     ->visible(fn (): bool => ContractWorkflow::approvalEnabled())
                     ->modalSubmitAction(false)
                     ->modalCancelAction(false)
-                    // 7xl: 5 columns (approver, comment, status, due, acted-at)
-                    // need the room; on mobile the secondary columns collapse.
                     ->modalWidth('7xl')
                     ->modalHeading(fn (Contract $record): string => trim(($record->number ? $record->number.' · ' : '').($record->title ?? '')) ?: __('app.label.approval_chain'))
                     ->modalContent(fn (Contract $record) => view(
@@ -260,14 +246,7 @@ class ContractsTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        // Shield generates no `deleteAny` ability, so Filament
-                        // would otherwise show bulk delete to anyone who can
-                        // open the list. Gate it on the delete permission.
                         ->visible(fn (): bool => auth()->user()?->can('delete_contract') ?? false)
-                        // The per-row Delete button is gated by canBeDeletedBy;
-                        // make sure the bulk variant respects the same rule —
-                        // only Drafts owned by the user (or super_admin) get
-                        // dropped, the rest of the selection is left alone.
                         ->action(function (Collection $records) {
                             $deletable = $records->filter(
                                 fn (Contract $contract): bool => $contract->canBeDeletedBy(),

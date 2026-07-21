@@ -56,26 +56,40 @@ jobs:
           script: |
             set -e
 
-            cd ${{ secrets.SERVER_APP_PATH }}
+            APP_PATH="${{ secrets.SERVER_APP_PATH }}"
+            cd "$APP_PATH"
+
+            git config --global --add safe.directory "$APP_PATH"
+            git config --global --add safe.directory /var/www
 
             git fetch origin main
             git reset --hard origin/main
 
             docker compose -f docker-compose.yml up -d --remove-orphans
 
-            docker compose -f docker-compose.yml exec -T app composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
+            docker compose -f docker-compose.yml exec -T app composer install \
+              --no-interaction --no-dev --prefer-dist --optimize-autoloader
 
-            npm ci
+            node -v
+            rm -rf public/build
+            npm ci --no-audit --no-fund
             npm run build
+            test -d public/build/assets
 
-            docker compose -f docker-compose.yml exec -T app php artisan migrate --force
             docker compose -f docker-compose.yml exec -T app php artisan filament:assets
             docker compose -f docker-compose.yml exec -T app php artisan livewire:publish --assets
+            docker compose -f docker-compose.yml exec -T app php artisan storage:link || true
+
+            docker compose -f docker-compose.yml exec -T app php artisan migrate --force
+
             docker compose -f docker-compose.yml exec -T app php artisan optimize:clear
             docker compose -f docker-compose.yml exec -T app php artisan project:cache
-            docker compose -f docker-compose.yml exec -T app php artisan storage:link || true
 
             docker compose -f docker-compose.yml exec -T -u root app chown -R www-data:www-data storage bootstrap/cache
             docker compose -f docker-compose.yml exec -T -u root app chmod -R 775 storage bootstrap/cache
+
+            docker compose -f docker-compose.yml restart queue scheduler reverb
+
+            docker compose -f docker-compose.yml ps
 
             echo "Deploy complete"

@@ -48,7 +48,6 @@ class PaymentsTable
                     ->label(__('app.label.contract_title'))
                     ->searchable()
                     ->sortable()
-                    ->limit(40)
                     ->wrap(),
 
                 TextColumn::make('percent')
