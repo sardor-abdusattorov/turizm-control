@@ -53,7 +53,7 @@ class SponsorsTable
                         Action::make('projectsBreakdown')
                             ->modalHeading(fn (Sponsor $record): string => $record->name)
                             ->modalIcon('heroicon-o-presentation-chart-bar')
-                            ->modalWidth('4xl')
+                            ->modalWidth('6xl')
                             ->modalContent(fn (Sponsor $record) => view('filament.partials.embedded-table', [
                                 'widget' => CounterpartyProjectsTableWidget::class,
                                 'params' => ['sponsorId' => $record->id],

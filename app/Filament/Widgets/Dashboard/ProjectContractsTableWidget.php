@@ -57,6 +57,7 @@ class ProjectContractsTableWidget extends TableWidget
                     ->badge()
                     ->color(fn (Contract $record): string => $record->contractType?->direction?->color() ?? 'gray')
                     ->placeholder(__('app.label.not_set'))
+                    ->visibleFrom('lg')
                     ->sortable(),
 
                 TextColumn::make('counterparty')
@@ -65,6 +66,7 @@ class ProjectContractsTableWidget extends TableWidget
                         ->where(fn (Builder $q) => $q
                             ->whereHas('contact', fn (Builder $c) => $c->where('name', 'like', "%{$search}%"))
                             ->orWhereHas('sponsor', fn (Builder $c) => $c->where('name', 'like', "%{$search}%"))))
+                    ->visibleFrom('md')
                     ->state(fn (Contract $record): string => $record->counterparty()?->name ?? __('app.label.not_set')),
 
                 TextColumn::make('amount')
@@ -83,6 +85,7 @@ class ProjectContractsTableWidget extends TableWidget
                     ->label(__('app.label.paid'))
                     ->formatStateUsing(fn (?string $state): string => round((float) $state).'%')
                     ->alignEnd()
+                    ->visibleFrom('md')
                     ->sortable(),
             ])
             ->paginated([5, 10, 25])

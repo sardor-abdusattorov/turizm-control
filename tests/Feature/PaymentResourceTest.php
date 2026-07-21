@@ -4,6 +4,7 @@ use App\Filament\Resources\Payments\Pages\CreatePayment;
 use App\Filament\Resources\Payments\Pages\EditPayment;
 use App\Filament\Resources\Payments\Pages\ListPayments;
 use App\Filament\Resources\Payments\Pages\ViewPayment;
+use App\Livewire\MediaLibrary;
 use App\Models\Contract;
 use App\Models\Payment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,7 +28,7 @@ it('lists payments for users who can view any payment', function () {
     Livewire::test(ListPayments::class)->assertSuccessful();
 });
 
-it('renders the payment view as a native infolist with the contract link and proof files', function () {
+it('renders the payment view with the contract link and native proof-file uploader', function () {
     $user = userWithPermission('view_any_payment', 'view_payment', 'view_all_contracts');
     actingAs($user);
 
@@ -45,7 +46,37 @@ it('renders the payment view as a native infolist with the contract link and pro
         ->assertSuccessful()
         ->assertSee($contract->number)
         ->assertSee(__('app.label.screenshot'))
-        ->assertSee('order.pdf');
+        ->assertSeeLivewire(MediaLibrary::class);
+});
+
+it('uploads payment proof inline through the media library, appending to the set', function () {
+    $user = userWithPermission('view_any_payment', 'view_payment', 'update_payment', 'view_all_contracts');
+    actingAs($user);
+
+    $contract = Contract::factory()->approved()->create();
+    Storage::disk('local')->put('uploads/files/payments/proof.png', 'png');
+
+    $payment = Payment::factory()->create([
+        'contract_id' => $contract->id,
+        'percent' => 35,
+        'screenshots' => ['uploads/files/payments/proof.png'],
+    ]);
+
+    Livewire::test(MediaLibrary::class, ['variant' => 'payment-screenshots', 'recordId' => $payment->id])
+        ->assertSet('canEdit', true)
+        ->fillForm([
+            'screenshots' => [
+                'uploads/files/payments/proof.png',
+                UploadedFile::fake()->image('order.png'),
+            ],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $screenshots = $payment->fresh()->screenshots;
+
+    expect($screenshots)->toHaveCount(2)
+        ->and($screenshots[0])->toBe('uploads/files/payments/proof.png');
 });
 
 it('forbids the create page for users without create_payment', function () {

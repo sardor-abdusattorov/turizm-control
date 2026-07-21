@@ -77,7 +77,7 @@ class ContactsTable
                         Action::make('contractsBreakdown')
                             ->modalHeading(fn (Contact $record): string => $record->name)
                             ->modalIcon('heroicon-o-document-text')
-                            ->modalWidth('4xl')
+                            ->modalWidth('6xl')
                             ->modalContent(fn (Contact $record) => view('filament.partials.embedded-table', [
                                 'widget' => CounterpartyContractsTableWidget::class,
                                 'params' => ['contactId' => $record->id],
@@ -101,7 +101,7 @@ class ContactsTable
                         Action::make('projectsBreakdown')
                             ->modalHeading(fn (Contact $record): string => $record->name)
                             ->modalIcon('heroicon-o-presentation-chart-bar')
-                            ->modalWidth('4xl')
+                            ->modalWidth('6xl')
                             ->modalContent(fn (Contact $record) => view('filament.partials.embedded-table', [
                                 'widget' => CounterpartyProjectsTableWidget::class,
                                 'params' => ['contactId' => $record->id],

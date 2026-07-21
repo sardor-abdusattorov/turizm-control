@@ -51,6 +51,7 @@ class ContractApproversTableWidget extends TableWidget
                     ->label(__('app.label.comment'))
                     ->placeholder(__('app.label.not_set'))
                     ->wrap()
+                    ->visibleFrom('lg')
                     // The system note ("cancelled — document was edited") rides
                     // under the human comment as a muted description.
                     ->description(fn (ContractApprover $record): ?string => $record->system_comment
@@ -72,11 +73,13 @@ class ContractApproversTableWidget extends TableWidget
                         : null)
                     ->badge(fn (ContractApprover $record): bool => $record->isOverdue())
                     ->color(fn (ContractApprover $record): string => $record->isOverdue() ? 'danger' : 'gray')
+                    ->visibleFrom('md')
                     ->placeholder(__('app.label.not_set')),
 
                 TextColumn::make('acted_at')
                     ->label(__('app.label.acted_at'))
                     ->dateTime('d.m.Y H:i')
+                    ->visibleFrom('md')
                     ->placeholder(__('app.label.not_set')),
             ])
             ->filters([

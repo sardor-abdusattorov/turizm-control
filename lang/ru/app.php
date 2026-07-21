@@ -502,7 +502,6 @@ return [
         'project_payment_exceeds_pledge' => 'Сумма платежа не может превышать остаток :amount.',
         'no_projects_for_contact' => 'У контрагента ещё нет участий в проектах.',
         'no_projects_for_sponsor' => 'У спонсора ещё нет участий в проектах.',
-        'no_gallery' => 'Фото и видео ещё не загружены.',
         'hero_draft' => 'Черновик — ещё не отправлен на согласование.',
         'hero_in_review' => 'Ожидает согласования от :name.',
         'hero_in_review_generic' => 'Проходит цепочку согласования.',

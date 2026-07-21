@@ -65,9 +65,7 @@
 
     $paidPercent = $feesTotal > 0 ? round($paidTotal / $feesTotal * 100) : 0;
 
-    $galleryImages = $record->galleryImageUrls();
-    $galleryVideos = $record->galleryVideoUrls();
-    $galleryCount = count($galleryImages) + count($galleryVideos);
+    $galleryCount = count($record->gallery ?? []);
 
     $heroVariant = $record->status ? 'success' : 'gray';
     $typeIcon = $record->type === \App\Enums\ProjectType::International ? 'heroicon-o-globe-alt' : 'heroicon-o-building-office-2';
@@ -267,41 +265,9 @@
             @livewire(\App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget::class, ['pageFilters' => ['projectId' => $record->id]], key('project-participants-'.$record->id))
         </div>
 
-        {{-- ---------- GALLERY ---------- --}}
+        {{-- ---------- GALLERY: native Filament FileUpload, in place ---------- --}}
         <div x-show="tab === 'gallery'" x-cloak class="pj-panel">
-            <section class="ow-card">
-                <header class="ow-hd">
-                    <span class="ow-hd__ic">{!! $ic('heroicon-o-photo', 18) !!}</span>
-                    <h2 class="ow-hd__t">{{ __('app.label.gallery') }}</h2>
-                    <span class="pj-count">{{ $galleryCount }}</span>
-                    @if (auth()->user()?->can('update', $record))
-                        <span style="margin-left:auto">{{ $this->uploadGalleryAction }}</span>
-                    @endif
-                </header>
-
-                @if ($galleryCount === 0)
-                    <p class="pj-empty">{{ __('app.message.no_gallery') }}</p>
-                @else
-                    <div class="pj-gallery-pad">
-                        @if ($galleryImages !== [])
-                            <x-image-gallery::image-gallery
-                                :images="$galleryImages"
-                                :thumb-width="160"
-                                :thumb-height="120"
-                                rounded="rounded-xl"
-                            />
-                        @endif
-
-                        @if ($galleryVideos !== [])
-                            <div class="pj-videos">
-                                @foreach ($galleryVideos as $videoUrl)
-                                    <video class="pj-video" src="{{ $videoUrl }}" controls preload="metadata"></video>
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-                @endif
-            </section>
+            @livewire(\App\Livewire\MediaLibrary::class, ['variant' => 'project-gallery', 'recordId' => $record->id], key('project-gallery-'.$record->id))
         </div>
     </div>
 </div>

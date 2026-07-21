@@ -8,6 +8,7 @@ use App\Filament\Resources\Projects\Pages\EditInternalProject;
 use App\Filament\Resources\Projects\Pages\ListInternalProjects;
 use App\Filament\Resources\Projects\Pages\ListInternationalProjects;
 use App\Filament\Resources\Projects\Pages\ViewInternationalProject;
+use App\Livewire\MediaLibrary;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractType;
@@ -99,7 +100,7 @@ it('updates a project through its typed resource', function () {
     expect($project->fresh()->name)->toBe('NEW-NAME');
 });
 
-it('renders the gallery through the image-gallery component', function () {
+it('renders the gallery as a native Filament FileUpload on the view page', function () {
     Storage::disk('local')->put('uploads/images/projects/2025/01/a.jpg', 'stub');
 
     $project = Project::factory()->international()->create([
@@ -110,10 +111,10 @@ it('renders the gallery through the image-gallery component', function () {
 
     Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
         ->assertSuccessful()
-        ->assertSee('data-viewer-gallery', false);
+        ->assertSeeLivewire(MediaLibrary::class);
 });
 
-it('uploads gallery files straight from the view page, appending to the set', function () {
+it('uploads gallery files inline through the media library, appending to the set', function () {
     Storage::disk('local')->put('uploads/images/projects/2025/01/old.jpg', 'stub');
 
     $project = Project::factory()->international()->create([
@@ -122,11 +123,16 @@ it('uploads gallery files straight from the view page, appending to the set', fu
 
     actingAs(userWithPermission('view_any_project', 'view_project', 'update_project'));
 
-    Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
-        ->callAction('uploadGallery', [
-            'gallery' => [UploadedFile::fake()->image('new.jpg')],
+    Livewire::test(MediaLibrary::class, ['variant' => 'project-gallery', 'recordId' => $project->id])
+        ->assertSet('canEdit', true)
+        ->fillForm([
+            'gallery' => [
+                'uploads/images/projects/2025/01/old.jpg',
+                UploadedFile::fake()->image('new.jpg'),
+            ],
         ])
-        ->assertHasNoActionErrors();
+        ->call('save')
+        ->assertHasNoFormErrors();
 
     $gallery = $project->fresh()->gallery;
 
@@ -135,13 +141,21 @@ it('uploads gallery files straight from the view page, appending to the set', fu
         ->and($gallery[0])->toBe('uploads/images/projects/2025/01/old.jpg');
 });
 
-it('hides the gallery upload from users without update_project', function () {
-    $project = Project::factory()->international()->create();
+it('disables inline gallery editing for users without update_project', function () {
+    Storage::disk('local')->put('uploads/images/projects/2025/01/a.jpg', 'stub');
+
+    $project = Project::factory()->international()->create([
+        'gallery' => ['uploads/images/projects/2025/01/a.jpg'],
+    ]);
 
     actingAs(userWithPermission('view_any_project', 'view_project'));
 
-    Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
-        ->assertActionHidden('uploadGallery');
+    Livewire::test(MediaLibrary::class, ['variant' => 'project-gallery', 'recordId' => $project->id])
+        ->assertSet('canEdit', false)
+        // A save attempt from a viewer is a no-op — the set is untouched.
+        ->call('save');
+
+    expect($project->fresh()->gallery)->toBe(['uploads/images/projects/2025/01/a.jpg']);
 });
 
 it('splits gallery urls into images and videos', function () {
@@ -161,18 +175,21 @@ it('splits gallery urls into images and videos', function () {
         ->and($project->galleryVideoUrls()[0])->toContain('b.mp4');
 });
 
-it('renders gallery videos as native players', function () {
+it('keeps video files through the inline media library', function () {
     Storage::disk('local')->put('uploads/images/projects/2025/01/clip.mp4', 'stub');
 
     $project = Project::factory()->international()->create([
         'gallery' => ['uploads/images/projects/2025/01/clip.mp4'],
     ]);
 
-    actingAs(userWithPermission('view_any_project', 'view_project'));
+    actingAs(userWithPermission('view_any_project', 'view_project', 'update_project'));
 
-    Livewire::test(ViewInternationalProject::class, ['record' => $project->id])
-        ->assertSuccessful()
-        ->assertSee('<video class="pj-video"', false);
+    Livewire::test(MediaLibrary::class, ['variant' => 'project-gallery', 'recordId' => $project->id])
+        ->fillForm(['gallery' => ['uploads/images/projects/2025/01/clip.mp4']])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($project->fresh()->gallery)->toBe(['uploads/images/projects/2025/01/clip.mp4']);
 });
 
 it('opens the role-scoped breakdown modals from the count badges', function () {

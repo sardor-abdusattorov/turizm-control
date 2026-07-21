@@ -143,7 +143,7 @@ class ProjectsTable
                         Action::make('projectContractsBreakdown')
                             ->modalHeading(fn (Project $record): string => $record->name)
                             ->modalIcon('heroicon-o-document-text')
-                            ->modalWidth('5xl')
+                            ->modalWidth('6xl')
                             ->modalContent(fn (Project $record) => view('filament.partials.embedded-table', [
                                 'widget' => ProjectContractsTableWidget::class,
                                 'params' => ['pageFilters' => ['projectId' => $record->id], 'hideHeading' => true],
@@ -258,7 +258,7 @@ class ProjectsTable
         return Action::make($name)
             ->modalHeading(fn (Project $record): string => $record->name)
             ->modalIcon($icon)
-            ->modalWidth('5xl')
+            ->modalWidth('6xl')
             ->modalContent(fn (Project $record) => view('filament.partials.embedded-table', [
                 'widget' => ProjectParticipantsTableWidget::class,
                 'params' => [

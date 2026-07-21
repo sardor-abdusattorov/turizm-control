@@ -189,9 +189,9 @@ class ContractsTable
                     ->visible(fn (): bool => ContractWorkflow::approvalEnabled())
                     ->modalSubmitAction(false)
                     ->modalCancelAction(false)
-                    // 6xl, not 4xl: 5 columns (approver, comment, status, due,
-                    // acted-at) need the room or the table scrolls sideways.
-                    ->modalWidth('6xl')
+                    // 7xl: 5 columns (approver, comment, status, due, acted-at)
+                    // need the room; on mobile the secondary columns collapse.
+                    ->modalWidth('7xl')
                     ->modalHeading(fn (Contract $record): string => trim(($record->number ? $record->number.' · ' : '').($record->title ?? '')) ?: __('app.label.approval_chain'))
                     ->modalContent(fn (Contract $record) => view(
                         'filament.resources.contracts.tables.approval-flow-modal',

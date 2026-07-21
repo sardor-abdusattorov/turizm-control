@@ -51,6 +51,7 @@ class CounterpartyProjectsTableWidget extends TableWidget
                 TextColumn::make('number')
                     ->label(__('app.label.contract_number'))
                     ->url(fn (Contract $record): string => ContractResource::getUrl('view', ['record' => $record]))
+                    ->visibleFrom('md')
                     ->sortable(),
 
                 TextColumn::make('amount')
@@ -62,7 +63,8 @@ class CounterpartyProjectsTableWidget extends TableWidget
                 TextColumn::make('paid')
                     ->label(__('app.label.paid'))
                     ->state(fn (Contract $record): string => Money::format($record->paidAmount()))
-                    ->alignEnd(),
+                    ->alignEnd()
+                    ->visibleFrom('lg'),
 
                 TextColumn::make('payment_status')
                     ->label(__('app.label.payment_status'))

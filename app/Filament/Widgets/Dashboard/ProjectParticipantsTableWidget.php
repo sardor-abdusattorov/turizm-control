@@ -66,13 +66,15 @@ class ProjectParticipantsTableWidget extends TableWidget
                 TextColumn::make('number')
                     ->label(__('app.label.contract_number'))
                     ->searchable()
+                    ->visibleFrom('lg')
                     ->sortable(),
 
                 TextColumn::make('contractType.title')
                     ->label(__('app.label.contract_type_single'))
                     ->badge()
                     ->color(fn (Contract $record): string => $record->contractType?->direction?->color() ?? 'gray')
-                    ->placeholder(__('app.label.not_set')),
+                    ->placeholder(__('app.label.not_set'))
+                    ->visibleFrom('xl'),
 
                 TextColumn::make('amount')
                     ->label(__('app.label.amount'))
@@ -84,11 +86,13 @@ class ProjectParticipantsTableWidget extends TableWidget
                     ->label(__('app.label.paid'))
                     ->formatStateUsing(fn (?string $state): string => round((float) $state).'%')
                     ->alignEnd()
+                    ->visibleFrom('lg')
                     ->sortable(),
 
                 TextColumn::make('payment_status')
                     ->label(__('app.label.payment_status'))
                     ->badge()
+                    ->visibleFrom('md')
                     ->formatStateUsing(fn (PaymentStatus $state): string => $state->label())
                     ->color(fn (PaymentStatus $state): string => $state->color()),
 
