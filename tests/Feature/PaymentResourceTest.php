@@ -49,6 +49,26 @@ it('renders the payment view with the contract link and native proof-file upload
         ->assertSeeLivewire(MediaLibrary::class);
 });
 
+it('hides the proof card on the payment view when no proof file is on disk', function () {
+    $user = userWithPermission('view_any_payment', 'view_payment', 'view_all_contracts');
+    actingAs($user);
+
+    $contract = Contract::factory()->approved()->create();
+
+    // A stored path with no file behind it (e.g. after a snapshot rebuild) must
+    // not surface as an empty, broken proof card.
+    $payment = Payment::factory()->create([
+        'contract_id' => $contract->id,
+        'percent' => 100,
+        'screenshots' => ['uploads/files/payments/missing.pdf'],
+    ]);
+
+    Livewire::test(ViewPayment::class, ['record' => $payment->id])
+        ->assertSuccessful()
+        ->assertSee($contract->number)
+        ->assertDontSee(__('app.label.screenshot'));
+});
+
 it('shows payment proof read-only on the view page and never mutates the record', function () {
     $user = userWithPermission('view_any_payment', 'view_payment', 'update_payment', 'view_all_contracts');
     actingAs($user);

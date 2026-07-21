@@ -13,6 +13,7 @@ use Filament\Schemas\Concerns\RestrictsFileUploadsToSchemaComponents;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use Livewire\Component;
 
@@ -35,6 +36,13 @@ class MediaLibrary extends Component implements HasForms
     public int $recordId;
 
     /**
+     * When the record has no displayable files, the payment view wants the
+     * whole card gone (a bare "нет файлов" panel reads as broken); the gallery
+     * tab keeps the empty-state message instead.
+     */
+    public bool $hideWhenEmpty = false;
+
+    /**
      * @var array<string, mixed>
      */
     public ?array $data = [];
@@ -43,8 +51,11 @@ class MediaLibrary extends Component implements HasForms
 
     public function mount(): void
     {
+        // Only feed the viewer files that actually exist on disk. Snapshot
+        // rebuilds restore file *paths* but not the uploads themselves, so a
+        // stale path would otherwise render as an empty, broken FilePond tile.
         $this->form->fill([
-            $this->field() => $this->record()->{$this->field()} ?? [],
+            $this->field() => $this->existingFiles(),
         ]);
     }
 
@@ -75,7 +86,23 @@ class MediaLibrary extends Component implements HasForms
 
     public function hasFiles(): bool
     {
-        return filled($this->record()->{$this->field()} ?? []);
+        return filled($this->existingFiles());
+    }
+
+    /**
+     * The record's stored paths, narrowed to files still present on the disk.
+     *
+     * @return list<string>
+     */
+    private function existingFiles(): array
+    {
+        $paths = (array) ($this->record()->{$this->field()} ?? []);
+
+        // Both variants store on the private 'local' disk.
+        return array_values(array_filter(
+            $paths,
+            fn ($path): bool => filled($path) && Storage::disk('local')->exists($path),
+        ));
     }
 
     public function render(): View

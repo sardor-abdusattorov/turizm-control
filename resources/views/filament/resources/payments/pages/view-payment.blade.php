@@ -62,8 +62,9 @@
         </div>
     </section>
 
-    {{-- PROOF FILES: native Filament FileUpload, in place --}}
-    @livewire(\App\Livewire\MediaLibrary::class, ['variant' => 'payment-screenshots', 'recordId' => $record->id], key('payment-proof-'.$record->id))
+    {{-- PROOF FILES: native Filament FileUpload, in place. Hidden entirely when
+         no proof file is present, so the view never shows an empty card. --}}
+    @livewire(\App\Livewire\MediaLibrary::class, ['variant' => 'payment-screenshots', 'recordId' => $record->id, 'hideWhenEmpty' => true], key('payment-proof-'.$record->id))
 </div>
 
 <style>
