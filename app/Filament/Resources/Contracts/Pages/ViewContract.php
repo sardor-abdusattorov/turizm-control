@@ -403,8 +403,8 @@ class ViewContract extends ViewRecord
 
     public function approverAvatar(ContractApprover $approver): string
     {
-        return $approver->user?->getFilamentAvatarUrl()
-            ?? 'https://ui-avatars.com/api/?name='.urlencode($approver->user?->name ?? '?').'&background=E0E7FF&color=4338CA&size=80';
+        return $approver->user?->avatarUrl()
+            ?? 'https://ui-avatars.com/api/?name=%3F&background=E0E7FF&color=4338CA&size=80';
     }
 
     /**

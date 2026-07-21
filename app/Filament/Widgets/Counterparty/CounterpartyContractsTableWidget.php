@@ -46,14 +46,12 @@ class CounterpartyContractsTableWidget extends TableWidget
                     ->badge()
                     ->color(fn (Contract $record): string => $record->contractType?->direction?->color() ?? 'gray')
                     ->placeholder(__('app.label.not_set'))
-                    ->visibleFrom('lg')
                     ->sortable(),
 
                 TextColumn::make('project.name')
                     ->label(__('app.label.project_single'))
                     ->placeholder(__('app.label.not_set'))
                     ->searchable()
-                    ->visibleFrom('md')
                     ->sortable(),
 
                 TextColumn::make('amount')

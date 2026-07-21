@@ -5,7 +5,11 @@
             <h2 class="ow-hd__t">{{ $this->headerTitle() }}</h2>
         </header>
         <div class="ml-body">
-            {{ $this->form }}
+            @if ($this->hasFiles())
+                {{ $this->form }}
+            @else
+                <p class="ml-empty">{{ __('app.message.no_files') }}</p>
+            @endif
         </div>
     </section>
 </div>

@@ -522,6 +522,29 @@ button.cw-row:focus-visible {
 .ml-body {
     padding: 1.1rem 1.25rem 1.25rem;
 }
+/* The media viewer is read-only (disabled FileUpload), so drop its "drag files
+   here" prompt — the grid of open/download tiles is all a view page needs. */
+.ml-body .filepond--drop-label {
+    display: none;
+}
+.ml-empty {
+    margin: 0;
+    padding: 1.5rem 0;
+    text-align: center;
+    color: var(--m2);
+    font-size: .85rem;
+}
+
+/* ─── Modals: full-width on phones ───────────────────────────────────────────
+   The fi-width-* classes cap the modal at a desktop max-width, which on a
+   narrow screen leaves it floating with side gaps while a wide table inside
+   still overflows. Below the tablet breakpoint force the window to fill the
+   viewport so the table scrolls inside a full-width sheet instead. */
+@media (max-width: 768px) {
+    .fi-modal-window {
+        min-width: 100%;
+    }
+}
 
 /* ─── Projects: hero, metric tiles, pill variants ───────────────────────────
    Mirrors the .pv-hero / .cw-stat look but lives in the global .pj block so

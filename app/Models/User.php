@@ -67,6 +67,17 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             : null;
     }
 
+    /**
+     * An avatar URL that always resolves — the uploaded photo when present,
+     * otherwise a generated initials avatar. Used wherever a name is shown
+     * alongside a face (approval chain, contract list).
+     */
+    public function avatarUrl(): string
+    {
+        return $this->getFilamentAvatarUrl()
+            ?? 'https://ui-avatars.com/api/?name='.urlencode($this->name ?? '?').'&background=E0E7FF&color=4338CA&size=80';
+    }
+
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);

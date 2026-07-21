@@ -17,7 +17,6 @@ use App\Models\Project;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
@@ -114,34 +113,25 @@ it('renders the gallery as a native Filament FileUpload on the view page', funct
         ->assertSeeLivewire(MediaLibrary::class);
 });
 
-it('uploads gallery files inline through the media library, appending to the set', function () {
-    Storage::disk('local')->put('uploads/images/projects/2025/01/old.jpg', 'stub');
+it('shows the gallery read-only on the view page and never mutates the record', function () {
+    Storage::disk('local')->put('uploads/images/projects/2025/01/a.jpg', 'stub');
 
     $project = Project::factory()->international()->create([
-        'gallery' => ['uploads/images/projects/2025/01/old.jpg'],
+        'gallery' => ['uploads/images/projects/2025/01/a.jpg'],
     ]);
 
     actingAs(userWithPermission('view_any_project', 'view_project', 'update_project'));
 
     Livewire::test(MediaLibrary::class, ['variant' => 'project-gallery', 'recordId' => $project->id])
-        ->assertSet('canEdit', true)
-        ->fillForm([
-            'gallery' => [
-                'uploads/images/projects/2025/01/old.jpg',
-                UploadedFile::fake()->image('new.jpg'),
-            ],
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors();
+        ->assertSuccessful();
 
-    $gallery = $project->fresh()->gallery;
-
-    // The old file survives and the new upload joins the set.
-    expect($gallery)->toHaveCount(2)
-        ->and($gallery)->toContain('uploads/images/projects/2025/01/old.jpg');
+    // The viewer is display-only: no save/persist path exists, so the gallery
+    // is untouched — editing lives on the Edit page's writable FileUpload.
+    expect(method_exists(MediaLibrary::class, 'save'))->toBeFalse()
+        ->and($project->fresh()->gallery)->toBe(['uploads/images/projects/2025/01/a.jpg']);
 });
 
-it('disables inline gallery editing for users without update_project', function () {
+it('shows the gallery read-only to viewers without update_project', function () {
     Storage::disk('local')->put('uploads/images/projects/2025/01/a.jpg', 'stub');
 
     $project = Project::factory()->international()->create([
@@ -151,11 +141,7 @@ it('disables inline gallery editing for users without update_project', function 
     actingAs(userWithPermission('view_any_project', 'view_project'));
 
     Livewire::test(MediaLibrary::class, ['variant' => 'project-gallery', 'recordId' => $project->id])
-        ->assertSet('canEdit', false)
-        // A save attempt from a viewer is a no-op — the set is untouched.
-        ->call('save');
-
-    expect($project->fresh()->gallery)->toBe(['uploads/images/projects/2025/01/a.jpg']);
+        ->assertSuccessful();
 });
 
 it('splits gallery urls into images and videos', function () {
@@ -175,19 +161,17 @@ it('splits gallery urls into images and videos', function () {
         ->and($project->galleryVideoUrls()[0])->toContain('b.mp4');
 });
 
-it('keeps video files through the inline media library', function () {
+it('renders a gallery video read-only in the media viewer', function () {
     Storage::disk('local')->put('uploads/images/projects/2025/01/clip.mp4', 'stub');
 
     $project = Project::factory()->international()->create([
         'gallery' => ['uploads/images/projects/2025/01/clip.mp4'],
     ]);
 
-    actingAs(userWithPermission('view_any_project', 'view_project', 'update_project'));
+    actingAs(userWithPermission('view_any_project', 'view_project'));
 
     Livewire::test(MediaLibrary::class, ['variant' => 'project-gallery', 'recordId' => $project->id])
-        ->fillForm(['gallery' => ['uploads/images/projects/2025/01/clip.mp4']])
-        ->call('save')
-        ->assertHasNoFormErrors();
+        ->assertSuccessful();
 
     expect($project->fresh()->gallery)->toBe(['uploads/images/projects/2025/01/clip.mp4']);
 });

@@ -48,17 +48,14 @@ class ContactBankAccountsTableWidget extends TableWidget
                     ->label(__('app.label.bank_name'))
                     ->wrap()
                     ->description(fn (BankAccount $record): ?string => $record->bank_address ?: null)
-                    ->visibleFrom('md')
                     ->placeholder(__('app.label.not_set')),
 
                 TextColumn::make('mfo')
                     ->label(__('app.label.mfo'))
-                    ->visibleFrom('lg')
                     ->placeholder(__('app.label.not_set')),
 
                 TextColumn::make('swift')
                     ->label(__('app.label.swift'))
-                    ->visibleFrom('lg')
                     ->placeholder(__('app.label.not_set')),
             ])
             ->paginated(false)

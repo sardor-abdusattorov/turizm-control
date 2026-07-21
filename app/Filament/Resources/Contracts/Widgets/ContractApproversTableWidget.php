@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Contracts\Widgets;
 use App\Enums\ContractApproverStatus;
 use App\Models\Contract;
 use App\Models\ContractApprover;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -38,6 +39,12 @@ class ContractApproversTableWidget extends TableWidget
                 ->with(['user.department', 'user.position'])
                 ->orderBy('id'))
             ->columns([
+                ImageColumn::make('avatar')
+                    ->label(__('app.label.photo'))
+                    ->state(fn (ContractApprover $record): ?string => $record->user?->avatarUrl())
+                    ->circular()
+                    ->size(38),
+
                 TextColumn::make('user.name')
                     ->label(__('app.label.approver'))
                     ->weight('semibold')
@@ -51,7 +58,6 @@ class ContractApproversTableWidget extends TableWidget
                     ->label(__('app.label.comment'))
                     ->placeholder(__('app.label.not_set'))
                     ->wrap()
-                    ->visibleFrom('lg')
                     // The system note ("cancelled — document was edited") rides
                     // under the human comment as a muted description.
                     ->description(fn (ContractApprover $record): ?string => $record->system_comment
@@ -73,13 +79,11 @@ class ContractApproversTableWidget extends TableWidget
                         : null)
                     ->badge(fn (ContractApprover $record): bool => $record->isOverdue())
                     ->color(fn (ContractApprover $record): string => $record->isOverdue() ? 'danger' : 'gray')
-                    ->visibleFrom('md')
                     ->placeholder(__('app.label.not_set')),
 
                 TextColumn::make('acted_at')
                     ->label(__('app.label.acted_at'))
                     ->dateTime('d.m.Y H:i')
-                    ->visibleFrom('md')
                     ->placeholder(__('app.label.not_set')),
             ])
             ->filters([

@@ -49,7 +49,7 @@ it('renders the payment view with the contract link and native proof-file upload
         ->assertSeeLivewire(MediaLibrary::class);
 });
 
-it('uploads payment proof inline through the media library, appending to the set', function () {
+it('shows payment proof read-only on the view page and never mutates the record', function () {
     $user = userWithPermission('view_any_payment', 'view_payment', 'update_payment', 'view_all_contracts');
     actingAs($user);
 
@@ -63,21 +63,10 @@ it('uploads payment proof inline through the media library, appending to the set
     ]);
 
     Livewire::test(MediaLibrary::class, ['variant' => 'payment-screenshots', 'recordId' => $payment->id])
-        ->assertSet('canEdit', true)
-        ->fillForm([
-            'screenshots' => [
-                'uploads/files/payments/proof.png',
-                UploadedFile::fake()->image('order.png'),
-            ],
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors();
+        ->assertSuccessful();
 
-    $screenshots = $payment->fresh()->screenshots;
-
-    // The existing proof survives and the fresh upload joins the set.
-    expect($screenshots)->toHaveCount(2)
-        ->and($screenshots)->toContain('uploads/files/payments/proof.png');
+    // Display-only: the proof set is untouched — editing lives on the Edit page.
+    expect($payment->fresh()->screenshots)->toBe(['uploads/files/payments/proof.png']);
 });
 
 it('forbids the create page for users without create_payment', function () {

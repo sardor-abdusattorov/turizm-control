@@ -21,6 +21,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
@@ -120,6 +121,13 @@ class ContractsTable
                     ->state(fn (Contract $record) => $record->currentApprover()?->due_at)
                     ->visible(fn (): bool => ContractWorkflow::approvalEnabled())
                     ->disabledClick(),
+
+                ImageColumn::make('responsible_avatar')
+                    ->label(__('app.label.photo'))
+                    ->state(fn (Contract $record): ?string => $record->responsible?->avatarUrl())
+                    ->circular()
+                    ->size(28)
+                    ->toggleable(),
 
                 TextColumn::make('responsible.name')
                     ->label(__('app.label.responsible'))
