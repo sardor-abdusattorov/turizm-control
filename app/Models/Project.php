@@ -62,16 +62,19 @@ class Project extends Model
     }
 
     /**
-     * The project the dashboard opens on before the user picks one: the
-     * nearest upcoming active project, falling back to the latest past one.
+     * The project the dashboard opens on before the user picks one: an
+     * international project first (nearest upcoming, else latest), since the
+     * dashboard leads with international exhibitions; only when none exist does
+     * it fall back to the latest active project of any type.
      */
     public static function dashboardDefault(): ?self
     {
-        return static::query()
+        $international = fn () => static::query()
             ->active()
-            ->whereDate('starts_on', '>=', today())
-            ->orderBy('starts_on')
-            ->first()
+            ->where('type', ProjectType::International->value);
+
+        return $international()->whereDate('starts_on', '>=', today())->orderBy('starts_on')->first()
+            ?? $international()->orderByDesc('starts_on')->first()
             ?? static::query()->active()->orderByDesc('starts_on')->first();
     }
 

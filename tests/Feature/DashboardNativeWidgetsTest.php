@@ -50,6 +50,13 @@ it('lands on the nearest upcoming project through the page filters', function ()
         ->assertSet('filters.type', Dashboard::ALL);
 });
 
+it('defaults the dashboard to an international project, even when an internal one is sooner', function () {
+    Project::factory()->internal()->create(['starts_on' => now()->addWeek(), 'status' => true]);
+    $international = Project::factory()->international()->create(['starts_on' => now()->subMonth(), 'status' => true]);
+
+    expect(Project::dashboardDefault()?->id)->toBe($international->id);
+});
+
 it('shows the picked project money in the two stat cards', function () {
     [$project, $viewer] = dashboardProject();
     actingAs($viewer);
