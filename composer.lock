@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "877fab1293124698204463dc89ff8c4c",
+    "content-hash": "bf7dd8d40dde1e41dcce6e95bc95fdad",
     "packages": [
         {
             "name": "abdulmajeed-jamaan/filament-translatable-tabs",
@@ -76,91 +76,6 @@
                 }
             ],
             "time": "2026-01-23T12:26:31+00:00"
-        },
-        {
-            "name": "al-saloul/filament-image-gallery",
-            "version": "v3.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/al-saloul/filament-image-gallery.git",
-                "reference": "68ed452b1a6fa1a943ba61292164441d09c62b3a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/al-saloul/filament-image-gallery/zipball/68ed452b1a6fa1a943ba61292164441d09c62b3a",
-                "reference": "68ed452b1a6fa1a943ba61292164441d09c62b3a",
-                "shasum": ""
-            },
-            "require": {
-                "filament/filament": "^3.0 || ^4.0 || ^5.0",
-                "filament/forms": "^3.0 || ^4.0 || ^5.0",
-                "filament/infolists": "^3.0 || ^4.0 || ^5.0",
-                "filament/tables": "^3.0 || ^4.0 || ^5.0",
-                "php": "^8.2",
-                "spatie/laravel-package-tools": "^1.15.0"
-            },
-            "require-dev": {
-                "laravel/pint": "^1.0",
-                "nunomaduro/collision": "^7.9 || ^8.0",
-                "orchestra/testbench": "^8.0 || ^9.0 || ^10.0",
-                "pestphp/pest": "^2.1 || ^3.0",
-                "pestphp/pest-plugin-arch": "^2.0 || ^3.0",
-                "pestphp/pest-plugin-laravel": "^2.0 || ^3.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Alsaloul\\ImageGallery\\ImageGalleryServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Alsaloul\\ImageGallery\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Mohammed Alsaloul",
-                    "email": "eng.alsaloul.mohammed@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A Filament plugin for displaying image galleries with zoom, rotate, and flip capabilities",
-            "homepage": "https://github.com/al-saloul/filament-image-gallery",
-            "keywords": [
-                "Viewer",
-                "al-saloul",
-                "filament",
-                "flip",
-                "flip-image",
-                "fullscreen-view",
-                "gallery-controls",
-                "image-gallery",
-                "image-navigation",
-                "image-preview",
-                "image-rotate",
-                "image-slider",
-                "image-viewer",
-                "laravel",
-                "lightbox",
-                "mirror-image",
-                "next-prev",
-                "photo-gallery",
-                "rotate",
-                "slideshow",
-                "zoom"
-            ],
-            "support": {
-                "issues": "https://github.com/al-saloul/filament-image-gallery/issues",
-                "source": "https://github.com/al-saloul/filament-image-gallery"
-            },
-            "time": "2026-01-20T21:36:59+00:00"
         },
         {
             "name": "anourvalar/eloquent-serialize",

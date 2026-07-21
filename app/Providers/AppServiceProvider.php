@@ -13,9 +13,6 @@ use BezhanSalleh\LanguageSwitch\Events\LocaleChanged;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
-use Filament\Support\Assets\Css;
-use Filament\Support\Assets\Js;
-use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Columns\Column;
 use Filament\Tables\Table;
@@ -184,14 +181,6 @@ class AppServiceProvider extends ServiceProvider
     private function configureFilament(): void
     {
         FilamentShield::prohibitDestructiveCommands($this->app->isProduction());
-
-        // Self-hosted Viewer.js for the image-gallery plugin: its loader only
-        // pulls from unpkg when window.Viewer is missing, so registering the
-        // vendored build keeps the gallery working on a closed network.
-        FilamentAsset::register([
-            Js::make('viewerjs', resource_path('js/vendor/viewerjs/viewer.min.js')),
-            Css::make('viewerjs', resource_path('js/vendor/viewerjs/viewer.min.css')),
-        ]);
 
         Column::configureUsing(fn (Column $column) => $column->toggleable());
 
