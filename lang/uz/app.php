@@ -779,6 +779,8 @@ return [
         'rejected' => 'Shartnoma rad etildi',
         'document_saved' => 'Hujjat yangilandi',
         'edit_invalidated' => 'Kelishuvlar tiklandi (hujjat o‘zgartirildi)',
+        'returned_to_work' => 'Ishga qaytarildi',
+        'approver_reassigned' => 'Kelishuvchi almashtirildi',
 
         // Faollik jurnali tahlili vidjetlari (filament-logger dashboard)
         'overview_heading' => 'Faollik sharhi',

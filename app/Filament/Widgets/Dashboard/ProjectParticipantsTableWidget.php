@@ -82,7 +82,7 @@ class ProjectParticipantsTableWidget extends TableWidget
 
                 TextColumn::make('paid_percent')
                     ->label(__('app.label.paid'))
-                    ->formatStateUsing(fn (?string $state): string => round((float) $state).'%')
+                    ->formatStateUsing(fn (?string $state): string => format_percent($state).'%')
                     ->alignEnd()
                     ->sortable(),
 

@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Rules\PaymentWithinRemaining;
 use App\Services\Contracts\ContractWorkflow;
 use App\Services\Payments\RecordPayment;
+use App\Support\Bytes;
 use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -344,9 +345,7 @@ class ViewContract extends ViewRecord
             return null;
         }
 
-        $bytes = Storage::disk('local')->size($this->record->documentPath());
-
-        return number_format($bytes / 1024, 1).' KB';
+        return Bytes::human(Storage::disk('local')->size($this->record->documentPath()));
     }
 
     public function pdfPreviewUrl(): ?string

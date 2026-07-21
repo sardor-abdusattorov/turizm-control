@@ -171,19 +171,16 @@
 /* Multi-line detail row (descriptions/addresses) — the value wraps instead of
    ellipsising, and the key top-aligns with it. Shared so any ow-/pv- view page
    can use it, not just the order page that first defined it inline. */
-.ow-row--wrap .ow-row__k,
-.pv-row--wrap .pv-row__k {
+.ow-row--wrap .ow-row__k {
     align-items: flex-start;
     padding-top: 1rem;
 }
-.ow-row--wrap .ow-row__v,
-.pv-row--wrap .pv-row__v {
+.ow-row--wrap .ow-row__v {
     align-items: flex-start;
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
-.ow-row__vl--wrap,
-.pv-row__vl--wrap {
+.ow-row__vl--wrap {
     white-space: normal;
     line-height: 1.55;
     overflow: visible;
@@ -227,81 +224,6 @@
     scrollbar-color: rgb(var(--primary-500)) transparent;
 }
 
-.fi-fo-rich-editor.fullscreen {
-    position: fixed !important;
-    inset: 0 !important;
-    z-index: 9999 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    background: white !important;
-    overflow: hidden !important;
-    border: none !important;
-    border-radius: 0 !important;
-}
-
-.fi-fo-rich-editor.fullscreen * {
-    max-height: none !important;
-}
-
-.fi-fo-rich-editor.fullscreen > *:not(.fi-fo-rich-editor-toolbar) {
-    flex: 1 1 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    min-height: 0 !important;
-    width: 100% !important;
-    overflow: hidden !important;
-}
-
-.fi-fo-rich-editor.fullscreen .fi-fo-rich-editor-toolbar {
-    flex: 0 0 auto !important;
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: white;
-    border-bottom: 1px solid rgb(229, 231, 235);
-    padding: 0.5rem 1rem;
-}
-
-.fi-fo-rich-editor.fullscreen .ProseMirror,
-.fi-fo-rich-editor.fullscreen [contenteditable="true"],
-.fi-fo-rich-editor.fullscreen .tiptap {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    height: 100% !important;
-    width: 100% !important;
-    overflow-y: auto !important;
-    padding: 2rem 3rem !important;
-    background: white !important;
-    border: none !important;
-    box-shadow: none !important;
-    margin: 0 !important;
-    max-width: none !important;
-}
-
-.dark .fi-fo-rich-editor.fullscreen,
-.dark .fi-fo-rich-editor.fullscreen .fi-fo-rich-editor-toolbar,
-.dark .fi-fo-rich-editor.fullscreen .ProseMirror,
-.dark .fi-fo-rich-editor.fullscreen [contenteditable="true"],
-.dark .fi-fo-rich-editor.fullscreen .tiptap {
-    background: rgb(24, 24, 27) !important;
-    color: rgb(244, 244, 245);
-}
-
-.dark .fi-fo-rich-editor.fullscreen .fi-fo-rich-editor-toolbar {
-    border-bottom-color: rgb(63, 63, 70);
-}
-.fi-fo-rich-editor.fullscreen .fi-fo-rich-editor-main{
-    max-width: 100%;
-}
-.fi-fo-rich-editor.fullscreen .fi-fo-rich-editor-content {
-    max-width: 100%;
-}
-.ck.ck-editor__editable_inline {
-    min-height: 400px;
-    height: auto;
-    max-height: none;
-}
-
 /* ─── Mobile: scroll the key/value detail table sideways ────────────────────
    On a phone the value column gets squeezed to an ellipsis. Instead of
    stacking, the detail table keeps its two columns and scrolls horizontally
@@ -331,8 +253,6 @@
 .cw-modal__x:focus-visible,
 .cf-btn:focus-visible,
 .ow-btn:focus-visible,
-.pv-btn:focus-visible,
-.tg-link__btn:focus-visible,
 .dh__tg-x:focus-visible {
     outline: 2px solid var(--accent, #2563eb);
     outline-offset: 2px;
@@ -421,21 +341,6 @@
 }
 .pj-wrap {
     white-space: normal;
-}
-/* Empty states share one calm voice: centred, muted, breathing room, and a
-   soft inner well so the emptiness reads as intentional, not broken. */
-.bkd-empty {
-    display: block;
-    padding: 2rem 1.25rem;
-    font-size: .85rem;
-    color: var(--m2);
-    text-align: center;
-}
-.bkd-empty {
-    background: var(--soft);
-    border: 1px dashed var(--d);
-    border-radius: .625rem;
-    margin: 0;
 }
 
 /* Keyboard focus on the custom interactive elements — the same visible ring

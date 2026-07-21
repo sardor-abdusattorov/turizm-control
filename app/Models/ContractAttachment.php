@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ContractAttachmentType;
+use App\Support\Bytes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -62,11 +63,7 @@ class ContractAttachment extends Model
 
     public function sizeLabel(): string
     {
-        $bytes = (int) $this->size;
-
-        return $bytes >= 1024 * 1024
-            ? number_format($bytes / 1024 / 1024, 2, '.', ' ').' MB'
-            : number_format(max($bytes, 0) / 1024, 1, '.', ' ').' KB';
+        return Bytes::human($this->size);
     }
 
     public function extension(): ?string

@@ -162,11 +162,10 @@ class ProjectsTable
                         fn (string $path): bool => ! Project::isVideoPath($path),
                     )))
                     ->disk('local')
-                    ->imageGallery()
                     ->imageHeight(36)
                     ->stacked()
                     ->limit(3)
-                    ->remainingTextBadge()
+                    ->limitedRemainingText()
                     ->toggleable(),
 
                 TextColumn::make('participants_sum_amount')

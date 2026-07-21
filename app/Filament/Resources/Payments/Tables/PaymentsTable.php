@@ -53,11 +53,11 @@ class PaymentsTable
 
                 TextColumn::make('percent')
                     ->label(__('app.label.percent'))
-                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 2, '.', ' ').'%')
+                    ->formatStateUsing(fn ($state): string => format_percent($state).'%')
                     ->summarize(
                         Sum::make()
                             ->label(__('app.label.total_paid'))
-                            ->formatStateUsing(fn ($state): string => number_format((float) $state, 2, '.', ' ').'%'),
+                            ->formatStateUsing(fn ($state): string => format_percent($state).'%'),
                     )
                     ->sortable(),
 

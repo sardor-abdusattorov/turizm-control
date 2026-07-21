@@ -64,7 +64,7 @@ class PaymentsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
             ++$this->rowNumber,
             $row->contract?->number,
             $row->contract?->title,
-            number_format((float) $row->percent, 2, '.', ' ').'%',
+            format_percent($row->percent).'%',
             $row->paid_at?->format('d.m.Y'),
             $row->contract?->payment_status?->label(),
             $row->creator?->name,

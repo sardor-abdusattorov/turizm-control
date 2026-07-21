@@ -784,6 +784,8 @@ return [
         'rejected' => 'Contract rejected',
         'document_saved' => 'Document updated',
         'edit_invalidated' => 'Approvals reset (document changed)',
+        'returned_to_work' => 'Returned to work',
+        'approver_reassigned' => 'Approver reassigned',
 
         // Activity-log analytics widgets (filament-logger dashboard)
         'overview_heading' => 'Activity Overview',

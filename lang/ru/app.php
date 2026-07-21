@@ -779,6 +779,8 @@ return [
         'rejected' => 'Договор отклонён',
         'document_saved' => 'Документ обновлён',
         'edit_invalidated' => 'Согласования сброшены (документ изменён)',
+        'returned_to_work' => 'Возвращён в работу',
+        'approver_reassigned' => 'Согласующий заменён',
 
         // Activity-log analytics widgets (filament-logger dashboard)
         'overview_heading' => 'Обзор активности',

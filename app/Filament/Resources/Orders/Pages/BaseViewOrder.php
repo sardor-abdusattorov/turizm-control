@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Pages;
 
+use App\Support\Bytes;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -53,9 +54,7 @@ abstract class BaseViewOrder extends ViewRecord
             return null;
         }
 
-        return $bytes >= 1024 * 1024
-            ? number_format($bytes / 1024 / 1024, 2, ',', ' ').' MB'
-            : number_format($bytes / 1024, 0, ',', ' ').' KB';
+        return Bytes::human($bytes);
     }
 
     public function fileInlineUrl(): ?string

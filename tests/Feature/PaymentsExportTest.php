@@ -49,7 +49,7 @@ it('exports the visible payments with sequential numbering and mapped columns', 
     expect($row[0])->toBe(1)                  // sequential №
         ->and($row[1])->toBe('DEMO-2026-001') // contract number
         ->and($row[2])->toBe('Office lease')  // contract title
-        ->and($row[3])->toBe('40.00%');       // formatted percent
+        ->and($row[3])->toBe('40%');           // formatted percent (canonical)
 });
 
 it('limits the payments export to what the user may see', function () {
