@@ -280,6 +280,15 @@
     vertical-align: middle;
 }
 
+/* Contracts list: the responsible person's name sat flush against the payment
+   pill in the next column — a long name left no visible gap between them.
+   A min-width plus trailing padding keeps the two columns clearly apart. */
+.contracts-col-responsible {
+    min-width: 13rem;
+    padding-right: 1.5rem;
+    vertical-align: middle;
+}
+
 /* A record action that is rendered but opened only from JS (the approval-flow
    modal is mounted via mountTableAction in the approvers column), so its
    auto-rendered button stays hidden. */

@@ -117,6 +117,8 @@ class ContractsTable
                         'sub' => null,
                     ])
                     ->view('filament.tables.columns.person')
+                    ->extraHeaderAttributes(['class' => 'contracts-col-responsible'])
+                    ->extraCellAttributes(['class' => 'contracts-col-responsible'])
                     ->toggleable(),
 
                 ViewColumn::make('payment_status')
