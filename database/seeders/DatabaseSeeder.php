@@ -33,6 +33,9 @@ class DatabaseSeeder extends Seeder
             Exhibitions2025Seeder::class,
             InternationalProjects2026Seeder::class,
             LocalEvents2026Seeder::class,
+            // The press / blogger / info-tour registry — a separate programme
+            // from the exhibitions, resting on its own buyruq (№ 49-АФ).
+            PressTours2026Seeder::class,
             // Replays database/seeders/data/contracts-snapshot.json (written
             // by `php artisan contracts:snapshot` BEFORE a rebuild) so the
             // hand-entered contracts survive migrate:fresh verbatim. A no-op

@@ -18,10 +18,13 @@ it('seeds only the project registries — no contracts or orders', function () {
 
     $this->seed(DatabaseSeeder::class);
 
-    // The main seeder is deliberately lean now: reference data, accounts and
-    // the projects. Contracts, orders and counterparties are entered by hand.
+    // The main seeder is deliberately lean: reference data, accounts and the
+    // registries. Contracts and counterparties are entered by hand. The sole
+    // seeded buyruq is the one the press-tour registry rests on — its tours
+    // cite приказ № 49-АФ, so the basis has to exist for them to point at.
     expect(Contract::count())->toBe(0)
-        ->and(Order::count())->toBe(0);
+        ->and(Order::count())->toBe(1)
+        ->and(Order::query()->value('number'))->toBe('49-AF');
 
     // 16 international exhibitions (2025) + 14 (2026) + 5 local events.
     expect(Project::query()->where('type', ProjectType::International->value)->count())->toBe(30)
