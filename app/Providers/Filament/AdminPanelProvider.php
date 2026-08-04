@@ -5,9 +5,6 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ProfileSettings;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
-use App\Filament\Widgets\Dashboard\ProjectContractsTableWidget;
-use App\Filament\Widgets\Dashboard\ProjectOverviewWidget;
-use App\Filament\Widgets\Dashboard\ProjectStatsWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
@@ -73,6 +70,11 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label(fn () => __('app.label.projects')),
 
+                // Counterparties and sponsors are day-to-day records, not
+                // reference data, so they get their own group above «Ресурсы».
+                NavigationGroup::make()
+                    ->label(fn () => __('app.label.contacts')),
+
                 // Daily-work groups above stay open; the reference registry
                 // and admin sections start collapsed to keep the sidebar short.
                 NavigationGroup::make()
@@ -94,13 +96,11 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
-                // The dashboard is a stock Filament stack: the greeting
-                // card, the picked project's stats, and two native tables —
-                // all driven by the page FilterAction (type / year / project).
+                // The dashboard is intentionally down to the greeting card
+                // alone while its contents are being reconsidered. The project
+                // widgets (overview / stats / contracts table) still exist and
+                // keep their tests; they are simply not registered here.
                 DashboardHeaderWidget::class,
-                ProjectOverviewWidget::class,
-                ProjectStatsWidget::class,
-                ProjectContractsTableWidget::class,
             ])
             ->resources([
 

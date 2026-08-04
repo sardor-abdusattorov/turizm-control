@@ -23,7 +23,7 @@ class SponsorResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('app.label.resources');
+        return __('app.label.contacts');
     }
 
     public static function getModelLabel(): string

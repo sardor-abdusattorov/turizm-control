@@ -66,6 +66,8 @@ class UserForm
 
                 Section::make(__('app.label.security'))
                     ->schema([
+                        // Passwords are write-only: on the read-only view page
+                        // they would render as two empty disabled boxes.
                         TextInput::make('password')
                             ->label(__('app.label.password'))
                             ->password()
@@ -73,12 +75,14 @@ class UserForm
                             ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                             ->dehydrated(fn ($state) => filled($state))
                             ->required(fn (string $context): bool => $context === 'create')
+                            ->visible(fn (string $context): bool => $context !== 'view')
                             ->maxLength(255),
 
                         TextInput::make('password_confirmation')
                             ->label(__('app.label.password_confirmation'))
                             ->password()
                             ->required(fn (string $context): bool => $context === 'create')
+                            ->visible(fn (string $context): bool => $context !== 'view')
                             ->dehydrated(false),
 
                         Select::make('roles')
