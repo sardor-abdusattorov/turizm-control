@@ -30,6 +30,9 @@ class PaymentsTable
     public static function configure(Table $table): Table
     {
         return $table
+            // Eager-load the relation columns; without it every row on the
+            // page fires its own query for them.
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['contract', 'creator']))
             ->defaultSort('paid_at', 'desc')
             ->groups([
                 Group::make('contract.number')

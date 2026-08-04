@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Enums\PressTourDirection;
 use App\Enums\PressTourState;
 use App\Models\Concerns\HasActiveStatus;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -71,16 +70,6 @@ class PressTour extends Model
     public function attachments(): HasMany
     {
         return $this->hasMany(PressTourAttachment::class)->orderBy('sort')->orderBy('id');
-    }
-
-    public function scopeDirection(Builder $query, PressTourDirection $direction): Builder
-    {
-        return $query->where('direction', $direction->value);
-    }
-
-    public function scopeHeld(Builder $query): Builder
-    {
-        return $query->where('state', PressTourState::Held->value);
     }
 
     public function isHeld(): bool

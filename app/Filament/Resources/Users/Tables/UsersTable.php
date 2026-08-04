@@ -14,6 +14,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Models\Role;
 
 class UsersTable
@@ -21,6 +22,9 @@ class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
+            // Eager-load the relation columns; without it every row on the
+            // page fires its own query for them.
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['department', 'position']))
             ->columns([
                 ImageColumn::make('avatar_url')
                     ->label(__('app.label.profile_image'))

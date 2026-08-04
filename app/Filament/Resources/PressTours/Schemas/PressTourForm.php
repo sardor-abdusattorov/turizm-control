@@ -8,7 +8,6 @@ use App\Models\Order;
 use App\Models\PressTour;
 use Closure;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -146,34 +145,11 @@ class PressTourForm
                     ])
                     ->columns(1),
 
-                // The report pack. Managed here on the form — create and edit
-                // — never on the view page, the same rule the contract dossier
-                // follows.
-                Section::make(__('app.label.press_tour_documents'))
-                    ->schema([
-                        FileUpload::make('document_files')
-                            ->label(__('app.label.press_tour_documents'))
-                            ->helperText(__('app.helper.press_tour_documents'))
-                            ->multiple()
-                            ->disk('local')
-                            ->directory(fn (): string => 'uploads/files/press-tours/'.now()->format('Y/m'))
-                            ->visibility('private')
-                            ->acceptedFileTypes([
-                                'application/pdf',
-                                'image/jpeg',
-                                'image/png',
-                                'application/msword',
-                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                'application/vnd.ms-excel',
-                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                            ])
-                            ->maxSize(25600)
-                            ->storeFileNamesIn('document_names')
-                            ->downloadable()
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(1),
-
+                // The report pack is NOT edited here. A tour is created as a
+                // plan months before it runs, and its documents arrive after —
+                // so they are filed on the view page's Documents tab, where
+                // each one is typed (отчёт / публикации / фото …). Keeping a
+                // second uploader here produced untyped duplicates.
                 Section::make(__('app.label.general_information'))
                     ->schema([
                         Textarea::make('notes')

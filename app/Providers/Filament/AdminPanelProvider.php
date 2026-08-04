@@ -52,9 +52,6 @@ class AdminPanelProvider extends PanelProvider
                 '*/editor',
                 '*/editor?*',
             ])
-            ->navigationItems([
-
-            ])
             ->userMenuItems([
                 'profile' => Action::make('profile')
                     ->label(fn () => __('app.label.profile_settings'))
@@ -101,9 +98,6 @@ class AdminPanelProvider extends PanelProvider
                 // widgets (overview / stats / contracts table) still exist and
                 // keep their tests; they are simply not registered here.
                 DashboardHeaderWidget::class,
-            ])
-            ->resources([
-
             ])
             ->plugins([
 

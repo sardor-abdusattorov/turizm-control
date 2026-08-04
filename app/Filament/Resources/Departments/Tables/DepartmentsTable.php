@@ -13,12 +13,16 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class DepartmentsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            // Eager-load the relation columns; without it every row on the
+            // page fires its own query for them.
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['head', 'positions']))
             ->columns([
                 TextColumn::make('name')
                     ->label(__('app.label.department_name'))

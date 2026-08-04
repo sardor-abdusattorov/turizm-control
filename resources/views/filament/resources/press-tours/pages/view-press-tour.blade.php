@@ -61,7 +61,7 @@
              x-transition:enter-start="opacity-0 -translate-y-1"
              x-transition:enter-end="opacity-100 translate-y-0">
 
-            @if ($record->isHeld() && $documentCount === 0)
+            @if ($record->awaitsDocuments())
                 {{-- The tour has run but nothing has been filed — the one thing
                      the programme still owes. --}}
                 <div class="ow-alert">
