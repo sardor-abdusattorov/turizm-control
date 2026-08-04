@@ -278,6 +278,9 @@ return [
         // Export gates for the projects registry and the sponsors list.
         'export_project',
         'export_sponsor',
+
+        // The press-tour registry is handed upward once the tours have run.
+        'export_press_tour',
     ],
 
     /*

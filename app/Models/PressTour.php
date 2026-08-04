@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use App\Enums\PressTourDirection;
+use App\Enums\PressTourState;
 use App\Models\Concerns\HasActiveStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * A press, blogger or info tour from the «Список пресс, блогер и инфо-туров»
@@ -32,6 +34,8 @@ class PressTour extends Model
         'responsible',
         'curator',
         'foreign_partner',
+        'state',
+        'held_on',
         'order_id',
         'notes',
         'status',
@@ -40,6 +44,8 @@ class PressTour extends Model
 
     protected $casts = [
         'direction' => PressTourDirection::class,
+        'state' => PressTourState::class,
+        'held_on' => 'date',
         'starts_month' => 'integer',
         'people_count' => 'integer',
         'status' => 'boolean',
@@ -59,9 +65,37 @@ class PressTour extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /**
+     * What the tour left behind — report, media coverage, photos, acts.
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(PressTourAttachment::class)->orderBy('sort')->orderBy('id');
+    }
+
     public function scopeDirection(Builder $query, PressTourDirection $direction): Builder
     {
         return $query->where('direction', $direction->value);
+    }
+
+    public function scopeHeld(Builder $query): Builder
+    {
+        return $query->where('state', PressTourState::Held->value);
+    }
+
+    public function isHeld(): bool
+    {
+        return $this->state === PressTourState::Held;
+    }
+
+    /**
+     * A tour that has happened but has nothing filed against it — the report
+     * pack is what the programme owes once the trip is over, so the list
+     * flags these rather than letting them go quiet.
+     */
+    public function awaitsDocuments(): bool
+    {
+        return $this->isHeld() && $this->attachments()->count() === 0;
     }
 
     /**

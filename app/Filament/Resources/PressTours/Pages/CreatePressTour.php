@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\PressTours\Pages;
 
+use App\Filament\Resources\PressTours\Pages\Concerns\HandlesTourDocuments;
 use App\Filament\Resources\PressTours\PressTourResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePressTour extends CreateRecord
 {
+    use HandlesTourDocuments;
+
     protected static string $resource = PressTourResource::class;
 
     /**
@@ -17,7 +20,12 @@ class CreatePressTour extends CreateRecord
     {
         $data['created_by'] ??= auth()->id();
 
-        return $data;
+        return $this->extractDocumentUploads($data);
+    }
+
+    protected function afterCreate(): void
+    {
+        $this->storeTourDocuments();
     }
 
     protected function getRedirectUrl(): string

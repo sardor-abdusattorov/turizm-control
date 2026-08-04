@@ -32,6 +32,10 @@ return new class extends Migration
             $table->string('responsible')->nullable();
             $table->string('curator')->nullable();
             $table->string('foreign_partner')->nullable();
+            // The registry is written a year ahead, so a tour is a plan first
+            // and a fact later; the report documents are due once it is held.
+            $table->string('state', 20)->default('planned');
+            $table->date('held_on')->nullable();
             // The buyruq the tour rests on — the 2026 domestic tours all cite
             // приказ № 49-АФ, mirroring how a project names its basis.
             $table->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
@@ -41,6 +45,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('direction');
+            $table->index('state');
             $table->index('status');
             $table->index('starts_month');
         });

@@ -1,12 +1,14 @@
 <?php
 
 use App\Enums\PressTourDirection;
+use App\Enums\PressTourState;
 use App\Filament\Resources\PressTours\Pages\CreatePressTour;
 use App\Filament\Resources\PressTours\Pages\EditPressTour;
 use App\Filament\Resources\PressTours\Pages\ListPressTours;
 use App\Filament\Resources\PressTours\Pages\ViewPressTour;
 use App\Filament\Resources\PressTours\PressTourResource;
 use App\Models\PressTour;
+use App\Models\PressTourAttachment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -142,4 +144,80 @@ it('keeps the registry away from a user without the permission', function () {
     actingAs(User::factory()->create(['status' => User::STATUS_ACTIVE]));
 
     expect(PressTourResource::canViewAny())->toBeFalse();
+});
+
+it('marks a tour as held with its actual date', function () {
+    actingAs(userWithPermission('view_any_press_tour', 'view_press_tour', 'update_press_tour'));
+
+    $tour = PressTour::factory()->create();
+    expect($tour->state)->toBe(PressTourState::Planned)
+        ->and($tour->isHeld())->toBeFalse();
+
+    Livewire::test(EditPressTour::class, ['record' => $tour->id])
+        ->fillForm([
+            'state' => PressTourState::Held->value,
+            'held_on' => '2026-08-20',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($tour->refresh()->isHeld())->toBeTrue()
+        ->and($tour->held_on->toDateString())->toBe('2026-08-20');
+});
+
+it('demands the actual date once a tour is marked held', function () {
+    actingAs(userWithPermission('view_any_press_tour', 'view_press_tour', 'update_press_tour'));
+
+    $tour = PressTour::factory()->create();
+
+    Livewire::test(EditPressTour::class, ['record' => $tour->id])
+        ->fillForm([
+            'state' => PressTourState::Held->value,
+            'held_on' => null,
+        ])
+        ->call('save')
+        ->assertHasFormErrors(['held_on' => 'required']);
+});
+
+it('flags a held tour that still owes its report pack', function () {
+    $held = PressTour::factory()->held()->create();
+    $documented = PressTour::factory()->held()->create();
+    PressTourAttachment::factory()->for($documented, 'pressTour')->create();
+    $planned = PressTour::factory()->create();
+
+    expect($held->awaitsDocuments())->toBeTrue()
+        ->and($documented->awaitsDocuments())->toBeFalse()
+        // A tour that has not happened yet owes nothing.
+        ->and($planned->awaitsDocuments())->toBeFalse();
+});
+
+it('filters the list down to held tours missing their documents', function () {
+    actingAs(userWithPermission('view_any_press_tour', 'view_press_tour'));
+
+    $awaiting = PressTour::factory()->held()->create();
+    $documented = PressTour::factory()->held()->create();
+    PressTourAttachment::factory()->for($documented, 'pressTour')->create();
+    $planned = PressTour::factory()->create();
+
+    Livewire::test(ListPressTours::class)
+        ->filterTable('awaiting_documents')
+        ->assertCanSeeTableRecords([$awaiting])
+        ->assertCanNotSeeTableRecords([$documented, $planned]);
+});
+
+it('drops the report pack when the tour is deleted', function () {
+    $tour = PressTour::factory()->held()->create();
+    PressTourAttachment::factory()->for($tour, 'pressTour')->create();
+
+    $tour->delete();
+
+    expect(PressTourAttachment::where('press_tour_id', $tour->id)->count())->toBe(0);
+});
+
+it('offers the export only to a user holding the export permission', function () {
+    actingAs(userWithPermission('view_any_press_tour', 'view_press_tour'));
+    Livewire::test(ListPressTours::class)->assertActionHidden('exportXlsx');
+
+    actingAs(userWithPermission('view_any_press_tour', 'view_press_tour', 'export_press_tour'));
+    Livewire::test(ListPressTours::class)->assertActionVisible('exportXlsx');
 });

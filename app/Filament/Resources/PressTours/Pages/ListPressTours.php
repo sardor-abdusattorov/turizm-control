@@ -3,12 +3,16 @@
 namespace App\Filament\Resources\PressTours\Pages;
 
 use App\Enums\PressTourDirection;
+use App\Exports\PressToursExport;
 use App\Filament\Resources\PressTours\PressTourResource;
+use App\Filament\Support\ExportPermission;
+use App\Filament\Support\ExportXlsxAction;
 use App\Models\PressTour;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListPressTours extends ListRecords
 {
@@ -17,6 +21,14 @@ class ListPressTours extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            // The sheet handed upward once the tours have run; it exports
+            // whatever the table currently shows, filters and tab included.
+            ExportXlsxAction::make()
+                ->visible(fn (): bool => ExportPermission::allows('export_press_tour'))
+                ->action(fn ($livewire) => Excel::download(
+                    new PressToursExport($livewire->getFilteredTableQuery()),
+                    'press-tours-'.now()->format('Y-m-d').'.xlsx',
+                )),
             CreateAction::make(),
         ];
     }

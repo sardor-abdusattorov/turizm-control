@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\PressTourDirection;
+use App\Enums\PressTourState;
 use App\Models\PressTour;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -31,9 +32,24 @@ class PressTourFactory extends Factory
             'responsible' => fake()->name(),
             'curator' => null,
             'foreign_partner' => null,
+            'state' => PressTourState::Planned->value,
+            'held_on' => null,
             'notes' => null,
             'status' => true,
         ];
+    }
+
+    public function held(): static
+    {
+        return $this->state(fn (): array => [
+            'state' => PressTourState::Held->value,
+            'held_on' => now()->subWeek()->toDateString(),
+        ]);
+    }
+
+    public function cancelled(): static
+    {
+        return $this->state(fn (): array => ['state' => PressTourState::Cancelled->value]);
     }
 
     public function inbound(): static

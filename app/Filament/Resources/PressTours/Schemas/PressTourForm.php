@@ -3,15 +3,19 @@
 namespace App\Filament\Resources\PressTours\Schemas;
 
 use App\Enums\PressTourDirection;
+use App\Enums\PressTourState;
 use App\Models\Order;
 use App\Models\PressTour;
 use Closure;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class PressTourForm
@@ -115,6 +119,57 @@ class PressTourForm
                         TextInput::make('foreign_partner')
                             ->label(__('app.label.press_tour_foreign_partner'))
                             ->maxLength(255)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(1),
+
+                // Plan → fact. The registry is drawn up a year ahead, so the
+                // actual date only exists once the tour has been held.
+                Section::make(__('app.label.press_tour_progress'))
+                    ->schema([
+                        Grid::make(2)->schema([
+                            Select::make('state')
+                                ->label(__('app.label.press_tour_state'))
+                                ->options(PressTourState::options())
+                                ->default(PressTourState::Planned->value)
+                                ->selectablePlaceholder(false)
+                                ->required()
+                                ->live(),
+
+                            DatePicker::make('held_on')
+                                ->label(__('app.label.press_tour_held_on'))
+                                ->native(false)
+                                ->displayFormat('d.m.Y')
+                                ->visible(fn (Get $get): bool => $get('state') === PressTourState::Held->value)
+                                ->required(fn (Get $get): bool => $get('state') === PressTourState::Held->value),
+                        ]),
+                    ])
+                    ->columns(1),
+
+                // The report pack. Managed here on the form — create and edit
+                // — never on the view page, the same rule the contract dossier
+                // follows.
+                Section::make(__('app.label.press_tour_documents'))
+                    ->schema([
+                        FileUpload::make('document_files')
+                            ->label(__('app.label.press_tour_documents'))
+                            ->helperText(__('app.helper.press_tour_documents'))
+                            ->multiple()
+                            ->disk('local')
+                            ->directory(fn (): string => 'uploads/files/press-tours/'.now()->format('Y/m'))
+                            ->visibility('private')
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'image/jpeg',
+                                'image/png',
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                'application/vnd.ms-excel',
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            ])
+                            ->maxSize(25600)
+                            ->storeFileNamesIn('document_names')
+                            ->downloadable()
                             ->columnSpanFull(),
                     ])
                     ->columns(1),
