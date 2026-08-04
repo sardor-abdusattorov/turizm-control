@@ -280,6 +280,29 @@
     vertical-align: middle;
 }
 
+/* A quiet warning strip above a view page's cards — used where a record is in
+   a state that still owes something (a held press tour with no report filed). */
+.ow-alert {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: 1rem;
+    padding: .75rem 1rem;
+    border-radius: .6rem;
+    background: rgba(251, 146, 60, .10);
+    border: 1px solid rgba(251, 146, 60, .32);
+    color: #c2410c;
+    font-size: .8125rem;
+    font-weight: 550;
+}
+.ow-alert__ic {
+    display: inline-flex;
+    flex-shrink: 0;
+}
+.dark .ow-alert {
+    color: #fdba74;
+}
+
 /* Contracts list: the responsible person's name sat flush against the payment
    pill in the next column — a long name left no visible gap between them.
    A min-width plus trailing padding keeps the two columns clearly apart. */

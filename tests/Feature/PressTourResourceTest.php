@@ -7,6 +7,7 @@ use App\Filament\Resources\PressTours\Pages\EditPressTour;
 use App\Filament\Resources\PressTours\Pages\ListPressTours;
 use App\Filament\Resources\PressTours\Pages\ViewPressTour;
 use App\Filament\Resources\PressTours\PressTourResource;
+use App\Filament\Resources\PressTours\Widgets\PressTourDocumentsTableWidget;
 use App\Models\PressTour;
 use App\Models\PressTourAttachment;
 use App\Models\User;
@@ -220,4 +221,36 @@ it('offers the export only to a user holding the export permission', function ()
 
     actingAs(userWithPermission('view_any_press_tour', 'view_press_tour', 'export_press_tour'));
     Livewire::test(ListPressTours::class)->assertActionVisible('exportXlsx');
+});
+
+it('reads a tour on a designed page, not a disabled form', function () {
+    actingAs(userWithPermission('view_any_press_tour', 'view_press_tour'));
+
+    $tour = PressTour::factory()->held()->create([
+        'name' => 'Праздник дыни',
+        'place' => 'Хорезм',
+        'responsible' => 'Хаёт Хамраев',
+    ]);
+
+    Livewire::test(ViewPressTour::class, ['record' => $tour->id])
+        ->assertSuccessful()
+        // The facts card and the report-pack table live under native tabs.
+        ->assertSee('Хорезм')
+        ->assertSee('Хаёт Хамраев')
+        ->assertSeeLivewire(PressTourDocumentsTableWidget::class)
+        // A held tour with nothing filed says so out loud.
+        ->assertSee(__('app.message.press_tour_documents_pending'));
+});
+
+it('lists the report pack in the documents table widget', function () {
+    actingAs(userWithPermission('view_any_press_tour', 'view_press_tour'));
+
+    $tour = PressTour::factory()->held()->create();
+    $document = PressTourAttachment::factory()->for($tour, 'pressTour')->create([
+        'original_name' => 'Отчёт о пресс-туре.pdf',
+    ]);
+
+    Livewire::test(PressTourDocumentsTableWidget::class, ['pressTourId' => $tour->id])
+        ->assertCanSeeTableRecords([$document])
+        ->assertSee('Отчёт о пресс-туре.pdf');
 });
