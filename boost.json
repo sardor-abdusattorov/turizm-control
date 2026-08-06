@@ -7,13 +7,15 @@
     "mcp": true,
     "nightwatch": false,
     "packages": [
-        "filament/filament"
+        "filament/filament",
+        "spatie/laravel-translatable"
     ],
     "sail": false,
     "skills": [
         "laravel-best-practices",
         "pest-testing",
         "echo-development",
-        "tailwindcss-development"
+        "tailwindcss-development",
+        "translatable-development"
     ]
 }

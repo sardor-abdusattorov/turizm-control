@@ -68,13 +68,16 @@ class ProjectsTable
                     ->label(__('app.label.project_name'))
                     ->weight('semibold')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->extraCellAttributes(['style' => 'min-width: 22rem'])
+                    ->wrap()
+                    ->lineClamp(10)
+                    ->tooltip(fn (Project $record): ?string => $record->name),
 
                 TextColumn::make('venue')
                     ->label(__('app.label.venue'))
                     ->searchable()
                     ->sortable()
-                    ->limit(24)
                     ->placeholder(__('app.label.not_set'))
                     ->toggleable(),
 

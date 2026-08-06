@@ -25,8 +25,6 @@ class PressToursTable
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('order'))
-            // The registry reads chronologically, and a tour's month is the
-            // only orderable part of its free-text period.
             ->defaultSort('starts_month')
             ->columns([
                 TextColumn::make('direction')
@@ -41,7 +39,11 @@ class PressToursTable
                     ->weight('semibold')
                     ->wrap()
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->extraCellAttributes(['style' => 'min-width: 22rem'])
+                    ->wrap()
+                    ->lineClamp(10)
+                    ->tooltip(fn (PressTour $record): ?string => $record->name),
 
                 TextColumn::make('place')
                     ->label(__('app.label.press_tour_place'))
@@ -54,8 +56,6 @@ class PressToursTable
                     ->placeholder(__('app.label.not_set'))
                     ->sortable('starts_month'),
 
-                // «6+11» and «n/a» both live here, so the column prints what
-                // the registry meant rather than a bare number.
                 TextColumn::make('people_count')
                     ->label(__('app.label.press_tour_people'))
                     ->state(fn (PressTour $record): string => $record->peopleLabel())
@@ -64,9 +64,13 @@ class PressToursTable
 
                 TextColumn::make('responsible')
                     ->label(__('app.label.responsible'))
-                    ->state(fn (PressTour $record): string => implode(' · ', $record->responsibleNames()) ?: __('app.label.not_set'))
-                    ->wrap()
+                    ->state(fn (PressTour $record): string => implode(' · ', $record->responsibleNames()))
+                    ->placeholder(__('app.label.not_set'))
                     ->searchable()
+                    ->extraCellAttributes(['style' => 'min-width: 15rem'])
+                    ->wrap()
+                    ->lineClamp(10)
+                    ->tooltip(fn ($state): ?string => $state ?: null)
                     ->toggleable(),
 
                 TextColumn::make('foreign_partner')

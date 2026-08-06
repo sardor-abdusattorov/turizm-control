@@ -70,7 +70,7 @@ class ContractsTable
                     ->sortable()
                     ->extraCellAttributes(['style' => 'min-width: 22rem'])
                     ->wrap()
-                    ->lineClamp(2)
+                    ->lineClamp(10)
                     ->tooltip(fn (Contract $record): ?string => $record->title),
 
                 TextColumn::make('contact.name')
@@ -79,7 +79,6 @@ class ContractsTable
                     ->placeholder(__('app.label.not_set'))
                     ->searchable()
                     ->sortable()
-                    ->limit(40)
                     ->toggleable(),
 
                 TextColumn::make('project.name')
