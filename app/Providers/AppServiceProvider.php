@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends ServiceProvider
@@ -131,6 +132,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDB();
         $this->configureModels();
+        $this->configureShieldPermissionKeys();
         $this->configureFilament();
         $this->configureLimit();
         $this->configureLanguageSwitch();
@@ -176,6 +178,26 @@ class AppServiceProvider extends ServiceProvider
         Model::preventAccessingMissingAttributes();
 
         Model::unguard();
+    }
+
+    /**
+     * Keep permission keys spelled `view_any_press_tour`.
+     *
+     * Shield 4.3 rejects `separator: _` with `case: snake` — on its own it can
+     * no longer tell where the affix ends and the subject begins. Our keys are
+     * written that way in every policy, seeder, test and role row, so instead
+     * of renaming them we take over the composition: the affix and the subject
+     * are snake-cased and joined by an underscore, exactly as Shield did
+     * before. Custom keys (`export_contract`) are already final and pass
+     * through untouched.
+     */
+    private function configureShieldPermissionKeys(): void
+    {
+        FilamentShield::buildPermissionKeyUsing(
+            fn (?string $affix, string $subject): string => $affix === null
+                ? $subject
+                : Str::snake($affix).'_'.Str::snake($subject),
+        );
     }
 
     private function configureFilament(): void

@@ -104,8 +104,18 @@ return [
     |
     */
 
+    /*
+     | Shield 4.3 refuses `separator: _` together with `case: snake`, because
+     | on its own it can no longer tell where the affix ends and the subject
+     | begins. Our permissions are named `view_any_press_tour` and are baked
+     | into every policy, seeder and role row in the database, so the names
+     | must not change. AppServiceProvider::configureShieldPermissionKeys()
+     | therefore builds every key itself and always returns a value — the
+     | separator below only has to pass Shield's validation; it is never used
+     | to assemble a key.
+     */
     'permissions' => [
-        'separator' => '_',
+        'separator' => '.',
         'case' => 'snake',
         'generate' => true,
     ],
