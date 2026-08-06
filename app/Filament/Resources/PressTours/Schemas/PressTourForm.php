@@ -13,7 +13,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
@@ -32,137 +32,142 @@ class PressTourForm
     public static function configure(Schema $schema): Schema
     {
         return $schema
+            // One column at the top level: stacked side-by-side sections tiled
+            // as a ragged two-column masonry, leaving half the page empty.
+            ->columns(1)
             ->components([
-                Section::make(__('app.label.basic_information'))
+                Tabs::make('press_tour')
+                    ->columnSpanFull()
                     ->schema([
-                        Select::make('direction')
-                            ->label(__('app.label.press_tour_direction'))
-                            ->options(PressTourDirection::options())
-                            ->default(PressTourDirection::Local->value)
-                            ->selectablePlaceholder(false)
-                            ->required()
-                            ->columnSpanFull(),
+                        Tabs\Tab::make(__('app.label.basic_information'))
+                            ->icon('heroicon-o-information-circle')
+                            ->schema([
+                                Select::make('direction')
+                                    ->label(__('app.label.press_tour_direction'))
+                                    ->options(PressTourDirection::options())
+                                    ->default(PressTourDirection::Local->value)
+                                    ->selectablePlaceholder(false)
+                                    ->required()
+                                    ->columnSpanFull(),
 
-                        TextInput::make('name')
-                            ->label(__('app.label.press_tour_name'))
-                            ->required()
-                            ->maxLength(255)
-                            ->columnSpanFull(),
+                                TextInput::make('name')
+                                    ->label(__('app.label.press_tour_name'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
 
-                        Grid::make(2)->schema([
-                            // Domestic tours name a region here, foreign ones
-                            // a country — one field covers both.
-                            TextInput::make('place')
-                                ->label(__('app.label.press_tour_place'))
-                                ->placeholder(self::hintUnlessViewing('Самарканд'))
-                                ->maxLength(255),
+                                Grid::make(['default' => 1, 'md' => 2])
+                                    ->schema([
+                                        // Domestic tours name a region here,
+                                        // foreign ones a country.
+                                        TextInput::make('place')
+                                            ->label(__('app.label.press_tour_place'))
+                                            ->placeholder(self::hintUnlessViewing('Самарканд'))
+                                            ->maxLength(255),
 
-                            // The buyruq the tour rests on — the domestic
-                            // programme all sits under приказ № 49-АФ.
-                            Select::make('order_id')
-                                ->label(__('app.label.order_basis'))
-                                ->options(fn (): array => Order::basisOptions())
-                                ->searchable()
-                                ->preload(),
-                        ]),
-                    ])
-                    ->columns(1),
+                                        // The buyruq the tour rests on — the
+                                        // domestic programme sits under № 49-АФ.
+                                        Select::make('order_id')
+                                            ->label(__('app.label.order_basis'))
+                                            ->options(fn (): array => Order::basisOptions())
+                                            ->searchable()
+                                            ->preload(),
+                                    ]),
 
-                Section::make(__('app.label.press_tour_schedule'))
-                    ->schema([
-                        Grid::make(2)->schema([
-                            // The registry writes «11-18 Август» or
-                            // «сентябрь - декабрь», so the wording is kept
-                            // verbatim and the month is picked separately to
-                            // give the list something to sort by.
-                            TextInput::make('period')
-                                ->label(__('app.label.press_tour_period'))
-                                ->placeholder(self::hintUnlessViewing('11-18 Август'))
-                                ->maxLength(255),
+                                Textarea::make('notes')
+                                    ->label(__('app.label.press_tour_notes'))
+                                    ->rows(3)
+                                    ->columnSpanFull(),
 
-                            Select::make('starts_month')
-                                ->label(__('app.label.press_tour_month'))
-                                ->options(PressTour::monthOptions())
-                                ->searchable(),
-                        ]),
+                                Toggle::make('status')
+                                    ->label(__('app.label.status'))
+                                    ->default(true)
+                                    ->inline(false),
+                            ]),
 
-                        Grid::make(2)->schema([
-                            TextInput::make('people_count')
-                                ->label(__('app.label.press_tour_people'))
-                                ->numeric()
-                                ->minValue(0)
-                                ->maxValue(65535),
+                        Tabs\Tab::make(__('app.label.press_tour_schedule'))
+                            ->icon('heroicon-o-calendar')
+                            ->schema([
+                                Grid::make(['default' => 1, 'md' => 2])
+                                    ->schema([
+                                        // The registry writes «11-18 Август» or
+                                        // «сентябрь - декабрь», so the wording
+                                        // is kept verbatim and the month picked
+                                        // separately to give the list a sort key.
+                                        TextInput::make('period')
+                                            ->label(__('app.label.press_tour_period'))
+                                            ->placeholder(self::hintUnlessViewing('11-18 Август'))
+                                            ->maxLength(255),
 
-                            // «6+11» means two groups travelling together —
-                            // a plain number cannot carry that.
-                            TextInput::make('people_note')
-                                ->label(__('app.label.press_tour_people_note'))
-                                ->placeholder(self::hintUnlessViewing('6+11'))
-                                ->maxLength(255),
-                        ]),
-                    ])
-                    ->columns(1),
+                                        Select::make('starts_month')
+                                            ->label(__('app.label.press_tour_month'))
+                                            ->options(PressTour::monthOptions())
+                                            ->searchable(),
 
-                Section::make(__('app.label.press_tour_people_section'))
-                    ->schema([
-                        Grid::make(2)->schema([
-                            TextInput::make('responsible')
-                                ->label(__('app.label.responsible'))
-                                ->maxLength(255),
+                                        TextInput::make('people_count')
+                                            ->label(__('app.label.press_tour_people'))
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(65535),
 
-                            TextInput::make('curator')
-                                ->label(__('app.label.press_tour_curator'))
-                                ->maxLength(255),
-                        ]),
+                                        // «6+11» means two groups travelling
+                                        // together — a plain number cannot
+                                        // carry that.
+                                        TextInput::make('people_note')
+                                            ->label(__('app.label.press_tour_people_note'))
+                                            ->placeholder(self::hintUnlessViewing('6+11'))
+                                            ->maxLength(255),
+                                    ]),
+                            ]),
 
-                        TextInput::make('foreign_partner')
-                            ->label(__('app.label.press_tour_foreign_partner'))
-                            ->maxLength(255)
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(1),
+                        Tabs\Tab::make(__('app.label.press_tour_people_section'))
+                            ->icon('heroicon-o-users')
+                            ->schema([
+                                Grid::make(['default' => 1, 'md' => 2])
+                                    ->schema([
+                                        TextInput::make('responsible')
+                                            ->label(__('app.label.responsible'))
+                                            ->maxLength(255),
 
-                // Plan → fact. The registry is drawn up a year ahead, so the
-                // actual date only exists once the tour has been held.
-                Section::make(__('app.label.press_tour_progress'))
-                    ->schema([
-                        Grid::make(2)->schema([
-                            Select::make('state')
-                                ->label(__('app.label.press_tour_state'))
-                                ->options(PressTourState::options())
-                                ->default(PressTourState::Planned->value)
-                                ->selectablePlaceholder(false)
-                                ->required()
-                                ->live(),
+                                        TextInput::make('curator')
+                                            ->label(__('app.label.press_tour_curator'))
+                                            ->maxLength(255),
+                                    ]),
 
-                            DatePicker::make('held_on')
-                                ->label(__('app.label.press_tour_held_on'))
-                                ->native(false)
-                                ->displayFormat('d.m.Y')
-                                ->visible(fn (Get $get): bool => $get('state') === PressTourState::Held->value)
-                                ->required(fn (Get $get): bool => $get('state') === PressTourState::Held->value),
-                        ]),
-                    ])
-                    ->columns(1),
+                                TextInput::make('foreign_partner')
+                                    ->label(__('app.label.press_tour_foreign_partner'))
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
+                            ]),
 
-                // The report pack is NOT edited here. A tour is created as a
-                // plan months before it runs, and its documents arrive after —
-                // so they are filed on the view page's Documents tab, where
-                // each one is typed (отчёт / публикации / фото …). Keeping a
-                // second uploader here produced untyped duplicates.
-                Section::make(__('app.label.general_information'))
-                    ->schema([
-                        Textarea::make('notes')
-                            ->label(__('app.label.press_tour_notes'))
-                            ->rows(3)
-                            ->columnSpanFull(),
+                        // Plan → fact. The registry is drawn up a year ahead,
+                        // so the actual date only exists once the tour is held.
+                        // The report pack is NOT edited here: a tour is created
+                        // as a plan months before it runs and its documents
+                        // arrive after, so they are filed on the view page's
+                        // Documents tab, where each one gets its own type.
+                        Tabs\Tab::make(__('app.label.press_tour_progress'))
+                            ->icon('heroicon-o-check-circle')
+                            ->schema([
+                                Grid::make(['default' => 1, 'md' => 2])
+                                    ->schema([
+                                        Select::make('state')
+                                            ->label(__('app.label.press_tour_state'))
+                                            ->options(PressTourState::options())
+                                            ->default(PressTourState::Planned->value)
+                                            ->selectablePlaceholder(false)
+                                            ->required()
+                                            ->live(),
 
-                        Toggle::make('status')
-                            ->label(__('app.label.status'))
-                            ->default(true)
-                            ->inline(false),
-                    ])
-                    ->columns(1),
+                                        DatePicker::make('held_on')
+                                            ->label(__('app.label.press_tour_held_on'))
+                                            ->native(false)
+                                            ->displayFormat('d.m.Y')
+                                            ->visible(fn (Get $get): bool => $get('state') === PressTourState::Held->value)
+                                            ->required(fn (Get $get): bool => $get('state') === PressTourState::Held->value),
+                                    ]),
+                            ]),
+                    ]),
             ]);
     }
 }
