@@ -12,6 +12,7 @@ use App\Services\Documents\ContractPlaceholderValues;
 use App\Services\Documents\TemplateFiller;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -236,6 +237,19 @@ class Contract extends Model
     public function attachments(): HasMany
     {
         return $this->hasMany(ContractAttachment::class)->orderBy('sort')->orderBy('id');
+    }
+
+    /**
+     * The dossier as a plain list of stored paths — the virtual field the
+     * contract form's FileUpload binds to. Filament reads it back when
+     * authorising submitted paths, which is the only reason it exists as an
+     * attribute at all; the rows themselves live in attachments().
+     *
+     * @return Attribute<list<string>, never>
+     */
+    protected function attachmentFiles(): Attribute
+    {
+        return Attribute::get(fn (): array => $this->attachments()->pluck('file_path')->all());
     }
 
     public function approvers(): HasMany

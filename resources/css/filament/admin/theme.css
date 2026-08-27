@@ -507,8 +507,9 @@ button.cw-row:focus-visible {
     justify-content: flex-end;
 }
 /* A locked panel cannot take files — drop the "drag files here" prompt and
-   leave the grid of open/download tiles. */
-.ap-body .fi-fo-file-upload-disabled .filepond--drop-label {
+   leave the grid of open/download tiles. FilePond marks the disabled state on
+   its root element; Filament emits no separate disabled class here. */
+.ap-body .filepond--root[data-disabled='disabled'] .filepond--drop-label {
     display: none;
 }
 

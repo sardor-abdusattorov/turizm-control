@@ -21,13 +21,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 /**
  * A record's file dossier as Filament's own FileUpload panel — drag-and-drop,
- * thumbnails, reorder, open and download, all in the component the edit forms
- * already use. It replaces the hand-built file tables: files are files, not
- * rows of metadata.
+ * thumbnails, open and download, all in the component the edit forms already
+ * use. It replaces the hand-built file tables: files are files, not rows of
+ * metadata.
  *
  * Two variants share the plumbing, both backed by a HasMany of attachment
  * rows kept in step by SyncAttachments: the contract dossier
@@ -38,11 +39,22 @@ use Livewire\Component;
  */
 class AttachmentPanel extends Component implements HasForms
 {
-    use InteractsWithForms;
+    // Aliased because the guard below has to call Filament's own
+    // implementation, and `parent::` cannot reach a trait method.
+    use InteractsWithForms {
+        isFileUploadForSchemaComponent as private schemaOwnsFileUpload;
+    }
     use RestrictsFileUploadsToSchemaComponents;
 
+    /**
+     * Locked: mount() authorises the record once, and Livewire would otherwise
+     * let the client repoint these on any later request — after which no gate
+     * runs again.
+     */
+    #[Locked]
     public string $variant;
 
+    #[Locked]
     public int $recordId;
 
     /**
@@ -80,14 +92,21 @@ class AttachmentPanel extends Component implements HasForms
     public function save(): void
     {
         // The button is merely hidden on a locked panel; save() is a public
-        // Livewire method anyone can call, so the gate lives here too.
+        // Livewire method anyone can call, so both gates live here too.
+        abort_unless(Gate::allows('view', $this->record()), 403);
         abort_unless($this->canManage(), 403);
 
         $data = $this->form->getState();
 
+        // A disabled field is not dehydrated, so getState() drops its key
+        // entirely. In a writer that treats the submitted list as the whole
+        // dossier, reading that absence as "no files" would wipe everything —
+        // refuse instead.
+        abort_unless(array_key_exists($this->field(), $data), 409);
+
         app(SyncAttachments::class)->sync(
             $this->relation(),
-            (array) ($data[$this->field()] ?? []),
+            (array) $data[$this->field()],
             (array) ($data[$this->namesField()] ?? []),
             $this->attributesForNewFiles($data),
         );
@@ -99,6 +118,16 @@ class AttachmentPanel extends Component implements HasForms
         Notification::make()->title(__('app.message.attachments_uploaded'))->success()->send();
 
         $this->dispatch('attachments-saved');
+    }
+
+    /**
+     * Filament's own restriction only checks that a matching upload component
+     * exists in the schema — never whether it is disabled. Without this a
+     * read-only viewer could still push temporary files at a locked panel.
+     */
+    public function isFileUploadForSchemaComponent(string $name): bool
+    {
+        return $this->canManage() && $this->schemaOwnsFileUpload($name);
     }
 
     public function canManage(): bool
@@ -163,6 +192,17 @@ class AttachmentPanel extends Component implements HasForms
             ->deletable($canManage)
             ->openable()
             ->downloadable()
+            // Filament passes string entries in the panel's state through
+            // unchanged, and they are client-controllable. Everything in this
+            // app shares one private disk, so without this an ordinary user
+            // could point the panel at another module's file — reading it
+            // through a signed URL, and unlinking it by removing the chip.
+            // The allow-callback is not optional: the panel's schema binds no
+            // model, so Filament's own whitelist would come back empty and
+            // reject every legitimate file.
+            ->preventFilePathTampering(allowFilePathUsing: fn (string $file): bool => $this->relation()
+                ->where('file_path', $file)
+                ->exists())
             ->columnSpanFull();
     }
 

@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 
@@ -266,14 +267,61 @@ it('locks the dossier panel for users without the update permission', function (
 
     $panel = Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $contract->id]);
 
-    expect($panel->instance()->canManage())->toBeFalse();
+    expect($panel->instance()->canManage())->toBeFalse()
+        // The upload endpoint itself refuses a locked panel, so a forged
+        // _startUpload cannot even park a temporary file.
+        ->and($panel->instance()->isFileUploadForSchemaComponent('data.attachment_files'))->toBeFalse();
 
-    // The save button is merely hidden — a forged call is refused outright.
-    $panel->fillForm([
-        'attachment_files' => [UploadedFile::fake()->create('sneaky.pdf', 10, 'application/pdf')],
-    ])->call('save')->assertForbidden();
+    $panel->assertFormFieldDisabled('attachment_files')
+        // The save button is merely hidden — a forged call is refused outright.
+        ->call('save')->assertForbidden();
 
     expect($contract->attachments()->count())->toBe(0);
+});
+
+it('refuses a path belonging to another record and leaves its file alone', function () {
+    Storage::fake('local');
+
+    // Everything in the app shares one private disk. Without path
+    // authorisation a manager could name a foreign file, mint a signed URL
+    // for it, and unlink it by removing the chip again.
+    $mine = Contract::factory()->create();
+    attachmentManager($mine);
+
+    $foreign = Contract::factory()->create();
+    $foreignPath = 'uploads/files/contract-attachments/'.$foreign->id.'/secret.pdf';
+    Storage::disk('local')->put($foreignPath, 'pdf');
+    $foreign->attachments()->create([
+        'file_path' => $foreignPath,
+        'original_name' => 'secret.pdf',
+        'size' => 3,
+        'sort' => 1,
+    ]);
+
+    Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $mine->id])
+        ->fillForm(['attachment_files' => [$foreignPath]])
+        ->call('save')
+        ->assertHasFormErrors(['attachment_files']);
+
+    expect($mine->attachments()->count())->toBe(0)
+        ->and($foreign->attachments()->count())->toBe(1);
+
+    Storage::disk('local')->assertExists($foreignPath);
+});
+
+it('will not let the panel be repointed at another record after mounting', function () {
+    Storage::fake('local');
+
+    // mount() authorises the record once; without #[Locked] the client could
+    // simply set a different id on the next request and skip that gate.
+    $mine = Contract::factory()->create();
+    attachmentManager($mine);
+
+    $other = Contract::factory()->create();
+
+    expect(fn () => Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $mine->id])
+        ->set('recordId', $other->id))
+        ->toThrow(CannotUpdateLockedPropertyException::class);
 });
 
 it('saving the dossier panel untouched changes nothing', function () {
@@ -356,11 +404,11 @@ it('freezes the dossier while the contract is under approval', function (mixed $
     $panel = Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $contract->id]);
 
     expect($panel->instance()->canManage())->toBeFalse()
-        ->and($panel->instance()->lockedNotice())->toBe(__('app.message.dossier_frozen_in_review'));
+        ->and($panel->instance()->lockedNotice())->toBe(__('app.message.dossier_frozen_in_review'))
+        ->and($panel->instance()->isFileUploadForSchemaComponent('data.attachment_files'))->toBeFalse();
 
-    $panel->fillForm([
-        'attachment_files' => [UploadedFile::fake()->create('late.pdf', 10, 'application/pdf')],
-    ])->call('save')->assertForbidden();
+    $panel->assertFormFieldDisabled('attachment_files')
+        ->call('save')->assertForbidden();
 
     expect($contract->attachments()->count())->toBe(0);
 })->with([

@@ -27,20 +27,12 @@ class SyncAttachments
     {
         $submitted = $this->submittedPaths($paths);
         $existing = $relation->get();
-
-        // A path that vanished from the panel was removed by the user — the
-        // row goes, and the model's deleting hook takes the file with it.
-        //
-        // Guard: FileUpload silently drops chips whose file is missing on
-        // disk, so a record with a lost file must not be mistaken for a
-        // deliberate removal.
-        $existing
-            ->reject(fn (Model $attachment): bool => in_array($attachment->file_path, $submitted, true))
-            ->filter(fn (Model $attachment): bool => Storage::disk('local')->exists((string) $attachment->file_path))
-            ->each(fn (Model $attachment) => $attachment->delete());
-
         $known = $existing->pluck('file_path')->all();
 
+        // Additions run FIRST. Deleting a row unlinks its file through the
+        // model's deleting hook, which no transaction can roll back — so a
+        // throw while filing must not leave the dossier already gutted.
+        //
         // Filed files keep the position they were filed in: the panel's own
         // array order is not a reliable statement of intent (a fresh upload
         // lands ahead of the existing chips in submitted state), so new files
@@ -61,6 +53,17 @@ class SyncAttachments
                 'sort' => ++$sort,
             ]);
         }
+
+        // A path that vanished from the panel was removed by the user — the
+        // row goes, and the model's deleting hook takes the file with it.
+        //
+        // Guard: FileUpload silently drops chips whose file is missing on
+        // disk, so a record with a lost file must not be mistaken for a
+        // deliberate removal.
+        $existing
+            ->reject(fn (Model $attachment): bool => in_array($attachment->file_path, $submitted, true))
+            ->filter(fn (Model $attachment): bool => Storage::disk('local')->exists((string) $attachment->file_path))
+            ->each(fn (Model $attachment) => $attachment->delete());
     }
 
     /**

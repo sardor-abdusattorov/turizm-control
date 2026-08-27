@@ -13,8 +13,10 @@ use Filament\Schemas\Concerns\RestrictsFileUploadsToSchemaComponents;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 /**
@@ -31,8 +33,15 @@ class MediaLibrary extends Component implements HasForms
     use InteractsWithForms;
     use RestrictsFileUploadsToSchemaComponents;
 
+    /**
+     * Locked: mount() authorises the record once, and Livewire would otherwise
+     * let the client repoint these on any later request — after which no gate
+     * runs again.
+     */
+    #[Locked]
     public string $variant;
 
+    #[Locked]
     public int $recordId;
 
     /**
@@ -51,6 +60,10 @@ class MediaLibrary extends Component implements HasForms
 
     public function mount(): void
     {
+        // $recordId arrives from the client, so the viewer carries its own
+        // gate rather than trusting the page that embedded it.
+        abort_unless(Gate::allows('view', $this->record()), 403);
+
         // Only feed the viewer files that actually exist on disk. Snapshot
         // rebuilds restore file *paths* but not the uploads themselves, so a
         // stale path would otherwise render as an empty, broken FilePond tile.
@@ -126,6 +139,14 @@ class MediaLibrary extends Component implements HasForms
             ->deletable(false)
             ->openable()
             ->downloadable()
+            // The panel's state is client-controllable and the private disk is
+            // shared by every module, so a signed URL may only ever be minted
+            // for a path this record actually owns.
+            ->preventFilePathTampering(allowFilePathUsing: fn (string $file): bool => in_array(
+                $file,
+                $this->existingFiles(),
+                true,
+            ))
             ->required(false);
     }
 

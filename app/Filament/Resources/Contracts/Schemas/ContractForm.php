@@ -239,6 +239,15 @@ class ContractForm
                                 // No per-batch type question: files are just
                                 // files (лёгкость выше каталогизации).
                                 ContractDossierUpload::make()
+                                    // String entries in the panel's state are
+                                    // client-controllable paths on a private
+                                    // disk shared by every module, so only the
+                                    // contract's own scans may be named. On
+                                    // create there is no record yet and only
+                                    // fresh uploads can appear.
+                                    ->preventFilePathTampering(allowFilePathUsing: fn (string $file, ?Contract $record): bool => (bool) $record?->attachments()
+                                        ->where('file_path', $file)
+                                        ->exists())
                                     ->columnSpanFull(),
                             ]),
 
