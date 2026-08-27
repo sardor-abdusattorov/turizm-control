@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasActiveStatus;
-use App\Models\Concerns\HasDocumentKey;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,14 +13,12 @@ use Illuminate\Support\Facades\Storage;
 class ContractTemplate extends Model
 {
     use HasActiveStatus;
-    use HasDocumentKey;
     use HasFactory;
 
     protected $fillable = [
         'contract_type_id',
         'name',
         'template_file',
-        'document_key',
         'sort',
         'status',
     ];
@@ -33,12 +30,6 @@ class ContractTemplate extends Model
 
     protected static function booted(): void
     {
-        static::creating(function (self $template): void {
-            if (! $template->document_key) {
-                $template->document_key = static::generateDocumentKey();
-            }
-        });
-
         static::deleting(function (self $template): void {
             if ($template->template_file && Storage::disk('local')->exists($template->template_file)) {
                 Storage::disk('local')->delete($template->template_file);

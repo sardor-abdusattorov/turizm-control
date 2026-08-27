@@ -139,24 +139,17 @@ class ContractAttachmentsTableWidget extends TableWidget
     }
 
     /**
-     * The in-browser or OnlyOffice view link — PDFs and images open in the
-     * browser's own viewer, Word files in the read-only OnlyOffice viewer.
+     * The in-browser view link. Only what the browser renders natively — PDFs
+     * and images — gets an «open» action; Word files have no viewer any more,
+     * so the download action next to it is their way out.
      */
     private function openUrl(ContractAttachment $attachment): ?string
     {
-        if (! $attachment->fileExists()) {
+        if (! $attachment->fileExists() || ! $attachment->isBrowserViewable()) {
             return null;
         }
 
-        if ($attachment->isWordDocument()) {
-            return route('contracts.attachments.viewer', ['contract' => $this->contractId, 'attachment' => $attachment]);
-        }
-
-        if ($attachment->isBrowserViewable()) {
-            return route('contracts.attachments.inline', ['contract' => $this->contractId, 'attachment' => $attachment]);
-        }
-
-        return null;
+        return route('contracts.attachments.inline', ['contract' => $this->contractId, 'attachment' => $attachment]);
     }
 
     private function contract(): Contract

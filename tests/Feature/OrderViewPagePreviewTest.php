@@ -42,7 +42,7 @@ it('renders the file card with a PDF-open link for PDF orders', function () {
         ->not->toContain('<iframe');
 });
 
-it('renders the file card with an OnlyOffice viewer link for docx orders', function () {
+it('renders the file card with a serve link for docx orders', function () {
     actAsOrderViewer();
     Storage::fake('local');
 
@@ -53,11 +53,11 @@ it('renders the file card with an OnlyOffice viewer link for docx orders', funct
 
     $html = Livewire::test(ViewInternalOrder::class, ['record' => $order->id])->html();
 
-    // The file card now carries a single primary action — for an editable
-    // docx that's the OnlyOffice editor (mode=edit).
+    // Every file type now gets the same single action — serve the file; the
+    // browser previews what it can and downloads a docx.
     expect($html)->toContain('sample.docx')
         ->toContain('DOCX')
-        ->toContain(route('orders.editor', ['order' => $order, 'mode' => 'edit']))
+        ->toContain(route('orders.file.inline', ['order' => $order]))
         ->not->toContain('<iframe');
 });
 
@@ -71,8 +71,8 @@ it('hides the preview card when the order has no file on disk', function () {
 
     $html = Livewire::test(ViewInternalOrder::class, ['record' => $order->id])->html();
 
-    // No file -> the file-preview component is gated behind fileExists()
-    // on the infolist, so the OnlyOffice viewer URL never appears.
+    // No file -> the whole card is gated behind fileExists(), so the serve
+    // URL never appears.
     expect($html)->not->toContain('<iframe')
-        ->not->toContain(route('orders.editor', ['order' => $order, 'mode' => 'view']));
+        ->not->toContain(route('orders.file.inline', ['order' => $order]));
 });

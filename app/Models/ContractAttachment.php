@@ -74,16 +74,8 @@ class ContractAttachment extends Model
     }
 
     /**
-     * Word files open through the OnlyOffice viewer; browsers cannot
-     * render them natively.
-     */
-    public function isWordDocument(): bool
-    {
-        return in_array($this->extension(), ['doc', 'docx'], true);
-    }
-
-    /**
      * Types the browser previews itself (with print and save built in).
+     * Everything else — Word files above all — only offers a download.
      */
     public function isBrowserViewable(): bool
     {
@@ -98,22 +90,5 @@ class ContractAttachment extends Model
     public function absolutePath(): string
     {
         return Storage::disk('local')->path((string) $this->file_path);
-    }
-
-    /**
-     * OnlyOffice cache key — stable per stored file version.
-     */
-    public function documentKey(): string
-    {
-        return 'att-'.$this->id.'-'.substr(md5($this->file_path.'|'.($this->updated_at?->timestamp ?? 0)), 0, 12);
-    }
-
-    /**
-     * The secret the OnlyOffice server presents when fetching the file —
-     * derived, so no extra column is needed.
-     */
-    public function sharedKey(): string
-    {
-        return hash_hmac('sha256', 'contract-attachment|'.$this->id.'|'.$this->file_path, (string) config('app.key'));
     }
 }

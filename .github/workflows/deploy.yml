@@ -16,7 +16,9 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          # Match the production server: testing on a newer PHP than we deploy
+          # to lets 8.4-only syntax pass CI and fatal in production.
+          php-version: "8.3"
           extensions: pdo_mysql,sqlite3,pdo_sqlite,mbstring,exif,bcmath,gd,zip,intl,pcntl
           coverage: none
 
@@ -65,9 +67,7 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            docker compose -f docker-compose.yml up -d --remove-orphans
-
-            docker compose -f docker-compose.yml exec -T app composer install \
+            composer install \
               --no-interaction --no-dev --prefer-dist --optimize-autoloader
 
             node -v
@@ -76,20 +76,22 @@ jobs:
             npm run build
             test -d public/build/assets
 
-            docker compose -f docker-compose.yml exec -T app php artisan filament:assets
-            docker compose -f docker-compose.yml exec -T app php artisan livewire:publish --assets
-            docker compose -f docker-compose.yml exec -T app php artisan storage:link || true
+            php artisan filament:assets
+            php artisan livewire:publish --assets
+            php artisan storage:link || true
 
-            docker compose -f docker-compose.yml exec -T app php artisan migrate --force
+            php artisan migrate --force
 
-            docker compose -f docker-compose.yml exec -T app php artisan optimize:clear
-            docker compose -f docker-compose.yml exec -T app php artisan project:cache
+            php artisan optimize:clear
+            php artisan project:cache
 
-            docker compose -f docker-compose.yml exec -T -u root app chown -R www-data:www-data storage bootstrap/cache
-            docker compose -f docker-compose.yml exec -T -u root app chmod -R 775 storage bootstrap/cache
+            chmod -R 775 storage bootstrap/cache || true
 
-            docker compose -f docker-compose.yml restart queue scheduler reverb
+            # Tell the running queue workers to finish the current job and
+            # exit; supervisor/systemd starts them again on the new code.
+            php artisan queue:restart
 
-            docker compose -f docker-compose.yml ps
+            # New code is only picked up once OPcache is dropped.
+            sudo systemctl reload php8.3-fpm || true
 
             echo "Deploy complete"

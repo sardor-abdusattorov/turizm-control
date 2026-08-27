@@ -47,11 +47,9 @@ class OrdersTable
                     ->icon(fn (Order $record): string => $record->documentIcon())
                     ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : __('app.label.not_set'))
                     ->limit(35)
-                    ->url(fn (Order $record): ?string => match (true) {
-                        ! $record->fileExists() => null,
-                        $record->isOpenableInOnlyOffice() => route('orders.editor', ['order' => $record, 'mode' => 'view']),
-                        default => route('orders.file.inline', ['order' => $record]),
-                    }, shouldOpenInNewTab: true),
+                    ->url(fn (Order $record): ?string => $record->fileExists()
+                        ? route('orders.file.inline', ['order' => $record])
+                        : null, shouldOpenInNewTab: true),
 
                 TextColumn::make('issued_at')
                     ->label(__('app.label.issued_at'))

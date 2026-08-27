@@ -38,11 +38,6 @@ class ContractFiles
         return $this->disk()->exists($this->documentPath($contract));
     }
 
-    public function pdfPath(Contract $contract): string
-    {
-        return $this->directory($contract).'/contract.pdf';
-    }
-
     /**
      * Render the contract's working docx from its template and point the
      * `document_file` column at it. No-op when the template or its file is
@@ -66,17 +61,16 @@ class ContractFiles
 
         $contract->update([
             'document_file' => $this->documentPath($contract),
-            'document_key' => Contract::generateDocumentKey(),
         ]);
     }
 
     /**
-     * Remove every file the contract owns — the explicit document/pdf columns
-     * plus the whole per-contract folder. Safe to call repeatedly.
+     * Remove every file the contract owns — the document column plus the
+     * whole per-contract folder. Safe to call repeatedly.
      */
     public function purge(Contract $contract): void
     {
-        foreach ([$contract->document_file, $contract->pdf_file] as $path) {
+        foreach ([$contract->document_file] as $path) {
             if ($path && $this->disk()->exists($path)) {
                 $this->disk()->delete($path);
             }

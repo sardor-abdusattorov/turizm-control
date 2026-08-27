@@ -19,7 +19,6 @@ return new class extends Migration
             // Nullable: real buyruqs sometimes reach the registry before their
             // scan does (the annual 74-АФ exists only as copies inside dossiers).
             $table->string('file_path')->nullable();
-            $table->string('document_key')->nullable();
             $table->date('issued_at')->nullable();
             $table->boolean('status')->default(true);
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();

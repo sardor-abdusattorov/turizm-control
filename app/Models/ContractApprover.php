@@ -48,7 +48,7 @@ class ContractApprover extends Model
     /**
      * System notes are stored as bare translation keys so they render in each
      * viewer's language rather than whatever locale the writer happened to be
-     * in (an OnlyOffice callback has no session and used to store English).
+     * in (a queued job has no session and used to store English).
      */
     private const SYSTEM_NOTE_KEYS = [
         'invalidated_on_edit',

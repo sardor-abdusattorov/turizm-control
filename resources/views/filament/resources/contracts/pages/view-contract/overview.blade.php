@@ -66,68 +66,10 @@
                         </div>
                     @endif
 
-                    @if ($active->isEmpty() && $historical->isEmpty())
-                        <div class="cw-bd"><p style="font-size:0.854rem;color:var(--m)">{{ __('app.label.no_approvers') }}</p></div>
-                    @else
-                        <div class="cw-chain">
-                            @foreach ($active as $ap)
-                                @php
-                                    $state = $this->approverState($ap);
-                                    $v = $this->approverVisual($ap);
-                                    $isDirector = $directorUserId && $ap->user_id === $directorUserId;
-                                @endphp
-                                <div class="cw-step cw-step--{{ $state }}{{ $isDirector ? ' cw-step--director' : '' }}">
-                                    <div class="cw-node">
-                                        <img src="{{ $this->approverAvatar($ap) }}" alt="{{ $ap->user?->name }}">
-                                        <span class="cw-badge cw-badge--{{ $state }}">{!! $ic($v['icon'], 13) !!}</span>
-                                    </div>
-                                    <div class="cw-step__bd">
-                                        <div class="cw-step__nm">{{ $ap->user?->name }} <span class="cw-ord">#{{ $ap->order }}</span>@if ($isDirector)<span class="cw-director">{!! $ic('heroicon-s-shield-check', 11) !!} {{ __('app.label.final_sign_off') }}</span>@endif</div>
-                                        <div class="cw-step__dp">{{ $ap->user?->department?->name }}{{ $ap->user?->position?->name ? ' · '.$ap->user->position->name : '' }}</div>
-                                        <div class="cw-step__meta">
-                                            <span class="cw-pill cw-pill--{{ $pillFor($ap->status) }}">{{ $approverLabel($ap->status) }}</span>
-                                            @if ($ap->acted_at)
-                                                <span class="cw-when">{!! $ic('heroicon-m-check', 13) !!} {{ $ap->acted_at->format('d.m.Y H:i') }}</span>
-                                            @elseif ($state === 'current' && $ap->due_at)
-                                                @php $stepDueIso = $ap->due_at->toIso8601String(); @endphp
-                                                <span class="cw-when"
-                                                    x-data="contractCountdown('{{ $stepDueIso }}')"
-                                                    x-init="start()"
-                                                    :class="overdue ? 'cw-when--over' : 'cw-when--soon'"
-                                                    :title="absolute">
-                                                    <template x-if="overdue">{!! $ic('heroicon-m-exclamation-triangle', 13) !!}</template>
-                                                    <template x-if="! overdue">{!! $ic('heroicon-m-clock', 13) !!}</template>
-                                                    <span x-text="label"></span>
-                                                </span>
-                                            @endif
-                                        </div>
-                                        @if ($ap->comment)<div class="cw-cmt">{{ $ap->comment }}</div>@endif
-                                        @if ($ap->system_comment)<div class="cw-cmt" style="background:rgba(251,146,60,.10);border-color:rgba(251,146,60,.32);color:#c2410c;font-weight:550;">{{ $ap->systemNoteLabel() }}</div>@endif
-                                    </div>
-                                    <button type="button" class="cw-eye" title="{{ __('app.label.view_history') }}" x-on:click="$wire.mountAction('approverDetails', { user: {{ $ap->user_id }} })">{!! $ic('heroicon-o-eye', 16) !!}</button>
-                                </div>
-                            @endforeach
-
-                            {{-- People dropped from the chain — muted, still
-                                 openable so their cancelled attempts aren't lost. --}}
-                            @foreach ($historicalOnly as $h)
-                                <div class="cw-step cw-step--ghost">
-                                    <div class="cw-node">
-                                        <img src="{{ $this->approverAvatar($h) }}" alt="{{ $h->user?->name }}">
-                                        <span class="cw-badge cw-badge--queued">{!! $ic('heroicon-m-minus', 13) !!}</span>
-                                    </div>
-                                    <div class="cw-step__bd">
-                                        <div class="cw-step__nm">{{ $h->user?->name }}</div>
-                                        <div class="cw-step__dp">{{ $h->user?->department?->name }}{{ $h->user?->position?->name ? ' · '.$h->user->position->name : '' }}</div>
-                                        <div class="cw-step__meta">
-                                            <span class="cw-pill cw-pill--gray">{{ __('app.label.no_longer_in_chain') }}</span>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="cw-eye" title="{{ __('app.label.view_history') }}" x-on:click="$wire.mountAction('approverDetails', { user: {{ $h->user_id }} })">{!! $ic('heroicon-o-eye', 16) !!}</button>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
+                    {{-- The chain itself is a stock Filament table: person,
+                         step, status, SLA and comment, with the per-approver
+                         history behind the row action. --}}
+                    @livewire(\App\Filament\Resources\Contracts\Widgets\ContractApprovalChainTableWidget::class, ['contractId' => $record->id], key('contract-chain-'.$record->id))
                 </section>
                 @endif
 
@@ -136,7 +78,6 @@
                 @if ($record->status === Contract::STATUS_APPROVED)
                 @php
                     $paymentSummary = $this->paymentSummary();
-                    $payments = $paymentSummary['payments'];
                     $paidPercent = $paymentSummary['paid_percent'];
                     $remainingPercent = $paymentSummary['remaining_percent'];
                     $paymentStatus = $paymentSummary['status'];
@@ -164,33 +105,10 @@
                         </div>
                     </div>
 
-                    @if ($payments->isEmpty())
-                        <div class="cw-bd"><p style="font-size:.854rem;color:var(--m)">{{ __('app.label.no_payments_yet') }}</p></div>
-                    @else
-                        <div class="cw-chain" style="gap:.55rem;">
-                            @foreach ($payments as $payment)
-                                @php $paymentFiles = $this->paymentScreenshotFiles($payment); @endphp
-                                <div class="cw-step" style="align-items:center;">
-                                    <div class="cw-node" style="background:rgba(34,197,94,.12);">
-                                        <span class="cw-badge cw-badge--approved">{!! $ic('heroicon-s-check-circle', 13) !!}</span>
-                                    </div>
-                                    <div class="cw-step__bd">
-                                        <div class="cw-step__nm">
-                                            {{ format_percent((float) $payment->percent) }}%
-                                            <span class="cw-ord">{{ $payment->paid_at?->format('d.m.Y') }}</span>
-                                        </div>
-                                        <div class="cw-step__dp">
-                                            {{ __('app.label.created_by') }}: {{ $payment->creator?->name ?? __('app.label.system') }}
-                                            · {{ $payment->created_at?->format('d.m.Y H:i') }}
-                                        </div>
-                                    </div>
-                                    @foreach ($paymentFiles as $file)
-                                        <a href="{{ $file['url'] }}" target="_blank" rel="noopener" class="cw-eye" title="{{ $file['pdf'] ? $file['name'] : __('app.label.open_screenshot') }}">{!! $ic($file['pdf'] ? 'heroicon-o-document-text' : 'heroicon-o-photo', 16) !!}</a>
-                                    @endforeach
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
+                    {{-- Payment ledger as a stock Filament table; filing a new
+                         one stays the «Add payment» action in the page header,
+                         which owns the remaining-percent validation. --}}
+                    @livewire(\App\Filament\Resources\Contracts\Widgets\ContractPaymentsTableWidget::class, ['contractId' => $record->id], key('contract-payments-'.$record->id))
                 </section>
                 @endif
             </div>
@@ -205,8 +123,6 @@
                         @php
                             $ext = 'DOCX';
                             $createdLabel = $record->created_at?->translatedFormat('d M Y H:i');
-                            $editUrl = $this->editorUrl($record->documentEditableBy() ? 'edit' : 'view');
-                            $previewUrl = $this->pdfPreviewUrl();
                         @endphp
                         <div class="cw-file">
                             <div class="cw-file__thumb" aria-hidden="true">
@@ -237,13 +153,13 @@
                                 @endif
                             </div>
                         </div>
-                        {{-- One primary action only. Preview / PDF download
-                             already live in the page header actions, so they're
-                             not duplicated here. --}}
+                        {{-- The document leaves as its own .docx: with the
+                             online editor gone there is nothing to render it
+                             in the browser. --}}
                         <div class="cw-file__act">
-                            <a href="{{ $editUrl }}" class="cw-btn cw-btn--primary">
-                                {!! $ic('heroicon-o-pencil-square', 16) !!}
-                                <span>{{ $record->canBeEditedBy() ? __('app.action.open_editor') : __('app.action.open_file') }}</span>
+                            <a href="{{ route('contracts.document.download', ['contract' => $record]) }}" class="cw-btn cw-btn--primary">
+                                {!! $ic('heroicon-o-arrow-down-tray', 16) !!}
+                                <span>{{ __('app.action.download_document') }}</span>
                             </a>
                         </div>
                     @endif
@@ -252,7 +168,7 @@
                         @foreach ($details as [$icon, $label, $value, $type])
                             @php $hasValue = ! empty($value); @endphp
                             @if ($type === 'contact' && $hasValue)
-                                <button type="button" class="cw-row cw-row--link" @click="contactOpen = true">
+                                <button type="button" class="cw-row cw-row--link" x-on:click="$wire.mountAction('contactDetails')">
                                     <span class="cw-row__k"><span class="cw-row__ic">{!! $ic($icon, 16) !!}</span><span class="cw-row__lb">{{ $label }}</span></span>
                                     <span class="cw-row__v"><span class="cw-row__vl">{{ $value }} {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}</span></span>
                                 </button>

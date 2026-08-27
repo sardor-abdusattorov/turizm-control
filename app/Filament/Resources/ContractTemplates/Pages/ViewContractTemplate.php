@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\ContractTemplates\Pages;
 
 use App\Filament\Resources\ContractTemplates\ContractTemplateResource;
-use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -14,16 +13,6 @@ class ViewContractTemplate extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('openEditor')
-                ->label(__('app.action.open_template_in_editor'))
-                ->icon('heroicon-o-eye')
-                ->color('gray')
-                ->url(fn () => route('contract-templates.editor', [
-                    'template' => $this->record,
-                    'mode' => 'view',
-                ]))
-                ->visible(fn () => $this->record?->templateExists()),
-
             EditAction::make(),
         ];
     }

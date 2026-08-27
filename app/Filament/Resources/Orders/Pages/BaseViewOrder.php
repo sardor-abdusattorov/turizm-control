@@ -24,19 +24,15 @@ abstract class BaseViewOrder extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('openEditor')
-                ->label(__('app.action.open_editor'))
-                ->icon('heroicon-o-pencil-square')
-                ->color('primary')
-                ->url(fn () => route('orders.editor', ['order' => $this->record, 'mode' => 'edit']))
-                ->visible(fn () => $this->record?->fileExists() && $this->record?->isOpenableInOnlyOffice()),
-
+            // Office files have no in-browser viewer any more, so the single
+            // action just serves the file — the browser previews what it can
+            // (PDF, images) and downloads the rest.
             Action::make('viewFile')
                 ->label(__('app.action.open_file'))
                 ->icon('heroicon-o-eye')
                 ->color('gray')
                 ->url(fn () => route('orders.file.inline', ['order' => $this->record]), shouldOpenInNewTab: true)
-                ->visible(fn () => $this->record?->fileExists() && ! $this->record?->isOpenableInOnlyOffice()),
+                ->visible(fn () => $this->record?->fileExists()),
 
             EditAction::make(),
         ];
@@ -63,15 +59,6 @@ abstract class BaseViewOrder extends ViewRecord
             return null;
         }
 
-        return $this->record->isOpenableInOnlyOffice()
-            ? route('orders.editor', ['order' => $this->record, 'mode' => 'view'])
-            : route('orders.file.inline', ['order' => $this->record]);
-    }
-
-    public function fileEditorUrl(): ?string
-    {
-        return $this->record->isOpenableInOnlyOffice()
-            ? route('orders.editor', ['order' => $this->record, 'mode' => 'edit'])
-            : null;
+        return route('orders.file.inline', ['order' => $this->record]);
     }
 }

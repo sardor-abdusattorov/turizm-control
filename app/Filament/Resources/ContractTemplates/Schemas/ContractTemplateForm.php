@@ -3,14 +3,10 @@
 namespace App\Filament\Resources\ContractTemplates\Schemas;
 
 use App\Filament\Support\DocumentUpload;
-use App\Models\ContractTemplate;
 use App\Models\ContractType;
-use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
@@ -64,26 +60,6 @@ class ContractTemplateForm
                             ->required()
                             ->maxSize(10240)
                             ->helperText(__('app.helper.template_file')),
-
-                        Actions::make([
-                            Action::make('openTemplateInEditor')
-                                ->label(__('app.action.open_template_in_editor'))
-                                ->icon('heroicon-o-pencil-square')
-                                ->color('primary')
-                                ->url(function (?ContractTemplate $record, $livewire) {
-                                    if (! $record) {
-                                        return null;
-                                    }
-
-                                    $mode = $livewire instanceof ViewRecord ? 'view' : 'edit';
-
-                                    return route('contract-templates.editor', [
-                                        'template' => $record,
-                                        'mode' => $mode,
-                                    ]);
-                                })
-                                ->visible(fn (?ContractTemplate $record) => $record?->templateExists() ?? false),
-                        ]),
                     ]),
 
                 Section::make(__('app.label.available_placeholders'))

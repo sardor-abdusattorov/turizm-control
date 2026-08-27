@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\OrderScope;
 use App\Models\Concerns\HasActiveStatus;
-use App\Models\Concerns\HasDocumentKey;
 use App\Observers\OrderObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +15,6 @@ use Illuminate\Support\Facades\Storage;
 class Order extends Model
 {
     use HasActiveStatus;
-    use HasDocumentKey;
     use HasFactory;
 
     protected $fillable = [
@@ -25,7 +23,6 @@ class Order extends Model
         'title',
         'description',
         'file_path',
-        'document_key',
         'issued_at',
         'status',
         'created_by',
@@ -76,11 +73,6 @@ class Order extends Model
     {
         return $this->file_path
             && Storage::disk('local')->exists($this->file_path);
-    }
-
-    public function isOpenableInOnlyOffice(): bool
-    {
-        return in_array($this->extension(), ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'], true);
     }
 
     public function extension(): ?string

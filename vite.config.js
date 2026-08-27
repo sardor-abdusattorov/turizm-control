@@ -16,9 +16,9 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
-        // host / HMR / polling are driven by env vars so the same config
-        // works both natively (defaults: localhost, no polling) and inside
-        // the Docker `node` container, which sets VITE_HOST=0.0.0.0 etc.
+        // host / HMR / polling are driven by env vars so the defaults suit a
+        // plain `npm run dev` while a remote/VM setup can override them
+        // (VITE_HOST=0.0.0.0, VITE_USE_POLLING=true) without editing this file.
         host: process.env.VITE_HOST || 'localhost',
         hmr: {
             host: process.env.VITE_HMR_HOST || 'localhost',

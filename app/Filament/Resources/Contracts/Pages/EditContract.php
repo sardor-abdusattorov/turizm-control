@@ -187,7 +187,7 @@ class EditContract extends EditRecord
 
         // Going through the save modal on a mid-flow contract is an explicit
         // promise to cancel the existing approval chain — honour it even
-        // when no visible field actually changed (the OnlyOffice document on
+        // when no visible field actually changed (the document on
         // disk may have changed between load and save).
         app(ApprovalChain::class)->resyncOnEdit(
             $this->record,
@@ -219,16 +219,6 @@ class EditContract extends EditRecord
                 ->icon('heroicon-o-arrow-left')
                 ->color('gray')
                 ->url(fn () => ContractResource::getUrl('view', ['record' => $this->record])),
-
-            Action::make('openEditor')
-                ->label(__('app.action.open_editor'))
-                ->icon('heroicon-o-pencil-square')
-                ->color('primary')
-                ->url(fn () => route('contracts.editor', [
-                    'contract' => $this->record,
-                    'mode' => $this->record->documentEditableBy() ? 'edit' : 'view',
-                ]))
-                ->visible(fn () => $this->record?->documentExists()),
 
             DeleteAction::make()
                 ->visible(fn () => $this->record?->canBeDeletedBy()),

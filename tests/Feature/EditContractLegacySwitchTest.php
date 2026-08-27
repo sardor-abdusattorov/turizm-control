@@ -9,7 +9,6 @@ use App\Models\ContractApprover;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\User;
-use App\Services\OnlyOffice\OnlyOfficeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
@@ -144,21 +143,6 @@ it('lets the author fix fields on an approved legacy contract without losing the
         ->and($contract->title)->toBe('Исправленное наименование')
         ->and($contract->signed_at?->format('Y-m-d'))->toBe('2024-05-20')
         ->and($contract->approvers()->count())->toBe(0);
-});
-
-it('keeps the signed document read-only even for a user who can reopen the form', function () {
-    $contract = legacySwitchContract(Contract::STATUS_APPROVED);
-    $author = $contract->responsible;
-
-    Permission::findOrCreate('update_approved_contract', 'web');
-    $author->givePermissionTo('update_approved_contract');
-    $author = $author->fresh();
-
-    expect($contract->canBeEditedBy($author))->toBeTrue();
-
-    $permissions = app(OnlyOfficeService::class)->resolvePermissions($contract, $author);
-
-    expect($permissions['edit'])->toBeFalse();
 });
 
 it('refuses the edit page for the author without the reopen permission', function () {

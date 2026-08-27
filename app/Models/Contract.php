@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\ContractStatus;
 use App\Enums\PaymentStatus;
-use App\Models\Concerns\HasDocumentKey;
 use App\Observers\ContractObserver;
 use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractFiles;
@@ -22,7 +21,7 @@ use Illuminate\Support\Facades\DB;
 #[ObservedBy(ContractObserver::class)]
 class Contract extends Model
 {
-    use HasDocumentKey, HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'number',
@@ -40,8 +39,6 @@ class Contract extends Model
         'paid_percent',
         'signed_at',
         'document_file',
-        'document_key',
-        'pdf_file',
     ];
 
     protected $casts = [
@@ -72,7 +69,7 @@ class Contract extends Model
 
     /**
      * Business fields whose change mid-flow must invalidate prior approvals.
-     * Bookkeeping columns (status, document_key, pdf_file, signed_at, …) are
+     * Bookkeeping columns (status, signed_at, …) are
      * intentionally NOT in this list — they change as part of the workflow
      * itself and must never trigger a cancel-on-edit cascade.
      *
@@ -137,49 +134,6 @@ class Contract extends Model
 
             return;
         }
-
-        $this->approvalChain()->requeue($this, $previousUserIds);
-    }
-
-    /**
-     * Bounce the contract back to Draft after its document was edited, unless
-     * the *only* person who edited was the current approver tweaking the doc
-     * before their verdict (we keep their Approve / Reject buttons alive).
-     * Any other editor — the author, a different approver, or the approver
-     * co-editing alongside someone else — means approvals are now stale.
-     *
-     * Runs from the OnlyOffice save-callback on both the session-end save
-     * (status 2) and a mid-session forcesave (status 6): either way the bytes
-     * on disk have already changed, so the chain must not stay live. It is
-     * idempotent — once the contract is a Draft, repeated saves are no-ops.
-     *
-     * @param  list<int>  $editorIds  user ids OnlyOffice reported as editors
-     */
-    public function reinvalidateAfterDocumentEdit(array $editorIds = []): void
-    {
-        $this->refresh();
-
-        if ($this->status === self::STATUS_DRAFT) {
-            return;
-        }
-
-        $current = $this->currentApprover();
-
-        if ($current && $editorIds === [$current->user_id]) {
-            return;
-        }
-
-        $previousUserIds = $this->activeApprovers()
-            ->orderBy('order')
-            ->pluck('user_id')
-            ->all();
-
-        $this->forceFill([
-            'status' => self::STATUS_DRAFT,
-            'signed_at' => null,
-        ])->saveQuietly();
-
-        $this->invalidateAllApprovers('invalidated_on_document_save');
 
         $this->approvalChain()->requeue($this, $previousUserIds);
     }
@@ -505,7 +459,7 @@ class Contract extends Model
         // decides who may fix archive entries; authorship alone is not
         // enough. Saving then either keeps it filed via the «already signed»
         // switch or honestly sends it back through approval; the signed
-        // OnlyOffice document itself stays read-only either way.
+        // document itself stays untouched either way.
         if ($this->status === self::STATUS_APPROVED) {
             return $user->can('update_approved_contract');
         }
@@ -524,16 +478,6 @@ class Contract extends Model
         // The approver whose turn it is may tweak the document before
         // approving it.
         return $this->currentApprover()?->user_id === $user->id;
-    }
-
-    /**
-     * Whether the user may edit the DOCUMENT (OnlyOffice), not just the form:
-     * an approved contract can be reopened for field fixes, but its signed
-     * document stays read-only — document changes go through re-approval.
-     */
-    public function documentEditableBy(?User $user = null): bool
-    {
-        return $this->status !== self::STATUS_APPROVED && $this->canBeEditedBy($user);
     }
 
     public function canBeDeletedBy(?User $user = null): bool

@@ -67,10 +67,10 @@ it('cancels every existing approver and drops the contract back to draft when a 
         ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(3);
 });
 
-it('keeps existing approvers when only bookkeeping fields change (status, document_key, signed_at)', function () {
+it('keeps existing approvers when only bookkeeping fields change (status, signed_at)', function () {
     [$contract] = inReviewContractWithChain();
 
-    $contract->update(['document_key' => 'fresh-key-12345']);
+    $contract->update(['signed_at' => now()->toDateString()]);
 
     expect($contract->fresh()->status)->toBe(Contract::STATUS_IN_REVIEW)
         ->and($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(0);

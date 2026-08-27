@@ -8,8 +8,8 @@
      * own activity — the heading/description/close ride on the Action modal.
      *
      * @var \App\Models\Contract $record
-     * @var \App\Filament\Resources\Contracts\Pages\ViewContract $page
      * @var int $userId
+     * @var \Illuminate\Support\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
      */
     $ic = fn (string $name, int $size = 18) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
@@ -26,7 +26,7 @@
         ? __('app.label.not_submitted')
         : $status->label();
 
-    $apActs = $page->getActivities()->where('causer_id', $userId)->values();
+    $apActs = $activities->values();
 
     // Timing tile, shaped by where this person currently stands.
     $timing = null;

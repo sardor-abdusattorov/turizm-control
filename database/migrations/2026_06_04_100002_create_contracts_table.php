@@ -30,8 +30,6 @@ return new class extends Migration
             $table->date('signed_at')->nullable();
 
             $table->string('document_file')->nullable();
-            $table->string('document_key')->nullable();
-            $table->string('pdf_file')->nullable();
 
             $table->timestamps();
 

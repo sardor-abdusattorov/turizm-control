@@ -36,11 +36,9 @@ class ContractTemplatesTable
                     ->icon('heroicon-o-document-text')
                     ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : __('app.label.not_set'))
                     ->limit(35)
-                    ->url(fn (ContractTemplate $record) => $record->templateExists()
-                        ? route('contract-templates.editor', ['template' => $record, 'mode' => 'view'])
-                        : null,
-                        shouldOpenInNewTab: true,
-                    ),
+                    ->tooltip(fn (ContractTemplate $record): ?string => $record->template_file
+                        ? basename($record->template_file)
+                        : null),
 
                 TextColumn::make('contractType.title')
                     ->sortable()

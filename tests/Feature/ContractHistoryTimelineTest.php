@@ -1,10 +1,11 @@
 <?php
 
-use App\Filament\Resources\Contracts\Pages\ViewContract;
+use App\Filament\Resources\Contracts\Widgets\ContractApprovalChainTableWidget;
 use App\Filament\Resources\Contracts\Widgets\ContractHistoryTimelineWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
@@ -45,26 +46,23 @@ it('opens the approver details as a native Filament modal', function () {
         'responsible_id' => $manager->id,
         'status' => Contract::STATUS_IN_REVIEW,
     ]);
-    ContractApprover::factory()->create([
+    $approverRecord = ContractApprover::factory()->create([
         'contract_id' => $contract->id, 'user_id' => $approver->id, 'order' => 1,
         'status' => ContractApprover::STATUS_PENDING,
     ]);
 
-    // The action mounts as a native Filament modal (heading closure, args)…
-    Livewire::test(ViewContract::class, ['record' => $contract->id])
-        ->mountAction('approverDetails', arguments: ['user' => $approver->id])
-        ->assertActionMounted('approverDetails');
+    // The row action on the chain table mounts as a native Filament modal…
+    Livewire::test(ContractApprovalChainTableWidget::class, ['contractId' => $contract->id])
+        ->mountAction(TestAction::make('approverDetails')->table($approverRecord))
+        ->assertActionMounted(TestAction::make('approverDetails')->table($approverRecord));
 
     // …and its content view carries the step tile and the records table.
     // (The modal body itself lives in a lazily-rendered wire:partial the
     // test snapshot does not include, so the view renders directly.)
-    $page = app(ViewContract::class);
-    $page->record = $contract->fresh()->loadMissing(['approvers.user.department', 'approvers.user.position', 'activeApprovers']);
-
-    $html = view('filament.resources.contracts.pages.view-contract.approver-details', [
-        'record' => $page->record,
-        'page' => $page,
+    $html = view('filament.resources.contracts.widgets.approver-details', [
+        'record' => $contract->fresh()->loadMissing(['approvers.user', 'activeApprovers']),
         'userId' => $approver->id,
+        'activities' => collect(),
     ])->render();
 
     expect($html)->toContain(__('app.label.step'))

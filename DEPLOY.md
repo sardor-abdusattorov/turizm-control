@@ -2,55 +2,77 @@
 
 Руководство по запуску проекта локально и на сервере.
 
-- **Домен:** https://www.prcontrol.uz (+ `prcontrol.uz`, `office.prcontrol.uz`)
+- **Домен:** https://www.prcontrol.uz (+ `prcontrol.uz`)
 - **Путь на сервере:** `/home/www/sardor_projects/turizm-control`
-- **База данных:** внешний MySQL 8 (на проде контейнера БД нет)
+- **База данных:** внешний MySQL 8
+- **Docker не используется** — приложение крутится нативно на хостовом
+  nginx + PHP-FPM 8.3.
 
 ---
 
 ## Архитектура
 
 ```
-Браузер ──HTTPS──> хостовый nginx (/etc/nginx, порты 80/443, TLS)
-   www.prcontrol.uz/      → 127.0.0.1:8000   Docker nginx → PHP-FPM (app)
-   www.prcontrol.uz/app   → 127.0.0.1:8080   Reverb (WebSocket)
-   office.prcontrol.uz/   → 127.0.0.1:8082   OnlyOffice
+Браузер ──HTTPS──> nginx (/etc/nginx, порты 80/443, TLS)
+                     └── fastcgi_pass → php8.3-fpm (unix-сокет)
+                            root = .../turizm-control/public
+
+systemd: turizm-queue.service   → php artisan queue:work   (Telegram-джобы)
+cron:    * * * * *              → php artisan schedule:run (4 напоминания)
 ```
 
-Docker разбит на два файла:
+Фоновых сервисов ровно два: **воркер очереди** и **планировщик**. WebSocket
+(Reverb) не нужен — в приложении нет ни одного `ShouldBroadcast`-события и ни
+одного слушателя Echo; конфиг оставлен на будущее, но процесс поднимать не надо.
 
-| Файл | Назначение | Сервисы |
-|------|------------|---------|
-| `docker-compose.yml` | **прод** | nginx, app, queue, scheduler, reverb, onlyoffice |
-| `docker-compose.override.yml` | **дев** (доп. поверх прод) | mysql, phpmyadmin, node (Vite) |
+---
 
-`docker compose` локально сам подмешивает override. На проде запускаем с
-`-f docker-compose.yml`, поэтому dev-сервисы (MySQL/phpMyAdmin/Vite) **на сервере
-никогда не стартуют** — БД там внешняя.
+## Требования к серверу
+
+| Компонент | Версия | Зачем |
+|-----------|--------|-------|
+| PHP | **8.3** | приложение и CLI |
+| Composer | 2.x | зависимости |
+| Node.js | 20.19+ / 22.12+ | сборка ассетов (Vite 7) |
+| MySQL | 8.x | БД |
+| nginx | любой актуальный | HTTP + TLS |
+
+Расширения PHP:
+
+```bash
+sudo apt install -y php8.3-fpm php8.3-cli php8.3-mysql php8.3-mbstring \
+  php8.3-xml php8.3-curl php8.3-zip php8.3-gd php8.3-intl php8.3-bcmath
+```
+
+`gd` + `intl` обязательны: первый — для превью и Excel-экспорта, второй — для
+форматирования дат/валют в отчётах.
 
 ---
 
 ## Локальная разработка
 
 ```bash
-docker compose up -d                 # поднимет ВСЁ: прод-сервисы + mysql/pma/vite
+cp .env.example .env
+composer install
+npm install
+php artisan key:generate
+php artisan project:init      # migrate:fresh + shield + сидеры + супер-админ
+composer run dev              # сервер + очередь + логи + Vite одной командой
 ```
 
-Первый запуск:
+Приложение — http://localhost:8000, Vite — :5173.
+
+`.env.example` по умолчанию смотрит на MySQL `127.0.0.1:3306` (база `turizm`).
+Для быстрого старта без MySQL можно переключиться на SQLite:
+
+```env
+DB_CONNECTION=sqlite
+```
 
 ```bash
-cp .env.example .env
-docker compose up -d
-docker compose exec app composer install
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan project:init   # migrate:fresh + shield + сидеры + супер-админ
+touch database/database.sqlite
+php artisan project:init
 ```
-
-Адреса: http://localhost:8000 (приложение) · :8081 (phpMyAdmin) ·
-:8082 (OnlyOffice) · :5173 (Vite).
-
-Остановить: `docker compose down`. Тяжёлый OnlyOffice можно гасить, когда не нужен:
-`docker compose stop onlyoffice node`.
 
 ---
 
@@ -59,7 +81,9 @@ docker compose exec app php artisan project:init   # migrate:fresh + shield + с
 ### 1. Клон и `.env`
 
 ```bash
-cd /home/www/sardor_projects/turizm-control
+cd /home/www/sardor_projects
+git clone <repo> turizm-control
+cd turizm-control
 cp .env.example .env
 nano .env
 ```
@@ -73,115 +97,97 @@ APP_URL=https://www.prcontrol.uz
 APP_KEY=                         # заполнит key:generate
 
 DB_CONNECTION=mysql
-DB_HOST=host.docker.internal      # MySQL на самом хосте; для отдельного сервера — его IP/домен
+DB_HOST=127.0.0.1                # MySQL на этом же сервере
 DB_PORT=3306
-DB_DATABASE=...
-DB_USERNAME=...
+DB_DATABASE=pr_control
+DB_USERNAME=pr_control
 DB_PASSWORD=...
 
 QUEUE_CONNECTION=database
+CACHE_STORE=database
+SESSION_DRIVER=database
 
-BROADCAST_CONNECTION=reverb
-REVERB_APP_ID=<рандом>
-REVERB_APP_KEY=<рандом>
-REVERB_APP_SECRET=<рандом>
-REVERB_HOST=reverb               # сервер публикует во внутренний контейнер
-REVERB_PORT=8080
-REVERB_SCHEME=http
-VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"
-VITE_REVERB_HOST=www.prcontrol.uz   # браузер коннектится по домену (wss)
-VITE_REVERB_PORT=443
-VITE_REVERB_SCHEME=https
-
-ONLYOFFICE_PUBLIC_URL=https://office.prcontrol.uz
-ONLYOFFICE_INTERNAL_URL=http://onlyoffice
-ONLYOFFICE_CALLBACK_HOST=http://nginx
-ONLYOFFICE_JWT_SECRET=<сильный секрет>
+TELEGRAM_BOT_TOKEN=...
+TELEGRAM_BOT_USERNAME=...
+TELEGRAM_WEBHOOK_SECRET=<длинная случайная строка>
 ```
 
-> ⚠️ `VITE_REVERB_*` должны быть в `.env` **до сборки ассетов** — Vite зашивает их в JS.
+`BROADCAST_CONNECTION`/`REVERB_*`/`VITE_REVERB_*` трогать не нужно — они
+неактивны, пока в приложении нет вещания.
 
-#### MySQL на хосте (а не отдельным сервером)
+### 2. Настройка PHP
 
-Контейнеры обращаются к хостовой БД через `host.docker.internal` — это уже
-прописано в `docker-compose.yml` (`extra_hosts: host.docker.internal:host-gateway`
-на `app`/`queue`/`scheduler`/`reverb`), поэтому в `.env` достаточно
-`DB_HOST=host.docker.internal`.
+`sudo nano /etc/php/8.3/fpm/conf.d/99-turizm.ini` (и такой же файл для
+`/etc/php/8.3/cli/conf.d/`, иначе `php artisan` будет падать на больших
+импортах):
 
-Хостовый MySQL должен принимать подключение из контейнера:
+```ini
+memory_limit = 1G
+upload_max_filesize = 50M
+post_max_size = 60M
+max_execution_time = 300
+max_input_vars = 10000
+date.timezone = Asia/Tashkent
 
-```bash
-sudo ss -tlnp | grep 3306            # если слышит только 127.0.0.1 — контейнер не достучится
+opcache.enable = 1
+opcache.enable_cli = 0
+opcache.memory_consumption = 256
+opcache.interned_strings_buffer = 16
+opcache.max_accelerated_files = 20000
+opcache.validate_timestamps = 0
+opcache.jit_buffer_size = 128M
+opcache.jit = tracing
 ```
 
-1. **bind-address** — в `/etc/mysql/mysql.conf.d/mysqld.cnf` указать адрес
-   docker-моста (безопаснее, чем `0.0.0.0`) и перезапустить MySQL:
-   ```
-   bind-address = 172.17.0.1
-   ```
-   ```bash
-   sudo systemctl restart mysql
-   ```
-2. **Доступ пользователю** — разрешить коннект не только с `localhost`:
-   ```sql
-   CREATE USER 'pr_control'@'172.%' IDENTIFIED BY '<пароль>';
-   GRANT ALL PRIVILEGES ON pr_control.* TO 'pr_control'@'172.%';
-   FLUSH PRIVILEGES;
-   ```
-3. **Файрвол** — если стоит ufw, открыть 3306 только для docker-подсети:
-   `sudo ufw allow from 172.16.0.0/12 to any port 3306`.
+> `opcache.validate_timestamps=0` означает, что новый код не подхватится, пока
+> не перезагрузить FPM. Деплой это делает сам (`systemctl reload php8.3-fpm`).
 
-После правок пересоздай контейнеры (`up -d` подхватит `extra_hosts`), и
-`turizm-queue` перестанет рестартовать.
-
-### 2. Поднять прод-стек
+Загрузка сканов договоров ограничена 25 МБ на файл в самой форме, но грузить
+можно несколько сразу — отсюда `post_max_size` больше `upload_max_filesize`.
 
 ```bash
-docker compose -f docker-compose.yml up -d --remove-orphans
+sudo systemctl restart php8.3-fpm
 ```
 
-Первый `up` долгий — тянется образ OnlyOffice (~2–3 ГБ). Это разово, дальше из кэша.
-
-### 3. Инициализация приложения
+### 3. Установка приложения
 
 ```bash
-docker compose -f docker-compose.yml exec app composer install --no-dev --optimize-autoloader
-docker compose -f docker-compose.yml exec app php artisan key:generate
-docker compose -f docker-compose.yml exec app php artisan migrate --force
+composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
+php artisan key:generate
+php artisan migrate --force
 # shield:generate запрещён в production (FilamentShield::prohibitDestructiveCommands),
 # поэтому для разовой генерации прав переопредели окружение на эту команду:
-docker compose -f docker-compose.yml exec -e APP_ENV=local app php artisan shield:generate --all --panel=admin
-docker compose -f docker-compose.yml exec app php artisan db:seed --force      # демо-данные (по желанию)
-docker compose -f docker-compose.yml exec app php artisan filament:assets
-docker compose -f docker-compose.yml exec app php artisan storage:link
+APP_ENV=local php artisan shield:generate --all --panel=admin
+php artisan storage:link
+php artisan filament:assets
 ```
 
-> ⚠️ `db:seed` создаёт демо-договоры/контакты/платежи и супер-админа
-> `mr.silverwind1998@gmail.com`. На «чистый» прод без демо — пропусти этот шаг и
-> назначь админа вручную (тоже с переопределением env):
-> `docker compose -f docker-compose.yml exec -e APP_ENV=local app php artisan shield:super-admin --user=1 --panel=admin`.
+> **Демо-данные.** `php artisan db:seed --force` создаёт демо-договоры,
+> контакты, платежи и супер-админа `mr.silverwind1998@gmail.com`. На «чистый»
+> прод этот шаг пропусти и назначь админа вручную:
+> `APP_ENV=local php artisan shield:super-admin --user=1 --panel=admin`.
 
-### 4. Сборка фронта (ассеты)
-
-На проде нет Vite-контейнера. Вариант с node на сервере (нужен Node 20.19+ / 22.12+):
+Права на запись (nginx/FPM работают от `www-data`):
 
 ```bash
-npm ci && npm run build
+sudo chown -R www-data:www-data storage bootstrap/cache
+sudo chmod -R 775 storage bootstrap/cache
 ```
 
-Либо разово через контейнер (если node на сервере старый/отсутствует):
+### 4. Сборка фронта
 
 ```bash
-docker run --rm -v "$PWD":/app -w /app node:24-alpine sh -c "npm ci && npm run build"
+npm ci --no-audit --no-fund
+npm run build
 ```
 
 ### 5. Кэш
 
 ```bash
-docker compose -f docker-compose.yml exec app php artisan optimize
+php artisan project:cache      # config + routes + views + events
 ```
 
-### 6. nginx (reverse proxy)
+### 6. nginx
 
 `sudo nano /etc/nginx/sites-available/prcontrol.uz`:
 
@@ -189,6 +195,10 @@ docker compose -f docker-compose.yml exec app php artisan optimize
 server {
     listen 80; listen [::]:80;
     server_name www.prcontrol.uz prcontrol.uz;
+
+    root /home/www/sardor_projects/turizm-control/public;
+    index index.php;
+
     client_max_body_size 60M;
 
     # Канонический хост: апекс → www. Иначе apex и www — разные origin, и
@@ -197,42 +207,31 @@ server {
         return 301 https://www.prcontrol.uz$request_uri;
     }
 
-    location /app {                       # Reverb (WebSocket)
-        proxy_pass http://127.0.0.1:8080;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_read_timeout 3600s;
-    }
-    location / {                          # приложение
-        proxy_pass http://127.0.0.1:8000;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $host;
-    }
-}
+    charset utf-8;
 
-server {
-    listen 80; listen [::]:80;
-    server_name office.prcontrol.uz;
-    client_max_body_size 100M;
-
-    location / {                          # OnlyOffice
-        proxy_pass http://127.0.0.1:8082;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_read_timeout 3600s;
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
     }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+        include fastcgi_params;
+
+        # Долгие операции: экспорт в Excel, генерация документов.
+        fastcgi_read_timeout 300;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    error_page 404 /index.php;
 }
 ```
 
@@ -245,17 +244,75 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d www.prcontrol.uz -d prcontrol.uz -d office.prcontrol.uz
+sudo certbot --nginx -d www.prcontrol.uz -d prcontrol.uz
 ```
 
 Certbot сам допишет 443 и редирект http→https.
 
-### 8. Проверка
+### 8. Очередь (systemd)
+
+Telegram-карточки согласования, напоминания и рассылки уходят через очередь
+(`QUEUE_CONNECTION=database`), поэтому воркер обязателен — без него кнопки в
+боте просто не придут.
+
+`sudo nano /etc/systemd/system/turizm-queue.service`:
+
+```ini
+[Unit]
+Description=turizm-control queue worker
+After=network.target mysql.service
+
+[Service]
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=5
+WorkingDirectory=/home/www/sardor_projects/turizm-control
+ExecStart=/usr/bin/php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now turizm-queue
+sudo systemctl status turizm-queue
+```
+
+`--max-time=3600` заставляет воркер перезапускаться раз в час — так он не
+копит утечки памяти и гарантированно берёт свежий код.
+
+### 9. Планировщик (cron)
+
+Четыре команды по расписанию: напоминания о согласовании (ежечасно), курс валют
+(07:00), дедлайны проектов (08:30), напоминания об оплате (09:00) —
+см. `routes/console.php`.
+
+```bash
+sudo crontab -u www-data -e
+```
+
+```cron
+* * * * * cd /home/www/sardor_projects/turizm-control && php artisan schedule:run >> /dev/null 2>&1
+```
+
+### 10. Telegram webhook
+
+```bash
+php artisan telegram:webhook:install
+```
+
+Роут `/telegram/webhook` защищён `TELEGRAM_WEBHOOK_SECRET` и throttle —
+секрет должен быть в `.env` **до** установки вебхука.
+
+### 11. Проверка
 
 - https://www.prcontrol.uz → страница входа `/login`
-- https://office.prcontrol.uz → «Document Server is running» (стартует ~30–60 сек)
-- Открыть договор → грузится редактор OnlyOffice
-- Колокольчик уведомлений обновляется в реальном времени
+- Открыть договор → цепочка согласования и вложения на месте, «Скачать
+  документ» отдаёт `.docx`
+- `sudo systemctl status turizm-queue` → `active (running)`
+- `php artisan schedule:list` → четыре команды с ближайшим временем запуска
 
 ---
 
@@ -263,16 +320,16 @@ Certbot сам допишет 443 и редирект http→https.
 
 Workflow `.github/workflows/deploy.yml` срабатывает на push в `main`:
 
-1. **test** — ставит PHP 8.4, `composer install`, гоняет `php artisan test`
-   (sqlite в памяти, БД не нужна). Красные тесты блокируют деплой.
-2. **deploy** — по SSH на сервере: `git reset --hard origin/main`, поднимает
-   прод-стек, `composer install`, **собирает ассеты прямо на сервере**
-   (`npm ci && npm run build` — чтобы `VITE_REVERB_*` взялись из прод-`.env`),
-   миграции, `filament:assets`, кэш, `storage:link`.
+1. **test** — ставит PHP 8.3 (та же версия, что на проде), `composer install`,
+   гоняет `php artisan test --compact` (sqlite в памяти, БД не нужна). Красные
+   тесты блокируют деплой.
+2. **deploy** — по SSH: `git reset --hard origin/main`, `composer install`,
+   **сборка ассетов прямо на сервере**, `migrate --force`, `filament:assets`,
+   кэш, `queue:restart`, `reload php8.3-fpm`.
 
-> Ассеты собираются **на сервере, а не в CI**: Vite зашивает `VITE_REVERB_*` в
-> бандл на этапе сборки, а правильный `wss`-хост есть только в прод-`.env`.
-> Поэтому на сервере должен стоять Node 20.19+ / 22.12+.
+> Ассеты собираются на сервере, а не в CI: Vite зашивает `VITE_*` в бандл на
+> этапе сборки, а актуальные значения есть только в прод-`.env`. Поэтому на
+> сервере должен стоять Node 20.19+ / 22.12+.
 
 ### Секреты GitHub
 
@@ -285,6 +342,13 @@ GitHub → **Settings → Secrets and variables → Actions** → *New repositor
 | `SERVER_SSH_KEY` | приватный SSH-ключ (целиком, с `-----BEGIN…`) |
 | `SERVER_PORT` | `22` |
 | `SERVER_APP_PATH` | `/home/www/sardor_projects/turizm-control` |
+
+Деплой делает `sudo systemctl reload php8.3-fpm` — разреши это без пароля:
+
+```bash
+echo 's_abdusattorov ALL=(root) NOPASSWD: /bin/systemctl reload php8.3-fpm' \
+  | sudo tee /etc/sudoers.d/turizm-deploy
+```
 
 ### SSH-ключ для деплоя
 
@@ -305,40 +369,45 @@ cat ~/.ssh/github_deploy        # ← это значение целиком в 
 ## Обслуживание
 
 ```bash
-# статус и логи
-docker compose -f docker-compose.yml ps
-docker compose -f docker-compose.yml logs -f app
+# логи приложения
+tail -f storage/logs/laravel.log
 
-# рестарт сервиса
-docker compose -f docker-compose.yml restart app
+# воркер очереди
+sudo systemctl status turizm-queue
+sudo journalctl -u turizm-queue -f
+sudo systemctl restart turizm-queue
 
 # обновить вручную (если без CI)
 git pull origin main
-docker compose -f docker-compose.yml up -d
-docker compose -f docker-compose.yml exec app composer install --no-dev --optimize-autoloader
-docker compose -f docker-compose.yml exec app php artisan migrate --force
+composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
 npm ci && npm run build
-docker compose -f docker-compose.yml exec app php artisan optimize
+php artisan migrate --force
+php artisan filament:assets
+php artisan optimize:clear && php artisan project:cache
+php artisan queue:restart
+sudo systemctl reload php8.3-fpm
 ```
 
----
+### Артизан-команды проекта
 
-## Несколько проектов на одном сервере
+| Команда | Что делает | Где можно |
+|---------|------------|-----------|
+| `project:init` | **сносит БД** (`migrate:fresh`) + shield + сидеры + супер-админ | только dev — в production падает с ошибкой |
+| `project:update` | `migrate` + `shield:generate --ignore-existing-policies` + кэш | прод |
+| `project:cache` | config/route/view/event кэш | прод |
 
-Имена сервисов (`app`, `queue`, …) изолированы по проекту — не конфликтуют.
-Конфликтуют только **порты на хосте**. turizm занимает `8000`, `8080`, `8082`.
-Если заняты — поменяй левую (хостовую) часть в `docker-compose.yml` и
-соответствующие `proxy_pass` в nginx. Внутренние порты контейнеров не трогать.
+На проде обновление — это `project:update`, а не `project:init`.
 
 ---
 
 ## Заметки
 
-- **Безопасность.** Чтобы `8000/8080/8082` не были доступны публично в обход TLS,
-  можно привязать их к localhost в `docker-compose.yml`:
-  `ports: ["127.0.0.1:8000:80"]` и т.д. Хостовый nginx достучится, снаружи — нет.
-- **OnlyOffice** требует HTTPS-поддомен (`office.prcontrol.uz`), потому что
-  редактор грузится в браузере, а сайт работает по HTTPS (mixed content).
-- **Reverb.** Сервер публикует события во внутренний `reverb:8080`, браузер
-  подключается по `wss://www.prcontrol.uz/app` (через nginx). Поэтому
-  `REVERB_HOST=reverb`, а `VITE_REVERB_HOST=www.prcontrol.uz`.
+- **Права на storage.** Если картинки/вложения не грузятся — почти всегда
+  `storage/app` принадлежит не `www-data`. Проверяй после ручного `git pull`
+  из-под другого пользователя.
+- **OPcache.** При `validate_timestamps=0` правка файла на сервере без
+  `reload php8.3-fpm` не даст эффекта — это не «кэш Laravel».
+- **Reverb.** Конфиг есть, процесс не нужен: сейчас ничего не вещает. Если
+  появится `ShouldBroadcast`-событие — подними `php artisan reverb:start`
+  отдельным systemd-юнитом и проксируй `/app` на `127.0.0.1:8080`.
+</content>

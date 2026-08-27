@@ -9,13 +9,6 @@ class ContractObserver
 {
     public function __construct(private ContractFiles $files) {}
 
-    public function creating(Contract $contract): void
-    {
-        if (! $contract->document_key) {
-            $contract->document_key = Contract::generateDocumentKey();
-        }
-    }
-
     public function updating(Contract $contract): void
     {
         $contract->maybeInvalidateOnEdit();

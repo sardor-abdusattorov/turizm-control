@@ -2,11 +2,6 @@
         [x-cloak] {
             display: none !important;
         }
-        /* While a custom cw-modal is open the page behind it must not
-           scroll — the root x-data toggles this class via x-effect. */
-        .cw-noscroll {
-            overflow: hidden;
-        }
         /* Base palette tokens (--s/--t/--m/--accent/...) live in theme.css.
            The cw page tunes a few values for tighter contrast against the
            chain/progress bars and keeps its page-specific extras (--track,
@@ -280,225 +275,6 @@
             flex-shrink: 0;
         }
 
-        /* approval chain — vertical timeline */
-        .cw-chain {
-            padding: .9rem 1.25rem 1.1rem;
-        }
-        .cw-step {
-            position: relative;
-            display: flex;
-            align-items: flex-start;
-            gap: .9rem;
-            padding: .6rem .65rem;
-            border-radius: .85rem;
-            transition: background .15s;
-        }
-        .cw-step:not(:last-child) {
-            margin-bottom: .15rem;
-        }
-        .cw-step:not(:last-child)::before {
-            content: '';
-            position: absolute;
-            left: 2rem;
-            top: 2.95rem;
-            bottom: -.45rem;
-            width: 2px;
-            background: var(--track);
-            border-radius: 2px;
-        }
-        .cw-step--approved:not(:last-child)::before {
-            background: linear-gradient(#34d399, var(--track));
-        }
-        .cw-step--current {
-            background: linear-gradient(90deg, var(--accent-soft), transparent 70%);
-        }
-        @keyframes cwPulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(37,99,235,.55);
-            }
-            70% {
-                box-shadow: 0 0 0 8px rgba(37,99,235,0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(37,99,235,0);
-            }
-        }
-        @media (prefers-reduced-motion: no-preference) {
-            .cw-step--current .cw-badge--current {
-                animation: cwPulse 1.8s ease-out infinite;
-            }
-        }
-        .cw-step:hover {
-            background: var(--soft);
-        }
-        .cw-node {
-            position: relative;
-            flex-shrink: 0;
-        }
-        .cw-node img {
-            width: 2.75rem;
-            height: 2.75rem;
-            border-radius: 999px;
-            object-fit: cover;
-            display: block;
-            box-shadow: 0 0 0 2px var(--s), 0 0 0 3px var(--track);
-        }
-        .cw-step--current .cw-node img {
-            box-shadow: 0 0 0 2px var(--s), 0 0 0 3px var(--accent), 0 0 0 7px var(--accent-ring);
-        }
-        .cw-step--approved .cw-node img {
-            box-shadow: 0 0 0 2px var(--s), 0 0 0 3px #34d399, 0 0 0 7px rgba(52,211,153,.15);
-        }
-        .cw-step--rejected .cw-node img {
-            box-shadow: 0 0 0 2px var(--s), 0 0 0 3px #f87171, 0 0 0 7px rgba(248,113,113,.15);
-        }
-
-        /* Director = final sign-off: gold ring on the node, kept after the state
-           rules so it wins. The state badge (check/clock) still shows on top. */
-        .cw-step--director .cw-node img {
-            box-shadow: 0 0 0 2px var(--s), 0 0 0 3px #f59e0b, 0 0 0 7px rgba(245,158,11,.18);
-        }
-        .cw-badge {
-            position: absolute;
-            bottom: -.25rem;
-            right: -.25rem;
-            width: 1.4rem;
-            height: 1.4rem;
-            border-radius: 999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 0 2px var(--s);
-            color: #fff;
-        }
-        .cw-badge--approved {
-            background: #10b981;
-        }
-        .cw-badge--rejected {
-            background: #ef4444;
-        }
-        .cw-badge--returned {
-            background: #3b82f6;
-        }
-        .cw-badge--current {
-            background: var(--accent);
-            color: var(--accent-on);
-        }
-        .cw-badge--queued {
-            background: #cbd5e1;
-            color: #64748b;
-        }
-        .dark .cw-badge--queued {
-            background: #3f3f46;
-            color: #a1a1aa;
-        }
-        .cw-step__bd {
-            min-width: 0;
-            flex: 1;
-            padding-top: .15rem;
-        }
-        .cw-step__nm {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--t);
-            display: flex;
-            align-items: center;
-            gap: .4rem;
-        }
-        .cw-ord {
-            font-size: 0.664rem;
-            font-weight: 700;
-            color: var(--m2);
-            background: var(--soft);
-            border-radius: 999px;
-            padding: .05rem .42rem;
-        }
-        .cw-director {
-            display: inline-flex;
-            align-items: center;
-            gap: .22rem;
-            font-size: .6rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .04em;
-            color: #b45309;
-            background: rgba(245,158,11,.15);
-            padding: .12rem .42rem;
-            border-radius: 999px;
-            white-space: nowrap;
-        }
-        .dark .cw-director {
-            color: #fcd34d;
-            background: rgba(245,158,11,.22);
-        }
-        .cw-step__dp {
-            font-size: 0.8rem;
-            font-weight: 450;
-            color: var(--m);
-            margin-top: .15rem;
-        }
-        .cw-step__meta {
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-            margin-top: .5rem;
-            flex-wrap: wrap;
-        }
-        .cw-when {
-            font-size: 0.724rem;
-            color: var(--m2);
-            display: inline-flex;
-            align-items: center;
-            gap: .25rem;
-        }
-        .cw-when--over {
-            color: #dc2626;
-            font-weight: 650;
-        }
-        .cw-when--soon {
-            color: var(--accent);
-            font-weight: 600;
-        }
-        .cw-cmt {
-            margin-top: .55rem;
-            padding: .45rem .7rem;
-            border-radius: .55rem;
-            background: var(--soft);
-            font-size: 0.784rem;
-            color: var(--m);
-            border: 1px solid var(--d);
-        }
-        .cw-eye {
-            flex-shrink: 0;
-            width: 2rem;
-            height: 2rem;
-            border-radius: .6rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--m2);
-            background: transparent;
-            border: 1px solid var(--d);
-            cursor: pointer;
-            transition: all .15s;
-        }
-        .cw-eye:hover {
-            color: var(--accent);
-            border-color: var(--accent);
-            background: var(--soft);
-        }
-
-        /* dropped-from-chain row — muted, still clickable for its history */
-        .cw-step--ghost {
-            opacity: .62;
-        }
-        .cw-step--ghost .cw-node img {
-            filter: grayscale(.4);
-            box-shadow: 0 0 0 2px var(--s), 0 0 0 3px var(--track);
-        }
-        .cw-step--ghost:hover {
-            opacity: .85;
-        }
 
         /* document */
         .cw-doc {
@@ -882,81 +658,6 @@
             display: inline-block;
         }
 
-        /* modal */
-        .cw-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 60;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-        .cw-modal__bg {
-            position: absolute;
-            inset: 0;
-            background: rgba(15,23,42,.55);
-            backdrop-filter: blur(3px);
-        }
-        .cw-modal__card {
-            position: relative;
-            width: 100%;
-            max-width: 30rem;
-            max-height: 86vh;
-            overflow: auto;
-            background: var(--s);
-            border: 1px solid var(--d);
-            border-radius: .75rem;
-            box-shadow: 0 24px 48px -12px rgba(15,20,25,.25);
-        }
-        .dark .cw-modal__card {
-            box-shadow: 0 24px 48px -12px rgba(0,0,0,.65);
-        }
-        .cw-modal__hd {
-            display: flex;
-            align-items: center;
-            gap: .85rem;
-            padding: 1.25rem 1.25rem 1rem;
-            border-bottom: 1px solid var(--d);
-        }
-        .cw-modal__hd img {
-            width: 3rem;
-            height: 3rem;
-            border-radius: 999px;
-            object-fit: cover;
-            box-shadow: 0 0 0 2px var(--track);
-        }
-        .cw-modal__nm {
-            font-size: 1.01rem;
-            font-weight: 700;
-            color: var(--t);
-        }
-        .cw-modal__dp {
-            font-size: 0.805rem;
-            color: var(--m);
-            margin-top: .1rem;
-        }
-        .cw-modal__x {
-            margin-left: auto;
-            width: 2rem;
-            height: 2rem;
-            border-radius: .6rem;
-            border: 1px solid var(--d);
-            background: transparent;
-            color: var(--m);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .cw-modal__x:hover {
-            background: var(--soft);
-            color: var(--t);
-        }
-        .cw-modal__bd {
-            padding: 1.1rem 1.25rem 1.35rem;
-        }
         .cw-kv {
             display: flex;
             align-items: center;
@@ -1075,11 +776,6 @@
             font-size: 0.7rem;
             color: var(--m2);
             white-space: nowrap;
-        }
-        .cw-modal__empty {
-            font-size: 0.825rem;
-            color: var(--m2);
-            padding: .4rem 0;
         }
 
         /* Per-record table inside the eye-modal — every row this user has on
@@ -1301,41 +997,9 @@
                 grid-template-columns: 12rem 1fr;
             }
 
-            /* Approval-chain step: let the name/role/pill wrap instead of
-               overflowing, and pull the eye button up to the top. */
-            .cw-step {
-                gap: .7rem;
-            }
-            .cw-step__nm {
-                flex-wrap: wrap;
-            }
-
-            /* Per-approver modal: give it the screen, stack the metric tiles,
-               wrap the header, and turn the record table into stacked blocks. */
-            .cw-modal {
-                padding: .5rem;
-            }
-            .cw-modal__card {
-                max-height: 92vh;
-            }
-            .cw-modal__hd {
-                flex-wrap: wrap;
-                padding: 1rem 3rem 1rem 1rem;
-            }
-            /* keep the close button pinned to the top-right corner instead of
-               dropping it onto its own row */
-            .cw-modal__x {
-                position: absolute;
-                top: .9rem;
-                right: .9rem;
-                margin-left: 0;
-            }
             .cw-stats {
                 grid-template-columns: 1fr;
                 padding: .85rem 1rem;
-            }
-            .cw-modal__bd {
-                padding: .9rem 1rem 1.2rem;
             }
             /* The record table stays a table and scrolls sideways inside its
                wrapper (see .cw-rt-wrap) rather than stacking into blocks. */

@@ -14,15 +14,7 @@
         : number_format($bytes / 1024, 1, '.', ' ').' KB';
 
     $createdLabel = $record->created_at?->translatedFormat('d M Y H:i');
-    $canEdit = $record->canBeEditedBy();
-    $editUrl = route('contracts.editor', ['contract' => $record, 'mode' => $canEdit ? 'edit' : 'view']);
-
-    // Opening the editor mid-approval lets the user change the document, which
-    // resets the whole chain once they close it — warn them first.
-    $warnReset = $canEdit && $record->documentEditWouldResetApprovals();
-    $previewUrl = $record->documentExists() && $record->status === \App\Models\Contract::STATUS_APPROVED
-        ? route('contracts.pdf.inline', ['contract' => $record])
-        : null;
+    $downloadUrl = route('contracts.document.download', ['contract' => $record]);
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 @endphp
@@ -58,18 +50,10 @@
         </div>
     </div>
     <div class="cf-file__act">
-        <a href="{{ $editUrl }}" class="cf-btn cf-btn--primary"
-            @if ($warnReset) onclick="return confirm(@js(__('app.message.editor_reset_warning')))" @endif
-        >
-            {!! $ic('heroicon-o-pencil-square', 16) !!}
-            <span>{{ __('app.action.open_editor') }}</span>
+        <a href="{{ $downloadUrl }}" class="cf-btn cf-btn--primary">
+            {!! $ic('heroicon-o-arrow-down-tray', 16) !!}
+            <span>{{ __('app.action.download_document') }}</span>
         </a>
-        @if ($previewUrl)
-            <a href="{{ $previewUrl }}" target="_blank" rel="noopener" class="cf-btn cf-btn--ghost">
-                {!! $ic('heroicon-o-arrow-top-right-on-square', 16) !!}
-                <span>{{ __('app.action.open_in_new_tab') }}</span>
-            </a>
-        @endif
     </div>
 </div>
 

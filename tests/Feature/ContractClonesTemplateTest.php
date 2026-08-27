@@ -66,20 +66,3 @@ it('clones and fills the template into a separate contract file, leaving the tem
     $templateBody = docxBody(Storage::disk('local')->path($templatePath));
     expect($templateBody)->toContain('{{number}}');
 });
-
-it('gives the contract a different document_key than the template', function () {
-    Storage::fake('local');
-
-    $templatePath = 'uploads/files/contract-templates/main.docx';
-    Storage::disk('local')->put($templatePath, file_get_contents(makeMinimalDocx('Contract {{number}}')));
-
-    $template = ContractTemplate::factory()->create(['template_file' => $templatePath]);
-    $contract = Contract::factory()->create([
-        'contract_template_id' => $template->id,
-        'number' => 'C-778',
-    ]);
-
-    $contract->buildDocumentFromTemplate(app(TemplateFiller::class), app(ContractPlaceholderValues::class));
-
-    expect($contract->fresh()->document_key)->not->toBe($template->document_key);
-});

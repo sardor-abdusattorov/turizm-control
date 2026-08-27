@@ -1,6 +1,7 @@
 <?php
 
 use App\Filament\Resources\Contracts\Pages\ViewContract;
+use App\Filament\Resources\Contracts\Widgets\ContractApprovalChainTableWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
@@ -109,18 +110,15 @@ it('keeps a cancelled approval verdict and comment in the per-approver modal', f
     $page = Livewire::test(ViewContract::class, ['record' => $contract->id]);
 
     // The standalone history button/modal is gone — details live behind the
-    // eye's native Filament modal.
+    // chain table's row action.
     expect($page->html())->not->toContain('cw-history-btn');
 
     // The per-approver modal keeps the cancelled verdict, the comment and
     // the system note explaining WHY the row was cancelled.
-    $component = app(ViewContract::class);
-    $component->record = $contract->fresh()->loadMissing(['approvers.user', 'activeApprovers']);
-
-    $modal = view('filament.resources.contracts.pages.view-contract.approver-details', [
-        'record' => $component->record,
-        'page' => $component,
+    $modal = view('filament.resources.contracts.widgets.approver-details', [
+        'record' => $contract->fresh()->loadMissing(['approvers.user', 'activeApprovers']),
         'userId' => $approver->id,
+        'activities' => collect(),
     ])->render();
 
     expect($modal)->toContain('Looks good, ship it.')  // their own comment
@@ -128,7 +126,7 @@ it('keeps a cancelled approval verdict and comment in the per-approver modal', f
         ->and($modal)->toContain(__('app.message.invalidated_on_edit'));
 });
 
-it('shows a single open action on the document card instead of an embedded pdf iframe', function () {
+it('offers the document as a download on the card, with no embedded viewer', function () {
     Storage::fake('local');
 
     $user = viewerWithAccess();
@@ -142,9 +140,9 @@ it('shows a single open action on the document card instead of an embedded pdf i
 
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
-    // The card carries one primary action into the editor; PDF download lives
-    // in the page header now, not as a second card button. No embedded iframe.
-    expect($html)->toContain(route('contracts.editor', ['contract' => $contract, 'mode' => 'view']))
+    // With the online editor gone the card's one action hands the .docx over;
+    // nothing is rendered in-page.
+    expect($html)->toContain(route('contracts.document.download', ['contract' => $contract]))
         ->and($html)->not->toContain('<iframe');
 });
 
@@ -169,13 +167,12 @@ it('marks the director step as the final sign-off in the chain', function () {
 
     actingAs($user);
 
-    $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
-
-    expect($html)->toContain('cw-step--director')
-        ->and($html)->toContain(__('app.label.final_sign_off'));
+    Livewire::test(ContractApprovalChainTableWidget::class, ['contractId' => $contract->id])
+        ->assertOk()
+        ->assertSee(__('app.label.final_sign_off'));
 });
 
-it('hides the PDF preview link until the contract is approved', function () {
+it('never offers a PDF preview — there is no converter any more', function () {
     Storage::fake('local');
 
     $user = viewerWithAccess();
@@ -189,10 +186,10 @@ it('hides the PDF preview link until the contract is approved', function () {
 
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
-    expect($html)->not->toContain(route('contracts.pdf.inline', ['contract' => $contract]));
+    expect($html)->not->toContain('/pdf');
 });
 
-it('shows a per-approver detail modal trigger and renders queued steps distinctly', function () {
+it('renders the approval chain as a Filament table with distinct step statuses', function () {
     $user = viewerWithAccess();
     $first = User::factory()->create();
     $second = User::factory()->create();
@@ -216,11 +213,10 @@ it('shows a per-approver detail modal trigger and renders queued steps distinctl
 
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
-    // Native Filament tabs + Alpine state + the eye that mounts the modal.
+    // Native Filament tabs + Alpine state.
     expect($html)->toContain("tab: 'overview'")
         ->and($html)->toContain('fi-tabs')
         ->and($html)->toContain('rec-tabs-row')
-        ->and($html)->toContain('cw-eye')
         // Status pill now rides on the tab bar instead of a separate strip.
         ->and($html)->toContain('rec-tabs-row__side')
         ->and($html)->not->toContain('cw-meta')
@@ -230,10 +226,17 @@ it('shows a per-approver detail modal trigger and renders queued steps distinctl
         ->and($html)->toContain('cw-prog__fill')
         ->and($html)->toContain('cw-prog__legend')
         ->and($html)->toContain('cw-prog__await')
-        // The eye mounts the NATIVE approver-details modal, keyed by user_id
-        // so one opener covers all of a person's records.
-        ->and($html)->toContain("mountAction('approverDetails', { user: ".$contract->approvers()->where('order', 1)->first()->user_id.' }')
-        // Queued step shows the "In queue" pill, current shows "Reviewing".
-        ->and($html)->toContain(__('app.contract_approver.status.queued'))
-        ->and($html)->toContain(__('app.contract_approver.status.pending'));
+        // The chain itself is a nested Filament table widget — the hand-rolled
+        // timeline (and its eye button) is gone.
+        ->and($html)->not->toContain('cw-chain')
+        ->and($html)->not->toContain('cw-eye');
+
+    // The chain widget renders both people and tells the two states apart.
+    Livewire::test(ContractApprovalChainTableWidget::class, ['contractId' => $contract->id])
+        ->assertOk()
+        ->assertSee($first->name)
+        ->assertSee($second->name)
+        // Queued step shows the "In queue" badge, current shows "Reviewing".
+        ->assertSee(__('app.contract_approver.status.queued'))
+        ->assertSee(__('app.contract_approver.status.pending'));
 });

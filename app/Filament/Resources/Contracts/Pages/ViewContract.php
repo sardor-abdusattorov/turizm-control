@@ -6,10 +6,10 @@ use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\PaymentFilesUpload;
+use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\ContractAttachment;
-use App\Models\Payment;
 use App\Models\User;
 use App\Rules\PaymentWithinRemaining;
 use App\Services\Contracts\ContractWorkflow;
@@ -38,14 +38,12 @@ class ViewContract extends ViewRecord
     {
         parent::mount($record);
 
-        // The chain timeline and payment list walk these relations per row —
-        // load them once instead of a query per approver/payment (N+1).
+        // The progress band counts approvers and names the current one — load
+        // them once instead of a query per row (N+1). The chain and payment
+        // tables are widgets and load their own relations.
         $this->record->loadMissing([
-            'approvers.user.department',
-            'approvers.user.position',
-            'activeApprovers.user.department',
-            'activeApprovers.user.position',
-            'payments.creator',
+            'approvers.user',
+            'activeApprovers.user',
         ]);
     }
 
@@ -291,36 +289,82 @@ class ViewContract extends ViewRecord
     }
 
     /**
-     * Per-approver detail as a NATIVE Filament modal — the same chrome the
-     * breakdown modals use, replacing the old hand-rolled Alpine overlay.
-     * Mounted with { user: <user_id> }; shows every record that person has
-     * on the contract (current + invalidated attempts).
+     * The counterparty's dossier as a native Filament modal, opened from the
+     * contact row in the sidebar. Fields are grouped exactly the way
+     * ContactForm splits them: identity, tax/legal, contacts, bank details.
      */
-    public function approverDetailsAction(): Action
+    public function contactDetailsAction(): Action
     {
-        $user = fn (array $arguments): ?User => User::query()
-            ->with(['department', 'position'])
-            ->find((int) ($arguments['user'] ?? 0));
-
-        return Action::make('approverDetails')
-            ->modalHeading(fn (array $arguments): string => $user($arguments)?->name ?? '')
-            ->modalDescription(function (array $arguments) use ($user): ?string {
-                $u = $user($arguments);
-
-                return $u ? trim(($u->department?->name ?? '').($u->position?->name ? ' · '.$u->position->name : ''), ' ·') ?: null : null;
-            })
-            ->modalIcon('heroicon-o-user-circle')
-            ->modalWidth('3xl')
-            ->modalContent(fn (array $arguments) => view(
-                'filament.resources.contracts.pages.view-contract.approver-details',
-                [
-                    'record' => $this->record,
-                    'page' => $this,
-                    'userId' => (int) ($arguments['user'] ?? 0),
-                ],
+        return Action::make('contactDetails')
+            ->modalHeading(fn (): string => $this->record->contact?->name ?? '')
+            ->modalDescription(fn (): ?string => $this->record->contact?->legal_form)
+            ->modalIcon('heroicon-o-building-office-2')
+            ->modalWidth('2xl')
+            ->modalContent(fn () => view(
+                'filament.resources.contracts.pages.view-contract.contact-modal',
+                ['groups' => $this->contactGroups()],
             ))
             ->modalSubmitAction(false)
             ->modalCancelAction(false);
+    }
+
+    /**
+     * @return list<array{0: string, 1: list<array{0: string, 1: string, 2: string}>}>
+     */
+    public function contactGroups(): array
+    {
+        $contact = $this->record->contact;
+
+        if (! $contact) {
+            return [];
+        }
+
+        // The account matching this contract's currency (falls back to a generic one).
+        $bankAccount = $contact->bankAccountFor($this->record->currency_id);
+        $contactType = $contact->type === Contact::TYPE_INDIVIDUAL
+            ? __('app.contact.type.individual')
+            : __('app.contact.type.legal');
+
+        $groups = [
+            [__('app.label.basic_information'), [
+                ['heroicon-o-building-office-2', __('app.label.name'), $contact->name],
+                ['heroicon-o-identification', __('app.label.contact_type'), $contactType],
+                ['heroicon-o-tag', __('app.label.legal_form'), $contact->legal_form],
+                ['heroicon-o-map-pin', __('app.label.address'), $contact->address],
+            ]],
+
+            [__('app.label.legal_details'), [
+                ['heroicon-o-finger-print', __('app.label.inn'), $contact->inn],
+                ['heroicon-o-finger-print', __('app.label.pinfl'), $contact->pinfl],
+                ['heroicon-o-bookmark', __('app.label.oked'), $contact->oked],
+                ['heroicon-o-user', __('app.label.director_name'), $contact->director_name],
+                ['heroicon-o-user-circle', __('app.label.contact_person'), $contact->contact_person],
+            ]],
+
+            [__('app.label.contacts'), [
+                ['heroicon-o-phone', __('app.label.phone'), $contact->phone],
+                ['heroicon-o-envelope', __('app.label.email'), $contact->email],
+            ]],
+
+            [__('app.label.bank_requisites'), [
+                ['heroicon-o-building-library', __('app.label.bank_name'), $bankAccount?->bank_name],
+                ['heroicon-o-map-pin', __('app.label.bank_address'), $bankAccount?->bank_address],
+                ['heroicon-o-banknotes', __('app.label.bank_account'), $bankAccount?->account_number],
+                ['heroicon-o-hashtag', __('app.label.mfo'), $bankAccount?->mfo],
+                ['heroicon-o-globe-alt', __('app.label.swift'), $bankAccount?->swift],
+            ]],
+        ];
+
+        // Drop blank rows, then any group left empty by that filter.
+        $groups = array_map(
+            fn (array $group): array => [$group[0], array_values(array_filter(
+                $group[1],
+                fn (array $row): bool => ! empty($row[2]),
+            ))],
+            $groups,
+        );
+
+        return array_values(array_filter($groups, fn (array $group): bool => $group[1] !== []));
     }
 
     public static function userCanExportContract(): bool
@@ -348,30 +392,11 @@ class ViewContract extends ViewRecord
         return Bytes::human(Storage::disk('local')->size($this->record->documentPath()));
     }
 
-    public function pdfPreviewUrl(): ?string
-    {
-        if (! $this->record->documentExists()) {
-            return null;
-        }
-
-        if ($this->record->status !== Contract::STATUS_APPROVED) {
-            return null;
-        }
-
-        return route('contracts.pdf.inline', ['contract' => $this->record]);
-    }
-
-    public function editorUrl(string $mode = 'view'): string
-    {
-        return route('contracts.editor', ['contract' => $this->record, 'mode' => $mode]);
-    }
-
     /**
-     * Payment progress summary for the View page — used by the Payments
-     * section in the blade view.
+     * Payment progress summary for the View page — the band above the ledger.
+     * The rows themselves come from ContractPaymentsTableWidget.
      *
      * @return array{
-     *     payments: Collection<int, Payment>,
      *     paid_percent: float,
      *     remaining_percent: float,
      *     status: PaymentStatus,
@@ -383,7 +408,6 @@ class ViewContract extends ViewRecord
         $paid = (float) $this->record->paid_percent;
 
         return [
-            'payments' => $this->record->payments,
             'paid_percent' => $paid,
             'remaining_percent' => $this->record->remainingPercent(),
             'status' => $this->record->payment_status ?? PaymentStatus::NotPaid,
@@ -392,43 +416,10 @@ class ViewContract extends ViewRecord
         ];
     }
 
-    /**
-     * @return list<array{url: string, name: string, pdf: bool}>
-     */
-    public function paymentScreenshotFiles(Payment $payment): array
-    {
-        return $payment->screenshotFiles();
-    }
-
     public function approverAvatar(ContractApprover $approver): string
     {
         return $approver->user?->avatarUrl()
             ?? 'https://ui-avatars.com/api/?name=%3F&background=E0E7FF&color=4338CA&size=80';
-    }
-
-    /**
-     * @return array{icon: string, color: string}
-     */
-    public function approverVisual(ContractApprover $approver): array
-    {
-        if ($approver->status === ContractApprover::STATUS_APPROVED) {
-            return ['icon' => 'heroicon-s-check-circle', 'color' => 'success'];
-        }
-
-        if ($approver->status === ContractApprover::STATUS_REJECTED) {
-            return ['icon' => 'heroicon-s-x-circle', 'color' => 'danger'];
-        }
-
-        if ($this->isCurrentApprover($approver)) {
-            return ['icon' => 'heroicon-s-clock', 'color' => 'primary'];
-        }
-
-        return ['icon' => 'heroicon-o-minus-circle', 'color' => 'gray'];
-    }
-
-    public function isCurrentApprover(ContractApprover $approver): bool
-    {
-        return $this->record->currentApprover()?->id === $approver->id;
     }
 
     /**
@@ -473,16 +464,6 @@ class ViewContract extends ViewRecord
                 'due' => null,
             ],
             default => ['message' => '', 'overdue' => false, 'due' => null],
-        };
-    }
-
-    public function approverState(ContractApprover $approver): string
-    {
-        return match (true) {
-            $approver->status === ContractApprover::STATUS_APPROVED => 'approved',
-            $approver->status === ContractApprover::STATUS_REJECTED => 'rejected',
-            $this->isCurrentApprover($approver) => 'current',
-            default => 'queued',
         };
     }
 }

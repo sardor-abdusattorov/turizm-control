@@ -13,7 +13,6 @@ return new class extends Migration
             $table->foreignId('contract_type_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
             $table->string('template_file');
-            $table->string('document_key')->nullable();
             $table->unsignedInteger('sort')->default(0);
             $table->boolean('status')->default(true);
             $table->timestamps();

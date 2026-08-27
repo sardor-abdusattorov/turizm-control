@@ -9,7 +9,6 @@
     $ext = strtoupper((string) $record->extension());
     $fileName = $record->file_path ? basename($record->file_path) : null;
     $fileSize = $this->fileSizeLabel();
-    $fileEditUrl = $this->fileEditorUrl();
     $fileViewUrl = $this->fileInlineUrl();
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
@@ -68,15 +67,10 @@
                     </div>
                 </div>
             </div>
-            {{-- Single primary action — editable docs open in the editor,
-                 everything else opens inline. The header keeps the rest. --}}
+            {{-- One primary action: serve the file. The browser previews what
+                 it can and downloads the rest. The header keeps the rest. --}}
             <div class="ow-file__act">
-                @if ($fileEditUrl)
-                    <a href="{{ $fileEditUrl }}" class="ow-btn ow-btn--primary">
-                        {!! $ic('heroicon-o-pencil-square', 14) !!}
-                        <span>{{ __('app.action.open_editor') }}</span>
-                    </a>
-                @elseif ($fileViewUrl)
+                @if ($fileViewUrl)
                     <a href="{{ $fileViewUrl }}" target="_blank" rel="noopener" class="ow-btn ow-btn--primary">
                         {!! $ic('heroicon-o-arrow-top-right-on-square', 14) !!}
                         <span>{{ __('app.action.open_file') }}</span>

@@ -128,8 +128,8 @@ it('reassigns the chain on an in-review contract: resets to draft, keeps the old
 it('cancels approvals and queues the same chain when save is invoked mid-flow, even with no form changes', function () {
     // Going through the Save modal on an in-review contract is an explicit
     // promise to cancel approvals (the modal says so). Honour it even when
-    // the author hasn't touched any field — the OnlyOffice doc on disk may
-    // have changed since the page was opened.
+    // the author hasn't touched any field — the document on disk may have
+    // been replaced since the page was opened.
     $author = editorWithPerms();
     $legal = chainApprover('legal');
     $accounting = chainApprover('accounting');

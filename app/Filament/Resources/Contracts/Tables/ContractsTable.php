@@ -195,23 +195,14 @@ class ContractsTable
                     ViewAction::make()
                         ->color('gray'),
 
-                    Action::make('previewPdf')
-                        ->label(__('app.action.preview_pdf'))
-                        ->icon('heroicon-o-eye')
-                        ->color('gray')
-                        ->url(
-                            fn (Contract $record) => route('contracts.pdf.inline', ['contract' => $record]),
-                            shouldOpenInNewTab: true,
-                        )
-                        ->visible(fn (Contract $record) => $record->documentExists()
-                            && $record->status === Contract::STATUS_APPROVED),
-
-                    Action::make('downloadPdf')
-                        ->label(__('app.action.download_pdf'))
+                    // The document leaves the system as its own .docx —
+                    // there is no server-side converter to render it inline.
+                    Action::make('downloadDocument')
+                        ->label(__('app.action.download_document'))
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('gray')
-                        ->url(fn (Contract $record) => route('contracts.pdf.download', ['contract' => $record]))
-                        ->visible(fn (Contract $record): bool => $record->status === Contract::STATUS_APPROVED
+                        ->url(fn (Contract $record) => route('contracts.document.download', ['contract' => $record]))
+                        ->visible(fn (Contract $record): bool => $record->documentExists()
                             && ViewContract::userCanExportContract()),
 
                     EditAction::make()
