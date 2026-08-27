@@ -276,6 +276,60 @@ it('locks the dossier panel for users without the update permission', function (
     expect($contract->attachments()->count())->toBe(0);
 });
 
+it('saving the dossier panel untouched changes nothing', function () {
+    Storage::fake('local');
+
+    // The single most destructive failure mode this panel could have: the
+    // submitted path list IS the dossier, so a save that arrives with empty
+    // state would wipe every file. Mounting must prefill it.
+    $contract = Contract::factory()->create();
+    attachmentManager($contract);
+
+    foreach (['scan.pdf', 'act.pdf'] as $index => $name) {
+        $path = 'uploads/files/contract-attachments/'.$contract->id.'/'.$name;
+        Storage::disk('local')->put($path, 'pdf');
+        $contract->attachments()->create([
+            'file_path' => $path,
+            'original_name' => $name,
+            'size' => 3,
+            'sort' => $index + 1,
+        ]);
+    }
+
+    $before = $contract->attachments()->pluck('id')->all();
+
+    Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $contract->id])
+        ->call('save');
+
+    expect($contract->attachments()->pluck('id')->all())->toBe($before);
+
+    foreach ($contract->attachments as $attachment) {
+        Storage::disk('local')->assertExists($attachment->file_path);
+    }
+});
+
+it('keeps an attachment whose file went missing from disk', function () {
+    Storage::fake('local');
+
+    // FileUpload silently drops a chip whose file is gone; that absence must
+    // not read as a deliberate removal and take the record with it.
+    $contract = Contract::factory()->create();
+    attachmentManager($contract);
+
+    $contract->attachments()->create([
+        'file_path' => 'uploads/files/contract-attachments/'.$contract->id.'/vanished.pdf',
+        'original_name' => 'vanished.pdf',
+        'size' => 3,
+        'sort' => 1,
+    ]);
+
+    Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $contract->id])
+        ->assertFormSet(['attachment_files' => []])
+        ->call('save');
+
+    expect($contract->attachments()->count())->toBe(1);
+});
+
 it('refuses to mount the dossier panel for a contract the user may not view', function () {
     Storage::fake('local');
 
