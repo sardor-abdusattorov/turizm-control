@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PressTourAttachmentType;
 use App\Enums\PressTourDirection;
 use App\Enums\PressTourState;
 use App\Filament\Resources\PressTours\Pages\CreatePressTour;
@@ -7,11 +8,13 @@ use App\Filament\Resources\PressTours\Pages\EditPressTour;
 use App\Filament\Resources\PressTours\Pages\ListPressTours;
 use App\Filament\Resources\PressTours\Pages\ViewPressTour;
 use App\Filament\Resources\PressTours\PressTourResource;
-use App\Filament\Resources\PressTours\Widgets\PressTourDocumentsTableWidget;
+use App\Livewire\AttachmentPanel;
 use App\Models\PressTour;
 use App\Models\PressTourAttachment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
@@ -234,23 +237,70 @@ it('reads a tour on a designed page, not a disabled form', function () {
 
     Livewire::test(ViewPressTour::class, ['record' => $tour->id])
         ->assertSuccessful()
-        // The facts card and the report-pack table live under native tabs.
+        // The facts card and the report-pack panel live under native tabs.
         ->assertSee('Хорезм')
         ->assertSee('Хаёт Хамраев')
-        ->assertSeeLivewire(PressTourDocumentsTableWidget::class)
+        ->assertSeeLivewire(AttachmentPanel::class)
         // A held tour with nothing filed says so out loud.
         ->assertSee(__('app.message.press_tour_documents_pending'));
 });
 
-it('lists the report pack in the documents table widget', function () {
+it('shows the filed report pack in the documents upload panel', function () {
+    Storage::fake('local');
+
     actingAs(userWithPermission('view_any_press_tour', 'view_press_tour'));
 
     $tour = PressTour::factory()->held()->create();
     $document = PressTourAttachment::factory()->for($tour, 'pressTour')->create([
         'original_name' => 'Отчёт о пресс-туре.pdf',
     ]);
+    Storage::disk('local')->put($document->file_path, 'pdf');
 
-    Livewire::test(PressTourDocumentsTableWidget::class, ['pressTourId' => $tour->id])
-        ->assertCanSeeTableRecords([$document])
-        ->assertSee('Отчёт о пресс-туре.pdf');
+    // Filament's own FileUpload panel is prefilled with the stored pack, and
+    // a viewer without update rights gets it locked.
+    $panel = Livewire::test(AttachmentPanel::class, ['variant' => 'press-tour-documents', 'recordId' => $tour->id])
+        ->assertSuccessful()
+        ->assertFormSet(['document_files' => [$document->file_path]]);
+
+    expect($panel->instance()->canManage())->toBeFalse();
+});
+
+it('files a report document through the upload panel', function () {
+    Storage::fake('local');
+
+    actingAs(userWithPermission('view_any_press_tour', 'view_press_tour', 'update_press_tour'));
+
+    $tour = PressTour::factory()->held()->create();
+
+    Livewire::test(AttachmentPanel::class, ['variant' => 'press-tour-documents', 'recordId' => $tour->id])
+        ->fillForm([
+            'type' => PressTourAttachmentType::MediaCoverage->value,
+            'document_files' => [UploadedFile::fake()->create('Публикации в СМИ.pdf', 40, 'application/pdf')],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $document = $tour->attachments()->sole();
+
+    expect($document->original_name)->toBe('Публикации в СМИ.pdf')
+        ->and($document->type)->toBe(PressTourAttachmentType::MediaCoverage);
+
+    Storage::disk('local')->assertExists($document->file_path);
+});
+
+it('drops a document whose chip was removed from the panel', function () {
+    Storage::fake('local');
+
+    actingAs(userWithPermission('view_any_press_tour', 'view_press_tour', 'update_press_tour'));
+
+    $tour = PressTour::factory()->held()->create();
+    $document = PressTourAttachment::factory()->for($tour, 'pressTour')->create();
+    Storage::disk('local')->put($document->file_path, 'pdf');
+
+    Livewire::test(AttachmentPanel::class, ['variant' => 'press-tour-documents', 'recordId' => $tour->id])
+        ->fillForm(['document_files' => []])
+        ->call('save');
+
+    expect($tour->attachments()->count())->toBe(0);
+    Storage::disk('local')->assertMissing($document->file_path);
 });

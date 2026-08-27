@@ -26,6 +26,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\On;
 use Spatie\Activitylog\Models\Activity;
 
 class ViewContract extends ViewRecord
@@ -282,6 +283,16 @@ class ViewContract extends ViewRecord
     }
 
     private ?Collection $cachedAttachments = null;
+
+    /**
+     * The Attachments tab badge counts the dossier, so a file filed in the
+     * panel below has to invalidate the count this page cached.
+     */
+    #[On('attachments-saved')]
+    public function refreshAttachmentCount(): void
+    {
+        $this->cachedAttachments = null;
+    }
 
     public function canManageAttachments(): bool
     {

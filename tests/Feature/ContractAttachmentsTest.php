@@ -2,12 +2,11 @@
 
 use App\Enums\ContractAttachmentType;
 use App\Filament\Resources\Contracts\Pages\EditContract;
-use App\Filament\Resources\Contracts\Widgets\ContractAttachmentsTableWidget;
+use App\Livewire\AttachmentPanel;
 use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Department;
 use App\Models\User;
-use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -178,7 +177,7 @@ it('deletes an attachment together with its file', function () {
     $path = 'uploads/files/contract-attachments/'.$contract->id.'/act.pdf';
     Storage::disk('local')->put($path, 'pdf');
 
-    $attachment = $contract->attachments()->create([
+    $contract->attachments()->create([
         'type' => ContractAttachmentType::Act->value,
         'file_path' => $path,
         'original_name' => 'act.pdf',
@@ -186,8 +185,12 @@ it('deletes an attachment together with its file', function () {
         'sort' => 1,
     ]);
 
-    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
-        ->callAction(TestAction::make('delete')->table($attachment));
+    // Removing the chip from the dossier panel and saving drops the row —
+    // and the model's deleting hook takes the file with it.
+    Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $contract->id])
+        ->assertFormSet(['attachment_files' => [$path]])
+        ->fillForm(['attachment_files' => []])
+        ->call('save');
 
     expect($contract->attachments()->count())->toBe(0);
     Storage::disk('local')->assertMissing($path);
@@ -213,17 +216,18 @@ it('removes attachment files when the contract itself is deleted', function () {
     Storage::disk('local')->assertMissing($path);
 });
 
-it('uploads dossier scans from the view page widget too', function () {
+it('uploads dossier scans from the view page panel too', function () {
     Storage::fake('local');
 
     $contract = Contract::factory()->create();
     attachmentManager($contract);
 
-    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
-        ->callAction(TestAction::make('uploadAttachments')->table(), [
-            'files' => [UploadedFile::fake()->create('proposal.pdf', 40, 'application/pdf')],
+    Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $contract->id])
+        ->fillForm([
+            'attachment_files' => [UploadedFile::fake()->create('proposal.pdf', 40, 'application/pdf')],
         ])
-        ->assertHasNoActionErrors();
+        ->call('save')
+        ->assertHasNoFormErrors();
 
     // The dossier must list the file under the name the user uploaded, not
     // the random hash Filament stores it as on disk.
@@ -242,25 +246,47 @@ it('keeps uploading open after full approval — SWIFT and act arrive later', fu
 
     attachmentManager($contract);
 
-    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
-        ->callAction(TestAction::make('uploadAttachments')->table(), [
-            'files' => [UploadedFile::fake()->create('SWIFT MT103.pdf', 60, 'application/pdf')],
+    Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $contract->id])
+        ->fillForm([
+            'attachment_files' => [UploadedFile::fake()->create('SWIFT MT103.pdf', 60, 'application/pdf')],
         ])
-        ->assertHasNoActionErrors();
+        ->call('save')
+        ->assertHasNoFormErrors();
 
     // Filing the SWIFT slip must not knock the contract off Approved.
     expect($contract->fresh()->status)->toBe(Contract::STATUS_APPROVED)
         ->and($contract->attachments()->count())->toBe(1);
 });
 
-it('hides the upload action from users without the update permission', function () {
+it('locks the dossier panel for users without the update permission', function () {
     Storage::fake('local');
 
     $contract = Contract::factory()->create();
     attachmentManager($contract, ['view_any_contract', 'view_contract']);
 
-    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
-        ->assertActionHidden(TestAction::make('uploadAttachments')->table());
+    $panel = Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $contract->id]);
+
+    expect($panel->instance()->canManage())->toBeFalse();
+
+    // The save button is merely hidden — a forged call is refused outright.
+    $panel->fillForm([
+        'attachment_files' => [UploadedFile::fake()->create('sneaky.pdf', 10, 'application/pdf')],
+    ])->call('save')->assertForbidden();
+
+    expect($contract->attachments()->count())->toBe(0);
+});
+
+it('refuses to mount the dossier panel for a contract the user may not view', function () {
+    Storage::fake('local');
+
+    // recordId comes from the client, so the panel gates itself instead of
+    // trusting whichever page embedded it.
+    $contract = Contract::factory()->create();
+    $stranger = User::factory()->create();
+    actingAs($stranger);
+
+    Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $contract->id])
+        ->assertForbidden();
 });
 
 it('freezes the dossier while the contract is under approval', function (mixed $status) {
@@ -273,8 +299,16 @@ it('freezes the dossier while the contract is under approval', function (mixed $
 
     attachmentManager($contract);
 
-    Livewire::test(ContractAttachmentsTableWidget::class, ['contractId' => $contract->id])
-        ->assertActionHidden(TestAction::make('uploadAttachments')->table());
+    $panel = Livewire::test(AttachmentPanel::class, ['variant' => 'contract-dossier', 'recordId' => $contract->id]);
+
+    expect($panel->instance()->canManage())->toBeFalse()
+        ->and($panel->instance()->lockedNotice())->toBe(__('app.message.dossier_frozen_in_review'));
+
+    $panel->fillForm([
+        'attachment_files' => [UploadedFile::fake()->create('late.pdf', 10, 'application/pdf')],
+    ])->call('save')->assertForbidden();
+
+    expect($contract->attachments()->count())->toBe(0);
 })->with([
     'regular chain review' => [Contract::STATUS_IN_REVIEW],
     'awaiting director' => [Contract::STATUS_PENDING_DIRECTOR],

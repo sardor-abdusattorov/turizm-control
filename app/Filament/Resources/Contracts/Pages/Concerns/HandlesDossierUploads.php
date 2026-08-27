@@ -2,14 +2,13 @@
 
 namespace App\Filament\Resources\Contracts\Pages\Concerns;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use App\Services\Documents\SyncAttachments;
 
 /**
- * Shared by CreateContract and EditContract: the dossier scans are uploaded
- * on the form (never on the view page), so both pages pull the virtual
- * attachment fields out of the payload before save and file them as
- * ContractAttachment records after.
+ * Shared by CreateContract and EditContract: the dossier scans ride on the
+ * form as a Filament FileUpload panel, so both pages pull the virtual upload
+ * fields out of the payload before save and hand them to SyncAttachments —
+ * the same syncer the view page's dossier panel uses.
  */
 trait HandlesDossierUploads
 {
@@ -36,41 +35,16 @@ trait HandlesDossierUploads
     }
 
     /**
-     * Sync the dossier to the upload field's state. The edit form prefills
-     * the field with the stored files, so: a path missing from the submitted
-     * list means its chip was removed — the attachment goes (the model hook
-     * deletes the file too); a path without a record is a fresh upload.
+     * Sync the dossier to the upload panel's state: the submitted list is the
+     * dossier, in order — a removed chip deletes its attachment (and file),
+     * a new path is filed, and dragging chips around re-sorts them.
      */
     protected function storeFormAttachments(): void
     {
-        $submitted = array_map(strval(...), array_values($this->attachmentFiles));
-        $existing = $this->record->attachments()->get();
-
-        // Guard: FileUpload silently drops chips whose file is missing on
-        // disk, so a record with a lost file must not be mistaken for a
-        // deliberate removal.
-        $existing
-            ->reject(fn ($attachment) => in_array($attachment->file_path, $submitted, true))
-            ->filter(fn ($attachment) => Storage::disk('local')->exists($attachment->file_path))
-            ->each(fn ($attachment) => $attachment->delete());
-
-        $known = $existing->pluck('file_path')->all();
-        $sort = (int) $this->record->attachments()->max('sort');
-
-        foreach ($this->attachmentFiles as $key => $path) {
-            if (in_array((string) $path, $known, true)) {
-                continue;
-            }
-
-            $this->record->attachments()->create([
-                'file_path' => $path,
-                // Filament keys the stored names by the stored PATH, not by
-                // the upload uuid — looking up by $key alone always missed.
-                'original_name' => $this->attachmentNames[$path] ?? $this->attachmentNames[$key] ?? basename((string) $path),
-                'size' => Storage::disk('local')->exists($path) ? Storage::disk('local')->size($path) : 0,
-                'uploaded_by' => Auth::id(),
-                'sort' => ++$sort,
-            ]);
-        }
+        app(SyncAttachments::class)->sync(
+            $this->record->attachments(),
+            $this->attachmentFiles,
+            $this->attachmentNames,
+        );
     }
 }

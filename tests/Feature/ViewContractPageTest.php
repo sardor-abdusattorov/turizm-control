@@ -186,7 +186,11 @@ it('never offers a PDF preview — there is no converter any more', function () 
 
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
-    expect($html)->not->toContain('/pdf');
+    // The converter routes are gone. Match the paths themselves rather than a
+    // bare '/pdf', which the dossier panel's accepted MIME list now contains.
+    expect($html)->not->toContain($contract->id.'/pdf')
+        ->and($html)->not->toContain('pdf/inline')
+        ->and($html)->not->toContain('pdf.download');
 });
 
 it('renders the approval chain as a Filament table with distinct step statuses', function () {

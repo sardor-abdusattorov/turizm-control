@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contracts\Schemas;
 
 use App\Filament\Resources\Contacts\Schemas\ContactForm;
 use App\Filament\Resources\Sponsors\Schemas\SponsorForm;
+use App\Filament\Support\ContractDossierUpload;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
@@ -18,7 +19,6 @@ use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractWorkflow;
 use Closure;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -233,27 +233,12 @@ class ContractForm
                                         : null)
                                     ->columnSpanFull(),
 
-                                // The dossier is managed here on the form — create
-                                // AND edit — never on the view page. New scans are
-                                // stored as attachments on save; no per-batch type
-                                // question, files are just files (лёгкость выше
-                                // каталогизации).
-                                FileUpload::make('attachment_files')
-                                    ->label(__('app.label.attachments'))
-                                    ->helperText(__('app.helper.attachment_scans'))
-                                    ->multiple()
-                                    ->disk('local')
-                                    // Same private, month-bucketed layout as
-                                    // DocumentUpload / ImageUpload use everywhere.
-                                    ->directory(fn (): string => 'uploads/files/contract-attachments/'.now()->format('Y/m'))
-                                    ->visibility('private')
-                                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
-                                    ->maxSize(25600)
-                                    ->storeFileNamesIn('attachment_names')
-                                    // On edit the field is prefilled with the
-                                    // stored dossier, so the files are visible
-                                    // and removable right here.
-                                    ->downloadable()
+                                // The very same panel the view page's dossier
+                                // tab renders — one definition, so a scan looks
+                                // and behaves identically wherever it is filed.
+                                // No per-batch type question: files are just
+                                // files (лёгкость выше каталогизации).
+                                ContractDossierUpload::make()
                                     ->columnSpanFull(),
                             ]),
 

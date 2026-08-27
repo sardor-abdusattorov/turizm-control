@@ -5,11 +5,12 @@ namespace App\Filament\Resources\PressTours\Pages;
 use App\Filament\Resources\PressTours\PressTourResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Livewire\Attributes\On;
 
 /**
  * A designed read page rather than a greyed-out copy of the edit form: the
- * facts as a card, the report pack as a stock Filament table, both under
- * native tabs — the same shape the contract view uses. No infolist.
+ * facts as a card, the report pack in Filament's own FileUpload panel, both
+ * under native tabs — the same shape the contract view uses. No infolist.
  */
 class ViewPressTour extends ViewRecord
 {
@@ -36,4 +37,11 @@ class ViewPressTour extends ViewRecord
             EditAction::make(),
         ];
     }
+
+    /**
+     * The documents tab badge counts the report pack, so a file filed in the
+     * panel below has to re-render the page that hosts it.
+     */
+    #[On('attachments-saved')]
+    public function refreshDocumentCount(): void {}
 }
