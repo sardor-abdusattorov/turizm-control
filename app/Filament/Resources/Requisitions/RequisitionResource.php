@@ -51,14 +51,12 @@ class RequisitionResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $waiting = static::getEloquentQuery()->awaiting()->count();
-
-        return $waiting > 0 ? (string) $waiting : null;
+        return (string) static::getEloquentQuery()->count();
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'warning';
+        return static::getEloquentQuery()->awaiting()->exists() ? 'warning' : null;
     }
 
     public static function form(Schema $schema): Schema

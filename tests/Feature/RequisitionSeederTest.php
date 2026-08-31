@@ -2,6 +2,7 @@
 
 use App\Enums\ApprovalStatus;
 use App\Enums\RequisitionStatus;
+use App\Filament\Resources\Requisitions\RequisitionResource;
 use App\Models\Requisition;
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\PositionSeeder;
@@ -9,6 +10,8 @@ use Database\Seeders\RequisitionSeeder;
 use Database\Seeders\SettingsSeeder;
 use Database\Seeders\TestUsersSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
+use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
@@ -45,4 +48,12 @@ it('seeds default requisition approvers so the chain works out of the box', func
     $this->seed(SettingsSeeder::class);
 
     expect(Requisition::defaultApproverIds())->toHaveCount(2);
+});
+
+it('badges requisitions with a total count like every other resource', function () {
+    $this->seed(RequisitionSeeder::class);
+
+    actingAs(userWithPermission('view_any_requisition', 'view_all_requisitions'));
+
+    expect(RequisitionResource::getNavigationBadge())->toBe((string) Requisition::query()->count());
 });
