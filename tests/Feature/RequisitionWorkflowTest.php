@@ -13,6 +13,7 @@ use App\Services\Approvals\ApprovalWorkflow;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\actingAs;
@@ -357,6 +358,42 @@ it('lays the view page out as designed cards, not a bare field list', function (
         ->toContain('ow-dets')
         ->toContain('Закупка канцелярии')
         ->toContain('Бумага А4');
+});
+
+it('carries the same tabs the contract page does', function () {
+    $author = requisitionUser();
+    $requisition = Requisition::factory()->inReview()->create(['author_id' => $author->id]);
+
+    actingAs($author);
+
+    $html = Livewire::test(ViewRequisition::class, ['record' => $requisition->id])->html();
+
+    expect($html)
+        ->toContain('rec-tabs-row')
+        ->toContain(__('app.label.basic_information'))
+        ->toContain(__('app.approval.section'))
+        ->toContain(__('app.label.history'));
+});
+
+it('writes the requisition into the activity log its history reads', function () {
+    $author = requisitionUser();
+    actingAs($author);
+
+    Livewire::test(CreateRequisition::class)
+        ->fillForm([
+            'title' => 'Стенд на выставке',
+            'description' => 'Аренда площади.',
+            'approver_ids' => [requisitionUser()->id],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $requisition = Requisition::firstWhere('title', 'Стенд на выставке');
+
+    expect(Activity::query()
+        ->where('subject_type', $requisition->getMorphClass())
+        ->where('subject_id', $requisition->getKey())
+        ->exists())->toBeTrue();
 });
 
 it('leads the view page with the reason it came back', function () {

@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Filament\Resources\Contracts\Widgets;
+namespace App\Filament\Widgets;
 
-use App\Models\Contract;
 use App\Support\ContractActivity;
 use Devletes\FilamentTimelineView\Tables\Columns\TimelineEntry;
 use Filament\Tables\Filters\SelectFilter;
@@ -10,18 +9,32 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
 
 /**
- * The contract's execution history rendered as a chronological timeline
- * (devletes/filament-timeline-view) — date-grouped cards fed by the same
- * activity log the old hand-rolled feed read, with a workflow/edits filter.
+ * Any document's execution history as a date-grouped timeline, fed by the
+ * activity log. Takes the record's morph class and key, so a second document
+ * type reuses it rather than growing its own copy.
  */
-class ContractHistoryTimelineWidget extends TableWidget
+class DocumentHistoryTimelineWidget extends TableWidget
 {
-    public int $contractId;
+    public string $subjectType;
+
+    public int $subjectId;
 
     protected int|string|array $columnSpan = 'full';
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function paramsFor(Model $record): array
+    {
+        return [
+            'subjectType' => $record->getMorphClass(),
+            'subjectId' => $record->getKey(),
+        ];
+    }
 
     public function table(Table $table): Table
     {
@@ -29,8 +42,8 @@ class ContractHistoryTimelineWidget extends TableWidget
             // No heading: the tab label already names it.
             ->heading(null)
             ->query(fn (): Builder => Activity::query()
-                ->where('subject_type', (new Contract)->getMorphClass())
-                ->where('subject_id', $this->contractId)
+                ->where('subject_type', $this->subjectType)
+                ->where('subject_id', $this->subjectId)
                 ->with('causer')
                 ->latest())
             ->columns([

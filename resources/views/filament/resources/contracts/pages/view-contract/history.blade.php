@@ -5,5 +5,5 @@
      x-transition:enter-start="opacity-0 -translate-y-1"
      x-transition:enter-end="opacity-100 translate-y-0"
      class="cw-panel">
-    @livewire(\App\Filament\Resources\Contracts\Widgets\ContractHistoryTimelineWidget::class, ['contractId' => $record->id], key('contract-history-'.$record->id))
+    @livewire(\App\Filament\Widgets\DocumentHistoryTimelineWidget::class, \App\Filament\Widgets\DocumentHistoryTimelineWidget::paramsFor($record), key('contract-history-'.$record->id))
 </div>

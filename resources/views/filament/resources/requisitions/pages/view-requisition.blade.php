@@ -36,9 +36,34 @@
 @endphp
 
 <x-filament-panels::page>
-<div class="ow">
+<div class="ow" x-data="{ tab: 'overview' }">
 
-    {{-- Why it came back, before anything else. --}}
+    {{-- Native Filament tabs, with the status pill riding on the right so it
+         stays visible whichever tab is open — the same shape the contract
+         page uses. --}}
+    <div class="rec-tabs-row">
+        <x-filament::tabs>
+            <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="tab = 'overview'">
+                {{ __('app.label.basic_information') }}
+            </x-filament::tabs.item>
+            <x-filament::tabs.item icon="heroicon-o-user-group" alpine-active="tab === 'approval'" x-on:click="tab = 'approval'"
+                :badge="$total ?: null">
+                {{ __('app.approval.section') }}
+            </x-filament::tabs.item>
+            <x-filament::tabs.item icon="heroicon-o-clock" alpine-active="tab === 'history'" x-on:click="tab = 'history'">
+                {{ __('app.label.history') }}
+            </x-filament::tabs.item>
+        </x-filament::tabs>
+
+        <span class="fi-state-pill rec-tabs-row__side"
+              style="background:rgba(127,127,127,.12);color:var(--m);">
+            <span class="fi-state-pill__dot" style="background:{{ $barColor }};"></span>
+            {{ $record->status->label() }}
+        </span>
+    </div>
+
+    {{-- Why it came back leads every tab: the author must not have to hunt
+         for it. --}}
     @if (filled($reason))
         <section class="ow-card rq-reject">
             <div class="ow-hd">
@@ -49,70 +74,83 @@
         </section>
     @endif
 
-    {{-- Where the chain stands. --}}
-    <section class="ow-card">
-        <div class="ow-hd">
-            <span class="ow-hd__ic">{!! $ic('heroicon-o-user-group') !!}</span>
-            <h2 class="ow-hd__t">{{ __('app.approval.section') }}</h2>
-            <span class="fi-state-pill" style="margin-inline-start:auto;background:rgba(127,127,127,.12);color:var(--m);">
-                <span class="fi-state-pill__dot" style="background:{{ $barColor }};"></span>
-                {{ $record->status->label() }}
-            </span>
-        </div>
-
-        @if ($total)
-            <div class="rq-progress">
-                <div class="rq-progress__bar">
-                    <span style="width: {{ $isDraft ? 0 : $fillPct }}%; background: {{ $barColor }};"></span>
-                </div>
-                <div class="rq-progress__meta">
-                    <span class="rq-progress__count">{{ $approved }}/{{ $total }}</span>
-                    @if ($isDraft)
-                        <span class="rq-progress__hint">{{ __('app.approval.not_submitted') }}</span>
-                    @elseif ($current)
-                        <span class="rq-progress__hint">
-                            {{ __('app.approval.now_with', ['name' => $current->user?->name ?? __('app.label.not_set')]) }}
-                            @include('filament.components.sla-countdown', ['due' => $current->due_at])
-                        </span>
-                    @endif
-                </div>
+    <div x-show="tab === 'overview'" x-cloak>
+        <section class="ow-card">
+            <div class="ow-hd">
+                <span class="ow-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span>
+                <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
             </div>
-        @endif
 
-        @livewire(\App\Filament\Widgets\ApprovalsTimelineWidget::class, ['requisitionId' => $record->id], key('approvals-'.$record->id))
-    </section>
+            <div class="ow-dets">
+                @foreach ($details as $row)
+                    @php
+                        [$icon, $label, $value, $type] = array_pad($row, 4, null);
+                        $hasValue = filled($value);
+                    @endphp
+                    <div class="ow-row {{ $type === 'wrap' ? 'ow-row--wrap' : '' }}">
+                        <span class="ow-row__k">
+                            <span class="ow-row__ic">{!! $ic($icon, 14) !!}</span>
+                            <span class="ow-row__lb">{{ $label }}</span>
+                        </span>
+                        <span class="ow-row__v">
+                            @if ($type === 'wrap' && $hasValue)
+                                <span class="ow-row__vl ow-row__vl--wrap">{!! nl2br(e($value)) !!}</span>
+                            @elseif ($hasValue)
+                                <span class="ow-row__vl">{{ $value }}</span>
+                            @else
+                                <span class="ow-row__vl ow-row__vl--muted">{{ __('app.label.not_set') }}</span>
+                            @endif
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    </div>
 
-    {{-- Every fact in full. --}}
-    <section class="ow-card">
-        <div class="ow-hd">
-            <span class="ow-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span>
-            <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
-        </div>
+    <div x-show="tab === 'approval'" x-cloak>
+        <section class="ow-card">
+            <div class="ow-hd">
+                <span class="ow-hd__ic">{!! $ic('heroicon-o-user-group') !!}</span>
+                <h2 class="ow-hd__t">{{ __('app.approval.section') }}</h2>
+            </div>
 
-        <div class="ow-dets">
-            @foreach ($details as $row)
-                @php
-                    [$icon, $label, $value, $type] = array_pad($row, 4, null);
-                    $hasValue = filled($value);
-                @endphp
-                <div class="ow-row {{ $type === 'wrap' ? 'ow-row--wrap' : '' }}">
-                    <span class="ow-row__k">
-                        <span class="ow-row__ic">{!! $ic($icon, 14) !!}</span>
-                        <span class="ow-row__lb">{{ $label }}</span>
-                    </span>
-                    <span class="ow-row__v">
-                        @if ($type === 'wrap' && $hasValue)
-                            <span class="ow-row__vl ow-row__vl--wrap">{!! nl2br(e($value)) !!}</span>
-                        @elseif ($hasValue)
-                            <span class="ow-row__vl">{{ $value }}</span>
-                        @else
-                            <span class="ow-row__vl ow-row__vl--muted">{{ __('app.label.not_set') }}</span>
+            @if ($total)
+                <div class="rq-progress">
+                    <div class="rq-progress__bar">
+                        <span style="width: {{ $isDraft ? 0 : $fillPct }}%; background: {{ $barColor }};"></span>
+                    </div>
+                    <div class="rq-progress__meta">
+                        <span class="rq-progress__count">{{ $approved }}/{{ $total }}</span>
+                        @if ($isDraft)
+                            <span class="rq-progress__hint">{{ __('app.approval.not_submitted') }}</span>
+                        @elseif ($current)
+                            <span class="rq-progress__hint">
+                                {{ __('app.approval.now_with', ['name' => $current->user?->name ?? __('app.label.not_set')]) }}
+                                @include('filament.components.sla-countdown', ['due' => $current->due_at])
+                            </span>
                         @endif
-                    </span>
+                    </div>
                 </div>
-            @endforeach
-        </div>
-    </section>
+            @endif
+
+            @livewire(\App\Filament\Widgets\ApprovalsTimelineWidget::class, ['requisitionId' => $record->id], key('approvals-'.$record->id))
+        </section>
+    </div>
+
+    <div x-show="tab === 'history'" x-cloak>
+        <section class="ow-card">
+            <div class="ow-hd">
+                <span class="ow-hd__ic">{!! $ic('heroicon-o-clock') !!}</span>
+                <h2 class="ow-hd__t">{{ __('app.label.history') }}</h2>
+            </div>
+
+            @livewire(
+                \App\Filament\Widgets\DocumentHistoryTimelineWidget::class,
+                \App\Filament\Widgets\DocumentHistoryTimelineWidget::paramsFor($record),
+                key('requisition-history-'.$record->id)
+            )
+        </section>
+    </div>
 </div>
 
 <style>

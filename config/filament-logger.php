@@ -7,6 +7,7 @@ use App\Filament\Resources\Orders\CommitteeOrderResource;
 use App\Filament\Resources\Orders\PrCenterOrderResource;
 use App\Filament\Resources\Projects\InternalProjectResource;
 use App\Filament\Resources\Projects\InternationalProjectResource;
+use App\Models\Approval;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
@@ -16,6 +17,7 @@ use App\Models\Department;
 use App\Models\Order;
 use App\Models\Position;
 use App\Models\Project;
+use App\Models\Requisition;
 use App\Models\Sponsor;
 use App\Models\User;
 use MrAdder\FilamentLogger\Loggers\AccessLogger;
@@ -295,6 +297,7 @@ return [
             // and PDF generation (pdf_file). Ignoring them stops a duplicate
             // "Contract Updated" landing next to the real entry.
             Contract::class => ['document_file', 'document_key', 'pdf_file', 'signed_at', 'status'],
+            Requisition::class => ['submitted_at'],
         ],
         'register' => [
             Contract::class,
@@ -307,6 +310,8 @@ return [
             Currency::class,
             Order::class,
             Project::class,
+            Requisition::class,
+            Approval::class,
             Sponsor::class,
         ],
     ],

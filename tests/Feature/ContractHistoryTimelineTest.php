@@ -1,7 +1,7 @@
 <?php
 
 use App\Filament\Resources\Contracts\Widgets\ContractApprovalChainTableWidget;
-use App\Filament\Resources\Contracts\Widgets\ContractHistoryTimelineWidget;
+use App\Filament\Widgets\DocumentHistoryTimelineWidget;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\User;
@@ -26,7 +26,7 @@ it('renders the contract history as a timeline with localized workflow labels', 
         ->event('Contract Submitted')
         ->log('Contract Submitted');
 
-    Livewire::test(ContractHistoryTimelineWidget::class, ['contractId' => $contract->id])
+    Livewire::test(DocumentHistoryTimelineWidget::class, DocumentHistoryTimelineWidget::paramsFor($contract))
         ->assertOk()
         // The stored raw English event renders through the app.activity.*
         // translation, not verbatim.
@@ -79,7 +79,7 @@ it('filters history down to workflow events only', function () {
     activity()->performedOn($contract)->event('Contract Submitted')->log('Contract Submitted');
     activity()->performedOn($contract)->event('updated')->log('updated');
 
-    Livewire::test(ContractHistoryTimelineWidget::class, ['contractId' => $contract->id])
+    Livewire::test(DocumentHistoryTimelineWidget::class, DocumentHistoryTimelineWidget::paramsFor($contract))
         ->filterTable('group', 'workflow')
         ->assertSee(__('app.activity.submitted'))
         ->assertDontSee(__('app.activity.updated'));
