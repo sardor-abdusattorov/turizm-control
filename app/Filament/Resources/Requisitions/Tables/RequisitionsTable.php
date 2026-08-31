@@ -56,7 +56,8 @@ class RequisitionsTable
                     ->lineClamp(3)
                     ->tooltip(fn (Requisition $record): string => (string) $record->title)
                     ->description(fn (Requisition $record): ?string => $record->project?->name)
-                    ->extraCellAttributes(['style' => 'min-width: 18rem']),
+                    ->extraHeaderAttributes(['class' => 'fi-col-title'])
+                    ->extraCellAttributes(['class' => 'fi-col-title']),
 
                 static::approversColumn(),
 
@@ -64,6 +65,8 @@ class RequisitionsTable
                     ->label(__('app.label.due'))
                     ->view('filament.components.sla-countdown')
                     ->state(fn (Requisition $record) => $record->currentApproval()?->due_at)
+                    ->extraHeaderAttributes(['class' => 'fi-col-sla'])
+                    ->extraCellAttributes(['class' => 'fi-col-sla'])
                     ->disabledClick(),
 
                 ViewColumn::make('author')

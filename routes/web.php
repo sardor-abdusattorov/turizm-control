@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ContractAttachmentFileController;
 use App\Http\Controllers\OrderFileController;
 use App\Http\Controllers\TelegramConnectController;
 use App\Http\Controllers\TelegramWebhookController;
@@ -16,7 +15,4 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     Route::get('/orders/{order}/file', [OrderFileController::class, 'inline'])
         ->name('orders.file.inline');
-
-    Route::get('/contracts/{contract}/attachments/{attachment}/file', [ContractAttachmentFileController::class, 'inline'])
-        ->name('contracts.attachments.inline');
 });

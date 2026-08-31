@@ -37,6 +37,9 @@ class ApprovalsTimelineWidget extends TableWidget
                 ->orderBy('order')
                 ->orderBy('id'))
             ->description(fn (): string => $this->progressSummary())
+            // A voided round recedes into history rather than competing with
+            // the round that is actually running.
+            ->recordClasses(fn (Approval $record): ?string => $record->isVoided() ? 'fi-approval-voided' : null)
             ->columns([
                 ViewColumn::make('approver')
                     ->label(__('app.approval.column.approver'))

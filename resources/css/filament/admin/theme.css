@@ -248,9 +248,7 @@
    invisible to anyone tabbing through. Filament's own controls keep
    their built-in ring; this adds one for ours. */
 .cw-btn:focus-visible,
-.cw-eye:focus-visible,
 .cw-row--link:focus-visible,
-.cw-modal__x:focus-visible,
 .cf-btn:focus-visible,
 .ow-btn:focus-visible,
 .dh__tg-x:focus-visible {
@@ -266,7 +264,6 @@
 .fi-auth-theme-switcher-wrapper {
     transform: translateX(-50%);
 }
-
 
 /* ─── Styling pulled out of PHP Filament config ─────────────────────────────
    These were raw style="" strings set on columns/fields/actions inside the
@@ -338,22 +335,6 @@
     line-height: 1;
     white-space: nowrap;
 }
-.pj-pill--success {
-    background: #d1fae5;
-    color: #047857;
-}
-.dark .pj-pill--success {
-    background: rgba(16, 185, 129, .16);
-    color: #6ee7b7;
-}
-.pj-pill--gray {
-    background: #f1f5f9;
-    color: #64748b;
-}
-.dark .pj-pill--gray {
-    background: rgba(255, 255, 255, .07);
-    color: #cbd5e1;
-}
 /* Type chip + status pill parked at the right edge of a section header — used
    where a standalone hero would be too empty (contacts, sponsors). */
 .pj-hd-tags {
@@ -381,8 +362,6 @@
 .ca:focus-visible,
 .ow-btn:focus-visible,
 .cw-btn:focus-visible,
-.cw-eye:focus-visible,
-.cw-modal__x:focus-visible,
 .dh__cta:focus-visible,
 .dh__tg-cta:focus-visible,
 .dh__tg-x:focus-visible,
@@ -859,7 +838,6 @@ a.pjo__name:hover {
     flex-shrink: 0;
 }
 
-
 .fi-approvers-empty {
     font-size: 0.82rem;
     color: currentColor;
@@ -1041,21 +1019,6 @@ a.pjo__name:hover {
 /* A file panel shown for reading only: the grid of previews stays, the drop
    zone goes. Uploading is already refused server-side; leaving the invitation
    on screen only offers something that cannot happen. */
-.fi-file-panel-readonly .filepond--drop-label {
-    display: none !important;
-}
-
-.fi-file-panel-readonly .filepond--panel-root {
-    background: transparent;
-    border-style: dashed;
-    border-color: rgba(127, 127, 127, 0.18);
-}
-
-.fi-file-panel-readonly .filepond--root {
-    margin-bottom: 0;
-    cursor: default;
-}
-
 
 /* ───────────────── Approval chain on a document ─────────────────────────
    A voided round stays on the record so the document can show it was sent
@@ -1225,57 +1188,7 @@ a.pjo__name:hover {
     min-width: 20rem;
 }
 
-.fi-details-table thead {
-    display: none;
-}
-
-.fi-details-table tbody {
-    font-family: var(--default-font-family);
-}
-
-.fi-details-table tbody th {
-    width: 16rem;
-    font-weight: 500;
-    color: var(--color-gray-500);
-}
-
-.dark .fi-details-table tbody th {
-    color: var(--color-gray-400);
-}
-
-.fi-details-table tbody td {
-    color: var(--color-gray-950);
-}
-
-.dark .fi-details-table tbody td {
-    color: var(--color-white);
-}
-
-.fi-details-avatar {
-    width: 4rem;
-    height: 4rem;
-    font-size: 1.25rem;
-}
-
 .fi-badge {
     font-size: 0.8125rem;
 }
 
-.fi-details-badge {
-    font-size: 0.875rem;
-    padding: 0.3rem 0.75rem;
-}
-
-.fi-details-link {
-    color: var(--color-primary-600);
-    font-weight: 500;
-    text-decoration: none;
-}
-
-.fi-details-link:hover {
-    text-decoration: underline;
-}
-
-.dark .fi-details-link {
-    color: var(--color-primary-400);
-}
