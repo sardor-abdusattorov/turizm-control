@@ -3,12 +3,16 @@
 namespace App\Services\Telegram;
 
 use App\Models\Contract;
+use App\Models\Project;
+use App\Models\Requisition;
 use App\Models\TelegramUser;
 use App\Models\User;
+use App\Services\Approvals\ApprovalWorkflow;
 use App\Services\Contracts\ContractWorkflow;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * Webhook dispatcher: turns Telegram updates into bot actions. Delegates
@@ -128,10 +132,13 @@ class TelegramBot
         }
 
         $contractId = (int) ($state['contract_id'] ?? 0);
+        $requisitionId = (int) ($state['requisition_id'] ?? 0);
 
         match ($state['action'] ?? null) {
             'reject' => $this->finishRejectFlow($chatId, $contractId, $text),
             'approve' => $this->finishApproveFlow($chatId, $contractId, $text),
+            'rq_reject' => $this->finishRequisitionReject($chatId, $requisitionId, $text),
+            'rq_approve' => $this->finishRequisitionApprove($chatId, $requisitionId, $text),
             default => null,
         };
     }
@@ -376,6 +383,58 @@ class TelegramBot
 
                 return;
 
+            case 'rq':
+                $page = max(1, (int) ($arg ?? 1));
+                $this->editToList($chatId, $messageId, $this->menu->requisitionAwaitingList($user, $page));
+                $this->telegram->answerCallbackQuery($callbackId);
+
+                return;
+
+            case 'rqm':
+                $page = max(1, (int) ($arg ?? 1));
+                $this->editToList($chatId, $messageId, $this->menu->requisitionMineList($user, $page));
+                $this->telegram->answerCallbackQuery($callbackId);
+
+                return;
+
+            case 'rqv':
+                $this->openRequisitionCard($chatId, $messageId, (int) $arg, $user);
+                $this->telegram->answerCallbackQuery($callbackId);
+
+                return;
+
+            case 'rqa':
+                $this->startRequisitionApproveFlow($callbackId, $chatId, $messageId, (int) $arg, $user);
+
+                return;
+
+            case 'rqan':
+                $this->finishRequisitionApprove($chatId, (int) $arg, null, $callbackId, $messageId);
+
+                return;
+
+            case 'rqr':
+                $this->startRequisitionRejectFlow($callbackId, $chatId, $messageId, (int) $arg, $user);
+
+                return;
+
+            case 'pj':
+                if (! $this->menu->roles->canSeeProjects($user)) {
+                    $this->telegram->answerCallbackQuery($callbackId, __('app.telegram.not_allowed'));
+
+                    return;
+                }
+                $page = max(1, (int) ($arg ?? 1));
+                $this->editToList($chatId, $messageId, $this->menu->projectList($page));
+                $this->telegram->answerCallbackQuery($callbackId);
+
+                return;
+
+            case 'pjv':
+                $this->openProjectCard($callbackId, $chatId, $messageId, (int) $arg, $user);
+
+                return;
+
             case 'noop':
             default:
                 $this->telegram->answerCallbackQuery($callbackId);
@@ -553,6 +612,170 @@ class TelegramBot
         $card = $this->menu->contractCard($contract, $user);
 
         $this->telegram->editMessage($chatId, $messageId, $card['text'], $card['keyboard']);
+    }
+
+    private function openRequisitionCard(string $chatId, ?int $messageId, int $requisitionId, User $user): void
+    {
+        $requisition = Requisition::query()->with('approvals')->find($requisitionId);
+
+        if (! $requisition || ! $this->canViewRequisition($requisition, $user)) {
+            return;
+        }
+
+        $card = $this->menu->requisitionCard($requisition, $user);
+
+        $this->telegram->editMessage($chatId, $messageId, $card['text'], $card['keyboard']);
+    }
+
+    /**
+     * The same rule the register uses: the author, anybody on the chain, and
+     * oversight.
+     */
+    private function canViewRequisition(Requisition $requisition, User $user): bool
+    {
+        return $requisition->author_id === $user->id
+            || $requisition->approvalFor($user) !== null
+            || $user->can('view_all_requisitions');
+    }
+
+    /**
+     * Approving carries an optional note, so the tap opens a comment step with
+     * a way to skip it — mirroring the contract flow and the web panel.
+     */
+    private function startRequisitionApproveFlow(string $callbackId, string $chatId, ?int $messageId, int $requisitionId, User $user): void
+    {
+        $requisition = Requisition::query()->with('approvals')->find($requisitionId);
+
+        if (! $requisition || ! $requisition->awaitsApprovalFrom($user)) {
+            $this->telegram->answerCallbackQuery($callbackId, __('app.telegram.not_allowed'));
+
+            return;
+        }
+
+        $this->state->set($chatId, 'rq_approve', ['requisition_id' => $requisitionId]);
+
+        $this->telegram->editMessage(
+            $chatId,
+            $messageId,
+            __('app.telegram.rq_approve_prompt', ['number' => $requisition->number]),
+            [
+                [$this->menu->skipCommentButton("rqan:{$requisitionId}")],
+                [$this->menu->cancelButton()],
+            ],
+        );
+
+        $this->telegram->answerCallbackQuery($callbackId);
+    }
+
+    /**
+     * A refusal always costs a reason, so there is no skip here — the flow
+     * waits for the text.
+     */
+    private function startRequisitionRejectFlow(string $callbackId, string $chatId, ?int $messageId, int $requisitionId, User $user): void
+    {
+        $requisition = Requisition::query()->with('approvals')->find($requisitionId);
+
+        if (! $requisition || ! $requisition->acceptsRejectionFrom($user)) {
+            $this->telegram->answerCallbackQuery($callbackId, __('app.telegram.not_allowed'));
+
+            return;
+        }
+
+        $this->state->set($chatId, 'rq_reject', ['requisition_id' => $requisitionId]);
+
+        $this->telegram->editMessage(
+            $chatId,
+            $messageId,
+            __('app.telegram.rq_reject_prompt', ['number' => $requisition->number]),
+            [[$this->menu->cancelButton()]],
+        );
+
+        $this->telegram->answerCallbackQuery($callbackId);
+    }
+
+    private function finishRequisitionApprove(string $chatId, int $requisitionId, ?string $comment, ?string $callbackId = null, ?int $messageId = null): void
+    {
+        $this->settleRequisition(
+            $chatId,
+            $requisitionId,
+            fn (Requisition $requisition, User $user) => app(ApprovalWorkflow::class)->approve($requisition, $user, $comment),
+            __('app.approval.message.approved'),
+            $callbackId,
+            $messageId,
+        );
+    }
+
+    private function finishRequisitionReject(string $chatId, int $requisitionId, string $reason): void
+    {
+        $this->settleRequisition(
+            $chatId,
+            $requisitionId,
+            fn (Requisition $requisition, User $user) => app(ApprovalWorkflow::class)->reject($requisition, $user, $reason),
+            __('app.approval.message.rejected'),
+        );
+    }
+
+    /**
+     * @param  callable(Requisition, User): void  $decide
+     */
+    private function settleRequisition(
+        string $chatId,
+        int $requisitionId,
+        callable $decide,
+        string $success,
+        ?string $callbackId = null,
+        ?int $messageId = null,
+    ): void {
+        $this->state->clear($chatId);
+
+        $user = $this->resolveUser($chatId);
+        $requisition = Requisition::query()->with('approvals')->find($requisitionId);
+
+        if (! $user || ! $requisition) {
+            return;
+        }
+
+        $this->withUserLocale($chatId, function () use ($chatId, $requisition, $user, $decide, $success, $callbackId, $messageId): void {
+            try {
+                $decide($requisition, $user);
+            } catch (Throwable $exception) {
+                $callbackId
+                    ? $this->telegram->answerCallbackQuery($callbackId, $exception->getMessage())
+                    : $this->telegram->send($chatId, $exception->getMessage());
+
+                return;
+            }
+
+            $callbackId and $this->telegram->answerCallbackQuery($callbackId, $success);
+
+            $card = $this->menu->requisitionCard($requisition->fresh()->load('approvals'), $user);
+
+            $messageId
+                ? $this->telegram->editMessage($chatId, $messageId, $card['text'], $card['keyboard'])
+                : $this->telegram->send($chatId, $success."\n\n".$card['text'], $card['keyboard']);
+        });
+    }
+
+    private function openProjectCard(string $callbackId, string $chatId, ?int $messageId, int $projectId, User $user): void
+    {
+        if (! $this->menu->roles->canSeeProjects($user)) {
+            $this->telegram->answerCallbackQuery($callbackId, __('app.telegram.not_allowed'));
+
+            return;
+        }
+
+        $project = Project::find($projectId);
+
+        if (! $project) {
+            $this->telegram->answerCallbackQuery($callbackId);
+
+            return;
+        }
+
+        $card = $this->menu->projectCard($project);
+
+        $this->telegram->editMessage($chatId, $messageId, $card['text'], $card['keyboard']);
+        $this->telegram->answerCallbackQuery($callbackId);
     }
 
     private function sendMainMenu(string $chatId): void

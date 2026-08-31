@@ -2,9 +2,15 @@
 
 namespace App\Services\Telegram;
 
+use App\Enums\ApprovalStatus;
+use App\Enums\RequisitionStatus;
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Resources\Projects\BaseProjectResource;
+use App\Filament\Resources\Requisitions\RequisitionResource;
 use App\Models\Contract;
 use App\Models\ContractApprover;
+use App\Models\Project;
+use App\Models\Requisition;
 use App\Models\User;
 use App\Support\TelegramText;
 use Filament\Facades\Filament;
@@ -22,6 +28,8 @@ class BotMenuBuilder
     public function __construct(
         public BotRoleResolver $roles,
         public BotContractQueries $queries,
+        public BotRequisitionQueries $requisitions,
+        public BotProjectQueries $projects,
     ) {}
 
     /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
@@ -81,6 +89,30 @@ class BotMenuBuilder
             $rows[] = [$this->cbBtn(
                 '🔎 '.__('app.telegram.menu_all_contracts')." · {$this->roles->allContractsCount($user)}",
                 'all:1',
+            )];
+        }
+
+        $rqAwaiting = $this->roles->requisitionsAwaitingCount($user);
+        $rqMine = $this->roles->myRequisitionsCount($user);
+
+        if ($rqAwaiting > 0) {
+            $rows[] = [$this->cbBtn(
+                '📥 '.__('app.telegram.menu_rq_awaiting')." · {$rqAwaiting}",
+                'rq:1',
+            )];
+        }
+
+        if ($rqMine > 0) {
+            $rows[] = [$this->cbBtn(
+                '🧾 '.__('app.telegram.menu_rq_mine')." · {$rqMine}",
+                'rqm:1',
+            )];
+        }
+
+        if ($this->roles->canSeeProjects($user)) {
+            $rows[] = [$this->cbBtn(
+                '📆 '.__('app.telegram.menu_projects'),
+                'pj:1',
             )];
         }
 
@@ -160,6 +192,252 @@ class BotMenuBuilder
             emptyMessage: __('app.telegram.list_mine_empty'),
             callbackPrefix: 'mc',
         );
+    }
+
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
+    public function requisitionAwaitingList(User $user, int $page): array
+    {
+        return $this->renderRequisitionList(
+            $this->requisitions->awaiting($user),
+            $page,
+            __('app.telegram.list_rq_awaiting_title'),
+            __('app.telegram.list_rq_awaiting_empty'),
+            'rq',
+        );
+    }
+
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
+    public function requisitionMineList(User $user, int $page): array
+    {
+        return $this->renderRequisitionList(
+            $this->requisitions->mine($user),
+            $page,
+            __('app.telegram.list_rq_mine_title'),
+            __('app.telegram.list_rq_mine_empty'),
+            'rqm',
+        );
+    }
+
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
+    public function requisitionCard(Requisition $requisition, User $viewer): array
+    {
+        $requisition->loadMissing(['approvals.user', 'author', 'project']);
+
+        $lines = ['<b>'.$this->htmlEscape((string) $requisition->number).'</b>'];
+
+        if ($requisition->title) {
+            $lines[] = '';
+            $lines[] = '<b>«'.$this->htmlEscape($requisition->title).'»</b>';
+        }
+
+        $lines[] = '';
+        $lines[] = __('app.telegram.field_status').': '.$this->requisitionBadge($requisition);
+        $lines[] = __('app.telegram.field_author').': '.$this->htmlEscape($requisition->author?->name ?? '—');
+
+        if ($requisition->project?->name) {
+            $lines[] = __('app.label.project_single').': '.$this->htmlEscape($requisition->project->name);
+        }
+
+        if ($requisition->description) {
+            $lines[] = '';
+            $lines[] = '<blockquote>'.$this->htmlEscape($this->truncate($requisition->description, 400)).'</blockquote>';
+        }
+
+        $chain = $this->renderApprovalChain($requisition);
+
+        if ($chain !== []) {
+            $lines[] = '';
+            $lines[] = '<b>'.__('app.telegram.field_chain').'</b>';
+            $lines[] = '<blockquote>'.implode("\n", $chain).'</blockquote>';
+        }
+
+        $keyboard = [];
+
+        if ($requisition->awaitsApprovalFrom($viewer)) {
+            $keyboard[] = [
+                $this->cbBtn('✅ '.__('app.approval.action.approve'), "rqa:{$requisition->id}"),
+                $this->cbBtn('❌ '.__('app.approval.action.reject'), "rqr:{$requisition->id}"),
+            ];
+        } elseif ($requisition->acceptsRejectionFrom($viewer)) {
+            // Still queued behind somebody: a veto is offered, an approval is not.
+            $keyboard[] = [$this->cbBtn('❌ '.__('app.approval.action.reject'), "rqr:{$requisition->id}")];
+        }
+
+        $keyboard[] = [$this->urlBtn(
+            '📋 '.__('app.telegram.btn_open_in_system'),
+            RequisitionResource::getUrl('view', ['record' => $requisition->id]),
+        )];
+        $keyboard[] = [$this->cbBtn('‹ '.__('app.telegram.btn_back'), 'menu')];
+
+        return ['text' => implode("\n", $lines), 'keyboard' => $keyboard];
+    }
+
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
+    public function projectList(int $page): array
+    {
+        return $this->renderList(
+            query: $this->projects->active(),
+            page: $page,
+            title: __('app.telegram.list_projects_title'),
+            emptyMessage: __('app.telegram.list_projects_empty'),
+            callbackPrefix: 'pj',
+            openPrefix: 'pjv',
+            eagerLoad: ['order'],
+            entry: fn (Project $project, int $position): string => $this->projectListEntry($project, $position),
+        );
+    }
+
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
+    public function projectCard(Project $project): array
+    {
+        $project->loadMissing(['order', 'areaCurrency', 'standCurrency']);
+
+        $lines = ['<b>'.$this->htmlEscape((string) $project->name).'</b>'];
+
+        $lines[] = '';
+        $lines[] = __('app.label.project_type').': '.$this->htmlEscape($project->type->label());
+
+        if ($period = $this->projectPeriod($project)) {
+            $lines[] = __('app.telegram.field_period').': '.$period;
+        }
+
+        if ($project->venue) {
+            $lines[] = __('app.label.venue').': '.$this->htmlEscape($project->venue);
+        }
+
+        if ($project->order) {
+            $lines[] = __('app.label.order_basis').': '.$this->htmlEscape(
+                trim(($project->order->number ? $project->order->number.' · ' : '').$project->order->title),
+            );
+        }
+
+        $contracts = $project->contracts()->count();
+
+        if ($contracts > 0) {
+            $lines[] = __('app.telegram.field_contracts').': <b>'.$contracts.'</b>';
+        }
+
+        if ($project->description) {
+            $lines[] = '';
+            $lines[] = '<blockquote>'.$this->htmlEscape($this->truncate($project->description, 400)).'</blockquote>';
+        }
+
+        return [
+            'text' => implode("\n", $lines),
+            'keyboard' => [
+                [$this->urlBtn(
+                    '📋 '.__('app.telegram.btn_open_in_system'),
+                    BaseProjectResource::urlFor($project),
+                )],
+                [$this->cbBtn('‹ '.__('app.telegram.btn_back'), 'pj:1')],
+            ],
+        ];
+    }
+
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
+    private function renderRequisitionList($query, int $page, string $title, string $emptyMessage, string $callbackPrefix): array
+    {
+        return $this->renderList(
+            query: $query,
+            page: $page,
+            title: $title,
+            emptyMessage: $emptyMessage,
+            callbackPrefix: $callbackPrefix,
+            openPrefix: 'rqv',
+            eagerLoad: ['author', 'project', 'approvals.user'],
+            entry: fn (Requisition $requisition, int $position): string => $this->requisitionListEntry($requisition, $position),
+        );
+    }
+
+    private function requisitionListEntry(Requisition $requisition, int $position): string
+    {
+        $lines = [
+            "<b>{$position}. {$this->htmlEscape((string) $requisition->number)}</b>  ".$this->requisitionBadge($requisition),
+        ];
+
+        if ($requisition->title) {
+            $lines[] = '<i>«'.$this->htmlEscape($this->truncate($requisition->title, 56)).'»</i>';
+        }
+
+        $meta = [__('app.telegram.field_author').': '.$this->htmlEscape($requisition->author?->name ?? '—')];
+
+        if ($progress = $requisition->approvalProgress()) {
+            $meta[] = __('app.approval.column.chain').': '.$progress;
+        }
+
+        $lines[] = implode(' · ', $meta);
+
+        return implode("\n", $lines);
+    }
+
+    private function projectListEntry(Project $project, int $position): string
+    {
+        $lines = ["<b>{$position}. {$this->htmlEscape((string) $project->name)}</b>"];
+
+        $meta = [$this->htmlEscape($project->type->label())];
+
+        if ($period = $this->projectPeriod($project)) {
+            $meta[] = $period;
+        }
+
+        if ($project->venue) {
+            $meta[] = $this->htmlEscape($this->truncate($project->venue, 40));
+        }
+
+        $lines[] = implode(' · ', $meta);
+
+        return implode("\n", $lines);
+    }
+
+    private function projectPeriod(Project $project): ?string
+    {
+        if (! $project->starts_on) {
+            return null;
+        }
+
+        return $project->ends_on
+            ? $project->starts_on->format('d.m.Y').' — '.$project->ends_on->format('d.m.Y')
+            : $project->starts_on->format('d.m.Y');
+    }
+
+    private function requisitionBadge(Requisition $requisition): string
+    {
+        $icon = match ($requisition->status) {
+            RequisitionStatus::Draft => '📝',
+            RequisitionStatus::InReview => '⏳',
+            RequisitionStatus::Approved => '✅',
+            RequisitionStatus::Rejected => '❌',
+        };
+
+        return $icon.' '.$this->htmlEscape($requisition->status->label());
+    }
+
+    /**
+     * The chain as one line per step, marked with where it stands — the same
+     * reading the register gives, sized for a phone.
+     *
+     * @return array<int, string>
+     */
+    private function renderApprovalChain(Requisition $requisition): array
+    {
+        return $requisition->activeApprovals()
+            ->map(function ($approval): string {
+                $icon = match ($approval->status) {
+                    ApprovalStatus::Approved => '✅',
+                    ApprovalStatus::Rejected => '❌',
+                    ApprovalStatus::Pending => '⏳',
+                    default => '▫️',
+                };
+
+                $line = $icon.' '.$this->htmlEscape($approval->user?->name ?? '—');
+
+                if (filled($approval->comment)) {
+                    $line .= "\n     <i>".$this->htmlEscape($this->truncate($approval->comment, 120)).'</i>';
+                }
+
+                return $line;
+            })
+            ->all();
     }
 
     /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
@@ -282,7 +560,19 @@ class BotMenuBuilder
     /** @return array<int, array<int, array<string, string>>> */
     public function rejectPromptKeyboard(): array
     {
-        return [[$this->cbBtn('✖ '.__('app.action.cancel'), 'cancel')]];
+        return [[$this->cancelButton()]];
+    }
+
+    /** @return array<string, string> */
+    public function cancelButton(): array
+    {
+        return $this->cbBtn('✖ '.__('app.action.cancel'), 'cancel');
+    }
+
+    /** @return array<string, string> */
+    public function skipCommentButton(string $callback): array
+    {
+        return $this->cbBtn('✅ '.__('app.telegram.approve_without_comment'), $callback);
     }
 
     public function approvePromptText(Contract $contract): string
@@ -326,6 +616,38 @@ class BotMenuBuilder
      */
     private function renderContractList($query, int $page, string $title, string $emptyMessage, string $callbackPrefix): array
     {
+        return $this->renderList(
+            query: $query,
+            page: $page,
+            title: $title,
+            emptyMessage: $emptyMessage,
+            callbackPrefix: $callbackPrefix,
+            openPrefix: 'view',
+            eagerLoad: ['currency', 'contact', 'responsible'],
+            entry: fn (Contract $contract, int $position): string => $this->contractListEntry($contract, $position),
+        );
+    }
+
+    /**
+     * One paginated register, whatever it holds: a numbered block per record,
+     * a row of index buttons that open the card, and page navigation. Every
+     * list in the bot goes through here so a second register is a query and a
+     * formatter, not another copy of this.
+     *
+     * @param  array<int, string>  $eagerLoad
+     * @param  callable(Model, int): string  $entry
+     * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
+     */
+    private function renderList(
+        $query,
+        int $page,
+        string $title,
+        string $emptyMessage,
+        string $callbackPrefix,
+        string $openPrefix,
+        array $eagerLoad,
+        callable $entry,
+    ): array {
         $page = max(1, $page);
         $total = (clone $query)->count();
 
@@ -340,7 +662,7 @@ class BotMenuBuilder
         $page = min($page, $pages);
 
         $rows = (clone $query)
-            ->with(['currency', 'contact', 'responsible'])
+            ->with($eagerLoad)
             ->forPage($page, self::PAGE_SIZE)
             ->get()
             ->values();
@@ -348,10 +670,10 @@ class BotMenuBuilder
         $entries = [];
         $indexButtons = [];
 
-        foreach ($rows as $i => $contract) {
+        foreach ($rows as $i => $record) {
             $position = $i + 1;
-            $entries[] = $this->contractListEntry($contract, $position);
-            $indexButtons[] = $this->cbBtn($this->indexEmoji($position), "view:{$contract->id}");
+            $entries[] = $entry($record, $position);
+            $indexButtons[] = $this->cbBtn($this->indexEmoji($position), "{$openPrefix}:{$record->getKey()}");
         }
 
         $body = '<b>'.$this->htmlEscape($title)."</b>\n"

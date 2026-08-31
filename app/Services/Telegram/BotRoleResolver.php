@@ -4,6 +4,7 @@ namespace App\Services\Telegram;
 
 use App\Models\Contract;
 use App\Models\ContractApprover;
+use App\Models\Requisition;
 use App\Models\User;
 
 /**
@@ -60,6 +61,21 @@ class BotRoleResolver
     public function allContractsCount(User $user): int
     {
         return Contract::query()->visibleTo($user)->count();
+    }
+
+    public function requisitionsAwaitingCount(User $user): int
+    {
+        return Requisition::query()->awaiting($user)->count();
+    }
+
+    public function myRequisitionsCount(User $user): int
+    {
+        return Requisition::query()->where('author_id', $user->id)->count();
+    }
+
+    public function canSeeProjects(User $user): bool
+    {
+        return $user->hasRole('super_admin') || $user->can('view_any_project');
     }
 
     public function isLawyer(User $user): bool
