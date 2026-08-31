@@ -34,6 +34,9 @@ class SettingsSeeder extends Seeder
             'approval.enabled' => true,
             'approval.flow' => ['legal', 'accounting'],
             'approval.sla_days' => 2,
+
+            'requisition.review_days' => 3,
+            'requisition.reviewer_id' => null,
         ];
 
         foreach ($values as $key => $value) {

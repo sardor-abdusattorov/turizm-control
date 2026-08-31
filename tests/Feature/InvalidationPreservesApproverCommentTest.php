@@ -3,7 +3,6 @@
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
-use App\Models\ContractTemplate;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
@@ -18,13 +17,11 @@ it('preserves an approver original comment when the chain is invalidated by an e
     $approver = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legal->id]);
 
     $contractType = ContractType::factory()->create();
-    $template = ContractTemplate::factory()->create(['contract_type_id' => $contractType->id, 'status' => true]);
 
     $contract = Contract::factory()->create([
         'responsible_id' => $author->id,
         'status' => Contract::STATUS_IN_REVIEW,
         'contract_type_id' => $contractType->id,
-        'contract_template_id' => $template->id,
         'contact_id' => Contact::factory()->create(['status' => true])->id,
         'currency_id' => Currency::factory()->create(['status' => true])->id,
         'number' => 'C-INV-PRESERVE',
@@ -64,13 +61,11 @@ it('does not stamp a verdict onto a queued row cancelled by an edit', function (
     $approver = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
     $contractType = ContractType::factory()->create();
-    $template = ContractTemplate::factory()->create(['contract_type_id' => $contractType->id, 'status' => true]);
 
     $contract = Contract::factory()->create([
         'responsible_id' => $author->id,
         'status' => Contract::STATUS_IN_REVIEW,
         'contract_type_id' => $contractType->id,
-        'contract_template_id' => $template->id,
         'contact_id' => Contact::factory()->create(['status' => true])->id,
         'currency_id' => Currency::factory()->create(['status' => true])->id,
         'number' => 'C-INV-QUEUED',
@@ -101,13 +96,11 @@ it('rebuilds a fresh queued chain mirroring the previous one after an in-flow ed
     $second = User::factory()->create(['name' => 'Madina Second', 'status' => User::STATUS_ACTIVE]);
 
     $contractType = ContractType::factory()->create();
-    $template = ContractTemplate::factory()->create(['contract_type_id' => $contractType->id, 'status' => true]);
 
     $contract = Contract::factory()->create([
         'responsible_id' => $author->id,
         'status' => Contract::STATUS_IN_REVIEW,
         'contract_type_id' => $contractType->id,
-        'contract_template_id' => $template->id,
         'contact_id' => Contact::factory()->create(['status' => true])->id,
         'currency_id' => Currency::factory()->create(['status' => true])->id,
         'number' => 'C-INV-REBUILD',

@@ -20,7 +20,7 @@ function createContractWithChain(int $approverCount = 3): array
     $responsible = User::factory()->create();
     $approvers = asApprover(User::factory()->count($approverCount)->create());
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);
@@ -153,7 +153,7 @@ it('refuses to approve when the acting user is not the current approver', functi
 
 it('refuses to submit when there are no approvers', function () {
     $responsible = User::factory()->create();
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);
@@ -170,7 +170,7 @@ it('refuses to submit when the contract has no document on disk', function () {
     $responsible = User::factory()->create();
     $approver = User::factory()->create();
 
-    // Note: no ->withDocument() — there is no docx on disk.
+    // Note: no ->withDossier() — there is no docx on disk.
     $contract = Contract::factory()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,

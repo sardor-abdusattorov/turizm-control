@@ -2,7 +2,6 @@
 
 use App\Models\Contract;
 use App\Models\ContractAttachment;
-use App\Models\ContractTemplate;
 use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,19 +20,6 @@ it('deletes the order docx from disk when the order is deleted', function () {
     $order->delete();
 
     Storage::disk('local')->assertMissing('uploads/files/orders/test.docx');
-});
-
-it('deletes the template docx from disk when the template is deleted', function () {
-    Storage::fake('local');
-
-    $template = ContractTemplate::factory()->create([
-        'template_file' => 'uploads/files/uploads/files/contract-templates/test.docx',
-    ]);
-    Storage::disk('local')->put($template->template_file, 'fake');
-
-    $template->delete();
-
-    Storage::disk('local')->assertMissing('uploads/files/uploads/files/contract-templates/test.docx');
 });
 
 it('wipes the contract folder on disk when a contract is deleted', function () {

@@ -21,7 +21,7 @@ function chainForSubmit(int $approverCount = 2): array
     $responsible = User::factory()->create();
     $approvers = asApprover(User::factory()->count($approverCount)->create());
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);

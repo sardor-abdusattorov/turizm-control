@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use App\Enums\OrderScope;
 use App\Filament\Support\DocumentUpload;
+use App\Models\Order;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -13,7 +16,7 @@ use Filament\Schemas\Schema;
 
 class OrderForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Schema $schema, ?OrderScope $scope = null): Schema
     {
         return $schema
             ->columns(1)
@@ -22,9 +25,6 @@ class OrderForm
                     ->schema([
                         Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
-                                // Every real buyruq carries its official
-                                // number (06-АФ, 119-АФ…) — entered by hand,
-                                // никакой автогенерации.
                                 TextInput::make('number')
                                     ->label(__('app.label.order_number'))
                                     ->required()
@@ -38,6 +38,16 @@ class OrderForm
                                     ->default(now())
                                     ->required(),
                             ]),
+
+                        Select::make('basis_order_id')
+                            ->label(__('app.label.committee_order_basis'))
+                            ->helperText(__('app.helper.committee_order_basis'))
+                            ->options(fn (): array => Order::committeeBasisOptions())
+                            ->getOptionLabelUsing(fn ($value): ?string => Order::find($value)?->label())
+                            ->searchable()
+                            ->preload()
+                            ->visible($scope === OrderScope::PrCenter)
+                            ->placeholder(__('app.label.not_set')),
 
                         TextInput::make('title')
                             ->label(__('app.label.title'))

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Payments\Pages;
 
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Payments\PaymentResource;
+use App\Filament\Resources\Projects\BaseProjectResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -15,8 +16,7 @@ class ViewPayment extends ViewRecord
 
     public function getHeading(): string
     {
-        return format_percent((float) $this->record->percent)
-            .'% · '.($this->record->contract?->number ?? __('app.label.payment_single'));
+        return $this->record->valueLabel().' · '.$this->record->subjectLabel();
     }
 
     public function getSubheading(): ?string
@@ -35,6 +35,13 @@ class ViewPayment extends ViewRecord
     {
         return $this->record->contract
             ? ContractResource::getUrl('view', ['record' => $this->record->contract])
+            : null;
+    }
+
+    public function projectUrl(): ?string
+    {
+        return $this->record->project
+            ? BaseProjectResource::urlFor($this->record->project)
             : null;
     }
 

@@ -13,7 +13,12 @@ return new class extends Migration
             // Every real buyruq has an official number (06-АФ, 119-АФ…) —
             // entered by hand, never generated.
             $table->string('number', 50)->unique();
-            $table->string('scope', 20)->default('internal');
+            $table->string('scope', 20)->default('pr_center');
+            // A PR-centre buyruq is issued on the strength of a committee one:
+            // the committee decides, the centre implements. Nullable because a
+            // committee order has no basis above it, and the centre sometimes
+            // acts on its own.
+            $table->foreignId('basis_order_id')->nullable()->constrained('orders')->nullOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
             // Nullable: real buyruqs sometimes reach the registry before their

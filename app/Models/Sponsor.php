@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasActiveStatus;
+use App\Models\Concerns\SearchesByTaxId;
 use App\Models\Concerns\SumsContractsByCurrency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,7 @@ class Sponsor extends Model
 {
     use HasActiveStatus;
     use HasFactory;
+    use SearchesByTaxId;
     use SumsContractsByCurrency;
 
     protected $fillable = [

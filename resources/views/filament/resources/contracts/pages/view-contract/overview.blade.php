@@ -118,52 +118,6 @@
                 <section class="cw-card">
                     <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><h2 class="cw-hd__t">{{ __('app.label.basic_information') }}</h2></div>
 
-                    {{-- File card (top of merged section) --}}
-                    @if ($record->documentExists())
-                        @php
-                            $ext = 'DOCX';
-                            $createdLabel = $record->created_at?->translatedFormat('d M Y H:i');
-                        @endphp
-                        <div class="cw-file">
-                            <div class="cw-file__thumb" aria-hidden="true">
-                                <svg viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8 4 h36 l12 12 v60 H8 Z" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
-                                    <path d="M44 4 v12 h12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
-                                    <rect x="14" y="30" width="34" height="2" rx="1" fill="#e2e8f0"/>
-                                    <rect x="14" y="36" width="28" height="2" rx="1" fill="#e2e8f0"/>
-                                    <rect x="14" y="42" width="34" height="2" rx="1" fill="#e2e8f0"/>
-                                    <rect x="14" y="48" width="22" height="2" rx="1" fill="#e2e8f0"/>
-                                </svg>
-                                <span class="cw-file__ext">{{ $ext }}</span>
-                            </div>
-                            <div class="cw-file__body">
-                                <div class="cw-file__field">
-                                    <div class="cw-file__lb">{{ __('app.label.file_name') }}</div>
-                                    <div class="cw-file__vl">{{ $record->number }}.docx</div>
-                                </div>
-                                <div class="cw-file__field">
-                                    <div class="cw-file__lb">{{ __('app.label.size') }}</div>
-                                    <div class="cw-file__vl">{{ $this->documentSizeLabel() }}</div>
-                                </div>
-                                @if ($createdLabel)
-                                    <div class="cw-file__field">
-                                        <div class="cw-file__lb">{{ __('app.label.created_at') }}</div>
-                                        <div class="cw-file__vl">{{ $createdLabel }}</div>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                        {{-- The document leaves as its own .docx: with the
-                             online editor gone there is nothing to render it
-                             in the browser. --}}
-                        <div class="cw-file__act">
-                            <a href="{{ route('contracts.document.download', ['contract' => $record]) }}" class="cw-btn cw-btn--primary">
-                                {!! $ic('heroicon-o-arrow-down-tray', 16) !!}
-                                <span>{{ __('app.action.download_document') }}</span>
-                            </a>
-                        </div>
-                    @endif
-
                     <div class="cw-dets">
                         @foreach ($details as [$icon, $label, $value, $type])
                             @php $hasValue = ! empty($value); @endphp

@@ -32,7 +32,6 @@
         ['heroicon-o-document-text', __('app.label.order_basis'), $record->project?->order ? trim(($record->project->order->number ? $record->project->order->number.' · ' : '').$record->project->order->title) : null, null],
         ['heroicon-o-user', __('app.label.responsible'), $record->responsible?->name, null],
         ['heroicon-o-banknotes', __('app.label.amount'), \App\Support\Money::format($record->amount).' '.($record->currency?->short_name ?? ''), null],
-        ['heroicon-o-document-duplicate', __('app.label.contract_template_single'), $record->template?->name, null],
         ['heroicon-o-paper-airplane', __('app.label.submitted'), $this->submittedAt()?->format('d.m.Y H:i'), null],
         ['heroicon-o-calendar-days', __('app.label.signing_date'), $record->signed_at?->format('d.m.Y'), null],
         ['heroicon-o-clock', __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i'), null],

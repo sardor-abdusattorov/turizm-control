@@ -3,13 +3,16 @@
 namespace App\Filament\Resources\Payments\Tables;
 
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentSubject;
 use App\Exports\PaymentsExport;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Filament\Resources\Payments\PaymentResource;
+use App\Filament\Resources\Projects\BaseProjectResource;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\ExportXlsxAction;
 use App\Models\Payment;
 use App\Models\User;
+use App\Support\Money;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
@@ -32,29 +35,45 @@ class PaymentsTable
         return $table
             // Eager-load the relation columns; without it every row on the
             // page fires its own query for them.
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['contract', 'creator']))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['contract', 'project', 'currency', 'creator']))
             ->defaultSort('paid_at', 'desc')
             ->groups([
                 Group::make('contract.number')
                     ->label(__('app.label.contract'))
                     ->titlePrefixedWithLabel(false)
                     ->collapsible(),
+
+                Group::make('project.name')
+                    ->label(__('app.label.project_single'))
+                    ->titlePrefixedWithLabel(false)
+                    ->collapsible(),
             ])
             ->summaries(pageCondition: false, allTableCondition: false)
             ->columns([
-                TextColumn::make('contract.number')
-                    ->label(__('app.label.contract_number'))
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('subject')
+                    ->label(__('app.label.payment_subject'))
+                    ->badge()
+                    ->state(fn (Payment $record): PaymentSubject => $record->isDirect()
+                        ? PaymentSubject::Project
+                        : PaymentSubject::Contract)
+                    ->color(fn (PaymentSubject $state): string => $state->color())
+                    ->icon(fn (PaymentSubject $state): string => $state->icon())
+                    ->formatStateUsing(fn (PaymentSubject $state): string => $state->label()),
 
-                TextColumn::make('contract.title')
-                    ->label(__('app.label.contract_title'))
+                TextColumn::make('contract.number')
+                    ->label(__('app.label.payment_object'))
+                    ->state(fn (Payment $record): string => $record->subjectLabel())
+                    ->description(fn (Payment $record): ?string => $record->isDirect()
+                        ? $record->purpose
+                        : $record->contract?->title)
                     ->searchable()
                     ->sortable()
-                    ->wrap(),
+                    ->wrap()
+                    ->extraCellAttributes(['style' => 'min-width: 20rem']),
 
                 TextColumn::make('percent')
                     ->label(__('app.label.percent'))
+                    ->placeholder('—')
                     ->formatStateUsing(fn ($state): string => format_percent($state).'%')
                     ->summarize(
                         Sum::make()
@@ -62,6 +81,14 @@ class PaymentsTable
                             ->formatStateUsing(fn ($state): string => format_percent($state).'%'),
                     )
                     ->sortable(),
+
+                TextColumn::make('amount')
+                    ->label(__('app.label.amount'))
+                    ->placeholder('—')
+                    ->formatStateUsing(fn (?string $state, Payment $record): string => Money::format($state)
+                        .' '.($record->currency?->short_name ?? ''))
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('paid_at')
                     ->label(__('app.label.paid_at'))
@@ -94,9 +121,26 @@ class PaymentsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('subject')
+                    ->label(__('app.label.payment_subject'))
+                    ->options(PaymentSubject::options())
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['value'] ?? null,
+                            fn (Builder $q, string $value) => $value === PaymentSubject::Project->value
+                                ? $q->whereNull('contract_id')
+                                : $q->whereNotNull('contract_id'),
+                        )),
+
                 SelectFilter::make('contract_id')
                     ->label(__('app.label.contract'))
                     ->relationship('contract', 'number')
+                    ->searchable()
+                    ->preload(),
+
+                SelectFilter::make('project_id')
+                    ->label(__('app.label.project_single'))
+                    ->relationship('project', 'name')
                     ->searchable()
                     ->preload(),
 
@@ -155,6 +199,15 @@ class PaymentsTable
                             ? ContractResource::getUrl('view', ['record' => $record->contract])
                             : null)
                         ->visible(fn (Payment $record): bool => $record->contract !== null),
+
+                    Action::make('openProject')
+                        ->label(__('app.action.open_project'))
+                        ->icon('heroicon-o-arrow-top-right-on-square')
+                        ->color('gray')
+                        ->url(fn (Payment $record) => $record->project
+                            ? BaseProjectResource::urlFor($record->project)
+                            : null)
+                        ->visible(fn (Payment $record): bool => $record->project !== null),
                 ])
                     ->icon('heroicon-m-ellipsis-vertical'),
             ]);

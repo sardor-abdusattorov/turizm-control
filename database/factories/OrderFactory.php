@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\OrderScope;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -19,6 +20,7 @@ class OrderFactory extends Factory
 
         return [
             'number' => fake()->unique()->numberBetween(1, 999).'-АФ',
+            'scope' => OrderScope::PrCenter,
             'title' => fake()->sentence(3),
             'description' => fake()->paragraph(),
             'file_path' => 'uploads/files/orders/2026/06/order-'.fake()->uuid().'.docx',
@@ -26,5 +28,18 @@ class OrderFactory extends Factory
             'created_by' => User::factory(),
             'status' => true,
         ];
+    }
+
+    public function committee(): static
+    {
+        return $this->state(fn (): array => [
+            'scope' => OrderScope::Committee,
+            'basis_order_id' => null,
+        ]);
+    }
+
+    public function prCenter(): static
+    {
+        return $this->state(fn (): array => ['scope' => OrderScope::PrCenter]);
     }
 }

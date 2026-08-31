@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -114,10 +115,34 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
      */
     public static function approverOptionsGroupedByDepartment(?int $excludeId = null): array
     {
+        return static::optionsGroupedByDepartment(
+            $excludeId,
+            fn (Builder $query) => $query->whereHas('department', fn ($department) => $department->approvers()),
+        );
+    }
+
+    /**
+     * Every active user, grouped by department — the picker for roles the
+     * approval flow knows nothing about, such as the supply officer who checks
+     * requisitions.
+     *
+     * @return array<string, array<int, string>>
+     */
+    public static function activeOptionsGroupedByDepartment(?int $excludeId = null): array
+    {
+        return static::optionsGroupedByDepartment($excludeId);
+    }
+
+    /**
+     * @param  (callable(Builder): Builder)|null  $filter
+     * @return array<string, array<int, string>>
+     */
+    private static function optionsGroupedByDepartment(?int $excludeId = null, ?callable $filter = null): array
+    {
         return static::query()
             ->where('status', self::STATUS_ACTIVE)
             ->when($excludeId, fn ($query) => $query->where('id', '!=', $excludeId))
-            ->whereHas('department', fn ($query) => $query->approvers())
+            ->when($filter, fn ($query) => $filter($query))
             ->with(['department', 'position'])
             ->get()
             ->reduce(function (array $grouped, self $user): array {

@@ -8,7 +8,6 @@ use App\Filament\Support\ContractDossierUpload;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
-use App\Models\ContractTemplate;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
@@ -30,7 +29,6 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 
@@ -76,10 +74,6 @@ class ContractForm
                         Tab::make(__('app.label.basic_information'))
                             ->icon('heroicon-o-clipboard-document-list')
                             ->schema([
-                                View::make('filament.resources.contracts.partials.file-card')
-                                    ->visible(fn (?Contract $record): bool => $record !== null && $record->documentExists())
-                                    ->columnSpanFull(),
-
                                 // Legacy import switch: a signed paper contract is
                                 // filed as approved straight away — no chain, just
                                 // the signing date and the scans below. On edit it
@@ -114,8 +108,6 @@ class ContractForm
                                     ->preload()
                                     ->live()
                                     ->afterStateUpdated(function (Set $set, mixed $state): void {
-                                        $set('contract_template_id', null);
-
                                         // The counterparty picker flips with the
                                         // type; clear whichever party no longer
                                         // applies so a contact contract never
@@ -128,43 +120,38 @@ class ContractForm
                                     })
                                     ->columnSpanFull(),
 
-                                Select::make('contract_template_id')
-                                    ->label(__('app.label.contract_template_single'))
-                                    ->options(fn (Get $get): array => self::templateOptions($get('contract_type_id')))
-                                    ->disabled(fn (Get $get): bool => blank($get('contract_type_id')))
-                                    ->placeholder(fn (Get $get): string => blank($get('contract_type_id'))
-                                        ? __('app.label.select_contract_type_first')
-                                        : __('app.label.select_option'))
-                                    ->helperText(__('app.helper.template_optional'))
-                                    ->searchable()
-                                    // A legacy paper contract is already written and
-                                    // signed — there is nothing to generate from a
-                                    // template, so don't offer one.
-                                    ->visible(fn (Get $get): bool => ! $get('already_signed'))
-                                    ->columnSpanFull(),
-
                                 // Counterparty — a Contact on most kinds, a
                                 // Sponsor on «Спонсорство». The type's
                                 // counterparty_kind toggles which picker shows;
                                 // exactly one of the two is filled and required.
                                 Select::make('contact_id')
                                     ->label(__('app.label.contact_single'))
-                                    ->options(Contact::getActive())
                                     ->visible(fn (Get $get): bool => ! self::typeUsesSponsor($get('contract_type_id')))
                                     ->required(fn (Get $get): bool => ! self::typeUsesSponsor($get('contract_type_id')))
                                     ->searchable()
-                                    ->preload()
+                                    ->getSearchResultsUsing(fn (string $search): array => Contact::searchOptions($search))
+                                    ->getOptionLabelUsing(fn ($value): ?string => Contact::find($value)?->optionLabel())
+                                    ->options(fn (): array => Contact::searchOptions())
+                                    ->allowHtml()
+                                    ->loadingMessage(__('app.label.searching'))
+                                    ->searchPrompt(__('app.helper.counterparty_search'))
+                                    ->noSearchResultsMessage(__('app.message.counterparty_not_found'))
                                     ->createOptionForm(fn (Schema $schema) => ContactForm::configure($schema, inline: true))
                                     ->createOptionUsing(fn (array $data) => ContactForm::createWithBankAccounts($data)->getKey())
                                     ->columnSpanFull(),
 
                                 Select::make('sponsor_id')
                                     ->label(__('app.label.sponsor_single'))
-                                    ->options(Sponsor::getActive())
                                     ->visible(fn (Get $get): bool => self::typeUsesSponsor($get('contract_type_id')))
                                     ->required(fn (Get $get): bool => self::typeUsesSponsor($get('contract_type_id')))
                                     ->searchable()
-                                    ->preload()
+                                    ->getSearchResultsUsing(fn (string $search): array => Sponsor::searchOptions($search))
+                                    ->getOptionLabelUsing(fn ($value): ?string => Sponsor::find($value)?->optionLabel())
+                                    ->options(fn (): array => Sponsor::searchOptions())
+                                    ->allowHtml()
+                                    ->loadingMessage(__('app.label.searching'))
+                                    ->searchPrompt(__('app.helper.counterparty_search'))
+                                    ->noSearchResultsMessage(__('app.message.counterparty_not_found'))
                                     ->createOptionForm(fn (Schema $schema) => SponsorForm::configure($schema))
                                     ->createOptionUsing(fn (array $data) => Sponsor::create($data)->getKey())
                                     ->columnSpanFull(),
@@ -295,28 +282,6 @@ class ContractForm
         }
 
         return in_array((int) $contractTypeId, ContractType::sponsorFacingIds(), true);
-    }
-
-    /**
-     * Active templates for the chosen contract type, plus untyped "general"
-     * templates that apply to any kind. Empty until a kind is selected so the
-     * dropdown stays gated behind the contract type.
-     *
-     * @return array<int, string>
-     */
-    protected static function templateOptions(?int $contractTypeId): array
-    {
-        if (blank($contractTypeId)) {
-            return [];
-        }
-
-        return ContractTemplate::query()
-            ->forContractType($contractTypeId)
-            ->get()
-            ->mapWithKeys(fn (ContractTemplate $t): array => [
-                $t->id => $t->name,
-            ])
-            ->toArray();
     }
 
     /**

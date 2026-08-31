@@ -53,6 +53,11 @@ abstract class BaseProjectResource extends Resource
             : InternationalProjectResource::class;
     }
 
+    public static function urlFor(Project $record): string
+    {
+        return static::resourceFor($record)::getUrl('view', ['record' => $record]);
+    }
+
     public static function form(Schema $schema): Schema
     {
         return ProjectForm::configure($schema);

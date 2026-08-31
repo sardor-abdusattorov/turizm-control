@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\ContractAttachmentFileController;
-use App\Http\Controllers\ContractDocumentController;
 use App\Http\Controllers\OrderFileController;
 use App\Http\Controllers\TelegramConnectController;
 use App\Http\Controllers\TelegramWebhookController;
@@ -14,9 +13,6 @@ Route::post('/telegram/webhook/{secret}', [TelegramWebhookController::class, 'ha
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/telegram/connect', [TelegramConnectController::class, 'connect'])
         ->name('telegram.connect');
-
-    Route::get('/contracts/{contract}/document/download', [ContractDocumentController::class, 'download'])
-        ->name('contracts.document.download');
 
     Route::get('/orders/{order}/file', [OrderFileController::class, 'inline'])
         ->name('orders.file.inline');

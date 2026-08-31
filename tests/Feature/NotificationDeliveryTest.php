@@ -24,7 +24,7 @@ it('notifies the manager AND the next approver when a step is approved', functio
     $lawyer = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE]));
     $accountant = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $manager->id,
         'status' => Contract::STATUS_IN_REVIEW,
     ]);
@@ -54,7 +54,7 @@ it('includes the approver, their decision time and comment in the step-approved 
     $lawyer = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Alisher Yuldoshev']));
     $accountant = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $manager->id,
         'status' => Contract::STATUS_IN_REVIEW,
     ]);
@@ -83,7 +83,7 @@ it('names the final approver and time in the fully-approved notification', funct
     $manager = User::factory()->create();
     $approver = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Madina Saidova']));
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $manager->id,
         'status' => Contract::STATUS_IN_REVIEW,
     ]);
@@ -111,7 +111,7 @@ it('sends the Telegram step-approved message in the recipient locale, not the se
     $lawyer = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE, 'name' => 'Alisher Yuldoshev']));
     $accountant = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $manager->id,
         'status' => Contract::STATUS_IN_REVIEW,
     ]);
@@ -151,7 +151,7 @@ it('renders the bell notification in the recipient saved panel locale, not the s
     $manager = User::factory()->create(['locale' => 'uz']);
     $lawyer = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE]));
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $manager->id,
         'status' => Contract::STATUS_IN_REVIEW,
     ]);
@@ -175,7 +175,7 @@ it('names the sender in the approval-requested notification', function () {
     $manager = User::factory()->create(['name' => 'Sardor Abdusattorov']);
     $approver = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $manager->id,
         'status' => Contract::STATUS_DRAFT,
     ]);
@@ -245,7 +245,7 @@ it('database-notifies the first approver when a contract is submitted', function
     $responsible = User::factory()->create();
     $approver = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);

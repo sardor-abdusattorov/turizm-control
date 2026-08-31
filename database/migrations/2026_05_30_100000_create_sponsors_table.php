@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('sponsors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('inn', 30)->nullable();
+            $table->string('inn', 30)->nullable()->unique();
             $table->string('contact_person')->nullable();
             $table->string('phone', 30)->nullable();
             $table->string('email')->nullable();

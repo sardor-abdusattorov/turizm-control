@@ -189,7 +189,7 @@ it('never lets a fresh contract inherit files from a recycled id', function () {
     $contract = Contract::query()->firstWhere('number', 'CLEAN-001');
 
     expect($contract->id)->toBe(1)
-        ->and($contract->documentExists())->toBeFalse();
+        ->and($contract->attachments()->count())->toBe(0);
 
     Storage::disk('local')->assertMissing('uploads/files/contracts/1/draft.docx');
 });

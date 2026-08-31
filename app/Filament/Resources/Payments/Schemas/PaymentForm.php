@@ -2,14 +2,20 @@
 
 namespace App\Filament\Resources\Payments\Schemas;
 
+use App\Enums\PaymentSubject;
 use App\Filament\Support\PaymentFilesUpload;
 use App\Models\Contract;
+use App\Models\Currency;
+use App\Models\Payment;
+use App\Models\Project;
 use App\Rules\PaymentWithinRemaining;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class PaymentForm
@@ -22,13 +28,46 @@ class PaymentForm
                 Section::make()
                     ->columns(2)
                     ->schema([
+                        Radio::make('subject')
+                            ->label(__('app.label.payment_subject'))
+                            ->helperText(__('app.helper.payment_subject'))
+                            ->options(PaymentSubject::options())
+                            ->default(PaymentSubject::Contract->value)
+                            ->dehydrated(false)
+                            ->inline()
+                            ->inlineLabel(false)
+                            ->live()
+                            ->afterStateHydrated(fn (Set $set, ?Payment $record) => $set(
+                                'subject',
+                                ($record?->isDirect() ?? false)
+                                    ? PaymentSubject::Project->value
+                                    : PaymentSubject::Contract->value,
+                            ))
+                            ->afterStateUpdated(function (Set $set, mixed $state): void {
+                                // Exactly one side is ever filled — clear the
+                                // other so a switched subject cannot save a
+                                // stale contract next to a project.
+                                if ($state === PaymentSubject::Project->value) {
+                                    $set('contract_id', null);
+                                    $set('percent', null);
+                                } else {
+                                    $set('project_id', null);
+                                    $set('amount', null);
+                                    $set('currency_id', null);
+                                    $set('purpose', null);
+                                }
+                            })
+                            ->disabledOn('view')
+                            ->columnSpanFull(),
+
                         Select::make('contract_id')
                             ->label(__('app.label.contract'))
                             ->options(fn () => self::approvedContractOptions())
                             ->searchable()
                             ->preload()
-                            ->required()
                             ->live()
+                            ->visible(fn (Get $get): bool => ! self::isDirect($get))
+                            ->required(fn (Get $get): bool => ! self::isDirect($get))
                             ->disabledOn('view')
                             ->rule(static fn () => static function (string $attribute, $value, $fail): void {
                                 $contract = Contract::find($value);
@@ -47,16 +86,54 @@ class PaymentForm
                             })
                             ->columnSpanFull(),
 
+                        Select::make('project_id')
+                            ->label(__('app.label.project_single'))
+                            ->options(fn (): array => Project::groupedOptions())
+                            ->searchable()
+                            ->preload()
+                            ->visible(fn (Get $get): bool => self::isDirect($get))
+                            ->required(fn (Get $get): bool => self::isDirect($get))
+                            ->disabledOn('view')
+                            ->columnSpanFull(),
+
                         TextInput::make('percent')
                             ->label(__('app.label.percent'))
                             ->numeric()
-                            ->required()
                             ->minValue(0.01)
                             ->maxValue(100)
                             ->step('0.01')
                             ->suffix('%')
+                            ->visible(fn (Get $get): bool => ! self::isDirect($get))
+                            ->required(fn (Get $get): bool => ! self::isDirect($get))
                             ->helperText(fn (Get $get): ?string => self::remainingHelper($get('contract_id')))
                             ->rule(static fn (Get $get) => new PaymentWithinRemaining(Contract::find($get('contract_id')))),
+
+                        // A project payment has no total to be a share of, so
+                        // it carries its own sum and currency instead.
+                        Select::make('currency_id')
+                            ->label(__('app.label.currency_single'))
+                            ->options(fn () => Currency::query()->where('status', true)->pluck('short_name', 'id'))
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->visible(fn (Get $get): bool => self::isDirect($get))
+                            ->required(fn (Get $get): bool => self::isDirect($get)),
+
+                        TextInput::make('amount')
+                            ->label(__('app.label.amount'))
+                            ->numeric()
+                            ->step(0.01)
+                            ->minValue(0.01)
+                            ->prefix(fn (Get $get): ?string => Currency::find($get('currency_id'))?->short_name)
+                            ->visible(fn (Get $get): bool => self::isDirect($get))
+                            ->required(fn (Get $get): bool => self::isDirect($get)),
+
+                        TextInput::make('purpose')
+                            ->label(__('app.label.payment_purpose'))
+                            ->helperText(__('app.helper.payment_purpose'))
+                            ->maxLength(255)
+                            ->visible(fn (Get $get): bool => self::isDirect($get))
+                            ->columnSpanFull(),
 
                         DatePicker::make('paid_at')
                             ->label(__('app.label.paid_at'))
@@ -70,9 +147,13 @@ class PaymentForm
             ]);
     }
 
+    private static function isDirect(Get $get): bool
+    {
+        return $get('subject') === PaymentSubject::Project->value;
+    }
+
     /**
-     * Build the contract dropdown — approved contracts that still have room
-     * for another instalment.
+     * Approved contracts that still have room for another instalment.
      *
      * @return array<int, string>
      */

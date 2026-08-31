@@ -26,7 +26,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // The director only consumes the work that reaches them: every
         // contract (to review + sign off), plus orders and payments. No
-        // settings, reference data or template management.
+        // settings or reference data management.
         $this->syncRole('director', [
             'view_all_contracts',
             'approve_contracts',
@@ -40,6 +40,8 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('payment', ['view_any', 'view']),
             ...$this->resourcePermissions('project', ['view_any', 'view']),
             ...$this->resourcePermissions('press_tour', ['view_any', 'view']),
+            ...$this->resourcePermissions('requisition', ['view_any', 'view']),
+            'view_all_requisitions',
         ]);
 
         $this->syncRole('manager', [
@@ -50,7 +52,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'export_sponsor',
             'view_profile_settings',
             ...$this->resourcePermissions('contract', ['view_any', 'view', 'create', 'update']),
-            ...$this->resourcePermissions('contract_template', ['view_any', 'view']),
             ...$this->resourcePermissions('contract_type', ['view_any']),
             ...$this->resourcePermissions('order', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('contact', ['view_any', 'view', 'create', 'update']),
@@ -61,11 +62,12 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('project', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('press_tour', ['view_any', 'view', 'create', 'update']),
             ...$this->resourcePermissions('sponsor', ['view_any', 'view', 'create', 'update']),
+            ...$this->resourcePermissions('requisition', ['view_any', 'view', 'create', 'update', 'delete']),
         ]);
 
         // Legal + accounting review and approve contracts; they do not author
-        // them, so contract-template access is intentionally left out (it stays
-        // with the manager who builds contracts and the super admin).
+        // them, so create/update access stays with the manager who builds
+        // contracts and the super admin.
         $this->syncRole('legal_officer', [
             'view_all_contracts',
             'approve_contracts',
@@ -87,7 +89,9 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('contract', ['view_any', 'view']),
             ...$this->resourcePermissions('contact', ['view_any', 'view']),
             ...$this->resourcePermissions('payment', ['view_any', 'view', 'create']),
-            ...$this->resourcePermissions('project', ['view_any', 'view']),        ]);
+            ...$this->resourcePermissions('project', ['view_any', 'view']),
+            ...$this->resourcePermissions('requisition', ['view_any', 'view']),
+        ]);
     }
 
     /**

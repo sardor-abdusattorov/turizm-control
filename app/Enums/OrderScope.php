@@ -8,8 +8,8 @@ enum OrderScope: string
 {
     use HasOptions;
 
-    case Internal = 'internal';
-    case External = 'external';
+    case Committee = 'committee';
+    case PrCenter = 'pr_center';
 
     public function label(): string
     {
@@ -19,8 +19,8 @@ enum OrderScope: string
     public function color(): string
     {
         return match ($this) {
-            self::Internal => 'info',
-            self::External => 'success',
+            self::Committee => 'success',
+            self::PrCenter => 'info',
         };
     }
 }

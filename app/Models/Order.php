@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 #[ObservedBy(OrderObserver::class)]
@@ -20,6 +21,7 @@ class Order extends Model
     protected $fillable = [
         'number',
         'scope',
+        'basis_order_id',
         'title',
         'description',
         'file_path',
@@ -116,5 +118,47 @@ class Order extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * The committee buyruq this one was issued on the strength of.
+     */
+    public function basisOrder(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'basis_order_id');
+    }
+
+    /**
+     * The PR-centre buyruqs issued on the strength of this committee one.
+     */
+    public function derivedOrders(): HasMany
+    {
+        return $this->hasMany(self::class, 'basis_order_id')
+            ->orderByDesc('issued_at')
+            ->orderByDesc('id');
+    }
+
+    public function label(): string
+    {
+        return trim(($this->number ? $this->number.' · ' : '').$this->title);
+    }
+
+    /**
+     * Active committee buyruqs a PR-centre order can name as its basis,
+     * grouped into optgroups by issue year, newest first.
+     *
+     * @return array<string, array<int, string>>
+     */
+    public static function committeeBasisOptions(): array
+    {
+        return static::query()
+            ->where('status', true)
+            ->where('scope', OrderScope::Committee)
+            ->orderByDesc('issued_at')
+            ->orderByDesc('id')
+            ->get()
+            ->groupBy(fn (self $order): string => $order->issued_at?->format('Y') ?? __('app.label.not_set'))
+            ->map(fn ($group) => $group->mapWithKeys(fn (self $order): array => [$order->id => $order->label()])->toArray())
+            ->toArray();
     }
 }

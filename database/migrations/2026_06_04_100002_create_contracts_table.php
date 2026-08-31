@@ -11,7 +11,6 @@ return new class extends Migration
         Schema::create('contracts', function (Blueprint $table) {
             $table->id();
             $table->string('number', 50)->unique();
-            $table->foreignId('contract_template_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('contract_type_id')->nullable()->constrained()->nullOnDelete();
             // A contract faces exactly one counterparty: a Contact OR a
             // Sponsor, chosen by its type's counterparty_kind.
@@ -28,8 +27,6 @@ return new class extends Migration
             $table->decimal('paid_percent', 5, 2)->default(0);
 
             $table->date('signed_at')->nullable();
-
-            $table->string('document_file')->nullable();
 
             $table->timestamps();
 

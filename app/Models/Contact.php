@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ContractDirection;
 use App\Models\Concerns\HasActiveOptions;
 use App\Models\Concerns\HasActiveStatus;
+use App\Models\Concerns\SearchesByTaxId;
 use App\Models\Concerns\SumsContractsByCurrency;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +20,7 @@ class Contact extends Model
     use HasActiveStatus;
     use HasFactory;
     use HasTranslations;
+    use SearchesByTaxId;
     use SumsContractsByCurrency;
 
     public $translatable = ['name', 'address'];
@@ -71,6 +73,22 @@ class Contact extends Model
     public static function getActive(): array
     {
         return static::activeOptions('name', 'id');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected static function taxIdColumns(): array
+    {
+        return [
+            'inn' => 'app.label.inn',
+            'pinfl' => 'app.label.pinfl',
+        ];
+    }
+
+    protected function searchableName(): string
+    {
+        return $this->getTranslation('name', app()->getLocale());
     }
 
     public function bankAccounts(): HasMany

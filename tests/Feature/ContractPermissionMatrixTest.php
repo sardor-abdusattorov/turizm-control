@@ -24,7 +24,7 @@ function permissionContext(ContractStatus $status, bool $withDocument = true): a
     $responsible = User::factory()->create(['status' => User::STATUS_ACTIVE]);
     $approver = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE]));
     $contract = Contract::factory()
-        ->when($withDocument, fn ($f) => $f->withDocument())
+        ->when($withDocument, fn ($f) => $f->withDossier())
         ->create([
             'responsible_id' => $responsible->id,
             'status' => $status,

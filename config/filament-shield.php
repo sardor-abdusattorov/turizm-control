@@ -291,6 +291,11 @@ return [
 
         // The press-tour registry is handed upward once the tours have run.
         'export_press_tour',
+
+        // Requisition-scoped: lets oversight roles see the whole registry.
+        // Without it a user only sees the requisitions they wrote and the ones
+        // waiting on their review.
+        'view_all_requisitions',
     ],
 
     /*

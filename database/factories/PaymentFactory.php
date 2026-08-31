@@ -3,7 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\Contract;
+use App\Models\Currency;
 use App\Models\Payment;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -34,5 +36,21 @@ class PaymentFactory extends Factory
     public function forContract(Contract $contract): self
     {
         return $this->state(['contract_id' => $contract->id]);
+    }
+
+    /**
+     * Project spending that never went through a contract: an absolute sum in
+     * its own currency, with no share of anything.
+     */
+    public function forProject(?Project $project = null): self
+    {
+        return $this->state(fn (): array => [
+            'contract_id' => null,
+            'project_id' => $project?->id ?? Project::factory(),
+            'percent' => null,
+            'amount' => $this->faker->randomFloat(2, 100_000, 50_000_000),
+            'currency_id' => Currency::factory(),
+            'purpose' => $this->faker->sentence(4),
+        ]);
     }
 }

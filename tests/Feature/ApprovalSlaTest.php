@@ -27,7 +27,7 @@ function slaChain(int $count = 2): array
     $responsible = User::factory()->create();
     $approvers = asApprover(User::factory()->count($count)->create());
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);

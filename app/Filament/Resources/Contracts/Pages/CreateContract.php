@@ -8,8 +8,6 @@ use App\Models\Contract;
 use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractFiles;
 use App\Services\Contracts\ContractWorkflow;
-use App\Services\Documents\ContractPlaceholderValues;
-use App\Services\Documents\TemplateFiller;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
@@ -48,15 +46,10 @@ class CreateContract extends CreateRecord
     {
         // A rebuilt database can hand a new contract the id of a deleted one
         // whose folder survived on disk — without this sweep the fresh
-        // contract would "inherit" a stranger's draft.docx.
+        // contract would inherit a stranger's files.
         app(ContractFiles::class)->purge($this->record);
 
         $this->storeFormAttachments();
-
-        $this->record->buildDocumentFromTemplate(
-            app(TemplateFiller::class),
-            app(ContractPlaceholderValues::class),
-        );
 
         // A legacy contract is already signed on paper: file it as approved
         // straight away — no chain, no notifications (same quiet path the

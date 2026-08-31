@@ -20,7 +20,7 @@ it('skips inactive approvers when the contract is submitted', function () {
     $inactiveLawyer = User::factory()->create(['status' => false]);
     $activeAccountant = User::factory()->create(['status' => true]);
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);

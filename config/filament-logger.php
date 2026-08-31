@@ -2,16 +2,14 @@
 
 use App\Filament\Resources\ActivityResource;
 use App\Filament\Resources\Contracts\ContractResource;
-use App\Filament\Resources\ContractTemplates\ContractTemplateResource;
 use App\Filament\Resources\ContractTypes\ContractTypeResource;
-use App\Filament\Resources\Orders\ExternalOrderResource;
-use App\Filament\Resources\Orders\InternalOrderResource;
+use App\Filament\Resources\Orders\CommitteeOrderResource;
+use App\Filament\Resources\Orders\PrCenterOrderResource;
 use App\Filament\Resources\Projects\InternalProjectResource;
 use App\Filament\Resources\Projects\InternationalProjectResource;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
-use App\Models\ContractTemplate;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
@@ -219,15 +217,14 @@ return [
         'color' => 'success',
 
         'exclude' => [
-            // Contracts, Templates, Orders and Projects are already tracked
+            // Contracts, Orders and Projects are already tracked
             // by the ModelLogger via Eloquent events; logging the Filament UI
             // actions on top of that produced duplicate Created / Updated
             // entries in the Execution history.
             ContractResource::class,
-            ContractTemplateResource::class,
             ContractTypeResource::class,
-            InternalOrderResource::class,
-            ExternalOrderResource::class,
+            PrCenterOrderResource::class,
+            CommitteeOrderResource::class,
             InternalProjectResource::class,
             InternationalProjectResource::class,
         ],
@@ -302,7 +299,6 @@ return [
         'register' => [
             Contract::class,
             ContractApprover::class,
-            ContractTemplate::class,
             ContractType::class,
             User::class,
             Contact::class,

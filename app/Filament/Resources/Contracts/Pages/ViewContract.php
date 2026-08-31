@@ -14,7 +14,6 @@ use App\Models\User;
 use App\Rules\PaymentWithinRemaining;
 use App\Services\Contracts\ContractWorkflow;
 use App\Services\Payments\RecordPayment;
-use App\Support\Bytes;
 use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -25,7 +24,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
 use Spatie\Activitylog\Models\Activity;
 
@@ -392,15 +390,6 @@ class ViewContract extends ViewRecord
             ->latest()
             ->limit(60)
             ->get();
-    }
-
-    public function documentSizeLabel(): ?string
-    {
-        if (! $this->record->documentExists()) {
-            return null;
-        }
-
-        return Bytes::human(Storage::disk('local')->size($this->record->documentPath()));
     }
 
     /**

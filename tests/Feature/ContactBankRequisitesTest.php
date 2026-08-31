@@ -6,7 +6,6 @@ use App\Models\BankAccount;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\Currency;
-use App\Services\Documents\ContractPlaceholderValues;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -155,7 +154,7 @@ it('picks the account matching the deal currency, falling back to a generic one'
         ->and($contact->bankAccountFor(999)?->id)->toBe($generic->id);
 });
 
-it('feeds the currency-matched account into the contract document placeholders', function () {
+it('resolves the currency-matched account for a contract', function () {
     $eur = Currency::factory()->create(['short_name' => 'EUR']);
     $contact = Contact::factory()->create(['type' => Contact::TYPE_LEGAL]);
 
@@ -167,7 +166,6 @@ it('feeds the currency-matched account into the contract document placeholders',
         'currency_id' => $eur->id,
     ]);
 
-    $values = app(ContractPlaceholderValues::class)->for($contract);
-
-    expect($values['contact.bank_account'])->toBe('EUR-ACCOUNT-000000000');
+    expect($contract->contact->bankAccountFor($contract->currency_id)->account_number)
+        ->toBe('EUR-ACCOUNT-000000000');
 });

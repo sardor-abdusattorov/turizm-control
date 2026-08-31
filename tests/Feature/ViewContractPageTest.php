@@ -126,26 +126,6 @@ it('keeps a cancelled approval verdict and comment in the per-approver modal', f
         ->and($modal)->toContain(__('app.message.invalidated_on_edit'));
 });
 
-it('offers the document as a download on the card, with no embedded viewer', function () {
-    Storage::fake('local');
-
-    $user = viewerWithAccess();
-    $contract = Contract::factory()->create([
-        'responsible_id' => $user->id,
-        'status' => Contract::STATUS_APPROVED,
-    ]);
-    Storage::disk('local')->put($contract->documentPath(), 'fake-docx');
-
-    actingAs($user);
-
-    $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
-
-    // With the online editor gone the card's one action hands the .docx over;
-    // nothing is rendered in-page.
-    expect($html)->toContain(route('contracts.document.download', ['contract' => $contract]))
-        ->and($html)->not->toContain('<iframe');
-});
-
 it('marks the director step as the final sign-off in the chain', function () {
     Role::firstOrCreate(['name' => Contract::DIRECTOR_ROLE, 'guard_name' => 'web']);
     $director = User::factory()->create(['status' => User::STATUS_ACTIVE]);
@@ -180,8 +160,6 @@ it('never offers a PDF preview — there is no converter any more', function () 
         'responsible_id' => $user->id,
         'status' => Contract::STATUS_IN_REVIEW,
     ]);
-    Storage::disk('local')->put($contract->documentPath(), 'fake-docx');
-
     actingAs($user);
 
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();

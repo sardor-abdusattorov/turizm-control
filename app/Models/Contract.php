@@ -8,8 +8,6 @@ use App\Observers\ContractObserver;
 use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractFiles;
 use App\Services\Contracts\ContractWorkflow;
-use App\Services\Documents\ContractPlaceholderValues;
-use App\Services\Documents\TemplateFiller;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -26,7 +24,6 @@ class Contract extends Model
 
     protected $fillable = [
         'number',
-        'contract_template_id',
         'contract_type_id',
         'contact_id',
         'sponsor_id',
@@ -39,7 +36,6 @@ class Contract extends Model
         'payment_status',
         'paid_percent',
         'signed_at',
-        'document_file',
     ];
 
     protected $casts = [
@@ -84,8 +80,6 @@ class Contract extends Model
         'contact_id',
         'sponsor_id',
         'contract_type_id',
-        'contract_template_id',
-        'document_file',
     ];
 
     private bool $preserveApprovedStatus = false;
@@ -144,26 +138,6 @@ class Contract extends Model
         return app(ContractFiles::class);
     }
 
-    public function documentPath(): string
-    {
-        return $this->files()->documentPath($this);
-    }
-
-    public function documentAbsolutePath(): string
-    {
-        return $this->files()->documentAbsolutePath($this);
-    }
-
-    public function documentExists(): bool
-    {
-        return $this->files()->documentExists($this);
-    }
-
-    public function buildDocumentFromTemplate(TemplateFiller $filler, ContractPlaceholderValues $values): void
-    {
-        $this->files()->buildFromTemplate($this, $filler, $values);
-    }
-
     public function approvalChain(): ApprovalChain
     {
         return app(ApprovalChain::class);
@@ -183,11 +157,6 @@ class Contract extends Model
     public static function approvalChainPreview(): array
     {
         return app(ApprovalChain::class)->preview();
-    }
-
-    public function template(): BelongsTo
-    {
-        return $this->belongsTo(ContractTemplate::class, 'contract_template_id');
     }
 
     public function contractType(): BelongsTo
@@ -400,7 +369,7 @@ class Contract extends Model
             && $user
             && $this->status === self::STATUS_DRAFT
             && ($this->responsible_id === $user->id || $user->hasRole('super_admin'))
-            && $this->documentExists()
+            && $this->attachments()->exists()
             && ($this->activeApprovers()->exists() || $this->canRebuildChainOnSubmit());
     }
 

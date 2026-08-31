@@ -16,8 +16,9 @@ beforeEach(function () {
         'view_profile_settings',
         'view_any_contract',
         'view_contract',
-        'view_any_contract_template',
-        'view_contract_template',
+        'create_contract',
+        'update_contract',
+        'delete_contract',
     ] as $name) {
         Permission::findOrCreate($name, 'web');
     }
@@ -31,29 +32,29 @@ it('gives every working role access to their own profile', function () {
     }
 });
 
-it('lets legal and accounting approve contracts but not browse templates', function () {
+it('lets legal and accounting approve contracts but not author them', function () {
     foreach (['legal_officer', 'accountant'] as $name) {
         $role = Role::findByName($name, 'web');
 
         expect($role->hasPermissionTo('approve_contracts'))->toBeTrue()
             ->and($role->hasPermissionTo('view_any_contract'))->toBeTrue()
-            // They review contracts, they do not author them.
-            ->and($role->hasPermissionTo('view_any_contract_template'))->toBeFalse()
-            ->and($role->hasPermissionTo('view_contract_template'))->toBeFalse();
+            ->and($role->hasPermissionTo('create_contract'))->toBeFalse()
+            ->and($role->hasPermissionTo('update_contract'))->toBeFalse();
     }
 });
 
-it('keeps contract-template access with the manager who builds contracts', function () {
+it('lets the manager build contracts but never approve them', function () {
     $manager = Role::findByName('manager', 'web');
 
-    expect($manager->hasPermissionTo('view_any_contract_template'))->toBeTrue()
-        // The manager submits but never approves.
+    expect($manager->hasPermissionTo('create_contract'))->toBeTrue()
+        ->and($manager->hasPermissionTo('update_contract'))->toBeTrue()
         ->and($manager->hasPermissionTo('approve_contracts'))->toBeFalse();
 });
 
-it('gives the super admin every permission, templates included', function () {
+it('gives the super admin every permission', function () {
     $admin = Role::findByName('super_admin', 'web');
 
     expect($admin->hasPermissionTo('approve_contracts'))->toBeTrue()
-        ->and($admin->hasPermissionTo('view_any_contract_template'))->toBeTrue();
+        ->and($admin->hasPermissionTo('view_any_contract'))->toBeTrue()
+        ->and($admin->hasPermissionTo('delete_contract'))->toBeTrue();
 });

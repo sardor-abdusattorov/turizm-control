@@ -7,21 +7,21 @@ use App\Enums\ContractStatus;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
-use App\Models\ContractTemplate;
+use App\Models\ContractAttachment;
+use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Payment;
 use App\Models\User;
-use App\Services\Documents\ContractPlaceholderValues;
-use App\Services\Documents\TemplateFiller;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Seeds a realistic showcase dataset: a handful of curated contracts plus a
  * generated batch spread across the last six months, covering every workflow
  * status, matching approval chains, SLA states (some overdue), and payments.
- * Each contract gets a real generated document, and paid ones a real receipt
+ * Each contract gets a scanned dossier file, and paid ones a real receipt
  * screenshot, so the demo has files on disk rather than broken links.
  */
 class ContractSeeder extends Seeder
@@ -41,27 +41,25 @@ class ContractSeeder extends Seeder
 
         $currencies = Currency::query()->get()->keyBy('short_name');
         $contacts = Contact::query()->orderBy('id')->get();
-        $templates = ContractTemplate::query()->where('status', true)->orderBy('sort')->get();
+        $types = ContractType::query()->where('status', true)->orderBy('sort')->get();
 
-        if ($currencies->isEmpty() || $contacts->isEmpty() || $templates->isEmpty()) {
-            $this->command?->warn('ContractSeeder skipped: currencies, contacts and templates must exist first.');
+        if ($currencies->isEmpty() || $contacts->isEmpty() || $types->isEmpty()) {
+            $this->command?->warn('ContractSeeder skipped: currencies, contacts and contract types must exist first.');
 
             return;
         }
 
-        $filler = app(TemplateFiller::class);
-        $values = app(ContractPlaceholderValues::class);
         $chain = ['legal' => $legal, 'accounting' => $accountant, 'director' => $director];
         $paymentAuthor = $accountant ?? $manager;
 
         $specs = array_merge(
-            $this->curatedContracts($currencies, $templates, $contacts),
-            $this->generatedContracts($currencies, $templates, $contacts),
+            $this->curatedContracts($currencies, $types, $contacts),
+            $this->generatedContracts($currencies, $types, $contacts),
         );
 
         foreach ($specs as $index => $spec) {
             $number = 'DEMO-'.now()->year.'-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT);
-            $this->seedContract($number, $spec, $manager, $paymentAuthor, $chain, $filler, $values);
+            $this->seedContract($number, $spec, $manager, $paymentAuthor, $chain);
         }
     }
 
@@ -75,24 +73,17 @@ class ContractSeeder extends Seeder
         User $manager,
         User $paymentAuthor,
         array $chain,
-        TemplateFiller $filler,
-        ContractPlaceholderValues $values,
     ): void {
         /** @var ContractStatus $status */
         $status = $spec['status'];
         $createdAt = $spec['created_at'];
         $signedAt = $spec['signed_at'] ?? null;
 
-        // Create as a draft, then promote: building the document issues an
-        // update() that would otherwise bounce a non-draft contract back to
-        // draft (document_file is a re-approval trigger). From draft the
-        // invalidation guard is a no-op, so the document builds cleanly.
         $contract = Contract::firstOrCreate(
             ['number' => $number],
             [
                 'title' => $spec['title'],
-                'contract_template_id' => $spec['template']->id,
-                'contract_type_id' => $spec['template']->contract_type_id,
+                'contract_type_id' => $spec['type']->id,
                 'contact_id' => $spec['contact']->id,
                 'currency_id' => $spec['currency']->id,
                 'responsible_id' => $manager->id,
@@ -105,7 +96,7 @@ class ContractSeeder extends Seeder
             return;
         }
 
-        $contract->buildDocumentFromTemplate($filler, $values);
+        $this->seedDossier($contract, $manager);
 
         // Promote to the final status and backdate via a raw update so the
         // contract observer's edit-invalidation never fires.
@@ -233,22 +224,44 @@ class ContractSeeder extends Seeder
     }
 
     /**
+     * The signed scan every contract is filed with — the dossier now carries
+     * what the generated draft used to, and the workflow refuses to submit a
+     * contract without one.
+     */
+    private function seedDossier(Contract $contract, User $uploader): void
+    {
+        $path = 'uploads/files/contract-attachments/demo/'.$contract->id.'/scan.pdf';
+        $body = "%PDF-1.4\n% ".$contract->number.' — '.$contract->title."\n%%EOF\n";
+
+        Storage::disk('local')->put($path, $body);
+
+        ContractAttachment::create([
+            'contract_id' => $contract->id,
+            'file_path' => $path,
+            'original_name' => $contract->number.'.pdf',
+            'size' => strlen($body),
+            'uploaded_by' => $uploader->id,
+            'sort' => 1,
+        ]);
+    }
+
+    /**
      * Five hand-written contracts that anchor the demo with recognisable,
      * round-number deals.
      *
      * @param  Collection<string, Currency>  $currencies
-     * @param  Collection<int, ContractTemplate>  $templates
+     * @param  Collection<int, ContractType>  $types
      * @param  Collection<int, Contact>  $contacts
      * @return array<int, array<string, mixed>>
      */
-    private function curatedContracts(Collection $currencies, Collection $templates, Collection $contacts): array
+    private function curatedContracts(Collection $currencies, Collection $types, Collection $contacts): array
     {
         $uzs = $currencies->get('UZS') ?? $currencies->first();
         $usd = $currencies->get('USD') ?? $uzs;
 
-        $rent = $templates->first(fn (ContractTemplate $t) => str_contains($t->name, 'аренды')) ?? $templates->first();
-        $service = $templates->first(fn (ContractTemplate $t) => str_contains($t->name, 'услуг')) ?? $templates->first();
-        $uzTemplate = $templates->first(fn (ContractTemplate $t) => str_contains(strtolower($t->name), 'uz')) ?? $templates->first();
+        $rent = $types->first(fn (ContractType $t) => str_contains(mb_strtolower($t->title), 'аренд')) ?? $types->first();
+        $service = $types->first(fn (ContractType $t) => str_contains(mb_strtolower($t->title), 'услуг')) ?? $types->first();
+        $other = $types->last() ?? $types->first();
         $individual = $contacts->firstWhere('type', Contact::TYPE_INDIVIDUAL) ?? $contacts->last();
 
         return [
@@ -256,7 +269,7 @@ class ContractSeeder extends Seeder
                 'title' => 'Аренда офисного помещения на 2026 год',
                 'amount' => 180_000_000,
                 'currency' => $uzs,
-                'template' => $rent,
+                'type' => $rent,
                 'contact' => $contacts->first(),
                 'status' => ContractStatus::Approved,
                 'created_at' => now()->subMonths(5)->startOfMonth()->addDays(8),
@@ -267,7 +280,7 @@ class ContractSeeder extends Seeder
                 'title' => 'Оказание услуг по организации туров',
                 'amount' => 25_000,
                 'currency' => $usd,
-                'template' => $service,
+                'type' => $service,
                 'contact' => $contacts->skip(1)->first() ?? $contacts->first(),
                 'status' => ContractStatus::Approved,
                 'created_at' => now()->subMonths(3)->startOfMonth()->addDays(5),
@@ -278,7 +291,7 @@ class ContractSeeder extends Seeder
                 'title' => 'Услуги транспортной логистики',
                 'amount' => 95_000_000,
                 'currency' => $uzs,
-                'template' => $service,
+                'type' => $service,
                 'contact' => $contacts->skip(2)->first() ?? $contacts->first(),
                 'status' => ContractStatus::InReview,
                 'created_at' => now()->subMonths(1)->startOfMonth()->addDays(14),
@@ -288,7 +301,7 @@ class ContractSeeder extends Seeder
                 'title' => 'Маркетинговое сопровождение тура',
                 'amount' => 12_500_000,
                 'currency' => $uzs,
-                'template' => $service,
+                'type' => $service,
                 'contact' => $contacts->first(),
                 'status' => ContractStatus::Draft,
                 'created_at' => now()->subDays(14),
@@ -297,7 +310,7 @@ class ContractSeeder extends Seeder
                 'title' => 'Договор с физлицом-гидом',
                 'amount' => 8_000_000,
                 'currency' => $uzs,
-                'template' => $uzTemplate,
+                'type' => $other,
                 'contact' => $individual,
                 'status' => ContractStatus::Rejected,
                 'created_at' => now()->subMonths(4)->startOfMonth()->addDays(20),
@@ -311,11 +324,11 @@ class ContractSeeder extends Seeder
      * payments derived deterministically so the dataset is stable between runs.
      *
      * @param  Collection<string, Currency>  $currencies
-     * @param  Collection<int, ContractTemplate>  $templates
+     * @param  Collection<int, ContractType>  $types
      * @param  Collection<int, Contact>  $contacts
      * @return array<int, array<string, mixed>>
      */
-    private function generatedContracts(Collection $currencies, Collection $templates, Collection $contacts): array
+    private function generatedContracts(Collection $currencies, Collection $types, Collection $contacts): array
     {
         $titles = [
             'Бронирование гостиничных номеров в Самарканде',
@@ -395,7 +408,7 @@ class ContractSeeder extends Seeder
                 'title' => $title,
                 'amount' => $this->pickAmount($currency->short_name, $index),
                 'currency' => $currency,
-                'template' => $templates[$index % $templates->count()],
+                'type' => $types[$index % $types->count()],
                 'contact' => $contacts[$index % $contacts->count()],
                 'status' => $status,
                 'created_at' => $createdAt,

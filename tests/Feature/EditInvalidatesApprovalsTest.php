@@ -39,7 +39,7 @@ function inReviewContractWithChain(): array
     $responsible = User::factory()->create();
     $approvers = User::factory()->count(3)->create();
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_IN_REVIEW,
     ]);

@@ -1,10 +1,13 @@
 <?php
 
+use App\Enums\PaymentSubject;
 use App\Exports\PaymentsExport;
 use App\Filament\Resources\Payments\Pages\ListPayments;
 use App\Filament\Support\ExportPermission;
 use App\Models\Contract;
+use App\Models\Currency;
 use App\Models\Payment;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -46,10 +49,28 @@ it('exports the visible payments with sequential numbering and mapped columns', 
 
     $row = $export->map(Payment::query()->where('percent', 40)->first());
 
-    expect($row[0])->toBe(1)                  // sequential №
-        ->and($row[1])->toBe('DEMO-2026-001') // contract number
-        ->and($row[2])->toBe('Office lease')  // contract title
-        ->and($row[3])->toBe('40%');           // formatted percent (canonical)
+    expect($row[0])->toBe(1)                                              // sequential №
+        ->and($row[1])->toBe(PaymentSubject::Contract->label())           // what it settles
+        ->and($row[2])->toBe('DEMO-2026-001 · Office lease')              // the contract itself
+        ->and($row[3])->toBe('40%')                                       // formatted percent (canonical)
+        ->and($row[4])->toBeNull();                                       // no absolute sum on a contract payment
+});
+
+it('exports a direct project payment as a sum rather than a share', function () {
+    $currency = Currency::factory()->create(['short_name' => 'UZS']);
+    $project = Project::factory()->create(['name' => 'ITB Berlin 2026']);
+    $payment = Payment::factory()->forProject($project)->create([
+        'amount' => 12_500_000,
+        'currency_id' => $currency->id,
+        'purpose' => 'Аренда оборудования',
+    ]);
+
+    $row = (new PaymentsExport(Payment::query()))->map($payment->fresh());
+
+    expect($row[1])->toBe(PaymentSubject::Project->label())
+        ->and($row[2])->toBe('ITB Berlin 2026')
+        ->and($row[3])->toBeNull()
+        ->and($row[4])->toContain('UZS');
 });
 
 it('limits the payments export to what the user may see', function () {

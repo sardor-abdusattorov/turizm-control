@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\OrderScope;
 use App\Models\Order;
 use App\Models\PressTour;
 use App\Models\User;
@@ -70,7 +71,7 @@ class PressTours2026Seeder extends Seeder
         return Order::firstOrCreate(
             ['number' => $number],
             [
-                'scope' => 'internal',
+                'scope' => OrderScope::PrCenter->value,
                 'title' => 'Об организации пресс-туров и информационных туров в 2026 году',
                 'issued_at' => '2026-01-01',
                 'status' => true,

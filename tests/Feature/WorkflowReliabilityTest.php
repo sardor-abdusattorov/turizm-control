@@ -24,7 +24,7 @@ function reliabilityChain(int $count = 2): array
     $responsible = User::factory()->create();
     $approvers = asApprover(User::factory()->count($count)->create());
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_DRAFT,
     ]);
@@ -76,7 +76,7 @@ it('reports failure when the director is already in the active chain', function 
     $director->assignRole('director');
     $responsible = User::factory()->create();
 
-    $contract = Contract::factory()->withDocument()->create([
+    $contract = Contract::factory()->withDossier()->create([
         'responsible_id' => $responsible->id,
         'status' => Contract::STATUS_PENDING_DIRECTOR,
     ]);

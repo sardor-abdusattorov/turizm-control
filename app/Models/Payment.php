@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Observers\PaymentObserver;
+use App\Support\Money;
 use Database\Factories\PaymentFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,14 +20,19 @@ class Payment extends Model
 
     protected $fillable = [
         'contract_id',
+        'project_id',
         'created_by',
         'percent',
+        'amount',
+        'currency_id',
+        'purpose',
         'paid_at',
         'screenshots',
     ];
 
     protected $casts = [
         'percent' => 'decimal:2',
+        'amount' => 'decimal:2',
         'paid_at' => 'date',
         'screenshots' => 'array',
     ];
@@ -88,9 +94,56 @@ class Payment extends Model
         return $this->belongsTo(Contract::class);
     }
 
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class);
+    }
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Whether this payment settles a project directly rather than a contract.
+     */
+    public function isDirect(): bool
+    {
+        return $this->contract_id === null;
+    }
+
+    /**
+     * The project the money belongs to: named outright on a direct payment,
+     * inherited from the contract otherwise.
+     */
+    public function resolvedProject(): ?Project
+    {
+        return $this->project ?? $this->contract?->project;
+    }
+
+    public function subjectLabel(): string
+    {
+        return $this->isDirect()
+            ? ($this->project?->name ?? __('app.label.not_set'))
+            : trim(($this->contract?->number ?? '').' · '.($this->contract?->title ?? ''), ' ·');
+    }
+
+    /**
+     * What the payment is worth as one line: a share for a contract payment,
+     * a sum in its own currency for a direct one.
+     */
+    public function valueLabel(): string
+    {
+        if (! $this->isDirect()) {
+            return format_percent((float) $this->percent).'%';
+        }
+
+        return Money::format($this->amount).' '.($this->currency?->short_name ?? '');
     }
 
     public function scopeVisibleTo(Builder $query, ?User $user = null): Builder
@@ -109,6 +162,12 @@ class Payment extends Model
             return $query;
         }
 
-        return $query->whereHas('contract', fn (Builder $q) => $q->where('responsible_id', $user->id));
+        // A direct project payment has no responsible contract to inherit
+        // visibility from, so it stays with whoever filed it.
+        return $query->where(fn (Builder $inner) => $inner
+            ->whereHas('contract', fn (Builder $contract) => $contract->where('responsible_id', $user->id))
+            ->orWhere(fn (Builder $direct) => $direct
+                ->whereNull('contract_id')
+                ->where('created_by', $user->id)));
     }
 }

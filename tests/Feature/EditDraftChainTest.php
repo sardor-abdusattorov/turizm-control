@@ -4,7 +4,6 @@ use App\Filament\Resources\Contracts\Pages\EditContract;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractApprover;
-use App\Models\ContractTemplate;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
@@ -20,14 +19,12 @@ uses(RefreshDatabase::class);
 function validDraftContract(User $author): Contract
 {
     $contractType = ContractType::factory()->create();
-    $template = ContractTemplate::factory()->create(['contract_type_id' => $contractType->id, 'status' => true]);
 
     return Contract::factory()->create([
         'responsible_id' => $author->id,
         'status' => Contract::STATUS_DRAFT,
         'number' => 'C-EDIT-'.fake()->unique()->numberBetween(1000, 9999),
         'contract_type_id' => $contractType->id,
-        'contract_template_id' => $template->id,
         'contact_id' => Contact::factory()->create(['status' => true])->id,
         'currency_id' => Currency::factory()->create(['status' => true])->id,
     ]);

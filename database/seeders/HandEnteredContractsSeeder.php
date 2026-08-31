@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\OrderScope;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractType;
@@ -41,7 +42,7 @@ class HandEnteredContractsSeeder extends Seeder
             Order::updateOrCreate(
                 ['number' => $data['number']],
                 [
-                    'scope' => $data['scope'] ?? 'external',
+                    'scope' => $this->scopeFrom($data['scope'] ?? null),
                     'title' => $data['title'],
                     'description' => $data['description'] ?? null,
                     'issued_at' => $data['issued_at'] ?? null,
@@ -164,5 +165,18 @@ class HandEnteredContractsSeeder extends Seeder
     protected function fallbackUserId(): int
     {
         return User::query()->orderBy('id')->value('id');
+    }
+
+    /**
+     * Snapshots taken before the buyruq registries were renamed still say
+     * internal / external — replay them as PR-centre / committee rather than
+     * refusing to restore hand-entered data.
+     */
+    protected function scopeFrom(?string $scope): string
+    {
+        return match ($scope) {
+            'internal', OrderScope::PrCenter->value => OrderScope::PrCenter->value,
+            default => OrderScope::Committee->value,
+        };
     }
 }

@@ -2,18 +2,32 @@
     /** @var \App\Models\Payment $record */
     $record = $this->record;
 
-    $percent = format_percent((float) $record->percent);
+    $isDirect = $record->isDirect();
+    $subject = $isDirect ? \App\Enums\PaymentSubject::Project : \App\Enums\PaymentSubject::Contract;
     $contractUrl = $this->contractUrl();
+    $projectUrl = $this->projectUrl();
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
     $details = [
         ['heroicon-o-document-text', __('app.label.contract'), trim(($record->contract?->number ?? '').' · '.($record->contract?->title ?? ''), ' ·'), 'contract'],
-        ['heroicon-o-chart-pie',     __('app.label.percent'),  $percent.'%'],
+        ['heroicon-o-presentation-chart-bar', __('app.label.project_single'), $record->project?->name, 'project'],
+        ['heroicon-o-chart-pie',     __('app.label.percent'),  $isDirect ? null : format_percent((float) $record->percent).'%'],
+        ['heroicon-o-banknotes',     __('app.label.amount'),   $isDirect ? \App\Support\Money::format($record->amount).' '.($record->currency?->short_name ?? '') : null],
+        ['heroicon-o-bars-3-bottom-left', __('app.label.payment_purpose'), $record->purpose],
         ['heroicon-o-calendar',      __('app.label.paid_at'),  $record->paid_at?->format('d.m.Y')],
         ['heroicon-o-user',          __('app.label.created_by'), $record->creator?->name],
         ['heroicon-o-clock',         __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i')],
     ];
+
+    // A row that cannot apply to this kind of payment is dropped rather than
+    // shown empty: a direct payment has no percent, a contract one no sum.
+    $details = array_values(array_filter($details, fn (array $row) => match ($row[1]) {
+        __('app.label.contract') => ! $isDirect,
+        __('app.label.project_single'), __('app.label.amount'), __('app.label.payment_purpose') => $isDirect,
+        __('app.label.percent') => ! $isDirect,
+        default => true,
+    }));
 @endphp
 
 <x-filament-panels::page>
@@ -22,19 +36,19 @@
     <section class="pv-hero">
         <div class="pv-hero__l">
             <div class="pv-hero__meta">
-                <span class="pv-chip">{!! $ic('heroicon-o-banknotes', 14) !!} {{ __('app.label.payment_single') }}</span>
+                <span class="pv-chip">{!! $ic($subject->icon(), 14) !!} {{ $subject->label() }}</span>
                 @if ($record->contract?->number)
                     <span class="pv-num">{{ $record->contract->number }}</span>
                 @endif
             </div>
-            <h2 class="pv-hero__title">{{ $record->contract?->title ?? __('app.label.payment_single') }}</h2>
+            <h2 class="pv-hero__title">{{ $isDirect ? ($record->purpose ?: $record->project?->name) : $record->contract?->title }}</h2>
             @if ($record->paid_at)
                 <div class="pv-hero__dates">
                     <span class="pv-hero__date">{!! $ic('heroicon-o-calendar', 14) !!} {{ __('app.label.paid_at') }}: <b>{{ $record->paid_at->translatedFormat('d M Y') }}</b></span>
                 </div>
             @endif
         </div>
-        <span class="pv-amount">{{ $percent }}%</span>
+        <span class="pv-amount">{{ $record->valueLabel() }}</span>
     </section>
 
     {{-- INFORMATION TABLE --}}
@@ -51,6 +65,8 @@
                     <span class="pv-row__v">
                         @if ($type === 'contract' && $has && $contractUrl)
                             <a href="{{ $contractUrl }}" class="pv-row__link">{{ $value }} {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}</a>
+                        @elseif ($type === 'project' && $has && $projectUrl)
+                            <a href="{{ $projectUrl }}" class="pv-row__link">{{ $value }} {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}</a>
                         @elseif ($has)
                             <span class="pv-row__vl">{{ $value }}</span>
                         @else

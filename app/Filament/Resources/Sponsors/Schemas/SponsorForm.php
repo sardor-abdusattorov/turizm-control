@@ -27,7 +27,9 @@ class SponsorForm
                             ->schema([
                                 TextInput::make('inn')
                                     ->label(__('app.label.inn'))
-                                    ->maxLength(30),
+                                    ->helperText(__('app.helper.inn'))
+                                    ->maxLength(30)
+                                    ->unique('sponsors', 'inn', ignoreRecord: true),
 
                                 TextInput::make('contact_person')
                                     ->label(__('app.label.contact_person'))

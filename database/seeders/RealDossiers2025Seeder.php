@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\ContractAttachmentType;
+use App\Enums\OrderScope;
 use App\Enums\ProjectType;
 use App\Models\Contact;
 use App\Models\Contract;
@@ -71,7 +72,7 @@ class RealDossiers2025Seeder extends Seeder
             $order = Order::firstOrCreate(
                 ['number' => $number],
                 [
-                    'scope' => 'external',
+                    'scope' => OrderScope::Committee->value,
                     'title' => $title,
                     'description' => 'Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз.',
                     'file_path' => null,

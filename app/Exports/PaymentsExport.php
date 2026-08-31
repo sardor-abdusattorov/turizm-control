@@ -2,8 +2,10 @@
 
 namespace App\Exports;
 
+use App\Enums\PaymentSubject;
 use App\Exports\Concerns\StyledExportSheet;
 use App\Models\Payment;
+use App\Support\Money;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -34,7 +36,7 @@ class PaymentsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
     /** @return Builder<Payment> */
     public function query(): Builder
     {
-        return (clone $this->query)->with(['contract', 'creator']);
+        return (clone $this->query)->with(['contract', 'project', 'currency', 'creator']);
     }
 
     public function title(): string
@@ -47,9 +49,10 @@ class PaymentsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
     {
         return [
             '№',
-            __('app.label.contract_number'),
-            __('app.label.contract_title'),
+            __('app.label.payment_subject'),
+            __('app.label.payment_object'),
             __('app.label.percent'),
+            __('app.label.amount'),
             __('app.label.paid_at'),
             __('app.label.payment_status'),
             __('app.label.created_by'),
@@ -62,9 +65,10 @@ class PaymentsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
     {
         return [
             ++$this->rowNumber,
-            $row->contract?->number,
-            $row->contract?->title,
-            format_percent($row->percent).'%',
+            ($row->isDirect() ? PaymentSubject::Project : PaymentSubject::Contract)->label(),
+            $row->subjectLabel(),
+            $row->isDirect() ? null : format_percent($row->percent).'%',
+            $row->isDirect() ? Money::format($row->amount).' '.($row->currency?->short_name ?? '') : null,
             $row->paid_at?->format('d.m.Y'),
             $row->contract?->payment_status?->label(),
             $row->creator?->name,

@@ -35,17 +35,6 @@ function legacyCreatorActing(): User
     return $creator;
 }
 
-it('hides the template picker once the already-signed switch is on', function () {
-    legacyCreatorActing();
-
-    // A signed paper contract has nothing to generate — the template select
-    // only invites a pointless choice, so it leaves with the switch.
-    Livewire::test(CreateContract::class)
-        ->assertFormFieldVisible('contract_template_id')
-        ->fillForm(['already_signed' => true])
-        ->assertFormFieldHidden('contract_template_id');
-});
-
 it('files an already-signed legacy contract as approved without a chain', function () {
     Storage::fake('local');
 

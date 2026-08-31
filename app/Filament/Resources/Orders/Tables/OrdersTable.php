@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use App\Enums\OrderScope;
 use App\Filament\Resources\Orders\BaseOrderResource;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
@@ -20,12 +21,16 @@ use Illuminate\Database\Eloquent\Builder;
 
 class OrdersTable
 {
-    public static function configure(Table $table): Table
+    public static function configure(Table $table, ?OrderScope $scope = null): Table
     {
+        $isPrCenter = $scope === OrderScope::PrCenter;
+
         return $table
             // Eager-load the relation columns; without it every row on the
             // page fires its own query for them.
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['creator']))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query
+                ->with(['creator', 'basisOrder'])
+                ->withCount('derivedOrders'))
             ->defaultSort('issued_at', 'desc')
             ->columns([
                 TextColumn::make('number')
@@ -33,6 +38,29 @@ class OrdersTable
                     ->searchable()
                     ->sortable()
                     ->weight('semibold'),
+
+                TextColumn::make('basisOrder.number')
+                    ->label(__('app.label.committee_order_basis'))
+                    ->badge()
+                    ->color('success')
+                    ->icon('heroicon-o-building-library')
+                    ->placeholder(__('app.label.not_set'))
+                    ->description(fn (Order $record): ?string => $record->basisOrder?->title)
+                    ->url(fn (Order $record): ?string => $record->basisOrder
+                        ? BaseOrderResource::urlFor($record->basisOrder)
+                        : null)
+                    ->visible($isPrCenter)
+                    ->toggleable(),
+
+                TextColumn::make('derived_orders_count')
+                    ->label(__('app.label.pr_center_order_plural'))
+                    ->badge()
+                    ->color(fn (int $state): string => $state > 0 ? 'info' : 'gray')
+                    ->icon('heroicon-o-document-text')
+                    ->formatStateUsing(fn (int $state): string => (string) $state)
+                    ->visible(! $isPrCenter)
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('title')
                     ->label(__('app.label.title'))
@@ -96,7 +124,7 @@ class OrdersTable
                     ->searchable(),
             ])
             ->filtersFormColumns(2)
-            ->recordUrl(fn (Order $record): string => BaseOrderResource::resourceFor($record)::getUrl('view', ['record' => $record]))
+            ->recordUrl(fn (Order $record): string => BaseOrderResource::urlFor($record))
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make(),

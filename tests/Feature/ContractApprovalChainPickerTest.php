@@ -3,7 +3,6 @@
 use App\Filament\Resources\Contracts\Pages\CreateContract;
 use App\Models\Contact;
 use App\Models\Contract;
-use App\Models\ContractTemplate;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Department;
@@ -71,12 +70,6 @@ it('creates approvers in the order they were picked', function () {
     $second = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $accountingDept->id]);
 
     $contractType = ContractType::factory()->create();
-    $template = ContractTemplate::factory()->create([
-        'contract_type_id' => $contractType->id,
-        'status' => true,
-    ]);
-    Storage::disk('local')->put($template->template_file, file_get_contents(fillableDocx()));
-
     $contact = Contact::factory()->create(['status' => true]);
     $currency = Currency::factory()->create(['status' => true]);
 
@@ -87,7 +80,6 @@ it('creates approvers in the order they were picked', function () {
         ->fillForm([
             'number' => 'C-900',
             'contract_type_id' => $contractType->id,
-            'contract_template_id' => $template->id,
             'contact_id' => $contact->id,
             'title' => 'Picker order test',
             'amount' => 1000,
@@ -114,10 +106,6 @@ it('rejects creating a contract whose chain has no accounting approver', functio
     $lawyer = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legalDept->id]);
 
     $contractType = ContractType::factory()->create();
-    $template = ContractTemplate::factory()->create([
-        'contract_type_id' => $contractType->id, 'status' => true,
-    ]);
-    Storage::disk('local')->put($template->template_file, file_get_contents(fillableDocx()));
     $contact = Contact::factory()->create(['status' => true]);
     $currency = Currency::factory()->create(['status' => true]);
 
@@ -127,7 +115,6 @@ it('rejects creating a contract whose chain has no accounting approver', functio
         ->fillForm([
             'number' => 'C-901',
             'contract_type_id' => $contractType->id,
-            'contract_template_id' => $template->id,
             'contact_id' => $contact->id,
             'title' => 'Missing accountant',
             'amount' => 1000,

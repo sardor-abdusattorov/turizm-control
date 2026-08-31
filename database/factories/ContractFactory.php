@@ -66,14 +66,22 @@ class ContractFactory extends Factory
     }
 
     /**
-     * Drop a fake .docx on disk where Contract::documentExists() will see it.
-     * Use whenever a test calls submit() — the workflow now refuses to send
-     * a contract for approval without an actual document.
+     * File one scan into the contract's dossier. Use whenever a test calls
+     * submit() — the workflow refuses to send a contract for approval whose
+     * dossier is empty.
      */
-    public function withDocument(string $body = 'fake-docx'): static
+    public function withDossier(string $body = 'fake-scan'): static
     {
         return $this->afterCreating(function (Contract $contract) use ($body): void {
-            Storage::disk('local')->put($contract->documentPath(), $body);
+            $path = "uploads/files/contract-attachments/{$contract->id}/scan.pdf";
+            Storage::disk('local')->put($path, $body);
+
+            $contract->attachments()->create([
+                'file_path' => $path,
+                'original_name' => 'scan.pdf',
+                'size' => strlen($body),
+                'sort' => 1,
+            ]);
         });
     }
 }

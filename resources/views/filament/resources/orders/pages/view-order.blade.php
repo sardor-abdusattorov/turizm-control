@@ -16,8 +16,12 @@
     // Every field that used to be scattered across Hero / File card / Sidebar
     // now lives in a single Information table — including the description
     // (rendered as a wrap row so paragraphs survive intact).
+    $isPrCenter = $record->scope === \App\Enums\OrderScope::PrCenter;
+    $basis = $record->basisOrder;
+
     $details = [
         ['heroicon-o-hashtag',                __('app.label.order_number'),       $record->number],
+        ['heroicon-o-building-library',       __('app.label.committee_order_basis'), $basis?->label(), 'basis'],
         ['heroicon-o-document-text',          __('app.label.title'),              $record->title, 'wrap'],
         ['heroicon-o-bolt',                   __('app.label.status'),             $statusLabel, 'status'],
         ['heroicon-o-calendar',               __('app.label.issued_at'),          $record->issued_at?->format('d.m.Y')],
@@ -93,13 +97,20 @@
                     [$icon, $label, $value, $type] = array_pad($row, 4, null);
                     $hasValue = filled($value);
                 @endphp
+                @continue($type === 'basis' && ! $isPrCenter)
                 <div class="ow-row {{ $type === 'wrap' ? 'ow-row--wrap' : '' }}">
                     <span class="ow-row__k">
                         <span class="ow-row__ic">{!! $ic($icon, 14) !!}</span>
                         <span class="ow-row__lb">{{ $label }}</span>
                     </span>
                     <span class="ow-row__v">
-                        @if ($type === 'status' && $hasValue)
+                        @if ($type === 'basis')
+                            @if ($hasValue)
+                                <a href="{{ \App\Filament\Resources\Orders\BaseOrderResource::urlFor($basis) }}" class="ow-row__vl ow-row__lnk">{{ $value }} {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}</a>
+                            @else
+                                <span class="ow-row__vl ow-row__vl--muted">{{ __('app.label.not_set') }}</span>
+                            @endif
+                        @elseif ($type === 'status' && $hasValue)
                             <span class="ow-pill ow-pill--{{ $heroVariant }}" style="padding:.2rem .55rem;font-size:.72rem;">{{ $value }}</span>
                         @elseif ($type === 'wrap' && $hasValue)
                             <span class="ow-row__vl ow-row__vl--wrap">{!! nl2br(e($value)) !!}</span>
@@ -113,6 +124,17 @@
             @endforeach
         </div>
     </section>
+
+    {{-- The other half of the chain: what the centre issued on this basis. --}}
+    @unless ($isPrCenter)
+        <section class="ow-card">
+            <div class="ow-hd">
+                <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text') !!}</span>
+                <h2 class="ow-hd__t">{{ __('app.label.pr_center_order_plural') }}</h2>
+            </div>
+            @livewire(\App\Filament\Resources\Orders\Widgets\DerivedOrdersTableWidget::class, ['orderId' => $record->id], key('derived-orders-'.$record->id))
+        </section>
+    @endunless
 </div>
 
 <style>
@@ -369,6 +391,17 @@
         overflow: visible;
         text-overflow: clip;
         font-weight: 500;
+    }
+    .ow-row__lnk {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        color: var(--accent);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .ow-row__lnk:hover {
+        text-decoration: underline;
     }
 
     /* ───── Mobile (< 640px) ─────────────────────────────────────────────── */

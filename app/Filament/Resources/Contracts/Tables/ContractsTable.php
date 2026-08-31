@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Contracts\Tables;
 
 use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
-use App\Filament\Resources\Contracts\Pages\ViewContract;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractType;
@@ -194,16 +193,6 @@ class ContractsTable
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('gray'),
-
-                    // The document leaves the system as its own .docx —
-                    // there is no server-side converter to render it inline.
-                    Action::make('downloadDocument')
-                        ->label(__('app.action.download_document'))
-                        ->icon('heroicon-o-document-arrow-down')
-                        ->color('gray')
-                        ->url(fn (Contract $record) => route('contracts.document.download', ['contract' => $record]))
-                        ->visible(fn (Contract $record): bool => $record->documentExists()
-                            && ViewContract::userCanExportContract()),
 
                     EditAction::make()
                         ->color('gray')

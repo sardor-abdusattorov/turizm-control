@@ -6,7 +6,6 @@ use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Sponsor;
-use App\Services\Documents\ContractPlaceholderValues;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
@@ -113,14 +112,11 @@ it('files a fee contract against a contact, leaving the sponsor empty', function
         ->and($contract->sponsor_id)->toBeNull();
 });
 
-it('builds the document placeholders for a sponsor contract without a contact', function () {
+it('leaves a sponsorship contract without a contact', function () {
     $contract = Contract::factory()->sponsorship()->create(['amount' => 50_000_000]);
 
-    $values = app(ContractPlaceholderValues::class)->for($contract);
-
-    // No contact behind a sponsorship contract — the contact.* placeholders
-    // fall back to empty strings instead of throwing.
-    expect($values['contact.name'])->toBe('')
-        ->and($values['contact.bank_account'])->toBe('')
-        ->and($values['amount'])->toBe('50 000 000.00');
+    expect($contract->contact_id)->toBeNull()
+        ->and($contract->contact)->toBeNull()
+        ->and($contract->sponsor)->not->toBeNull()
+        ->and((float) $contract->amount)->toBe(50_000_000.0);
 });

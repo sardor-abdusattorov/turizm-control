@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
 use App\Models\Department;
 use App\Models\Settings as SettingsModel;
+use App\Models\User;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
@@ -211,6 +212,26 @@ class Settings extends Page implements HasForms
                                     ->minValue(1)
                                     ->maxValue(60)
                                     ->default(2),
+                            ]),
+
+                        Tabs\Tab::make(__('app.label.requisition_plural'))
+                            ->schema([
+                                Select::make('requisition.reviewer_id')
+                                    ->label(__('app.label.requisition_default_reviewer'))
+                                    ->helperText(__('app.helper.requisition_default_reviewer'))
+                                    ->options(fn (): array => User::activeOptionsGroupedByDepartment())
+                                    ->allowHtml()
+                                    ->searchable()
+                                    ->preload()
+                                    ->native(false),
+
+                                TextInput::make('requisition.review_days')
+                                    ->label(__('app.label.requisition_review_days'))
+                                    ->helperText(__('app.helper.requisition_review_days'))
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->maxValue(60)
+                                    ->default(3),
                             ]),
                     ]),
             ])

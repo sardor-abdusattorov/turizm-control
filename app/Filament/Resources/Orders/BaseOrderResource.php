@@ -12,7 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Internal and external orders are two full-fledged sidebar resources over
+ * Committee and PR-centre buyruqs are two full-fledged sidebar resources over
  * the same Order model — the same split the project resources use. Each
  * subclass pins its OrderScope, scopes its queries and stamps it on create.
  * Shield keys permissions by model, so both share the *_order set.
@@ -48,19 +48,24 @@ abstract class BaseOrderResource extends Resource
      */
     public static function resourceFor(Order $record): string
     {
-        return $record->scope === OrderScope::External
-            ? ExternalOrderResource::class
-            : InternalOrderResource::class;
+        return $record->scope === OrderScope::Committee
+            ? CommitteeOrderResource::class
+            : PrCenterOrderResource::class;
+    }
+
+    public static function urlFor(Order $record): string
+    {
+        return static::resourceFor($record)::getUrl('view', ['record' => $record]);
     }
 
     public static function form(Schema $schema): Schema
     {
-        return OrderForm::configure($schema);
+        return OrderForm::configure($schema, static::orderScope());
     }
 
     public static function table(Table $table): Table
     {
-        return OrdersTable::configure($table);
+        return OrdersTable::configure($table, static::orderScope());
     }
 
     public static function getRelations(): array
