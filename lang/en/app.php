@@ -2,6 +2,8 @@
 
 return [
     'label' => [
+        'details' => 'Details',
+        'more_count' => ':count more',
         'payment_subject' => 'Payment kind',
         'payment_object' => 'Paid against',
         'payment_purpose' => 'Payment purpose',
@@ -814,6 +816,71 @@ return [
             'pr_center' => 'PR Centre',
             'committee' => 'Committee',
         ],
+    ],
+    'approval' => [
+        'section' => 'Approval chain',
+        'section_description' => 'Who reviews the requisition, and in what order. The order follows the departments.',
+        'not_submitted' => 'Not submitted',
+        'overdue' => 'overdue',
+        'cancelled_after_edit' => 'Voided after an edit',
+        'empty' => 'No approvers assigned.',
+        'sequential_hint' => 'Steps run in turn',
+        'due' => 'by :date',
+        'now_with' => 'Now with :name',
+        'status' => [
+            'queued' => 'Queued',
+            'pending' => 'Under review',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+            'invalidated' => 'Voided',
+        ],
+        'action' => [
+            'submit' => 'Send for approval',
+            'approve' => 'Approve',
+            'reject' => 'Reject',
+            'recall' => 'Recall',
+        ],
+        'field' => [
+            'approvers' => 'Approvers',
+            'approvers_help' => 'Each sees it in turn. Any of them can reject, which stops the chain.',
+            'comment' => 'Comment',
+            'reason' => 'Reason for rejection',
+            'reason_help' => 'The author sees this and fixes the requisition against it.',
+        ],
+        'confirm' => [
+            'submit' => 'It goes to the first approver; each step gets :days day(s). It cannot be edited while under approval.',
+            'recall' => 'The requisition returns to draft and the open steps are voided.',
+        ],
+        'message' => [
+            'submitted' => 'Sent for approval.',
+            'approved' => 'You approved this requisition.',
+            'rejected' => 'Requisition rejected.',
+            'recalled' => 'Requisition recalled.',
+        ],
+        'error' => [
+            'not_draft' => 'Only a draft can be sent.',
+            'no_approvers' => 'Assign approvers first.',
+            'not_in_review' => 'The requisition is not under approval.',
+            'not_an_approver' => 'You are not an approver on this requisition.',
+            'waiting_for_previous' => 'It is not your turn yet.',
+            'already_decided' => 'You have already decided on this requisition.',
+        ],
+        'filter' => [
+            'my_approval' => 'My approval',
+            'approved_by_me' => 'Approved by me',
+            'not_approved_by_me' => 'Not approved by me',
+            'mine' => 'Mine',
+            'awaiting_me' => 'Awaiting me',
+        ],
+        'column' => [
+            'chain' => 'Approvers',
+            'approver' => 'Approver',
+            'due' => 'Due',
+            'acted_at' => 'Decided',
+        ],
+        'progress' => 'Approved :approved of :total',
+        'in_queue' => ':count queued',
+        'step' => 'Step :step of :total',
     ],
     'requisition' => [
         'status' => [

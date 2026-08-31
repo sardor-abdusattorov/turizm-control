@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Requisitions;
 
-use App\Enums\RequisitionStatus;
 use App\Filament\Resources\Requisitions\Pages\CreateRequisition;
 use App\Filament\Resources\Requisitions\Pages\EditRequisition;
 use App\Filament\Resources\Requisitions\Pages\ListRequisitions;
@@ -56,11 +55,7 @@ class RequisitionResource extends Resource
      */
     public static function getNavigationBadge(): ?string
     {
-        $waiting = static::getEloquentQuery()
-            ->where('status', RequisitionStatus::InReview)
-            ->when(auth()->user()?->cannot('view_all_requisitions'), fn (Builder $query) => $query
-                ->where('reviewer_id', auth()->id()))
-            ->count();
+        $waiting = static::getEloquentQuery()->awaiting()->count();
 
         return $waiting > 0 ? (string) $waiting : null;
     }

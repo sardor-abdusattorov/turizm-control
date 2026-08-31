@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ApprovalStatus;
 use App\Enums\OrderScope;
 use App\Enums\RequisitionStatus;
 use App\Models\Contact;
@@ -211,21 +212,42 @@ class HandEnteredContractsSeeder extends Seeder
                         ? Project::query()->where('name', $data['project'])->value('id')
                         : null,
                     'author_id' => $this->userId($data['author_email'] ?? null),
-                    'reviewer_id' => filled($data['reviewer_email'] ?? null)
-                        ? User::query()->where('email', $data['reviewer_email'])->value('id')
-                        : null,
                 ],
             );
 
-            // The review already happened in a previous life: file its state
+            // The rounds already happened in a previous life: file their state
             // verbatim rather than replaying the workflow.
             $requisition->forceFill([
                 'status' => $data['status'] ?? RequisitionStatus::Draft->value,
                 'submitted_at' => $data['submitted_at'] ?? null,
-                'due_at' => $data['due_at'] ?? null,
-                'reviewed_at' => $data['reviewed_at'] ?? null,
-                'review_comment' => $data['review_comment'] ?? null,
             ])->saveQuietly();
+
+            foreach ($data['approvals'] ?? [] as $approval) {
+                $userId = filled($approval['user_email'] ?? null)
+                    ? User::query()->where('email', $approval['user_email'])->value('id')
+                    : null;
+
+                if (! $userId) {
+                    continue;
+                }
+
+                $requisition->approvals()->firstOrCreate(
+                    [
+                        'user_id' => $userId,
+                        'round' => $approval['round'] ?? 1,
+                    ],
+                    [
+                        'order' => $approval['order'] ?? 1,
+                        'status' => $approval['status'] ?? ApprovalStatus::Queued->value,
+                        'original_status' => $approval['original_status'] ?? null,
+                        'comment' => $approval['comment'] ?? null,
+                        'acted_at' => $approval['acted_at'] ?? null,
+                        'due_at' => $approval['due_at'] ?? null,
+                    ],
+                );
+            }
+
+            $requisition->unsetRelation('approvals');
         }
     }
 

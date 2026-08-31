@@ -42,4 +42,14 @@ enum RequisitionStatus: string
             self::Rejected => 'heroicon-o-x-circle',
         };
     }
+
+    /**
+     * A settled document is not edited in place: an approved one is the record,
+     * and a rejected one goes back to draft first so the round it collects next
+     * is a new one.
+     */
+    public function isEditable(): bool
+    {
+        return in_array($this, [self::Draft, self::Rejected], true);
+    }
 }

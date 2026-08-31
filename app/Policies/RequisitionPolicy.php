@@ -30,7 +30,7 @@ class RequisitionPolicy
 
         return $authUser->can('view_all_requisitions')
             || $requisition->author_id === $authUser->getKey()
-            || $requisition->reviewer_id === $authUser->getKey();
+            || $requisition->approvals()->where('user_id', $authUser->getKey())->exists();
     }
 
     public function create(AuthUser $authUser): bool

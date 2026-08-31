@@ -118,7 +118,7 @@ class SnapshotContracts extends Command
             ]);
 
         $requisitions = Requisition::query()
-            ->with(['project', 'author', 'reviewer'])
+            ->with(['project', 'author', 'approvals.user'])
             ->orderBy('id')
             ->get()
             ->map(fn (Requisition $requisition): array => [
@@ -127,12 +127,19 @@ class SnapshotContracts extends Command
                 'description' => $requisition->description,
                 'project' => $requisition->project?->name,
                 'author_email' => $requisition->author?->email,
-                'reviewer_email' => $requisition->reviewer?->email,
                 'status' => $requisition->status->value,
                 'submitted_at' => $requisition->submitted_at?->toDateTimeString(),
-                'due_at' => $requisition->due_at?->toDateTimeString(),
-                'reviewed_at' => $requisition->reviewed_at?->toDateTimeString(),
-                'review_comment' => $requisition->review_comment,
+                'approvals' => $requisition->approvals
+                    ->map(fn ($approval): array => [
+                        'user_email' => $approval->user?->email,
+                        'order' => $approval->order,
+                        'round' => $approval->round,
+                        'status' => $approval->status->value,
+                        'original_status' => $approval->original_status?->value,
+                        'comment' => $approval->comment,
+                        'acted_at' => $approval->acted_at?->toDateTimeString(),
+                        'due_at' => $approval->due_at?->toDateTimeString(),
+                    ])->all(),
             ]);
 
         $path = $this->option('path') ?: database_path('seeders/data/contracts-snapshot.json');

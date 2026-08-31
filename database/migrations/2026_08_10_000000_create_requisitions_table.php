@@ -17,18 +17,11 @@ return new class extends Migration
             $table->text('description');
             $table->foreignId('project_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('author_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('reviewer_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('status', 20)->default('draft');
-            // Stamped on submit from settings.requisition.review_days, so a
-            // later change to the setting never moves a live deadline.
             $table->timestamp('submitted_at')->nullable();
-            $table->timestamp('due_at')->nullable();
-            $table->timestamp('reviewed_at')->nullable();
-            $table->text('review_comment')->nullable();
             $table->timestamps();
 
             $table->index('status');
-            $table->index(['reviewer_id', 'status']);
             $table->index(['author_id', 'status']);
         });
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ApprovalStatus;
 use App\Enums\OrderScope;
 use App\Enums\RequisitionStatus;
 use App\Models\Contact;
@@ -229,14 +230,12 @@ it('carries requisitions across a wipe, review state and all', function () {
     $author = User::factory()->create(['email' => 'author@test.uz', 'status' => User::STATUS_ACTIVE]);
     $reviewer = User::factory()->create(['email' => 'supply@test.uz', 'status' => User::STATUS_ACTIVE]);
 
-    Requisition::factory()->rejected()->create([
+    Requisition::factory()->rejected([$reviewer])->create([
         'number' => 'ЗВ-2026-001',
         'title' => 'Канцелярия на III квартал',
         'description' => 'Бумага А4 — 20 пачек.',
         'project_id' => $project->id,
         'author_id' => $author->id,
-        'reviewer_id' => $reviewer->id,
-        'review_comment' => 'Уточните смету.',
     ]);
 
     $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
@@ -251,11 +250,14 @@ it('carries requisitions across a wipe, review state and all', function () {
         ->and($restored->title)->toBe('Канцелярия на III квартал')
         ->and($restored->description)->toBe('Бумага А4 — 20 пачек.')
         ->and($restored->status)->toBe(RequisitionStatus::Rejected)
-        ->and($restored->review_comment)->toBe('Уточните смету.')
         ->and($restored->project?->name)->toBe('ATM 25')
         ->and($restored->author?->email)->toBe('author@test.uz')
-        ->and($restored->reviewer?->email)->toBe('supply@test.uz')
-        ->and($restored->reviewed_at)->not->toBeNull();
+        // The chain comes back with its verdict and its reason intact.
+        ->and($restored->approvals)->toHaveCount(1)
+        ->and($restored->approvals->first()->user?->email)->toBe('supply@test.uz')
+        ->and($restored->approvals->first()->status)->toBe(ApprovalStatus::Rejected)
+        ->and($restored->approvals->first()->comment)->toBe('Уточните смету и приложите обоснование.')
+        ->and($restored->approvals->first()->acted_at)->not->toBeNull();
 });
 
 it('never duplicates project payments or requisitions on a second replay', function () {
@@ -264,7 +266,7 @@ it('never duplicates project payments or requisitions on a second replay', funct
     $currency = Currency::factory()->create(['short_name' => 'UZS', 'status' => true]);
     $project = Project::factory()->international()->create(['name' => 'ATM 25']);
     Payment::factory()->forProject($project)->create(['amount' => 500, 'currency_id' => $currency->id, 'paid_at' => '2026-01-05']);
-    Requisition::factory()->create(['number' => 'ЗВ-2026-009']);
+    Requisition::factory()->withChain()->create(['number' => 'ЗВ-2026-009']);
 
     $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
 

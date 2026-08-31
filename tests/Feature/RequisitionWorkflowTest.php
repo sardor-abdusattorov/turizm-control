@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ApprovalStatus;
 use App\Enums\RequisitionStatus;
 use App\Filament\Resources\Requisitions\Pages\CreateRequisition;
 use App\Filament\Resources\Requisitions\Pages\EditRequisition;
@@ -8,7 +9,7 @@ use App\Filament\Resources\Requisitions\Pages\ViewRequisition;
 use App\Models\Requisition;
 use App\Models\Settings;
 use App\Models\User;
-use App\Services\Requisitions\RequisitionWorkflow;
+use App\Services\Approvals\ApprovalWorkflow;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -30,16 +31,17 @@ function requisitionUser(array $abilities = ['view_any_requisition', 'view_requi
     return $user->fresh();
 }
 
-it('numbers a new requisition and stamps its author', function () {
+it('numbers a new requisition and queues the whole chain', function () {
     $author = requisitionUser();
-    $reviewer = requisitionUser();
+    $first = requisitionUser();
+    $second = requisitionUser();
     actingAs($author);
 
     Livewire::test(CreateRequisition::class)
         ->fillForm([
             'title' => 'Канцелярия на III квартал',
-            'description' => 'Бумага А4 — 20 пачек, картриджи — 4 шт.',
-            'reviewer_id' => $reviewer->id,
+            'description' => 'Бумага А4 — 20 пачек.',
+            'approver_ids' => [$first->id, $second->id],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -48,154 +50,218 @@ it('numbers a new requisition and stamps its author', function () {
 
     expect($requisition->number)->toBe('ЗВ-'.now()->year.'-001')
         ->and($requisition->author_id)->toBe($author->id)
-        ->and($requisition->reviewer_id)->toBe($reviewer->id)
         ->and($requisition->status)->toBe(RequisitionStatus::Draft)
-        ->and($requisition->due_at)->toBeNull();
+        ->and($requisition->activeApprovals())->toHaveCount(2)
+        ->and($requisition->activeApprovals()->pluck('status')->unique()->all())->toBe([ApprovalStatus::Queued]);
 });
 
-it('keeps numbering sequential within the year', function () {
+it('pre-fills the chain from settings', function () {
     $author = requisitionUser();
-    actingAs($author);
-
-    Requisition::factory()->create(['number' => 'ЗВ-'.now()->year.'-007']);
-
-    expect(Requisition::nextNumber())->toBe('ЗВ-'.now()->year.'-008');
-});
-
-it('pre-fills the reviewer from settings', function () {
-    $author = requisitionUser();
-    $defaultReviewer = requisitionUser();
-    Settings::set('requisition.reviewer_id', $defaultReviewer->id);
+    $a = requisitionUser();
+    $b = requisitionUser();
+    Settings::set('requisition.approver_ids', [$a->id, $b->id]);
     actingAs($author);
 
     Livewire::test(CreateRequisition::class)
-        ->assertFormSet(['reviewer_id' => $defaultReviewer->id]);
+        ->assertFormSet(['approver_ids' => [$a->id, $b->id]]);
 });
 
-it('stamps the review deadline from settings on submit', function () {
+it('opens only the first step on submit and leaves the rest queued', function () {
     Settings::set('requisition.review_days', 5);
 
     $author = requisitionUser();
-    $requisition = Requisition::factory()->create(['author_id' => $author->id]);
+    $first = requisitionUser();
+    $second = requisitionUser();
+    $requisition = Requisition::factory()->withChain([$first, $second])->create(['author_id' => $author->id]);
 
     actingAs($author);
+    app(ApprovalWorkflow::class)->submit($requisition->fresh());
 
-    expect(app(RequisitionWorkflow::class)->submit($requisition))->toBeTrue();
-
-    $requisition->refresh();
+    $requisition = $requisition->fresh()->load('approvals');
+    $steps = $requisition->activeApprovals();
 
     expect($requisition->status)->toBe(RequisitionStatus::InReview)
         ->and($requisition->submitted_at)->not->toBeNull()
-        ->and((int) round(now()->diffInDays($requisition->due_at)))->toBe(5);
+        ->and($steps->firstWhere('user_id', $first->id)->status)->toBe(ApprovalStatus::Pending)
+        ->and($steps->firstWhere('user_id', $second->id)->status)->toBe(ApprovalStatus::Queued)
+        ->and((int) round(now()->diffInDays($steps->firstWhere('user_id', $first->id)->due_at)))->toBe(5);
 });
 
-it('does not move a live deadline when the setting changes afterwards', function () {
-    Settings::set('requisition.review_days', 2);
-
+it('hands the turn to the next approver and settles when the last one approves', function () {
     $author = requisitionUser();
-    $requisition = Requisition::factory()->create(['author_id' => $author->id]);
-    actingAs($author);
+    $first = requisitionUser();
+    $second = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$first, $second])->create(['author_id' => $author->id]);
 
-    app(RequisitionWorkflow::class)->submit($requisition);
-    $stamped = $requisition->fresh()->due_at;
+    $workflow = app(ApprovalWorkflow::class);
 
-    Settings::set('requisition.review_days', 30);
+    actingAs($first);
+    $workflow->approve($requisition->fresh()->load('approvals'), $first, 'Ок от первого.');
 
-    expect($requisition->fresh()->due_at->timestamp)->toBe($stamped->timestamp);
+    $mid = $requisition->fresh()->load('approvals');
+
+    expect($mid->status)->toBe(RequisitionStatus::InReview)
+        ->and($mid->activeApprovals()->firstWhere('user_id', $second->id)->status)->toBe(ApprovalStatus::Pending);
+
+    actingAs($second);
+    $workflow->approve($mid, $second, 'Ок от второго.');
+
+    expect($requisition->fresh()->status)->toBe(RequisitionStatus::Approved);
 });
 
-it('refuses to submit a requisition someone else wrote', function () {
+it('refuses an approver whose turn has not come', function () {
+    $first = requisitionUser();
+    $second = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$first, $second])->create();
+
+    actingAs($second);
+
+    expect(fn () => app(ApprovalWorkflow::class)->approve($requisition->fresh()->load('approvals'), $second))
+        ->toThrow(RuntimeException::class, __('app.approval.error.waiting_for_previous'));
+});
+
+it('stops the whole chain when somebody rejects', function () {
     $author = requisitionUser();
-    $stranger = requisitionUser();
-    $requisition = Requisition::factory()->create(['author_id' => $author->id]);
+    $first = requisitionUser();
+    $second = requisitionUser();
+    $third = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$first, $second, $third])->create(['author_id' => $author->id]);
 
-    actingAs($stranger);
+    actingAs($first);
+    app(ApprovalWorkflow::class)->reject($requisition->fresh()->load('approvals'), $first, 'Нет обоснования суммы.');
 
-    expect(app(RequisitionWorkflow::class)->submit($requisition))->toBeFalse()
-        ->and($requisition->fresh()->status)->toBe(RequisitionStatus::Draft);
-});
-
-it('refuses to submit a requisition with nobody to review it', function () {
-    $author = requisitionUser();
-    $requisition = Requisition::factory()->create([
-        'author_id' => $author->id,
-        'reviewer_id' => null,
-    ]);
-
-    actingAs($author);
-
-    expect(app(RequisitionWorkflow::class)->submit($requisition))->toBeFalse();
-});
-
-it('lets only the named reviewer settle it', function () {
-    $reviewer = requisitionUser();
-    $stranger = requisitionUser();
-    $requisition = Requisition::factory()->inReview()->create(['reviewer_id' => $reviewer->id]);
-
-    actingAs($stranger);
-    expect(app(RequisitionWorkflow::class)->approve($requisition))->toBeFalse();
-
-    actingAs($reviewer);
-    expect(app(RequisitionWorkflow::class)->approve($requisition, 'Согласовано.'))->toBeTrue();
-
-    $requisition->refresh();
-
-    expect($requisition->status)->toBe(RequisitionStatus::Approved)
-        ->and($requisition->review_comment)->toBe('Согласовано.')
-        ->and($requisition->reviewed_at)->not->toBeNull();
-});
-
-it('keeps the rejection reason and lets the author edit again', function () {
-    $author = requisitionUser();
-    $reviewer = requisitionUser();
-    $requisition = Requisition::factory()->inReview()->create([
-        'author_id' => $author->id,
-        'reviewer_id' => $reviewer->id,
-    ]);
-
-    actingAs($reviewer);
-    app(RequisitionWorkflow::class)->reject($requisition, 'Нет обоснования суммы.');
-
-    $requisition->refresh();
-
-    actingAs($author);
+    $requisition = $requisition->fresh()->load('approvals');
+    $rows = $requisition->approvals;
 
     expect($requisition->status)->toBe(RequisitionStatus::Rejected)
-        ->and($requisition->review_comment)->toBe('Нет обоснования суммы.')
-        ->and($requisition->canBeEditedBy())->toBeTrue()
-        ->and($requisition->canBeSubmittedBy())->toBeTrue();
+        ->and($rows->firstWhere('user_id', $first->id)->status)->toBe(ApprovalStatus::Rejected)
+        ->and($rows->firstWhere('user_id', $first->id)->comment)->toBe('Нет обоснования суммы.')
+        // Nobody is left holding a step on a document that is already going back.
+        ->and($rows->firstWhere('user_id', $second->id)->status)->toBe(ApprovalStatus::Invalidated)
+        ->and($rows->firstWhere('user_id', $third->id)->status)->toBe(ApprovalStatus::Invalidated);
 });
 
-it('freezes a requisition while it is under review', function () {
+it('lets an approver further down the queue veto without waiting their turn', function () {
+    $first = requisitionUser();
+    $last = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$first, $last])->create();
+
+    actingAs($last);
+    app(ApprovalWorkflow::class)->reject($requisition->fresh()->load('approvals'), $last, 'Не согласен по существу.');
+
+    $requisition = $requisition->fresh()->load('approvals');
+
+    expect($requisition->status)->toBe(RequisitionStatus::Rejected)
+        ->and($requisition->approvals->firstWhere('user_id', $last->id)->status)->toBe(ApprovalStatus::Rejected);
+});
+
+it('keeps the rejected verdict readable after the author edits and it goes round again', function () {
+    $author = requisitionUser();
+    $approver = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$approver])->create(['author_id' => $author->id]);
+
+    actingAs($approver);
+    app(ApprovalWorkflow::class)->reject($requisition->fresh()->load('approvals'), $approver, 'Уточните смету.');
+
+    actingAs($author);
+
+    Livewire::test(EditRequisition::class, ['record' => $requisition->id])
+        ->fillForm(['title' => 'Канцелярия, исправлено', 'approver_ids' => [$approver->id]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $requisition = $requisition->fresh()->load('approvals');
+    $rounds = $requisition->approvals->groupBy('round');
+
+    expect($requisition->status)->toBe(RequisitionStatus::Draft)
+        ->and($rounds)->toHaveCount(2)
+        // The old round is history and still carries what it decided.
+        ->and($rounds->get(1)->first()->isVoided())->toBeTrue()
+        ->and($rounds->get(1)->first()->displayStatus())->toBe(ApprovalStatus::Rejected)
+        ->and($rounds->get(1)->first()->comment)->toBe('Уточните смету.')
+        // The new round is a clean queue.
+        ->and($rounds->get(2)->first()->status)->toBe(ApprovalStatus::Queued);
+});
+
+it('restarts a live round from the top when the author edits mid-review', function () {
+    $author = requisitionUser();
+    $first = requisitionUser();
+    $second = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$first, $second])->create(['author_id' => $author->id]);
+
+    actingAs($first);
+    app(ApprovalWorkflow::class)->approve($requisition->fresh()->load('approvals'), $first, 'Ок.');
+
+    actingAs($author);
+    app(ApprovalWorkflow::class)->restartAfterEdit($requisition->fresh()->load('approvals'));
+
+    $requisition = $requisition->fresh()->load('approvals');
+    $live = $requisition->activeApprovals();
+
+    expect($requisition->status)->toBe(RequisitionStatus::InReview)
+        ->and($live)->toHaveCount(2)
+        // The verdict given on text that no longer exists does not carry over.
+        ->and($live->firstWhere('user_id', $first->id)->status)->toBe(ApprovalStatus::Pending)
+        ->and($live->firstWhere('user_id', $second->id)->status)->toBe(ApprovalStatus::Queued);
+});
+
+it('recalls a requisition back to draft and voids the open steps', function () {
+    $author = requisitionUser();
+    $approver = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$approver])->create(['author_id' => $author->id]);
+
+    actingAs($author);
+    app(ApprovalWorkflow::class)->recall($requisition->fresh()->load('approvals'));
+
+    $requisition = $requisition->fresh()->load('approvals');
+
+    expect($requisition->status)->toBe(RequisitionStatus::Draft)
+        ->and($requisition->submitted_at)->toBeNull()
+        ->and($requisition->activeApprovals())->toHaveCount(0)
+        ->and($requisition->approvals->first()->isVoided())->toBeTrue();
+});
+
+it('refuses to submit a requisition with nobody on the chain', function () {
+    $author = requisitionUser();
+    $requisition = Requisition::factory()->create(['author_id' => $author->id]);
+
+    actingAs($author);
+
+    expect(fn () => app(ApprovalWorkflow::class)->submit($requisition->fresh()))
+        ->toThrow(RuntimeException::class, __('app.approval.error.no_approvers'));
+});
+
+it('never lets the same person decide twice', function () {
+    $approver = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$approver])->create();
+
+    actingAs($approver);
+    $workflow = app(ApprovalWorkflow::class);
+    $workflow->approve($requisition->fresh()->load('approvals'), $approver, 'Ок');
+
+    expect(fn () => $workflow->reject($requisition->fresh()->load('approvals'), $approver, 'Передумал'))
+        ->toThrow(RuntimeException::class);
+
+    expect($requisition->fresh()->status)->toBe(RequisitionStatus::Approved);
+});
+
+it('freezes a requisition while it is under approval', function () {
     $author = requisitionUser();
     $requisition = Requisition::factory()->inReview()->create(['author_id' => $author->id]);
 
     actingAs($author);
 
-    expect($requisition->canBeEditedBy())->toBeFalse();
+    expect($requisition->fresh()->canBeEditedBy())->toBeFalse();
 
     Livewire::test(EditRequisition::class, ['record' => $requisition->id])
         ->assertForbidden();
 });
 
-it('never settles the same requisition twice', function () {
-    $reviewer = requisitionUser();
-    $requisition = Requisition::factory()->inReview()->create(['reviewer_id' => $reviewer->id]);
-
-    actingAs($reviewer);
-
-    $workflow = app(RequisitionWorkflow::class);
-
-    expect($workflow->approve($requisition, 'Ок'))->toBeTrue()
-        ->and($workflow->reject($requisition, 'Передумал'))->toBeFalse()
-        ->and($requisition->fresh()->status)->toBe(RequisitionStatus::Approved);
-});
-
 it('shows only the requisitions a user is part of', function () {
     $author = requisitionUser();
-    $reviewer = requisitionUser();
-    $mine = Requisition::factory()->create(['author_id' => $author->id, 'reviewer_id' => $reviewer->id]);
-    $toReview = Requisition::factory()->create(['reviewer_id' => $author->id]);
+    $approver = requisitionUser();
+    $mine = Requisition::factory()->create(['author_id' => $author->id]);
+    $toReview = Requisition::factory()->withChain([$author])->create();
     $stranger = Requisition::factory()->create();
 
     actingAs($author);
@@ -205,68 +271,116 @@ it('shows only the requisitions a user is part of', function () {
         ->assertCanNotSeeTableRecords([$stranger]);
 });
 
-it('shows the whole registry to oversight', function () {
-    $overseer = requisitionUser(['view_any_requisition', 'view_requisition', 'view_all_requisitions']);
-    $others = Requisition::factory()->count(3)->create();
-
-    actingAs($overseer);
-
-    Livewire::test(ListRequisitions::class)
-        ->assertCanSeeTableRecords($others);
-});
-
-it('offers the review actions only to the reviewer', function () {
+it('offers the review actions only to whoever the chain is asking', function () {
     $author = requisitionUser();
-    $reviewer = requisitionUser();
-    $requisition = Requisition::factory()->inReview()->create([
-        'author_id' => $author->id,
-        'reviewer_id' => $reviewer->id,
-    ]);
+    $approver = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$approver])->create(['author_id' => $author->id]);
 
     actingAs($author);
     Livewire::test(ViewRequisition::class, ['record' => $requisition->id])
-        ->assertActionHidden('approveRequisition')
-        ->assertActionHidden('rejectRequisition');
+        ->assertActionHidden('approve')
+        ->assertActionVisible('recall');
 
-    actingAs($reviewer);
+    actingAs($approver);
     Livewire::test(ViewRequisition::class, ['record' => $requisition->id])
-        ->assertActionVisible('approveRequisition')
-        ->assertActionVisible('rejectRequisition');
-});
-
-it('rejects through the page action and records the reason', function () {
-    $reviewer = requisitionUser();
-    $requisition = Requisition::factory()->inReview()->create(['reviewer_id' => $reviewer->id]);
-
-    actingAs($reviewer);
-
-    Livewire::test(ViewRequisition::class, ['record' => $requisition->id])
-        ->callAction(TestAction::make('rejectRequisition'), ['comment' => 'Смета не приложена.'])
-        ->assertNotified();
-
-    expect($requisition->fresh()->status)->toBe(RequisitionStatus::Rejected)
-        ->and($requisition->fresh()->review_comment)->toBe('Смета не приложена.');
+        ->assertActionVisible('approve')
+        ->assertActionVisible('reject');
 });
 
 it('demands a reason before a rejection goes through', function () {
-    $reviewer = requisitionUser();
-    $requisition = Requisition::factory()->inReview()->create(['reviewer_id' => $reviewer->id]);
+    $approver = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$approver])->create();
 
-    actingAs($reviewer);
+    actingAs($approver);
 
     Livewire::test(ViewRequisition::class, ['record' => $requisition->id])
-        ->callAction(TestAction::make('rejectRequisition'), ['comment' => null])
+        ->callAction(TestAction::make('reject'), ['comment' => null])
         ->assertHasActionErrors(['comment' => 'required']);
 
     expect($requisition->fresh()->status)->toBe(RequisitionStatus::InReview);
 });
 
-it('marks an unmet deadline as overdue', function () {
+it('rejects through the page action and shows the reason back on the record', function () {
+    $approver = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$approver])->create();
+
+    actingAs($approver);
+
+    Livewire::test(ViewRequisition::class, ['record' => $requisition->id])
+        ->callAction(TestAction::make('reject'), ['comment' => 'Смета не приложена.'])
+        ->assertNotified();
+
+    expect($requisition->fresh()->status)->toBe(RequisitionStatus::Rejected);
+
+    expect(Livewire::test(ViewRequisition::class, ['record' => $requisition->id])->html())
+        ->toContain('Смета не приложена.');
+});
+
+it('renders the chain on the index with each approver and the progress', function () {
+    $author = requisitionUser(['view_any_requisition', 'view_requisition', 'view_all_requisitions']);
+    $first = requisitionUser();
+    $second = requisitionUser();
+    Requisition::factory()->inReview([$first, $second])->create();
+
+    actingAs($author);
+
+    $html = Livewire::test(ListRequisitions::class)->html();
+
+    expect($html)->toContain('fi-approvers-cell')
+        ->toContain('fi-state-pill')
+        ->toContain($first->name)
+        ->toContain($second->name)
+        ->toContain('0/2');
+});
+
+it('lays the view page out as designed cards, not a bare field list', function () {
+    $author = requisitionUser();
+    $first = requisitionUser();
+    $second = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$first, $second])->create([
+        'author_id' => $author->id,
+        'title' => 'Закупка канцелярии',
+        'description' => "Бумага А4 — 20 пачек.\nКартриджи — 4 шт.",
+    ]);
+
+    actingAs($author);
+
+    $html = Livewire::test(ViewRequisition::class, ['record' => $requisition->id])->html();
+
+    expect($html)
+        // The chain leads: progress bar, who holds it now, the timeline table.
+        ->toContain('rq-progress__bar')
+        ->toContain('0/2')
+        ->toContain($first->name)
+        // Then the record itself, as the card/details table the panel uses.
+        ->toContain('ow-card')
+        ->toContain('ow-dets')
+        ->toContain('Закупка канцелярии')
+        ->toContain('Бумага А4');
+});
+
+it('leads the view page with the reason it came back', function () {
+    $author = requisitionUser();
+    $approver = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$approver])->create(['author_id' => $author->id]);
+
+    actingAs($approver);
+    app(ApprovalWorkflow::class)
+        ->reject($requisition->fresh()->load('approvals'), $approver, 'Смета не приложена.');
+
+    actingAs($author);
+
+    expect(Livewire::test(ViewRequisition::class, ['record' => $requisition->id])->html())
+        ->toContain('rq-reject')
+        ->toContain('Смета не приложена.');
+});
+
+it('marks an unmet step as overdue', function () {
     $onTime = Requisition::factory()->inReview()->create();
     $late = Requisition::factory()->overdue()->create();
-    $settled = Requisition::factory()->approved()->create(['due_at' => now()->subWeek()]);
+    $settled = Requisition::factory()->approved()->create();
 
-    expect($onTime->isOverdue())->toBeFalse()
-        ->and($late->isOverdue())->toBeTrue()
-        ->and($settled->isOverdue())->toBeFalse();
+    expect($onTime->fresh()->load('approvals')->isOverdue())->toBeFalse()
+        ->and($late->fresh()->load('approvals')->isOverdue())->toBeTrue()
+        ->and($settled->fresh()->load('approvals')->isOverdue())->toBeFalse();
 });

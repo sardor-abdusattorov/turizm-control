@@ -36,7 +36,7 @@ class SettingsSeeder extends Seeder
             'approval.sla_days' => 2,
 
             'requisition.review_days' => 3,
-            'requisition.reviewer_id' => null,
+            'requisition.approver_ids' => [],
         ];
 
         foreach ($values as $key => $value) {

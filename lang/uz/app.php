@@ -2,6 +2,8 @@
 
 return [
     'label' => [
+        'details' => 'Batafsil',
+        'more_count' => 'yana :count',
         'payment_subject' => 'To‘lov turi',
         'payment_object' => 'To‘lov obyekti',
         'payment_purpose' => 'To‘lov maqsadi',
@@ -809,6 +811,71 @@ return [
             'pr_center' => 'PR markazi',
             'committee' => 'Qo‘mita',
         ],
+    ],
+    'approval' => [
+        'section' => 'Kelishuv zanjiri',
+        'section_description' => 'Arizani kim va qanday tartibda ko‘radi. Tartib bo‘limlar tartibidan olinadi.',
+        'not_submitted' => 'Yuborilmagan',
+        'overdue' => 'muddati o‘tgan',
+        'cancelled_after_edit' => 'Tahrirdan keyin bekor qilindi',
+        'empty' => 'Kelishuvchilar tayinlanmagan.',
+        'sequential_hint' => 'Bosqichlar navbat bilan',
+        'due' => ':date gacha',
+        'now_with' => 'Hozir :name da',
+        'status' => [
+            'queued' => 'Navbatda',
+            'pending' => 'Ko‘rib chiqilmoqda',
+            'approved' => 'Kelishildi',
+            'rejected' => 'Rad etildi',
+            'invalidated' => 'Bekor qilindi',
+        ],
+        'action' => [
+            'submit' => 'Kelishuvga yuborish',
+            'approve' => 'Kelishish',
+            'reject' => 'Rad etish',
+            'recall' => 'Qaytarib olish',
+        ],
+        'field' => [
+            'approvers' => 'Kelishuvchilar',
+            'approvers_help' => 'Har biri o‘z navbatida ko‘radi. Ularning har biri rad etishi mumkin — zanjir to‘xtaydi.',
+            'comment' => 'Izoh',
+            'reason' => 'Rad etish sababi',
+            'reason_help' => 'Muallif buni ko‘radi va shunga qarab tuzatadi.',
+        ],
+        'confirm' => [
+            'submit' => 'Ariza birinchi kelishuvchiga ketadi, har bosqichga :days kun. Kelishuv davomida tahrirlab bo‘lmaydi.',
+            'recall' => 'Ariza qoralamaga qaytadi, ochiq bosqichlar bekor qilinadi.',
+        ],
+        'message' => [
+            'submitted' => 'Ariza kelishuvga yuborildi.',
+            'approved' => 'Ariza siz tomondan kelishildi.',
+            'rejected' => 'Ariza rad etildi.',
+            'recalled' => 'Ariza qaytarib olindi.',
+        ],
+        'error' => [
+            'not_draft' => 'Faqat qoralamani yuborish mumkin.',
+            'no_approvers' => 'Avval kelishuvchilarni tayinlang.',
+            'not_in_review' => 'Ariza kelishuvda emas.',
+            'not_an_approver' => 'Siz bu ariza bo‘yicha kelishuvchi emassiz.',
+            'waiting_for_previous' => 'Navbatingiz hali kelmadi.',
+            'already_decided' => 'Siz bu ariza bo‘yicha qaror qabul qilgansiz.',
+        ],
+        'filter' => [
+            'my_approval' => 'Mening kelishuvim',
+            'approved_by_me' => 'Men kelishganman',
+            'not_approved_by_me' => 'Men kelishmaganman',
+            'mine' => 'Mening',
+            'awaiting_me' => 'Meni kutmoqda',
+        ],
+        'column' => [
+            'chain' => 'Kelishuvchilar',
+            'approver' => 'Kelishuvchi',
+            'due' => 'Muddat',
+            'acted_at' => 'Qaror qabul qilindi',
+        ],
+        'progress' => ':total dan :approved kelishildi',
+        'in_queue' => 'navbatda :count',
+        'step' => ':total dan :step-bosqich',
     ],
     'requisition' => [
         'status' => [

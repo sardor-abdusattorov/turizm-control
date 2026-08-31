@@ -216,9 +216,10 @@ class Settings extends Page implements HasForms
 
                         Tabs\Tab::make(__('app.label.requisition_plural'))
                             ->schema([
-                                Select::make('requisition.reviewer_id')
+                                Select::make('requisition.approver_ids')
                                     ->label(__('app.label.requisition_default_reviewer'))
                                     ->helperText(__('app.helper.requisition_default_reviewer'))
+                                    ->multiple()
                                     ->options(fn (): array => User::activeOptionsGroupedByDepartment())
                                     ->allowHtml()
                                     ->searchable()

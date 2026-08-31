@@ -834,3 +834,448 @@ a.pjo__name:hover {
     font-size: .8rem;
 }
 
+/* ═══════════ Approval chain: state pills, the approvers cell and the
+   per-approver breakdown. Ported from the reference registry so a document
+   reads the same here as it does there. ═══════════ */
+
+/* Status / payment pills in data tables — bigger and more legible than the
+   default Filament badge, which renders at ~text-xs inside a table row. */
+.fi-state-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .35rem .7rem;
+    border-radius: .45rem;
+    font-size: .83rem;
+    font-weight: 600;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.fi-state-pill__dot {
+    width: .42rem;
+    height: .42rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+
+.fi-approvers-empty {
+    font-size: 0.82rem;
+    color: currentColor;
+    opacity: 0.45;
+}
+
+/* The whole cell is the click target for the approval-chain modal, so it has
+   to look like one: a card that lifts on hover, the way the reference panel
+   does it. Without this the cell reads as plain text and nobody discovers the
+   modal. */
+.fi-approvers-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    align-items: stretch;
+    min-width: 15rem;
+    max-width: 20rem;
+    padding: 0.65rem 0.75rem;
+    margin: 0.25rem 0;
+    border-radius: 0.7rem;
+    cursor: pointer;
+    text-align: left;
+    transition:
+        background 0.12s ease,
+        box-shadow 0.12s ease;
+}
+
+.fi-approvers-cell:hover {
+    background: rgba(127, 127, 127, 0.07);
+    box-shadow: inset 0 0 0 1px rgba(127, 127, 127, 0.16);
+}
+
+.dark .fi-approvers-cell:hover {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+/* A quiet "expand" affordance that only comes forward under the cursor. */
+.fi-approvers-open {
+    display: inline-flex;
+    width: 0.85rem;
+    height: 0.85rem;
+    flex-shrink: 0;
+    opacity: 0;
+    color: currentColor;
+    transition: opacity 0.12s ease;
+}
+
+.fi-approvers-open svg {
+    width: 100%;
+    height: 100%;
+}
+
+.fi-approvers-cell:hover .fi-approvers-open {
+    opacity: 0.6;
+}
+
+.fi-approvers-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.fi-approvers-bar {
+    flex: 1;
+    min-width: 4rem;
+    height: 0.4rem;
+    border-radius: 99px;
+    background: rgba(148, 163, 184, 0.22);
+    overflow: hidden;
+}
+
+.fi-approvers-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.25s ease;
+    animation: fi-approvers-grow 0.65s ease-out both;
+}
+
+@keyframes fi-approvers-grow {
+    from {
+        width: 0 !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fi-approvers-bar > span {
+        animation: none;
+    }
+}
+
+.fi-approvers-summary {
+    font-size: 0.76rem;
+    font-weight: 650;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+}
+
+.fi-approvers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.fi-approvers-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.84rem;
+    line-height: 1.2;
+}
+
+.fi-approvers-avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    background: #e0e7ff;
+    color: #1d4ed8;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.14);
+}
+
+.dark .fi-approvers-avatar {
+    background: rgba(99, 102, 241, 0.25);
+    color: #a5b4fc;
+}
+
+.fi-approvers-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.fi-approvers-name {
+    color: currentColor;
+    opacity: 0.95;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fi-approvers-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.fi-approvers-icon svg {
+    width: 0.8rem;
+    height: 0.8rem;
+}
+
+.fi-approvers-more {
+    font-size: 0.74rem;
+    color: currentColor;
+    opacity: 0.55;
+    padding-left: 2.85rem;
+    padding-top: 0.1rem;
+}
+
+/* The chain and the SLA countdown sat flush against each other and read as one
+   column. Give the pair room to breathe. */
+/* A file panel shown for reading only: the grid of previews stays, the drop
+   zone goes. Uploading is already refused server-side; leaving the invitation
+   on screen only offers something that cannot happen. */
+.fi-file-panel-readonly .filepond--drop-label {
+    display: none !important;
+}
+
+.fi-file-panel-readonly .filepond--panel-root {
+    background: transparent;
+    border-style: dashed;
+    border-color: rgba(127, 127, 127, 0.18);
+}
+
+.fi-file-panel-readonly .filepond--root {
+    margin-bottom: 0;
+    cursor: default;
+}
+
+
+/* ───────────────── Approval chain on a document ─────────────────────────
+   A voided round stays on the record so the document can show it was sent
+   back; it reads as history, dimmed, rather than competing with the round
+   that is actually running. */
+.fi-approval-state {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+
+.fi-state-pill--voided {
+    opacity: 0.6;
+}
+
+.fi-approval-state__note,
+.fi-approval-state__late {
+    font-size: 0.72rem;
+    line-height: 1.1;
+}
+
+.fi-approval-state__note {
+    color: currentColor;
+    opacity: 0.55;
+}
+
+.fi-approval-state__late {
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+.dark .fi-approval-state__late {
+    color: #fca5a5;
+}
+
+.fi-approval-voided {
+    opacity: 0.62;
+}
+
+.fi-approval-voided:hover {
+    opacity: 1;
+}
+
+.ap-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.ap-details__head {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.ap-details__photo {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.16);
+}
+
+.ap-details__meta {
+    font-size: 0.9rem;
+    opacity: 0.75;
+}
+
+.ap-details__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 0.65rem;
+    margin: 0;
+}
+
+.ap-details__fact dt {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    opacity: 0.55;
+}
+
+.ap-details__fact dd {
+    margin: 0.15rem 0 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* One block per round the person was asked in, newest first. */
+.ap-details__attempts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.ap-details__attempt {
+    display: flex;
+    gap: 0.65rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.6rem;
+    background: rgba(127, 127, 127, 0.06);
+}
+
+.ap-details__attempt.is-current {
+    box-shadow: inset 0 0 0 1px rgba(127, 127, 127, 0.22);
+}
+
+.ap-details__attempt.is-voided {
+    opacity: 0.62;
+}
+
+.ap-details__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    margin-top: 0.4rem;
+    flex-shrink: 0;
+}
+
+.ap-details__attempt-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.ap-details__attempt-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.ap-details__attempt-status {
+    font-size: 0.85rem;
+    font-weight: 650;
+}
+
+.ap-details__attempt-when {
+    font-size: 0.76rem;
+    opacity: 0.6;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.ap-details__attempt-comment {
+    font-size: 0.86rem;
+    margin-top: 0.15rem;
+}
+
+.ap-details__attempt-note {
+    font-size: 0.74rem;
+    opacity: 0.55;
+    margin-top: 0.2rem;
+}
+
+.fi-col-approvers {
+    padding-right: 1.5rem !important;
+}
+
+.fi-col-sla {
+    padding-left: 1.25rem !important;
+    white-space: nowrap;
+}
+
+.fi-col-title {
+    min-width: 20rem;
+}
+
+.fi-details-table thead {
+    display: none;
+}
+
+.fi-details-table tbody {
+    font-family: var(--default-font-family);
+}
+
+.fi-details-table tbody th {
+    width: 16rem;
+    font-weight: 500;
+    color: var(--color-gray-500);
+}
+
+.dark .fi-details-table tbody th {
+    color: var(--color-gray-400);
+}
+
+.fi-details-table tbody td {
+    color: var(--color-gray-950);
+}
+
+.dark .fi-details-table tbody td {
+    color: var(--color-white);
+}
+
+.fi-details-avatar {
+    width: 4rem;
+    height: 4rem;
+    font-size: 1.25rem;
+}
+
+.fi-badge {
+    font-size: 0.8125rem;
+}
+
+.fi-details-badge {
+    font-size: 0.875rem;
+    padding: 0.3rem 0.75rem;
+}
+
+.fi-details-link {
+    color: var(--color-primary-600);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.fi-details-link:hover {
+    text-decoration: underline;
+}
+
+.dark .fi-details-link {
+    color: var(--color-primary-400);
+}

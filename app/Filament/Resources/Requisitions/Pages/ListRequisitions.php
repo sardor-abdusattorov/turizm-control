@@ -13,6 +13,8 @@ class ListRequisitions extends ListRecords
 {
     protected static string $resource = RequisitionResource::class;
 
+    protected ?int $awaitingMe = null;
+
     protected function getHeaderActions(): array
     {
         return [
@@ -27,13 +29,22 @@ class ListRequisitions extends ListRecords
     {
         $tabs = [
             'all' => Tab::make(__('app.label.all'))
-                ->badge(fn (): int => $this->countBy()),
+                ->icon('heroicon-o-rectangle-stack'),
+
+            'mine' => Tab::make(__('app.approval.filter.mine'))
+                ->icon('heroicon-o-user')
+                ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('author_id', auth()->id())),
+
+            'awaiting_me' => Tab::make(__('app.approval.filter.awaiting_me'))
+                ->icon('heroicon-o-inbox-arrow-down')
+                ->badge($this->awaitingMeCount() ?: null)
+                ->badgeColor('warning')
+                ->modifyQueryUsing(fn (Builder $query): Builder => $query->awaiting()),
         ];
 
         foreach (RequisitionStatus::cases() as $status) {
             $tabs[$status->value] = Tab::make($status->label())
                 ->icon($status->icon())
-                ->badge(fn (): int => $this->countBy($status))
                 ->badgeColor($status->color())
                 ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('status', $status));
         }
@@ -41,10 +52,14 @@ class ListRequisitions extends ListRecords
         return $tabs;
     }
 
-    private function countBy(?RequisitionStatus $status = null): int
+    /** Whatever is actually waiting on the viewer leads, when there is any. */
+    public function getDefaultActiveTab(): string|int|null
     {
-        return static::getResource()::getEloquentQuery()
-            ->when($status, fn (Builder $query) => $query->where('status', $status))
-            ->count();
+        return $this->awaitingMeCount() > 0 ? 'awaiting_me' : 'all';
+    }
+
+    protected function awaitingMeCount(): int
+    {
+        return $this->awaitingMe ??= static::getResource()::getEloquentQuery()->awaiting()->count();
     }
 }

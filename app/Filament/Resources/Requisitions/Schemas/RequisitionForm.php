@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Requisitions\Schemas;
 
+use App\Enums\ApprovalStatus;
 use App\Models\Project;
 use App\Models\Requisition;
 use App\Models\User;
@@ -22,15 +23,17 @@ class RequisitionForm
             ->components([
                 Section::make()
                     ->hiddenLabel()
-                    ->visible(fn (?Requisition $record): bool => filled($record?->review_comment))
+                    ->visible(fn (?Requisition $record): bool => filled(static::lastVerdict($record)))
                     ->schema([
-                        TextEntry::make('review_comment')
-                            ->label(__('app.label.review_comment'))
-                            ->color(fn (?Requisition $record): string => $record?->status?->color() ?? 'gray')
+                        TextEntry::make('last_verdict')
+                            ->label(__('app.approval.field.reason'))
+                            ->state(fn (?Requisition $record): ?string => static::lastVerdict($record))
+                            ->color('danger')
                             ->columnSpanFull(),
                     ]),
 
                 Section::make(__('app.label.basic_information'))
+                    ->icon('heroicon-o-clipboard-document-list')
                     ->schema([
                         TextInput::make('title')
                             ->label(__('app.label.requisition_title'))
@@ -48,16 +51,6 @@ class RequisitionForm
 
                         Grid::make(['default' => 1, 'md' => 2])
                             ->schema([
-                                Select::make('reviewer_id')
-                                    ->label(__('app.label.requisition_reviewer'))
-                                    ->helperText(__('app.helper.requisition_reviewer'))
-                                    ->options(fn (): array => User::activeOptionsGroupedByDepartment())
-                                    ->default(fn (): ?int => Requisition::defaultReviewerId())
-                                    ->allowHtml()
-                                    ->searchable()
-                                    ->preload()
-                                    ->required(),
-
                                 Select::make('project_id')
                                     ->label(__('app.label.project_single'))
                                     ->options(fn (): array => Project::groupedOptions())
@@ -66,6 +59,41 @@ class RequisitionForm
                                     ->nullable(),
                             ]),
                     ]),
+
+                Section::make(__('app.approval.section'))
+                    ->icon('heroicon-o-user-group')
+                    ->description(__('app.approval.section_description'))
+                    ->schema([
+                        Select::make('approver_ids')
+                            ->label(__('app.approval.field.approvers'))
+                            ->helperText(__('app.approval.field.approvers_help'))
+                            ->multiple()
+                            ->options(fn (): array => User::activeOptionsGroupedByDepartment())
+                            ->default(fn (): array => Requisition::defaultApproverIds())
+                            ->afterStateHydrated(function (Select $component, ?Requisition $record): void {
+                                if ($record) {
+                                    $component->state($record->activeApprovals()->pluck('user_id')->all());
+                                }
+                            })
+                            ->dehydrated()
+                            ->allowHtml()
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
             ]);
+    }
+
+    /**
+     * The reason the last round came back, shown at the top of the form the
+     * author reopens — that is the whole point of them being here.
+     */
+    protected static function lastVerdict(?Requisition $record): ?string
+    {
+        return $record?->approvals()
+            ->where('status', ApprovalStatus::Rejected)
+            ->orderByDesc('acted_at')
+            ->value('comment');
     }
 }
