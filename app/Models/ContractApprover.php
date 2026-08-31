@@ -47,7 +47,6 @@ class ContractApprover extends Model
 
     private const SYSTEM_NOTE_KEYS = [
         'invalidated_on_edit',
-        'invalidated_on_document_save',
     ];
 
     public function systemNoteLabel(): ?string

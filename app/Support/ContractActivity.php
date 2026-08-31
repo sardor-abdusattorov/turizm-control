@@ -12,8 +12,6 @@ class ContractActivity
             'Contract Sent To Director' => ['icon' => 'heroicon-o-arrow-up-circle', 'color' => 'primary'],
             'Contract Step Approved', 'Contract Approved', 'Contract Awaiting Director' => ['icon' => 'heroicon-o-check-circle', 'color' => 'success'],
             'Contract Rejected' => ['icon' => 'heroicon-o-x-circle', 'color' => 'danger'],
-            'Contract Document Saved', 'Contract Document Forcesave' => ['icon' => 'heroicon-o-document-text', 'color' => 'info'],
-            'Contract Edit Invalidated' => ['icon' => 'heroicon-o-no-symbol', 'color' => 'warning'],
             'Contract Returned To Work' => ['icon' => 'heroicon-o-arrow-uturn-left', 'color' => 'warning'],
             'Contract Approver Reassigned' => ['icon' => 'heroicon-o-arrows-right-left', 'color' => 'primary'],
             default => match (strtolower($event)) {
@@ -49,8 +47,6 @@ class ContractActivity
             'Contract Approved' => 'approved',
             'Contract Sent To Director' => 'sent_to_director',
             'Contract Rejected' => 'rejected',
-            'Contract Document Saved', 'Contract Document Forcesave' => 'document_saved',
-            'Contract Edit Invalidated' => 'edit_invalidated',
             'Contract Returned To Work' => 'returned_to_work',
             'Contract Approver Reassigned' => 'approver_reassigned',
             default => match (strtolower($event)) {
