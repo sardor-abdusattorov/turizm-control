@@ -13,9 +13,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "BEYOND DMC LLC",
                     "ru": "ООО «BEYOND DMC»",
-                    "uz": "\"BEYOND DMC\" MChJ"
+                    "uz": "\"BEYOND DMC\" MChJ",
+                    "en": "BEYOND DMC LLC"
                 },
                 "inn": "311687587",
                 "type": "legal",
@@ -23,9 +23,9 @@
                 "phone": "+998 99 235 48 36; +998 94 092 11 75; 909062456",
                 "email": "info@beyond-dmc.com",
                 "address": {
-                    "en": "44A Bahodir Street, Rakatboshi Mahalla, Yakkasaray District, Tashkent, Republic of Uzbekistan",
                     "ru": "Республика Узбекистан, г. Ташкент, Яккасарайский район, МСГ «Ракатбоши», ул. Баходир, 44А",
-                    "uz": "Oʻzbekiston Respublikasi, Toshkent shahri, Yakkasaroy tumani, \"Rakatboshi\" MFY, Bahodir koʻchasi, 44A"
+                    "uz": "Oʻzbekiston Respublikasi, Toshkent shahri, Yakkasaroy tumani, \"Rakatboshi\" MFY, Bahodir koʻchasi, 44A",
+                    "en": "44A Bahodir Street, Rakatboshi Mahalla, Yakkasaray District, Tashkent, Republic of Uzbekistan"
                 },
                 "director_name": "Раджеш Кумар",
                 "bank_accounts": [
@@ -64,9 +64,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Beyond Expectations JV",
                     "ru": "СП «Beyond Expectations»",
-                    "uz": "\"Beyond Expectations\" QK"
+                    "uz": "\"Beyond Expectations\" QK",
+                    "en": "Beyond Expectations JV"
                 },
                 "inn": "304415856",
                 "type": "legal",
@@ -74,9 +74,9 @@
                 "phone": "+998 90 955 94 31",
                 "email": "beyondexpectations.uz@gmail.com",
                 "address": {
-                    "en": "Rakat 1-13, Yakkasaray District, Tashkent",
                     "ru": "г. Ташкент, Яккасарайский район, Ракат 1-13",
-                    "uz": "Toshkent shahri, Yakkasaroy tumani, Rakat 1-13"
+                    "uz": "Toshkent shahri, Yakkasaroy tumani, Rakat 1-13",
+                    "en": "Rakat 1-13, Yakkasaray District, Tashkent"
                 },
                 "director_name": "О.О. Хакимова",
                 "bank_accounts": [
@@ -115,9 +115,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ASIA LUXE TRAVEL LLC",
                     "ru": "ООО «ASIA LUXE TRAVEL»",
-                    "uz": "\"ASIA LUXE TRAVEL\" MChJ"
+                    "uz": "\"ASIA LUXE TRAVEL\" MChJ",
+                    "en": "ASIA LUXE TRAVEL LLC"
                 },
                 "inn": "305855245",
                 "type": "legal",
@@ -125,9 +125,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "24 Amir Temur Street, Mirabad District, Tashkent",
                     "ru": "г. Ташкент, Мирабадский район, ул. Амира Темура, 24",
-                    "uz": "Toshkent shahri, Mirabod tumani, Amir Temur koʻchasi, 24"
+                    "uz": "Toshkent shahri, Mirabod tumani, Amir Temur koʻchasi, 24",
+                    "en": "24 Amir Temur Street, Mirabad District, Tashkent"
                 },
                 "director_name": "Ташмухамедов Сирожидин",
                 "bank_accounts": [
@@ -166,9 +166,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Rezbook Global International LLC",
                     "ru": "ООО «Rezbook Global International»",
-                    "uz": "\"Rezbook Global International\" MChJ"
+                    "uz": "\"Rezbook Global International\" MChJ",
+                    "en": "Rezbook Global International LLC"
                 },
                 "inn": "311247643",
                 "type": "legal",
@@ -176,9 +176,9 @@
                 "phone": "+998 90 951 46 64; +998 93 324 38 83",
                 "email": "Uzbekistan@rezbookglobal.com",
                 "address": {
-                    "en": "7/1 Mukumiy Street, Yakkasaray District, Tashkent",
                     "ru": "г. Ташкент, Яккасарайский район, ул. Мукумий 7/1",
-                    "uz": "Toshkent shahri, Yakkasaroy tumani, Mukumiy koʻchasi 7/1"
+                    "uz": "Toshkent shahri, Yakkasaroy tumani, Mukumiy koʻchasi 7/1",
+                    "en": "7/1 Mukumiy Street, Yakkasaray District, Tashkent"
                 },
                 "director_name": "Ж.Ф. Сафаров",
                 "bank_accounts": [
@@ -217,9 +217,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "VERSAILLES TRAVEL LLC",
                     "ru": "ООО «VERSAILLES TRAVEL»",
-                    "uz": "\"VERSAILLES TRAVEL\" MChJ"
+                    "uz": "\"VERSAILLES TRAVEL\" MChJ",
+                    "en": "VERSAILLES TRAVEL LLC"
                 },
                 "inn": "207153986",
                 "type": "legal",
@@ -227,9 +227,9 @@
                 "phone": "(+99871) 256 64 21; (+99891) 162 22 09",
                 "email": null,
                 "address": {
-                    "en": "8/1 Afrosiyob Street, Tashkent, 100015",
                     "ru": "100015, г. Ташкент, ул. Афросиеб 8/1",
-                    "uz": "100015, Toshkent shahri, Afrosiyob koʻchasi 8/1"
+                    "uz": "100015, Toshkent shahri, Afrosiyob koʻchasi 8/1",
+                    "en": "8/1 Afrosiyob Street, Tashkent, 100015"
                 },
                 "director_name": "Иноятова Н.Ш.",
                 "bank_accounts": [
@@ -268,9 +268,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Sanat Travel Experts JV",
                     "ru": "СП «Sanat Travel Experts»",
-                    "uz": "\"Sanat Travel Experts\" QK"
+                    "uz": "\"Sanat Travel Experts\" QK",
+                    "en": "Sanat Travel Experts JV"
                 },
                 "inn": "305072628",
                 "type": "legal",
@@ -278,9 +278,9 @@
                 "phone": "+998 99 807 06 08",
                 "email": "timur@ste.uz",
                 "address": {
-                    "en": "2 Chatqol Street, Mirzo Ulugbek District, Tashkent, 100007",
                     "ru": "г. Ташкент, Мирзо-Улугбекский район, ул. Чаткол 2, индекс 100007",
-                    "uz": "Toshkent shahri, Mirzo Ulugʻbek tumani, Chatqol koʻchasi 2, 100007"
+                    "uz": "Toshkent shahri, Mirzo Ulugʻbek tumani, Chatqol koʻchasi 2, 100007",
+                    "en": "2 Chatqol Street, Mirzo Ulugbek District, Tashkent, 100007"
                 },
                 "director_name": "Ишмухаметов Тимур",
                 "bank_accounts": [
@@ -319,9 +319,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZAMIN DMC LLC",
                     "ru": "ООО «ZAMIN DMC»",
-                    "uz": "\"ZAMIN DMC\" MChJ"
+                    "uz": "\"ZAMIN DMC\" MChJ",
+                    "en": "ZAMIN DMC LLC"
                 },
                 "inn": "311343097",
                 "type": "legal",
@@ -329,9 +329,9 @@
                 "phone": "+998 99 575 50 50; +99899 5750550",
                 "email": "info@zamindmc.uz",
                 "address": {
-                    "en": "22 A. Temur Street, Mirabad District, Tashkent",
                     "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
-                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22",
+                    "en": "22 A. Temur Street, Mirabad District, Tashkent"
                 },
                 "director_name": "Ходжаев Т.А.",
                 "bank_accounts": [
@@ -394,9 +394,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Rocket DMC Registan LLC",
                     "ru": "ООО «Rocket DMC Registan»",
-                    "uz": "\"Rocket DMC Registan\" MChJ"
+                    "uz": "\"Rocket DMC Registan\" MChJ",
+                    "en": "Rocket DMC Registan LLC"
                 },
                 "inn": "310367653",
                 "type": "legal",
@@ -404,9 +404,9 @@
                 "phone": "90 809 26 01; +998 90 512 24 78",
                 "email": "rocketuz.all@rocketdmc.com",
                 "address": {
-                    "en": "Samarkand, Kunigil",
                     "ru": "Самарканд, Кунигил",
-                    "uz": "Samarqand, Kunigil"
+                    "uz": "Samarqand, Kunigil",
+                    "en": "Samarkand, Kunigil"
                 },
                 "director_name": "Н.М Мухтарова",
                 "bank_accounts": [
@@ -445,9 +445,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SAMARCANDA ADVENTURES LLC",
                     "ru": "ООО «SAMARCANDA ADVENTURES»",
-                    "uz": "\"SAMARCANDA ADVENTURES\" MChJ"
+                    "uz": "\"SAMARCANDA ADVENTURES\" MChJ",
+                    "en": "SAMARCANDA ADVENTURES LLC"
                 },
                 "inn": "311728344",
                 "type": "legal",
@@ -455,9 +455,9 @@
                 "phone": "+998-50-444-17-17",
                 "email": "info@samarcanda.uz",
                 "address": {
-                    "en": "Avisozlar-3, 50, Yashnabad District, Tashkent",
                     "ru": "Ависозлар-3, 50, Яшнабадский р-н г. Ташкент",
-                    "uz": "Avisozlar-3, 50, Yashnobod tumani, Toshkent"
+                    "uz": "Avisozlar-3, 50, Yashnobod tumani, Toshkent",
+                    "en": "Avisozlar-3, 50, Yashnabad District, Tashkent"
                 },
                 "director_name": "А.К. Муминов",
                 "bank_accounts": [
@@ -496,9 +496,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZAMIN TRAVEL LLC",
                     "ru": "ООО «ZAMIN TRAVEL»",
-                    "uz": "\"ZAMIN TRAVEL\" MChJ"
+                    "uz": "\"ZAMIN TRAVEL\" MChJ",
+                    "en": "ZAMIN TRAVEL LLC"
                 },
                 "inn": "205315190",
                 "type": "legal",
@@ -506,9 +506,9 @@
                 "phone": "(99866) 2350036",
                 "email": "info@zamin-travel.com",
                 "address": {
-                    "en": "35 I. Karimov Street, Samarkand",
                     "ru": "г. Самарканд, ул. И. Каримова, 35",
-                    "uz": "Samarqand, I. Karimov koʻchasi, 35"
+                    "uz": "Samarqand, I. Karimov koʻchasi, 35",
+                    "en": "35 I. Karimov Street, Samarkand"
                 },
                 "director_name": "Усанов. И.Х",
                 "bank_accounts": [
@@ -547,9 +547,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Dolores Travel Services JV LLC",
                     "ru": "СП ООО «Dolores Travel Services»",
-                    "uz": "\"Dolores Travel Services\" QK MChJ"
+                    "uz": "\"Dolores Travel Services\" QK MChJ",
+                    "en": "Dolores Travel Services JV LLC"
                 },
                 "inn": "205424619",
                 "type": "legal",
@@ -557,9 +557,9 @@
                 "phone": "(99871) 1208883; +99855 515-88-83; (99875) 5158883; (99878) 1208883; (998 78) 1208873",
                 "email": "info@dolores.uz",
                 "address": {
-                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent",
                     "ru": "104 А, ул. Кичик Бешагач, Яккасарайский р-он, г. Ташкент",
-                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent"
+                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent",
+                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent"
                 },
                 "director_name": "Байзакова Ш.Б.",
                 "bank_accounts": [
@@ -598,9 +598,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "GLOBAL EXPLORE LLC",
                     "ru": "ООО «GLOBAL EXPLORE»",
-                    "uz": "\"GLOBAL EXPLORE\" MChJ"
+                    "uz": "\"GLOBAL EXPLORE\" MChJ",
+                    "en": "GLOBAL EXPLORE LLC"
                 },
                 "inn": "308716494",
                 "type": "legal",
@@ -608,9 +608,9 @@
                 "phone": "+99897 444 45 33",
                 "email": "info@uzbekistandiscovery.com",
                 "address": {
-                    "en": "Y квартал 3/82, Chilanzar District, Tashkent",
                     "ru": "Чиланзарский район, Е квартал, 3/82, г. Ташкент",
-                    "uz": "Chilonzor tumani, Y kvartal, 3/82, Toshkent"
+                    "uz": "Chilonzor tumani, Y kvartal, 3/82, Toshkent",
+                    "en": "Y квартал 3/82, Chilanzar District, Tashkent"
                 },
                 "director_name": "И.Н.Курбонов",
                 "bank_accounts": [
@@ -649,9 +649,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Sonder Voyage LLC",
                     "ru": "ООО «Sonder Voyage»",
-                    "uz": "\"Sonder Voyage\" MChJ"
+                    "uz": "\"Sonder Voyage\" MChJ",
+                    "en": "Sonder Voyage LLC"
                 },
                 "inn": "311240258",
                 "type": "legal",
@@ -659,9 +659,9 @@
                 "phone": "998 90 908 00 82",
                 "email": "sonderuz@gmail.com",
                 "address": {
-                    "en": "154 Yangi Avlod, Kibray District, Tashkent",
                     "ru": "г. Ташкент, Кибрайский район, Янги Авлод, 154",
-                    "uz": "Toshkent, Qibray tumani, Yangi Avlod, 154"
+                    "uz": "Toshkent, Qibray tumani, Yangi Avlod, 154",
+                    "en": "154 Yangi Avlod, Kibray District, Tashkent"
                 },
                 "director_name": "Д.У.Сарикова",
                 "bank_accounts": [
@@ -700,9 +700,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ADVANTOUR LLC",
                     "ru": "ООО «ADVANTOUR»",
-                    "uz": "\"ADVANTOUR\" MChJ"
+                    "uz": "\"ADVANTOUR\" MChJ",
+                    "en": "ADVANTOUR LLC"
                 },
                 "inn": "204702676",
                 "type": "legal",
@@ -710,9 +710,9 @@
                 "phone": "+99878 150 30 20",
                 "email": "info@advantour.com",
                 "address": {
-                    "en": "43 Mirobod Street, 1, Yakkasaray District, Tashkent",
                     "ru": "г. Ташкент, Яккасарайский район, ул. Миробод, 1 дом 43",
-                    "uz": "Toshkent, Yakkasaroy tumani, Mirobod koʻchasi, 1-uy 43"
+                    "uz": "Toshkent, Yakkasaroy tumani, Mirobod koʻchasi, 1-uy 43",
+                    "en": "43 Mirobod Street, 1, Yakkasaray District, Tashkent"
                 },
                 "director_name": "Ф.О. Назарова",
                 "bank_accounts": [
@@ -751,9 +751,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "OLIMPIK TURSERVIS LLC",
                     "ru": "ООО «OLIMPIK TURSERVIS»",
-                    "uz": "\"OLIMPIK TURSERVIS\" MChJ"
+                    "uz": "\"OLIMPIK TURSERVIS\" MChJ",
+                    "en": "OLIMPIK TURSERVIS LLC"
                 },
                 "inn": "204511749",
                 "type": "legal",
@@ -761,9 +761,9 @@
                 "phone": "(998 78) 120-63-00; (998 78) 120-64-00; +998977470630",
                 "email": "info@olympic-ts.com",
                 "address": {
-                    "en": "51A S. Azimov Street, Tashkent",
                     "ru": "г. Ташкент, ул. С. Азимова, 51А",
-                    "uz": "Toshkent, S. Azimov koʻchasi, 51A"
+                    "uz": "Toshkent, S. Azimov koʻchasi, 51A",
+                    "en": "51A S. Azimov Street, Tashkent"
                 },
                 "director_name": "В.В. Сильченко",
                 "bank_accounts": [
@@ -802,9 +802,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZAMIN DMC LLC",
                     "ru": "ООО «ZAMIN DMC»",
-                    "uz": "\"ZAMIN DMC\" MChJ"
+                    "uz": "\"ZAMIN DMC\" MChJ",
+                    "en": "ZAMIN DMC LLC"
                 },
                 "inn": "311343097",
                 "type": "legal",
@@ -812,9 +812,9 @@
                 "phone": "+998 99 575 50 50; +99899 5750550",
                 "email": "info@zamindmc.uz",
                 "address": {
-                    "en": "22 A. Temur Street, Mirabad District, Tashkent",
                     "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
-                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22",
+                    "en": "22 A. Temur Street, Mirabad District, Tashkent"
                 },
                 "director_name": "Ходжаев Т.А.",
                 "bank_accounts": [
@@ -877,9 +877,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "EL MUNDO TOUR LLC",
                     "ru": "ООО «EL MUNDO TOUR»",
-                    "uz": "\"EL MUNDO TOUR\" MChJ"
+                    "uz": "\"EL MUNDO TOUR\" MChJ",
+                    "en": "EL MUNDO TOUR LLC"
                 },
                 "inn": "206752534",
                 "type": "legal",
@@ -887,9 +887,9 @@
                 "phone": "97 707 32 82",
                 "email": null,
                 "address": {
-                    "en": "4 Chorsu, Apartment 117, Shaykhantakhur District, Tashkent",
                     "ru": "г. Ташкент, Шайхантахурский район, край Чорсу, дом 4, квартира 117",
-                    "uz": "Toshkent, Shayxontohur tumani, Chorsu chekkasi, 4-uy, 117-xonadon"
+                    "uz": "Toshkent, Shayxontohur tumani, Chorsu chekkasi, 4-uy, 117-xonadon",
+                    "en": "4 Chorsu, Apartment 117, Shaykhantakhur District, Tashkent"
                 },
                 "director_name": "Хаитов Т.Ю",
                 "bank_accounts": [
@@ -928,9 +928,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT STAR GROUP LLC",
                     "ru": "ООО «ORIENT STAR GROUP»",
-                    "uz": "\"ORIENT STAR GROUP\" MChJ"
+                    "uz": "\"ORIENT STAR GROUP\" MChJ",
+                    "en": "ORIENT STAR GROUP LLC"
                 },
                 "inn": "303722254",
                 "type": "legal",
@@ -938,9 +938,9 @@
                 "phone": "+99897-722-22-26; +998974441555",
                 "email": "welcome@orientstar.uz",
                 "address": {
-                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
                     "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
-                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6",
+                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011"
                 },
                 "director_name": "С. Х. Бегматов",
                 "bank_accounts": [
@@ -995,9 +995,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "CAUCASSIA TRAVEL LLC",
                     "ru": "ООО «CAUCASSIA TRAVEL»",
-                    "uz": "\"CAUCASSIA TRAVEL\" MChJ"
+                    "uz": "\"CAUCASSIA TRAVEL\" MChJ",
+                    "en": "CAUCASSIA TRAVEL LLC"
                 },
                 "inn": "310711881",
                 "type": "legal",
@@ -1005,9 +1005,9 @@
                 "phone": "+998 94 540 53 54",
                 "email": null,
                 "address": {
-                    "en": "36 Gagarin Street, Orzu MFY, Samarkand",
                     "ru": "Самарканд шахар, Орзу МФЙ, Гагарина кучаси, 36-уй",
-                    "uz": "Samarqand shahar, Orzu MFY, Gagarin koʻchasi, 36-uy"
+                    "uz": "Samarqand shahar, Orzu MFY, Gagarin koʻchasi, 36-uy",
+                    "en": "36 Gagarin Street, Orzu MFY, Samarkand"
                 },
                 "director_name": "В. Анохин",
                 "bank_accounts": [
@@ -1046,9 +1046,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZAMIN DMC LLC",
                     "ru": "ООО «ZAMIN DMC»",
-                    "uz": "\"ZAMIN DMC\" MChJ"
+                    "uz": "\"ZAMIN DMC\" MChJ",
+                    "en": "ZAMIN DMC LLC"
                 },
                 "inn": "311343097",
                 "type": "legal",
@@ -1056,9 +1056,9 @@
                 "phone": "+998 99 575 50 50; +99899 5750550",
                 "email": "info@zamindmc.uz",
                 "address": {
-                    "en": "22 A. Temur Street, Mirabad District, Tashkent",
                     "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
-                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22",
+                    "en": "22 A. Temur Street, Mirabad District, Tashkent"
                 },
                 "director_name": "Ходжаев Т.А.",
                 "bank_accounts": [
@@ -1121,9 +1121,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "UZTUR INVESTMENT AND DEVELOPMENT LLC",
                     "ru": "ИП ООО «UZTUR INVESTMENT AND DEVELOPMENT»",
-                    "uz": "\"UZTUR INVESTMENT AND DEVELOPMENT\" IP MChJ"
+                    "uz": "\"UZTUR INVESTMENT AND DEVELOPMENT\" IP MChJ",
+                    "en": "UZTUR INVESTMENT AND DEVELOPMENT LLC"
                 },
                 "inn": "306777698",
                 "type": "legal",
@@ -1131,9 +1131,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "24A A. Kodiriy Street, Yunusabad District, Tashkent, Republic of Uzbekistan",
                     "ru": "Республика Узбекистан, г. Ташкент, Юнусабадский р-он, ул. А. Кодирий, 24А",
-                    "uz": "Oʻzbekiston Respublikasi, Toshkent shahri, Yunusobod tumani, A. Qodiriy koʻchasi, 24A"
+                    "uz": "Oʻzbekiston Respublikasi, Toshkent shahri, Yunusobod tumani, A. Qodiriy koʻchasi, 24A",
+                    "en": "24A A. Kodiriy Street, Yunusabad District, Tashkent, Republic of Uzbekistan"
                 },
                 "director_name": "Эрик Сейлер",
                 "bank_accounts": [
@@ -1172,9 +1172,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT STAR GROUP LLC",
                     "ru": "ООО «ORIENT STAR GROUP»",
-                    "uz": "\"ORIENT STAR GROUP\" MChJ"
+                    "uz": "\"ORIENT STAR GROUP\" MChJ",
+                    "en": "ORIENT STAR GROUP LLC"
                 },
                 "inn": "303722254",
                 "type": "legal",
@@ -1182,9 +1182,9 @@
                 "phone": "+99897-722-22-26; +998974441555",
                 "email": "welcome@orientstar.uz",
                 "address": {
-                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
                     "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
-                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6",
+                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011"
                 },
                 "director_name": "С. Х. Бегматов",
                 "bank_accounts": [
@@ -1239,9 +1239,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SunRoad LLC",
                     "ru": "ООО «SunRoad»",
-                    "uz": "\"SunRoad\" MChJ"
+                    "uz": "\"SunRoad\" MChJ",
+                    "en": "SunRoad LLC"
                 },
                 "inn": "311534832",
                 "type": "legal",
@@ -1249,9 +1249,9 @@
                 "phone": "909228549",
                 "email": null,
                 "address": {
-                    "en": "26, 2nd Passage, Pakhlavon Makhmud Street, Tashkent, 100070",
                     "ru": "100070, г. Ташкент, ул. Пахлавон Махмуд, 2 проезд 26",
-                    "uz": "100070, Toshkent, Paxlavon Mahmud koʻchasi, 2-tor koʻchasi 26"
+                    "uz": "100070, Toshkent, Paxlavon Mahmud koʻchasi, 2-tor koʻchasi 26",
+                    "en": "26, 2nd Passage, Pakhlavon Makhmud Street, Tashkent, 100070"
                 },
                 "director_name": "Г. Исакова",
                 "bank_accounts": [
@@ -1290,9 +1290,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Another Travel LLC",
                     "ru": "ООО «Another Travel»",
-                    "uz": "\"Another Travel\" MChJ"
+                    "uz": "\"Another Travel\" MChJ",
+                    "en": "Another Travel LLC"
                 },
                 "inn": "309484364",
                 "type": "legal",
@@ -1300,9 +1300,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "14 Zulfiyaxonim Street, Labzak MFY, Shaykhantakhur District, Tashkent",
                     "ru": "г. Ташкент, Шайхантахурский район, ул. Зулфияхоним, Лабзак МСГ, 14-дом",
-                    "uz": "Toshkent, Shayxontohur tumani, Zulfiyaxonim koʻchasi, Labzak MFY, 14-uy"
+                    "uz": "Toshkent, Shayxontohur tumani, Zulfiyaxonim koʻchasi, Labzak MFY, 14-uy",
+                    "en": "14 Zulfiyaxonim Street, Labzak MFY, Shaykhantakhur District, Tashkent"
                 },
                 "director_name": "М. Тагаева",
                 "bank_accounts": [
@@ -1341,9 +1341,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "UZBEKISTAN AIRWAYS JSC",
                     "ru": "АО «UZBEKISTAN AIRWAYS»",
-                    "uz": "«UZBEKISTAN AIRWAYS» AJ"
+                    "uz": "«UZBEKISTAN AIRWAYS» AJ",
+                    "en": "UZBEKISTAN AIRWAYS JSC"
                 },
                 "inn": "306628114",
                 "type": "legal",
@@ -1351,9 +1351,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
                     "ru": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
-                    "uz": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,"
+                    "uz": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
+                    "en": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,"
                 },
                 "director_name": "У.А. Хусанов",
                 "bank_accounts": [
@@ -1400,9 +1400,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "East Asia Point JV",
                     "ru": "СП «East Asia Point»",
-                    "uz": "\"East Asia Point\" QK"
+                    "uz": "\"East Asia Point\" QK",
+                    "en": "East Asia Point JV"
                 },
                 "inn": "207160718",
                 "type": "legal",
@@ -1410,9 +1410,9 @@
                 "phone": "+998977207752",
                 "email": null,
                 "address": {
-                    "en": "25 Binokor Street, Tashkent",
                     "ru": "г. Ташкент, ул. Бинокор, дом 25",
-                    "uz": "Toshkent, Binokor koʻchasi, 25"
+                    "uz": "Toshkent, Binokor koʻchasi, 25",
+                    "en": "25 Binokor Street, Tashkent"
                 },
                 "director_name": "Расулев Б.Б.",
                 "bank_accounts": [
@@ -1459,9 +1459,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ANUR TOUR LLC",
                     "ru": "ООО «ANUR TOUR»",
-                    "uz": "\"ANUR TOUR\" MChJ"
+                    "uz": "\"ANUR TOUR\" MChJ",
+                    "en": "ANUR TOUR LLC"
                 },
                 "inn": "202232646",
                 "type": "legal",
@@ -1469,9 +1469,9 @@
                 "phone": "+99855 501 22 60; +99871 2302260",
                 "email": "info@anurtour.com",
                 "address": {
-                    "en": "C-5, 65, Apartment 185, Tashkent, 100017",
                     "ru": "г. Ташкент, Ц-5, дом-65, кв-185, 100017",
-                    "uz": "Toshkent, C-5, 65-uy, 185-xonadon, 100017"
+                    "uz": "Toshkent, C-5, 65-uy, 185-xonadon, 100017",
+                    "en": "C-5, 65, Apartment 185, Tashkent, 100017"
                 },
                 "director_name": "М.К. Раубаев",
                 "bank_accounts": [
@@ -1510,9 +1510,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "KARAVAN TRAVEL LLC",
                     "ru": "ООО «KARAVAN TRAVEL»",
-                    "uz": "\"KARAVAN TRAVEL\" MChJ"
+                    "uz": "\"KARAVAN TRAVEL\" MChJ",
+                    "en": "KARAVAN TRAVEL LLC"
                 },
                 "inn": "300832523",
                 "type": "legal",
@@ -1520,9 +1520,9 @@
                 "phone": "+998 97 910 13 87; +998 97 288 44 00",
                 "email": "jahongir.kt@gmail.com",
                 "address": {
-                    "en": "72 M. Koshgariy Street, Samarkand, 140100",
                     "ru": "Улица М. Кошгарий 72, Самарканд, 140100",
-                    "uz": "M. Koshgariy koʻchasi 72, Samarqand, 140100"
+                    "uz": "M. Koshgariy koʻchasi 72, Samarqand, 140100",
+                    "en": "72 M. Koshgariy Street, Samarkand, 140100"
                 },
                 "director_name": "Ж.Х. Санакулов",
                 "bank_accounts": [
@@ -1561,9 +1561,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "MEGA TOUR LLC",
                     "ru": "ООО «MEGA TOUR»",
-                    "uz": "\"MEGA TOUR\" MChJ"
+                    "uz": "\"MEGA TOUR\" MChJ",
+                    "en": "MEGA TOUR LLC"
                 },
                 "inn": "205886850",
                 "type": "legal",
@@ -1571,9 +1571,9 @@
                 "phone": "+99890-185-33-33",
                 "email": "megatour@mail.com",
                 "address": {
-                    "en": "235 A Buyuk Ipak Yoli Street, Tashkent",
                     "ru": "г. Ташкент, ул. Буюк Ипак Йули, 235 А",
-                    "uz": "Toshkent, Buyuk Ipak Yoʻli koʻchasi, 235 A"
+                    "uz": "Toshkent, Buyuk Ipak Yoʻli koʻchasi, 235 A",
+                    "en": "235 A Buyuk Ipak Yoli Street, Tashkent"
                 },
                 "director_name": "А.В. Хабарова",
                 "bank_accounts": [
@@ -1612,9 +1612,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SACRED EAST TRAVEL LLC",
                     "ru": "ООО «SACRED EAST TRAVEL»",
-                    "uz": "\"SACRED EAST TRAVEL\" MChJ"
+                    "uz": "\"SACRED EAST TRAVEL\" MChJ",
+                    "en": "SACRED EAST TRAVEL LLC"
                 },
                 "inn": "308308202",
                 "type": "legal",
@@ -1622,9 +1622,9 @@
                 "phone": "+998 906550500",
                 "email": "info@sacredeasttravel.com",
                 "address": {
-                    "en": "3 Pushkin Street, Samarkand",
                     "ru": "г. Самарканд, ул. Пушкина 3",
-                    "uz": "Samarqand, Pushkin koʻchasi 3"
+                    "uz": "Samarqand, Pushkin koʻchasi 3",
+                    "en": "3 Pushkin Street, Samarkand"
                 },
                 "director_name": "Н.У.Садыкова",
                 "bank_accounts": [
@@ -1663,9 +1663,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT STAR GROUP LLC",
                     "ru": "ООО «ORIENT STAR GROUP»",
-                    "uz": "\"ORIENT STAR GROUP\" MChJ"
+                    "uz": "\"ORIENT STAR GROUP\" MChJ",
+                    "en": "ORIENT STAR GROUP LLC"
                 },
                 "inn": "303722254",
                 "type": "legal",
@@ -1673,9 +1673,9 @@
                 "phone": "+99897-722-22-26; +998974441555",
                 "email": "welcome@orientstar.uz",
                 "address": {
-                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
                     "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
-                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6",
+                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011"
                 },
                 "director_name": "С. Х. Бегматов",
                 "bank_accounts": [
@@ -1730,9 +1730,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Uktamxon Tour LLC",
                     "ru": "ООО «Uktamxon Tour»",
-                    "uz": "\"Uktamxon Tour\" MChJ"
+                    "uz": "\"Uktamxon Tour\" MChJ",
+                    "en": "Uktamxon Tour LLC"
                 },
                 "inn": "310148514",
                 "type": "legal",
@@ -1740,9 +1740,9 @@
                 "phone": "(97) 577 07 57",
                 "email": "uktamxontour01@gmail.com",
                 "address": {
-                    "en": "31 Mirzo Ulugbek Street, Samarkand",
                     "ru": "г. Самарканд, ул. Мирзо Улугбек-31",
-                    "uz": "Samarqand, Mirzo Ulugʻbek koʻchasi 31"
+                    "uz": "Samarqand, Mirzo Ulugʻbek koʻchasi 31",
+                    "en": "31 Mirzo Ulugbek Street, Samarkand"
                 },
                 "director_name": "Махсудов М.У.",
                 "bank_accounts": [
@@ -1781,9 +1781,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Selfie Travel LLC",
                     "ru": "ООО «Selfie Travel»",
-                    "uz": "\"Selfie Travel\" MChJ"
+                    "uz": "\"Selfie Travel\" MChJ",
+                    "en": "Selfie Travel LLC"
                 },
                 "inn": "305299709",
                 "type": "legal",
@@ -1791,9 +1791,9 @@
                 "phone": "+998910185141",
                 "email": "inc@selfietravel.uzb",
                 "address": {
-                    "en": "7/71 Sebzor Street, Shaykhantakhur District, Tashkent",
                     "ru": "г. Ташкент, Шайхантахурский р-н, ул. Себзор 7/71",
-                    "uz": "Toshkent, Shayxontohur tumani, Sebzor koʻchasi 7/71"
+                    "uz": "Toshkent, Shayxontohur tumani, Sebzor koʻchasi 7/71",
+                    "en": "7/71 Sebzor Street, Shaykhantakhur District, Tashkent"
                 },
                 "director_name": "Р.М.Мухрумбаев",
                 "bank_accounts": [
@@ -1832,9 +1832,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "CENTRAL ASIA TRAVEL LLC",
                     "ru": "ООО «CENTRAL ASIA TRAVEL»",
-                    "uz": "\"CENTRAL ASIA TRAVEL\" MChJ"
+                    "uz": "\"CENTRAL ASIA TRAVEL\" MChJ",
+                    "en": "CENTRAL ASIA TRAVEL LLC"
                 },
                 "inn": "206976184",
                 "type": "legal",
@@ -1842,9 +1842,9 @@
                 "phone": "71 20002 99; +99871 2525008; +998 71 252 50 07",
                 "email": "info@centralasia-travel.com",
                 "address": {
-                    "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan",
                     "ru": "Улица Ойбек 40, офис 3, Ташкент, Узбекистан",
-                    "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston"
+                    "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston",
+                    "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan"
                 },
                 "director_name": "Н.А. Сербин",
                 "bank_accounts": [
@@ -1883,9 +1883,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "EMERALD TRAVEL PE",
                     "ru": "ЧП «EMERALD TRAVEL»",
-                    "uz": "\"EMERALD TRAVEL\" XK"
+                    "uz": "\"EMERALD TRAVEL\" XK",
+                    "en": "EMERALD TRAVEL PE"
                 },
                 "inn": "206228464",
                 "type": "legal",
@@ -1893,9 +1893,9 @@
                 "phone": "998905120123",
                 "email": "info@emerald.uz",
                 "address": {
-                    "en": "91 M. Anbar Street, Bukhara, 200118",
                     "ru": "Бухара, улица М. Анбара, дом 91, индекс 200118",
-                    "uz": "Buxoro, M. Anbar koʻchasi, 91-uy, 200118"
+                    "uz": "Buxoro, M. Anbar koʻchasi, 91-uy, 200118",
+                    "en": "91 M. Anbar Street, Bukhara, 200118"
                 },
                 "director_name": "Н. Ботирова",
                 "bank_accounts": [
@@ -1934,9 +1934,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "CENTRAL ASIA TRAVEL LLC",
                     "ru": "ООО «CENTRAL ASIA TRAVEL»",
-                    "uz": "\"CENTRAL ASIA TRAVEL\" MChJ"
+                    "uz": "\"CENTRAL ASIA TRAVEL\" MChJ",
+                    "en": "CENTRAL ASIA TRAVEL LLC"
                 },
                 "inn": "206976184",
                 "type": "legal",
@@ -1944,9 +1944,9 @@
                 "phone": "71 20002 99; +99871 2525008; +998 71 252 50 07",
                 "email": "info@centralasia-travel.com",
                 "address": {
-                    "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan",
                     "ru": "Улица Ойбек 40, офис 3, Ташкент, Узбекистан",
-                    "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston"
+                    "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston",
+                    "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan"
                 },
                 "director_name": "Н.А. Сербин",
                 "bank_accounts": [
@@ -1985,9 +1985,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SEZAM TRAVEL LLC",
                     "ru": "ООО «SEZAM TRAVEL»",
-                    "uz": "\"SEZAM TRAVEL\" MChJ"
+                    "uz": "\"SEZAM TRAVEL\" MChJ",
+                    "en": "SEZAM TRAVEL LLC"
                 },
                 "inn": "301755974",
                 "type": "legal",
@@ -1995,9 +1995,9 @@
                 "phone": "+99871 271 2267",
                 "email": "sales@sezamtravel.com",
                 "address": {
-                    "en": "44/1 Chilanzar Street, Tashkent",
                     "ru": "44/1, ул. Чиланзарская, г. Ташкент",
-                    "uz": "44/1, Chilonzor koʻchasi, Toshkent"
+                    "uz": "44/1, Chilonzor koʻchasi, Toshkent",
+                    "en": "44/1 Chilanzar Street, Tashkent"
                 },
                 "director_name": "Сабитова К.А.",
                 "bank_accounts": [
@@ -2036,9 +2036,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "JALOL QUDUQ AVIA TRANS PE",
                     "ru": "ЧП «JALOL QUDUQ AVIA TRANS»",
-                    "uz": "\"JALOL QUDUQ AVIA TRANS\" XK"
+                    "uz": "\"JALOL QUDUQ AVIA TRANS\" XK",
+                    "en": "JALOL QUDUQ AVIA TRANS PE"
                 },
                 "inn": "302076552",
                 "type": "legal",
@@ -2046,9 +2046,9 @@
                 "phone": "+9989117305001",
                 "email": "SAIDA9717@MAIL.RU",
                 "address": {
-                    "en": "Namuna Mahalla, Okhunboboyev, Jalolquduq District, Jizzakh Region",
                     "ru": "Джизакская область, Жалолкудукский район, г. Охунбобоев, махалля Намуна",
-                    "uz": "Jizzax viloyati, Jalolquduq tumani, Oxunboboyev shahri, Namuna mahallasi"
+                    "uz": "Jizzax viloyati, Jalolquduq tumani, Oxunboboyev shahri, Namuna mahallasi",
+                    "en": "Namuna Mahalla, Okhunboboyev, Jalolquduq District, Jizzakh Region"
                 },
                 "director_name": "АХМЕДОВА САИДА",
                 "bank_accounts": [
@@ -2087,9 +2087,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "PEOPLETRAVEL LLC",
                     "ru": "ООО «PEOPLETRAVEL»",
-                    "uz": "\"PEOPLETRAVEL\" MChJ"
+                    "uz": "\"PEOPLETRAVEL\" MChJ",
+                    "en": "PEOPLETRAVEL LLC"
                 },
                 "inn": "207071194",
                 "type": "legal",
@@ -2097,9 +2097,9 @@
                 "phone": "+998 71 232 23 33",
                 "email": "info@peopletravel.uz",
                 "address": {
-                    "en": "47/1 M. Keuja Street, Tashkent",
                     "ru": "г. Ташкент, ул. М. Кеужа, 47/1",
-                    "uz": "Toshkent, M. Keuja koʻchasi, 47/1"
+                    "uz": "Toshkent, M. Keuja koʻchasi, 47/1",
+                    "en": "47/1 M. Keuja Street, Tashkent"
                 },
                 "director_name": "Султанов У.А.",
                 "bank_accounts": [
@@ -2138,9 +2138,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Antique Travel Experts JV",
                     "ru": "СП «Antique Travel Experts»",
-                    "uz": "\"Antique Travel Experts\" QK"
+                    "uz": "\"Antique Travel Experts\" QK",
+                    "en": "Antique Travel Experts JV"
                 },
                 "inn": "310149060",
                 "type": "legal",
@@ -2148,9 +2148,9 @@
                 "phone": "+997977255255",
                 "email": "info@antique-travel.com",
                 "address": {
-                    "en": "9/1 K. Murtazoyev Street, Apartment 6, Bukhara",
                     "ru": "г. Бухара, ул. К. Муртазоева, 9/1, 6-хонадон",
-                    "uz": "Buxoro, Q. Murtazoyev koʻchasi 9/1, 6-xonadon"
+                    "uz": "Buxoro, Q. Murtazoyev koʻchasi 9/1, 6-xonadon",
+                    "en": "9/1 K. Murtazoyev Street, Apartment 6, Bukhara"
                 },
                 "director_name": "Б.Р.Ражабов",
                 "bank_accounts": [
@@ -2189,9 +2189,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Dolores Travel Services JV LLC",
                     "ru": "СП ООО «Dolores Travel Services»",
-                    "uz": "\"Dolores Travel Services\" QK MChJ"
+                    "uz": "\"Dolores Travel Services\" QK MChJ",
+                    "en": "Dolores Travel Services JV LLC"
                 },
                 "inn": "205424619",
                 "type": "legal",
@@ -2199,9 +2199,9 @@
                 "phone": "(99871) 1208883; +99855 515-88-83; (99875) 5158883; (99878) 1208883; (998 78) 1208873",
                 "email": "info@dolores.uz",
                 "address": {
-                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent",
                     "ru": "104 А, ул. Кичик Бешагач, Яккасарайский р-он, г. Ташкент",
-                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent"
+                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent",
+                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent"
                 },
                 "director_name": "Байзакова Ш.Б.",
                 "bank_accounts": [
@@ -2240,9 +2240,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "MEGA TOUR LLC",
                     "ru": "ООО «MEGA TOUR»",
-                    "uz": "\"MEGA TOUR\" MChJ"
+                    "uz": "\"MEGA TOUR\" MChJ",
+                    "en": "MEGA TOUR LLC"
                 },
                 "inn": "205886850",
                 "type": "legal",
@@ -2250,9 +2250,9 @@
                 "phone": "+99890-185-33-33",
                 "email": "megatour@mail.com",
                 "address": {
-                    "en": "235 A Buyuk Ipak Yoli Street, Tashkent",
                     "ru": "г. Ташкент, ул. Буюк Ипак Йули, 235 А",
-                    "uz": "Toshkent, Buyuk Ipak Yoʻli koʻchasi, 235 A"
+                    "uz": "Toshkent, Buyuk Ipak Yoʻli koʻchasi, 235 A",
+                    "en": "235 A Buyuk Ipak Yoli Street, Tashkent"
                 },
                 "director_name": "А.В. Хабарова",
                 "bank_accounts": [
@@ -2291,9 +2291,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "IMRAN-TOURS LLC",
                     "ru": "ООО «IMRAN-TOURS»",
-                    "uz": "\"IMRAN-TOURS\" MChJ"
+                    "uz": "\"IMRAN-TOURS\" MChJ",
+                    "en": "IMRAN-TOURS LLC"
                 },
                 "inn": "309963464",
                 "type": "legal",
@@ -2301,9 +2301,9 @@
                 "phone": "+998977376060; +99897 548 33 33",
                 "email": "assalom.tour@mail.ru",
                 "address": {
-                    "en": "2 Kichik Xalqa Yoli Street, Apartment 2, Tashkent",
                     "ru": "г. Ташкент, Кичик Халка Йули, 2-уй, 2-хонадон",
-                    "uz": "Toshkent, Kichik Xalqa Yoʻli, 2-uy, 2-xonadon"
+                    "uz": "Toshkent, Kichik Xalqa Yoʻli, 2-uy, 2-xonadon",
+                    "en": "2 Kichik Xalqa Yoli Street, Apartment 2, Tashkent"
                 },
                 "director_name": "Дадаходжаев.С.Ф",
                 "bank_accounts": [
@@ -2342,9 +2342,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Geo Tour Service LLC",
                     "ru": "ООО «Geo Tour Service»",
-                    "uz": "\"Geo Tour Service\" MChJ"
+                    "uz": "\"Geo Tour Service\" MChJ",
+                    "en": "Geo Tour Service LLC"
                 },
                 "inn": "303906847",
                 "type": "legal",
@@ -2352,9 +2352,9 @@
                 "phone": "+998 71 288 44 48; +998 99 575 5050; +99890 9600150; +99899 7610150",
                 "email": "info@orientmice.com",
                 "address": {
-                    "en": "9 Mavze, 12, Apartment 1, Chilanzar District, Tashkent",
                     "ru": "г. Ташкент, Чиланзарский район, 9 квартал, дом 12, квартира 1",
-                    "uz": "Toshkent, Chilonzor tumani, 9-mavze, 12-uy, 1-xonadon"
+                    "uz": "Toshkent, Chilonzor tumani, 9-mavze, 12-uy, 1-xonadon",
+                    "en": "9 Mavze, 12, Apartment 1, Chilanzar District, Tashkent"
                 },
                 "director_name": "Ш. Пардаев",
                 "bank_accounts": [
@@ -2393,9 +2393,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT STAR GROUP LLC",
                     "ru": "ООО «ORIENT STAR GROUP»",
-                    "uz": "\"ORIENT STAR GROUP\" MChJ"
+                    "uz": "\"ORIENT STAR GROUP\" MChJ",
+                    "en": "ORIENT STAR GROUP LLC"
                 },
                 "inn": "303722254",
                 "type": "legal",
@@ -2403,9 +2403,9 @@
                 "phone": "+99897-722-22-26; +998974441555",
                 "email": "welcome@orientstar.uz",
                 "address": {
-                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
                     "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
-                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6",
+                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011"
                 },
                 "director_name": "С. Х. Бегматов",
                 "bank_accounts": [
@@ -2460,9 +2460,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Rocket DMC Registan LLC",
                     "ru": "ООО «Rocket DMC Registan»",
-                    "uz": "\"Rocket DMC Registan\" MChJ"
+                    "uz": "\"Rocket DMC Registan\" MChJ",
+                    "en": "Rocket DMC Registan LLC"
                 },
                 "inn": "310367653",
                 "type": "legal",
@@ -2470,9 +2470,9 @@
                 "phone": "90 809 26 01; +998 90 512 24 78",
                 "email": "rocketuz.all@rocketdmc.com",
                 "address": {
-                    "en": "Samarkand, Kunigil",
                     "ru": "Самарканд, Кунигил",
-                    "uz": "Samarqand, Kunigil"
+                    "uz": "Samarqand, Kunigil",
+                    "en": "Samarkand, Kunigil"
                 },
                 "director_name": "Н.М Мухтарова",
                 "bank_accounts": [
@@ -2511,9 +2511,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZAMIN DMC LLC",
                     "ru": "ООО «ZAMIN DMC»",
-                    "uz": "\"ZAMIN DMC\" MChJ"
+                    "uz": "\"ZAMIN DMC\" MChJ",
+                    "en": "ZAMIN DMC LLC"
                 },
                 "inn": "311343097",
                 "type": "legal",
@@ -2521,9 +2521,9 @@
                 "phone": "+998 99 575 50 50; +99899 5750550",
                 "email": "info@zamindmc.uz",
                 "address": {
-                    "en": "22 A. Temur Street, Mirabad District, Tashkent",
                     "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
-                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22",
+                    "en": "22 A. Temur Street, Mirabad District, Tashkent"
                 },
                 "director_name": "Ходжаев Т.А.",
                 "bank_accounts": [
@@ -2586,9 +2586,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SITARA INTERNATIONAL LTD LLC",
                     "ru": "ИП ООО «SITARA INTERNATIONAL LTD»",
-                    "uz": "\"SITARA INTERNATIONAL LTD\" IP MChJ"
+                    "uz": "\"SITARA INTERNATIONAL LTD\" IP MChJ",
+                    "en": "SITARA INTERNATIONAL LTD LLC"
                 },
                 "inn": "201904269",
                 "type": "legal",
@@ -2596,9 +2596,9 @@
                 "phone": "+99871 2814148; (+99871) 255-35-04",
                 "email": "tashkent@sitara.com",
                 "address": {
-                    "en": "45 Shota Rustaveli Street, Tashkent, 100100",
                     "ru": "100100 г. Ташкент, ул. Шота Руставели, 45",
-                    "uz": "100100 Toshkent, Shota Rustaveli koʻchasi, 45"
+                    "uz": "100100 Toshkent, Shota Rustaveli koʻchasi, 45",
+                    "en": "45 Shota Rustaveli Street, Tashkent, 100100"
                 },
                 "director_name": "Н.Б. Сангилова",
                 "bank_accounts": [
@@ -2637,9 +2637,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ANUR TOUR LLC",
                     "ru": "ООО «ANUR TOUR»",
-                    "uz": "\"ANUR TOUR\" MChJ"
+                    "uz": "\"ANUR TOUR\" MChJ",
+                    "en": "ANUR TOUR LLC"
                 },
                 "inn": "202232646",
                 "type": "legal",
@@ -2647,9 +2647,9 @@
                 "phone": "+99855 501 22 60; +99871 2302260",
                 "email": "info@anurtour.com",
                 "address": {
-                    "en": "C-5, 65, Apartment 185, Tashkent, 100017",
                     "ru": "г. Ташкент, Ц-5, дом-65, кв-185, 100017",
-                    "uz": "Toshkent, C-5, 65-uy, 185-xonadon, 100017"
+                    "uz": "Toshkent, C-5, 65-uy, 185-xonadon, 100017",
+                    "en": "C-5, 65, Apartment 185, Tashkent, 100017"
                 },
                 "director_name": "М.К. Раубаев",
                 "bank_accounts": [
@@ -2688,9 +2688,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "OLIMPIK TURSERVIS LLC",
                     "ru": "ООО «OLIMPIK TURSERVIS»",
-                    "uz": "\"OLIMPIK TURSERVIS\" MChJ"
+                    "uz": "\"OLIMPIK TURSERVIS\" MChJ",
+                    "en": "OLIMPIK TURSERVIS LLC"
                 },
                 "inn": "204511749",
                 "type": "legal",
@@ -2698,9 +2698,9 @@
                 "phone": "(998 78) 120-63-00; (998 78) 120-64-00; +998977470630",
                 "email": "info@olympic-ts.com",
                 "address": {
-                    "en": "51A S. Azimov Street, Tashkent",
                     "ru": "г. Ташкент, ул. С. Азимова, 51А",
-                    "uz": "Toshkent, S. Azimov koʻchasi, 51A"
+                    "uz": "Toshkent, S. Azimov koʻchasi, 51A",
+                    "en": "51A S. Azimov Street, Tashkent"
                 },
                 "director_name": "В.В. Сильченко",
                 "bank_accounts": [
@@ -2739,9 +2739,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Selfie Travel LLC",
                     "ru": "ООО «Selfie Travel»",
-                    "uz": "\"Selfie Travel\" MChJ"
+                    "uz": "\"Selfie Travel\" MChJ",
+                    "en": "Selfie Travel LLC"
                 },
                 "inn": "305299709",
                 "type": "legal",
@@ -2749,9 +2749,9 @@
                 "phone": "+998910185141",
                 "email": "inc@selfietravel.uzb",
                 "address": {
-                    "en": "7/71 Sebzor Street, Shaykhantakhur District, Tashkent",
                     "ru": "г. Ташкент, Шайхантахурский р-н, ул. Себзор 7/71",
-                    "uz": "Toshkent, Shayxontohur tumani, Sebzor koʻchasi 7/71"
+                    "uz": "Toshkent, Shayxontohur tumani, Sebzor koʻchasi 7/71",
+                    "en": "7/71 Sebzor Street, Shaykhantakhur District, Tashkent"
                 },
                 "director_name": "Р.М.Мухрумбаев",
                 "bank_accounts": [
@@ -2790,9 +2790,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT STAR GROUP LLC",
                     "ru": "ООО «ORIENT STAR GROUP»",
-                    "uz": "\"ORIENT STAR GROUP\" MChJ"
+                    "uz": "\"ORIENT STAR GROUP\" MChJ",
+                    "en": "ORIENT STAR GROUP LLC"
                 },
                 "inn": "303722254",
                 "type": "legal",
@@ -2800,9 +2800,9 @@
                 "phone": "+99897-722-22-26; +998974441555",
                 "email": "welcome@orientstar.uz",
                 "address": {
-                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
                     "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
-                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6",
+                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011"
                 },
                 "director_name": "С. Х. Бегматов",
                 "bank_accounts": [
@@ -2857,9 +2857,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Rocket DMC Registan LLC",
                     "ru": "ООО «Rocket DMC Registan»",
-                    "uz": "\"Rocket DMC Registan\" MChJ"
+                    "uz": "\"Rocket DMC Registan\" MChJ",
+                    "en": "Rocket DMC Registan LLC"
                 },
                 "inn": "310367653",
                 "type": "legal",
@@ -2867,9 +2867,9 @@
                 "phone": "90 809 26 01; +998 90 512 24 78",
                 "email": "rocketuz.all@rocketdmc.com",
                 "address": {
-                    "en": "Samarkand, Kunigil",
                     "ru": "Самарканд, Кунигил",
-                    "uz": "Samarqand, Kunigil"
+                    "uz": "Samarqand, Kunigil",
+                    "en": "Samarkand, Kunigil"
                 },
                 "director_name": "Н.М Мухтарова",
                 "bank_accounts": [
@@ -2908,9 +2908,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "IZEL LLC",
                     "ru": "ООО «IZEL»",
-                    "uz": "«IZEL» MChJ"
+                    "uz": "«IZEL» MChJ",
+                    "en": "IZEL LLC"
                 },
                 "inn": "311884303",
                 "type": "legal",
@@ -2918,9 +2918,9 @@
                 "phone": "+998 94 092 55 44",
                 "email": "izelchina@gmail.com",
                 "address": {
-                    "en": "Тошкент вилояти.Янгиюл шахар Туркистон МФЙ, Регистон кучаси, 16-дом",
                     "ru": "Тошкент вилояти.Янгиюл шахар Туркистон МФЙ, Регистон кучаси, 16-дом",
-                    "uz": "Тошкент вилояти.Янгиюл шахар Туркистон МФЙ, Регистон кучаси, 16-дом"
+                    "uz": "Тошкент вилояти.Янгиюл шахар Туркистон МФЙ, Регистон кучаси, 16-дом",
+                    "en": "Тошкент вилояти.Янгиюл шахар Туркистон МФЙ, Регистон кучаси, 16-дом"
                 },
                 "director_name": "Е.А Умаралиев",
                 "bank_accounts": [
@@ -2959,9 +2959,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZIYARAH TRAVEL LLC",
                     "ru": "ООО «ZIYARAH TRAVEL»",
-                    "uz": "«ZIYARAH TRAVEL» MChJ"
+                    "uz": "«ZIYARAH TRAVEL» MChJ",
+                    "en": "ZIYARAH TRAVEL LLC"
                 },
                 "inn": "305282002",
                 "type": "legal",
@@ -2969,9 +2969,9 @@
                 "phone": "+998 97 182 82 00",
                 "email": "info@ziyarah-travel.uz",
                 "address": {
-                    "en": "Наманганская область, город Наманган, улица Машраб, Дом-5",
                     "ru": "Наманганская область, город Наманган, улица Машраб, Дом-5",
-                    "uz": "Наманганская область, город Наманган, улица Машраб, Дом-5"
+                    "uz": "Наманганская область, город Наманган, улица Машраб, Дом-5",
+                    "en": "Наманганская область, город Наманган, улица Машраб, Дом-5"
                 },
                 "director_name": null,
                 "bank_accounts": [
@@ -3010,9 +3010,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Antique Travel Experts JV",
                     "ru": "СП «Antique Travel Experts»",
-                    "uz": "\"Antique Travel Experts\" QK"
+                    "uz": "\"Antique Travel Experts\" QK",
+                    "en": "Antique Travel Experts JV"
                 },
                 "inn": "310149060",
                 "type": "legal",
@@ -3020,9 +3020,9 @@
                 "phone": "+997977255255",
                 "email": "info@antique-travel.com",
                 "address": {
-                    "en": "9/1 K. Murtazoyev Street, Apartment 6, Bukhara",
                     "ru": "г. Бухара, ул. К. Муртазоева, 9/1, 6-хонадон",
-                    "uz": "Buxoro, Q. Murtazoyev koʻchasi 9/1, 6-xonadon"
+                    "uz": "Buxoro, Q. Murtazoyev koʻchasi 9/1, 6-xonadon",
+                    "en": "9/1 K. Murtazoyev Street, Apartment 6, Bukhara"
                 },
                 "director_name": "Б.Р.Ражабов",
                 "bank_accounts": [
@@ -3061,9 +3061,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Beyond Expectations JV",
                     "ru": "СП «Beyond Expectations»",
-                    "uz": "\"Beyond Expectations\" QK"
+                    "uz": "\"Beyond Expectations\" QK",
+                    "en": "Beyond Expectations JV"
                 },
                 "inn": "304415856",
                 "type": "legal",
@@ -3071,9 +3071,9 @@
                 "phone": "+998 90 955 94 31",
                 "email": "beyondexpectations.uz@gmail.com",
                 "address": {
-                    "en": "Rakat 1-13, Yakkasaray District, Tashkent",
                     "ru": "г. Ташкент, Яккасарайский район, Ракат 1-13",
-                    "uz": "Toshkent shahri, Yakkasaroy tumani, Rakat 1-13"
+                    "uz": "Toshkent shahri, Yakkasaroy tumani, Rakat 1-13",
+                    "en": "Rakat 1-13, Yakkasaray District, Tashkent"
                 },
                 "director_name": "О.О. Хакимова",
                 "bank_accounts": [
@@ -3112,9 +3112,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Geo Tour Service LLC",
                     "ru": "ООО «Geo Tour Service»",
-                    "uz": "\"Geo Tour Service\" MChJ"
+                    "uz": "\"Geo Tour Service\" MChJ",
+                    "en": "Geo Tour Service LLC"
                 },
                 "inn": "303906847",
                 "type": "legal",
@@ -3122,9 +3122,9 @@
                 "phone": "+998 71 288 44 48; +998 99 575 5050; +99890 9600150; +99899 7610150",
                 "email": "info@orientmice.com",
                 "address": {
-                    "en": "9 Mavze, 12, Apartment 1, Chilanzar District, Tashkent",
                     "ru": "г. Ташкент, Чиланзарский район, 9 квартал, дом 12, квартира 1",
-                    "uz": "Toshkent, Chilonzor tumani, 9-mavze, 12-uy, 1-xonadon"
+                    "uz": "Toshkent, Chilonzor tumani, 9-mavze, 12-uy, 1-xonadon",
+                    "en": "9 Mavze, 12, Apartment 1, Chilanzar District, Tashkent"
                 },
                 "director_name": "Ш. Пардаев",
                 "bank_accounts": [
@@ -3163,9 +3163,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Sanat Travel Experts JV",
                     "ru": "СП «Sanat Travel Experts»",
-                    "uz": "\"Sanat Travel Experts\" QK"
+                    "uz": "\"Sanat Travel Experts\" QK",
+                    "en": "Sanat Travel Experts JV"
                 },
                 "inn": "305072628",
                 "type": "legal",
@@ -3173,9 +3173,9 @@
                 "phone": "+998 99 807 06 08",
                 "email": "timur@ste.uz",
                 "address": {
-                    "en": "2 Chatqol Street, Mirzo Ulugbek District, Tashkent, 100007",
                     "ru": "г. Ташкент, Мирзо-Улугбекский район, ул. Чаткол 2, индекс 100007",
-                    "uz": "Toshkent shahri, Mirzo Ulugʻbek tumani, Chatqol koʻchasi 2, 100007"
+                    "uz": "Toshkent shahri, Mirzo Ulugʻbek tumani, Chatqol koʻchasi 2, 100007",
+                    "en": "2 Chatqol Street, Mirzo Ulugbek District, Tashkent, 100007"
                 },
                 "director_name": "Ишмухаметов Тимур",
                 "bank_accounts": [
@@ -3214,9 +3214,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "BEYOND DMC LLC",
                     "ru": "ООО «BEYOND DMC»",
-                    "uz": "\"BEYOND DMC\" MChJ"
+                    "uz": "\"BEYOND DMC\" MChJ",
+                    "en": "BEYOND DMC LLC"
                 },
                 "inn": "311687587",
                 "type": "legal",
@@ -3224,9 +3224,9 @@
                 "phone": "+998 99 235 48 36; +998 94 092 11 75; 909062456",
                 "email": "info@beyond-dmc.com",
                 "address": {
-                    "en": "44A Bahodir Street, Rakatboshi Mahalla, Yakkasaray District, Tashkent, Republic of Uzbekistan",
                     "ru": "Республика Узбекистан, г. Ташкент, Яккасарайский район, МСГ «Ракатбоши», ул. Баходир, 44А",
-                    "uz": "Oʻzbekiston Respublikasi, Toshkent shahri, Yakkasaroy tumani, \"Rakatboshi\" MFY, Bahodir koʻchasi, 44A"
+                    "uz": "Oʻzbekiston Respublikasi, Toshkent shahri, Yakkasaroy tumani, \"Rakatboshi\" MFY, Bahodir koʻchasi, 44A",
+                    "en": "44A Bahodir Street, Rakatboshi Mahalla, Yakkasaray District, Tashkent, Republic of Uzbekistan"
                 },
                 "director_name": "Раджеш Кумар",
                 "bank_accounts": [
@@ -3265,9 +3265,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SkyWay DMC LLC",
                     "ru": "ООО «SkyWay DMC»",
-                    "uz": "«SkyWay DMC» MChJ"
+                    "uz": "«SkyWay DMC» MChJ",
+                    "en": "SkyWay DMC LLC"
                 },
                 "inn": "311092054",
                 "type": "legal",
@@ -3275,9 +3275,9 @@
                 "phone": "+998500767016",
                 "email": null,
                 "address": {
-                    "en": "Ташкент, Ул. Нукус 86/3",
                     "ru": "Ташкент, Ул. Нукус 86/3",
-                    "uz": "Ташкент, Ул. Нукус 86/3"
+                    "uz": "Ташкент, Ул. Нукус 86/3",
+                    "en": "Ташкент, Ул. Нукус 86/3"
                 },
                 "director_name": "А. А. Леу",
                 "bank_accounts": [
@@ -3316,9 +3316,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Beyond Expectations JV",
                     "ru": "СП «Beyond Expectations»",
-                    "uz": "\"Beyond Expectations\" QK"
+                    "uz": "\"Beyond Expectations\" QK",
+                    "en": "Beyond Expectations JV"
                 },
                 "inn": "304415856",
                 "type": "legal",
@@ -3326,9 +3326,9 @@
                 "phone": "+998 90 955 94 31",
                 "email": "beyondexpectations.uz@gmail.com",
                 "address": {
-                    "en": "Rakat 1-13, Yakkasaray District, Tashkent",
                     "ru": "г. Ташкент, Яккасарайский район, Ракат 1-13",
-                    "uz": "Toshkent shahri, Yakkasaroy tumani, Rakat 1-13"
+                    "uz": "Toshkent shahri, Yakkasaroy tumani, Rakat 1-13",
+                    "en": "Rakat 1-13, Yakkasaray District, Tashkent"
                 },
                 "director_name": "О.О. Хакимова",
                 "bank_accounts": [
@@ -3367,9 +3367,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Dolores Travel Services JV LLC",
                     "ru": "СП ООО «Dolores Travel Services»",
-                    "uz": "\"Dolores Travel Services\" QK MChJ"
+                    "uz": "\"Dolores Travel Services\" QK MChJ",
+                    "en": "Dolores Travel Services JV LLC"
                 },
                 "inn": "205424619",
                 "type": "legal",
@@ -3377,9 +3377,9 @@
                 "phone": "(99871) 1208883; +99855 515-88-83; (99875) 5158883; (99878) 1208883; (998 78) 1208873",
                 "email": "info@dolores.uz",
                 "address": {
-                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent",
                     "ru": "104 А, ул. Кичик Бешагач, Яккасарайский р-он, г. Ташкент",
-                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent"
+                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent",
+                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent"
                 },
                 "director_name": "Байзакова Ш.Б.",
                 "bank_accounts": [
@@ -3418,9 +3418,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "CENTRAL ASIA TRAVEL LLC",
                     "ru": "ООО «CENTRAL ASIA TRAVEL»",
-                    "uz": "\"CENTRAL ASIA TRAVEL\" MChJ"
+                    "uz": "\"CENTRAL ASIA TRAVEL\" MChJ",
+                    "en": "CENTRAL ASIA TRAVEL LLC"
                 },
                 "inn": "206976184",
                 "type": "legal",
@@ -3428,9 +3428,9 @@
                 "phone": "71 20002 99; +99871 2525008; +998 71 252 50 07",
                 "email": "info@centralasia-travel.com",
                 "address": {
-                    "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan",
                     "ru": "Улица Ойбек 40, офис 3, Ташкент, Узбекистан",
-                    "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston"
+                    "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston",
+                    "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan"
                 },
                 "director_name": "Н.А. Сербин",
                 "bank_accounts": [
@@ -3469,9 +3469,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "TIMURWAY TOUR LLC",
                     "ru": "ООО «TIMURWAY TOUR»",
-                    "uz": "«TIMURWAY TOUR» MChJ"
+                    "uz": "«TIMURWAY TOUR» MChJ",
+                    "en": "TIMURWAY TOUR LLC"
                 },
                 "inn": "309957606",
                 "type": "legal",
@@ -3479,9 +3479,9 @@
                 "phone": "+998 90 985 00 95",
                 "email": null,
                 "address": {
-                    "en": "Узбекистан, Город Ташкент, Мирзо-Улугбексий р-он, Ахмад Югнакий МФЙ, Ахмад Югнакий мавзеси, 19 а-уй",
                     "ru": "Узбекистан, Город Ташкент, Мирзо-Улугбексий р-он, Ахмад Югнакий МФЙ, Ахмад Югнакий мавзеси, 19 а-уй",
-                    "uz": "Узбекистан, Город Ташкент, Мирзо-Улугбексий р-он, Ахмад Югнакий МФЙ, Ахмад Югнакий мавзеси, 19 а-уй"
+                    "uz": "Узбекистан, Город Ташкент, Мирзо-Улугбексий р-он, Ахмад Югнакий МФЙ, Ахмад Югнакий мавзеси, 19 а-уй",
+                    "en": "Узбекистан, Город Ташкент, Мирзо-Улугбексий р-он, Ахмад Югнакий МФЙ, Ахмад Югнакий мавзеси, 19 а-уй"
                 },
                 "director_name": "Салихова Л.У.",
                 "bank_accounts": [
@@ -3520,9 +3520,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Sole Vita LLC",
                     "ru": "ООО «Sole Vita»",
-                    "uz": "«Sole Vita» MChJ"
+                    "uz": "«Sole Vita» MChJ",
+                    "en": "Sole Vita LLC"
                 },
                 "inn": "300614889",
                 "type": "legal",
@@ -3530,9 +3530,9 @@
                 "phone": "+998 78 210 0444; +998 93 720 0444",
                 "email": null,
                 "address": {
-                    "en": "Узбекистан, город Самарканд, улица Мирзо Улугбека, 79а, 140103",
                     "ru": "Узбекистан, город Самарканд, улица Мирзо Улугбека, 79а, 140103",
-                    "uz": "Узбекистан, город Самарканд, улица Мирзо Улугбека, 79а, 140103"
+                    "uz": "Узбекистан, город Самарканд, улица Мирзо Улугбека, 79а, 140103",
+                    "en": "Узбекистан, город Самарканд, улица Мирзо Улугбека, 79а, 140103"
                 },
                 "director_name": "Турдалиева Д.И.",
                 "bank_accounts": [
@@ -3571,9 +3571,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZAMIN DMC LLC",
                     "ru": "ООО «ZAMIN DMC»",
-                    "uz": "\"ZAMIN DMC\" MChJ"
+                    "uz": "\"ZAMIN DMC\" MChJ",
+                    "en": "ZAMIN DMC LLC"
                 },
                 "inn": "311343097",
                 "type": "legal",
@@ -3581,9 +3581,9 @@
                 "phone": "+998 99 575 50 50; +99899 5750550",
                 "email": "info@zamindmc.uz",
                 "address": {
-                    "en": "22 A. Temur Street, Mirabad District, Tashkent",
                     "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
-                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22",
+                    "en": "22 A. Temur Street, Mirabad District, Tashkent"
                 },
                 "director_name": "Ходжаев Т.А.",
                 "bank_accounts": [
@@ -3646,9 +3646,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "CATO MOTORS LLC",
                     "ru": "ООО «CATO MOTORS»",
-                    "uz": "«CATO MOTORS» MChJ"
+                    "uz": "«CATO MOTORS» MChJ",
+                    "en": "CATO MOTORS LLC"
                 },
                 "inn": "310109134",
                 "type": "legal",
@@ -3656,9 +3656,9 @@
                 "phone": "+998(93) 355-11-17",
                 "email": "azim.travel@gmail.com",
                 "address": {
-                    "en": "г. Самарканд ул. Фирдавсий 3.",
                     "ru": "г. Самарканд ул. Фирдавсий 3.",
-                    "uz": "г. Самарканд ул. Фирдавсий 3."
+                    "uz": "г. Самарканд ул. Фирдавсий 3.",
+                    "en": "г. Самарканд ул. Фирдавсий 3."
                 },
                 "director_name": "Азимова А.У.",
                 "bank_accounts": [
@@ -3697,9 +3697,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Selfie Travel LLC",
                     "ru": "ООО «Selfie Travel»",
-                    "uz": "\"Selfie Travel\" MChJ"
+                    "uz": "\"Selfie Travel\" MChJ",
+                    "en": "Selfie Travel LLC"
                 },
                 "inn": "305299709",
                 "type": "legal",
@@ -3707,9 +3707,9 @@
                 "phone": "+998910185141",
                 "email": "inc@selfietravel.uzb",
                 "address": {
-                    "en": "7/71 Sebzor Street, Shaykhantakhur District, Tashkent",
                     "ru": "г. Ташкент, Шайхантахурский р-н, ул. Себзор 7/71",
-                    "uz": "Toshkent, Shayxontohur tumani, Sebzor koʻchasi 7/71"
+                    "uz": "Toshkent, Shayxontohur tumani, Sebzor koʻchasi 7/71",
+                    "en": "7/71 Sebzor Street, Shaykhantakhur District, Tashkent"
                 },
                 "director_name": "Р.М.Мухрумбаев",
                 "bank_accounts": [
@@ -3748,9 +3748,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZAMIN DMC LLC",
                     "ru": "ООО «ZAMIN DMC»",
-                    "uz": "\"ZAMIN DMC\" MChJ"
+                    "uz": "\"ZAMIN DMC\" MChJ",
+                    "en": "ZAMIN DMC LLC"
                 },
                 "inn": "311343097",
                 "type": "legal",
@@ -3758,9 +3758,9 @@
                 "phone": "+998 99 575 50 50; +99899 5750550",
                 "email": "info@zamindmc.uz",
                 "address": {
-                    "en": "22 A. Temur Street, Mirabad District, Tashkent",
                     "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
-                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22",
+                    "en": "22 A. Temur Street, Mirabad District, Tashkent"
                 },
                 "director_name": "Ходжаев Т.А.",
                 "bank_accounts": [
@@ -3823,9 +3823,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "MY-TRIPGUIDE LLC",
                     "ru": "ООО «MY-TRIPGUIDE»",
-                    "uz": "«MY-TRIPGUIDE» MChJ"
+                    "uz": "«MY-TRIPGUIDE» MChJ",
+                    "en": "MY-TRIPGUIDE LLC"
                 },
                 "inn": "309943434",
                 "type": "legal",
@@ -3833,9 +3833,9 @@
                 "phone": "+998 77 026 77 14",
                 "email": "info@tripguide.uz",
                 "address": {
-                    "en": "г. Ургенч, Хорезм, Камолот МФЙ,ул. Тонг 1, д.4",
                     "ru": "г. Ургенч, Хорезм, Камолот МФЙ,ул. Тонг 1, д.4",
-                    "uz": "г. Ургенч, Хорезм, Камолот МФЙ,ул. Тонг 1, д.4"
+                    "uz": "г. Ургенч, Хорезм, Камолот МФЙ,ул. Тонг 1, д.4",
+                    "en": "г. Ургенч, Хорезм, Камолот МФЙ,ул. Тонг 1, д.4"
                 },
                 "director_name": "Б.Р. Удаев",
                 "bank_accounts": [
@@ -3874,9 +3874,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "BEYOND DMC LLC",
                     "ru": "ООО «BEYOND DMC»",
-                    "uz": "\"BEYOND DMC\" MChJ"
+                    "uz": "\"BEYOND DMC\" MChJ",
+                    "en": "BEYOND DMC LLC"
                 },
                 "inn": "311687587",
                 "type": "legal",
@@ -3884,9 +3884,9 @@
                 "phone": "+998 99 235 48 36; +998 94 092 11 75; 909062456",
                 "email": "info@beyond-dmc.com",
                 "address": {
-                    "en": "44A Bahodir Street, Rakatboshi Mahalla, Yakkasaray District, Tashkent, Republic of Uzbekistan",
                     "ru": "Республика Узбекистан, г. Ташкент, Яккасарайский район, МСГ «Ракатбоши», ул. Баходир, 44А",
-                    "uz": "Oʻzbekiston Respublikasi, Toshkent shahri, Yakkasaroy tumani, \"Rakatboshi\" MFY, Bahodir koʻchasi, 44A"
+                    "uz": "Oʻzbekiston Respublikasi, Toshkent shahri, Yakkasaroy tumani, \"Rakatboshi\" MFY, Bahodir koʻchasi, 44A",
+                    "en": "44A Bahodir Street, Rakatboshi Mahalla, Yakkasaray District, Tashkent, Republic of Uzbekistan"
                 },
                 "director_name": "Раджеш Кумар",
                 "bank_accounts": [
@@ -3925,9 +3925,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "FAYZ GRAND MINON LLC",
                     "ru": "ООО «FAYZ GRAND MINON»",
-                    "uz": "«FAYZ GRAND MINON» MChJ"
+                    "uz": "«FAYZ GRAND MINON» MChJ",
+                    "en": "FAYZ GRAND MINON LLC"
                 },
                 "inn": "309570052",
                 "type": "legal",
@@ -3935,9 +3935,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "г. Ташкент Яккасарой р. Ул. Мукумий 7/1-дом",
                     "ru": "г. Ташкент Яккасарой р. Ул. Мукумий 7/1-дом",
-                    "uz": "г. Ташкент Яккасарой р. Ул. Мукумий 7/1-дом"
+                    "uz": "г. Ташкент Яккасарой р. Ул. Мукумий 7/1-дом",
+                    "en": "г. Ташкент Яккасарой р. Ул. Мукумий 7/1-дом"
                 },
                 "director_name": "Ж.Ф. Сафаров",
                 "bank_accounts": [
@@ -3976,9 +3976,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SULTAN TRAVEL UZBEKISTAN LLC",
                     "ru": "ООО «SULTAN TRAVEL UZBEKISTAN»",
-                    "uz": "«SULTAN TRAVEL UZBEKISTAN» MChJ"
+                    "uz": "«SULTAN TRAVEL UZBEKISTAN» MChJ",
+                    "en": "SULTAN TRAVEL UZBEKISTAN LLC"
                 },
                 "inn": "311367502",
                 "type": "legal",
@@ -3986,9 +3986,9 @@
                 "phone": "93-253-53-54",
                 "email": "sultan_travel@bk.ru",
                 "address": {
-                    "en": "г.Андижан, ул. Истиклол-9",
                     "ru": "г.Андижан, ул. Истиклол-9",
-                    "uz": "г.Андижан, ул. Истиклол-9"
+                    "uz": "г.Андижан, ул. Истиклол-9",
+                    "en": "г.Андижан, ул. Истиклол-9"
                 },
                 "director_name": "Х.Султонов",
                 "bank_accounts": [
@@ -4027,9 +4027,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZAMIN DESTINATION LLC",
                     "ru": "ООО «ZAMIN DESTINATION»",
-                    "uz": "«ZAMIN DESTINATION» MChJ"
+                    "uz": "«ZAMIN DESTINATION» MChJ",
+                    "en": "ZAMIN DESTINATION LLC"
                 },
                 "inn": "310442497",
                 "type": "legal",
@@ -4037,9 +4037,9 @@
                 "phone": "+998-99-575-50-50",
                 "email": "inbound@asialuxe.uz",
                 "address": {
-                    "en": "г. Ташкент, Мирабадский район, ул. А.Темура, дом24/2",
                     "ru": "г. Ташкент, Мирабадский район, ул. А.Темура, дом24/2",
-                    "uz": "г. Ташкент, Мирабадский район, ул. А.Темура, дом24/2"
+                    "uz": "г. Ташкент, Мирабадский район, ул. А.Темура, дом24/2",
+                    "en": "г. Ташкент, Мирабадский район, ул. А.Темура, дом24/2"
                 },
                 "director_name": "Т.А.Ходжаев",
                 "bank_accounts": [
@@ -4078,9 +4078,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "MIRAN TRIPS LLC",
                     "ru": "ООО «MIRAN TRIPS»",
-                    "uz": "«MIRAN TRIPS» MChJ"
+                    "uz": "«MIRAN TRIPS» MChJ",
+                    "en": "MIRAN TRIPS LLC"
                 },
                 "inn": "310635027",
                 "type": "legal",
@@ -4088,9 +4088,9 @@
                 "phone": "+998 97 036 38 30",
                 "email": "mirantripsuz@gmail.com",
                 "address": {
-                    "en": "г.Ташкент, Шайхантахурский р. Лабзак 30/49",
                     "ru": "г.Ташкент, Шайхантахурский р. Лабзак 30/49",
-                    "uz": "г.Ташкент, Шайхантахурский р. Лабзак 30/49"
+                    "uz": "г.Ташкент, Шайхантахурский р. Лабзак 30/49",
+                    "en": "г.Ташкент, Шайхантахурский р. Лабзак 30/49"
                 },
                 "director_name": "Б.Н. Туляганов",
                 "bank_accounts": [
@@ -4129,9 +4129,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Geo Tour Service LLC",
                     "ru": "ООО «Geo Tour Service»",
-                    "uz": "\"Geo Tour Service\" MChJ"
+                    "uz": "\"Geo Tour Service\" MChJ",
+                    "en": "Geo Tour Service LLC"
                 },
                 "inn": "303906847",
                 "type": "legal",
@@ -4139,9 +4139,9 @@
                 "phone": "+998 71 288 44 48; +998 99 575 5050; +99890 9600150; +99899 7610150",
                 "email": "info@orientmice.com",
                 "address": {
-                    "en": "9 Mavze, 12, Apartment 1, Chilanzar District, Tashkent",
                     "ru": "г. Ташкент, Чиланзарский район, 9 квартал, дом 12, квартира 1",
-                    "uz": "Toshkent, Chilonzor tumani, 9-mavze, 12-uy, 1-xonadon"
+                    "uz": "Toshkent, Chilonzor tumani, 9-mavze, 12-uy, 1-xonadon",
+                    "en": "9 Mavze, 12, Apartment 1, Chilanzar District, Tashkent"
                 },
                 "director_name": "Ш. Пардаев",
                 "bank_accounts": [
@@ -4180,9 +4180,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ONS Travel LLC",
                     "ru": "ООО «ONS Travel»",
-                    "uz": "«ONS Travel» MChJ"
+                    "uz": "«ONS Travel» MChJ",
+                    "en": "ONS Travel LLC"
                 },
                 "inn": "311530213",
                 "type": "legal",
@@ -4190,9 +4190,9 @@
                 "phone": "+998 91 996 49 49",
                 "email": "info@onstravel.uz",
                 "address": {
-                    "en": "г.Ташкент, Чиланзарский-2-МФЙ 76-уй",
                     "ru": "г.Ташкент, Чиланзарский-2-МФЙ 76-уй",
-                    "uz": "г.Ташкент, Чиланзарский-2-МФЙ 76-уй"
+                    "uz": "г.Ташкент, Чиланзарский-2-МФЙ 76-уй",
+                    "en": "г.Ташкент, Чиланзарский-2-МФЙ 76-уй"
                 },
                 "director_name": "Б.Б. Эгамберганов",
                 "bank_accounts": [
@@ -4231,9 +4231,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ENJOY TRAVEL LLC",
                     "ru": "ООО «ENJOY TRAVEL»",
-                    "uz": "«ENJOY TRAVEL» MChJ"
+                    "uz": "«ENJOY TRAVEL» MChJ",
+                    "en": "ENJOY TRAVEL LLC"
                 },
                 "inn": "302881501",
                 "type": "legal",
@@ -4241,9 +4241,9 @@
                 "phone": "+998 71 241 06 49",
                 "email": "enjoytravel.uz@gmail.com",
                 "address": {
-                    "en": "100128, г.Ташкент, Ц-12 д.1, кв-18",
                     "ru": "100128, г.Ташкент, Ц-12 д.1, кв-18",
-                    "uz": "100128, г.Ташкент, Ц-12 д.1, кв-18"
+                    "uz": "100128, г.Ташкент, Ц-12 д.1, кв-18",
+                    "en": "100128, г.Ташкент, Ц-12 д.1, кв-18"
                 },
                 "director_name": "С.С. Мухамедов",
                 "bank_accounts": [
@@ -4282,9 +4282,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "AKFA Dream World LLC",
                     "ru": "ООО «AKFA Dream World»",
-                    "uz": "«AKFA Dream World» MChJ"
+                    "uz": "«AKFA Dream World» MChJ",
+                    "en": "AKFA Dream World LLC"
                 },
                 "inn": "305163498",
                 "type": "legal",
@@ -4292,9 +4292,9 @@
                 "phone": "+998 71 210 88 88",
                 "email": null,
                 "address": {
-                    "en": "100027, г.Ташкент, ул. Укчи, д.1",
                     "ru": "100027, г.Ташкент, ул. Укчи, д.1",
-                    "uz": "100027, г.Ташкент, ул. Укчи, д.1"
+                    "uz": "100027, г.Ташкент, ул. Укчи, д.1",
+                    "en": "100027, г.Ташкент, ул. Укчи, д.1"
                 },
                 "director_name": "Ж.К. Абидов",
                 "bank_accounts": [
@@ -4333,9 +4333,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Rezbook Global International LLC",
                     "ru": "ООО «Rezbook Global International»",
-                    "uz": "\"Rezbook Global International\" MChJ"
+                    "uz": "\"Rezbook Global International\" MChJ",
+                    "en": "Rezbook Global International LLC"
                 },
                 "inn": "311247643",
                 "type": "legal",
@@ -4343,9 +4343,9 @@
                 "phone": "+998 90 951 46 64; +998 93 324 38 83",
                 "email": "Uzbekistan@rezbookglobal.com",
                 "address": {
-                    "en": "7/1 Mukumiy Street, Yakkasaray District, Tashkent",
                     "ru": "г. Ташкент, Яккасарайский район, ул. Мукумий 7/1",
-                    "uz": "Toshkent shahri, Yakkasaroy tumani, Mukumiy koʻchasi 7/1"
+                    "uz": "Toshkent shahri, Yakkasaroy tumani, Mukumiy koʻchasi 7/1",
+                    "en": "7/1 Mukumiy Street, Yakkasaray District, Tashkent"
                 },
                 "director_name": "Ж.Ф. Сафаров",
                 "bank_accounts": [
@@ -4384,9 +4384,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Rocket DMC Registan LLC",
                     "ru": "ООО «Rocket DMC Registan»",
-                    "uz": "\"Rocket DMC Registan\" MChJ"
+                    "uz": "\"Rocket DMC Registan\" MChJ",
+                    "en": "Rocket DMC Registan LLC"
                 },
                 "inn": "310367653",
                 "type": "legal",
@@ -4394,9 +4394,9 @@
                 "phone": "90 809 26 01; +998 90 512 24 78",
                 "email": "rocketuz.all@rocketdmc.com",
                 "address": {
-                    "en": "Samarkand, Kunigil",
                     "ru": "Самарканд, Кунигил",
-                    "uz": "Samarqand, Kunigil"
+                    "uz": "Samarqand, Kunigil",
+                    "en": "Samarkand, Kunigil"
                 },
                 "director_name": "Н.М Мухтарова",
                 "bank_accounts": [
@@ -4435,9 +4435,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Right Flight LLC",
                     "ru": "ООО «Right Flight»",
-                    "uz": "«Right Flight» MChJ"
+                    "uz": "«Right Flight» MChJ",
+                    "en": "Right Flight LLC"
                 },
                 "inn": "311043178",
                 "type": "legal",
@@ -4445,9 +4445,9 @@
                 "phone": "+998900882222",
                 "email": "info@right-flight.uz",
                 "address": {
-                    "en": "г. Ташкент, Шайхантахурский район, ул. Кичик Халка юли/9,",
                     "ru": "г. Ташкент, Шайхантахурский район, ул. Кичик Халка юли/9,",
-                    "uz": "г. Ташкент, Шайхантахурский район, ул. Кичик Халка юли/9,"
+                    "uz": "г. Ташкент, Шайхантахурский район, ул. Кичик Халка юли/9,",
+                    "en": "г. Ташкент, Шайхантахурский район, ул. Кичик Халка юли/9,"
                 },
                 "director_name": "Ким Анжела",
                 "bank_accounts": [
@@ -4486,9 +4486,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SunRoad LLC",
                     "ru": "ООО «SunRoad»",
-                    "uz": "\"SunRoad\" MChJ"
+                    "uz": "\"SunRoad\" MChJ",
+                    "en": "SunRoad LLC"
                 },
                 "inn": "311534832",
                 "type": "legal",
@@ -4496,9 +4496,9 @@
                 "phone": "909228549",
                 "email": null,
                 "address": {
-                    "en": "26, 2nd Passage, Pakhlavon Makhmud Street, Tashkent, 100070",
                     "ru": "100070, г. Ташкент, ул. Пахлавон Махмуд, 2 проезд 26",
-                    "uz": "100070, Toshkent, Paxlavon Mahmud koʻchasi, 2-tor koʻchasi 26"
+                    "uz": "100070, Toshkent, Paxlavon Mahmud koʻchasi, 2-tor koʻchasi 26",
+                    "en": "26, 2nd Passage, Pakhlavon Makhmud Street, Tashkent, 100070"
                 },
                 "director_name": "Г. Исакова",
                 "bank_accounts": [
@@ -4537,9 +4537,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "EAST-STAR HOTEL LLC",
                     "ru": "ООО «EAST-STAR HOTEL»",
-                    "uz": "«EAST-STAR HOTEL» MChJ"
+                    "uz": "«EAST-STAR HOTEL» MChJ",
+                    "en": "EAST-STAR HOTEL LLC"
                 },
                 "inn": "309748074",
                 "type": "legal",
@@ -4547,9 +4547,9 @@
                 "phone": "(998 66) 233 77 77",
                 "email": null,
                 "address": {
-                    "en": "140100, Узбекистан, г. Самарканд, ул. Мироншох, 34.",
                     "ru": "140100, Узбекистан, г. Самарканд, ул. Мироншох, 34.",
-                    "uz": "140100, Узбекистан, г. Самарканд, ул. Мироншох, 34."
+                    "uz": "140100, Узбекистан, г. Самарканд, ул. Мироншох, 34.",
+                    "en": "140100, Узбекистан, г. Самарканд, ул. Мироншох, 34."
                 },
                 "director_name": "Кулиев М.И.",
                 "bank_accounts": [
@@ -4596,9 +4596,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "MY FREIGHTER LLC",
                     "ru": "ООО «MY FREIGHTER»",
-                    "uz": "«MY FREIGHTER» MChJ"
+                    "uz": "«MY FREIGHTER» MChJ",
+                    "en": "MY FREIGHTER LLC"
                 },
                 "inn": "306985993",
                 "type": "legal",
@@ -4606,9 +4606,9 @@
                 "phone": "+99891-030-82-21",
                 "email": "a.osintsev@centrum-air.com",
                 "address": {
-                    "en": "ул. Буюк Ипак Йули, 262, Мирзо Улугбекский район, Ташкент, Узбекистан, 100187.",
                     "ru": "ул. Буюк Ипак Йули, 262, Мирзо Улугбекский район, Ташкент, Узбекистан, 100187.",
-                    "uz": "ул. Буюк Ипак Йули, 262, Мирзо Улугбекский район, Ташкент, Узбекистан, 100187."
+                    "uz": "ул. Буюк Ипак Йули, 262, Мирзо Улугбекский район, Ташкент, Узбекистан, 100187.",
+                    "en": "ул. Буюк Ипак Йули, 262, Мирзо Улугбекский район, Ташкент, Узбекистан, 100187."
                 },
                 "director_name": "А.А.Абдурахманов",
                 "bank_accounts": [
@@ -4647,9 +4647,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "INTURIZM LLC",
                     "ru": "ООО «INTURIZM»",
-                    "uz": "«INTURIZM» MChJ"
+                    "uz": "«INTURIZM» MChJ",
+                    "en": "INTURIZM LLC"
                 },
                 "inn": "311153864",
                 "type": "legal",
@@ -4657,9 +4657,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "г.Ташкент Яккасарайский район, Хамидсулаймон МФУ, ул. Кичик Бешогоч, 70 дом, 24 кв.",
                     "ru": "г.Ташкент Яккасарайский район, Хамидсулаймон МФУ, ул. Кичик Бешогоч, 70 дом, 24 кв.",
-                    "uz": "г.Ташкент Яккасарайский район, Хамидсулаймон МФУ, ул. Кичик Бешогоч, 70 дом, 24 кв."
+                    "uz": "г.Ташкент Яккасарайский район, Хамидсулаймон МФУ, ул. Кичик Бешогоч, 70 дом, 24 кв.",
+                    "en": "г.Ташкент Яккасарайский район, Хамидсулаймон МФУ, ул. Кичик Бешогоч, 70 дом, 24 кв."
                 },
                 "director_name": "?ой С.И.",
                 "bank_accounts": [
@@ -4698,9 +4698,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "CENTRAL ASIA TRAVEL LLC",
                     "ru": "ООО «CENTRAL ASIA TRAVEL»",
-                    "uz": "\"CENTRAL ASIA TRAVEL\" MChJ"
+                    "uz": "\"CENTRAL ASIA TRAVEL\" MChJ",
+                    "en": "CENTRAL ASIA TRAVEL LLC"
                 },
                 "inn": "206976184",
                 "type": "legal",
@@ -4708,9 +4708,9 @@
                 "phone": "71 20002 99; +99871 2525008; +998 71 252 50 07",
                 "email": "info@centralasia-travel.com",
                 "address": {
-                    "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan",
                     "ru": "Улица Ойбек 40, офис 3, Ташкент, Узбекистан",
-                    "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston"
+                    "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston",
+                    "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan"
                 },
                 "director_name": "Н.А. Сербин",
                 "bank_accounts": [
@@ -4749,9 +4749,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT STAR GROUP LLC",
                     "ru": "ООО «ORIENT STAR GROUP»",
-                    "uz": "\"ORIENT STAR GROUP\" MChJ"
+                    "uz": "\"ORIENT STAR GROUP\" MChJ",
+                    "en": "ORIENT STAR GROUP LLC"
                 },
                 "inn": "303722254",
                 "type": "legal",
@@ -4759,9 +4759,9 @@
                 "phone": "+99897-722-22-26; +998974441555",
                 "email": "welcome@orientstar.uz",
                 "address": {
-                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
                     "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
-                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6",
+                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011"
                 },
                 "director_name": "С. Х. Бегматов",
                 "bank_accounts": [
@@ -4816,9 +4816,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "TRAVEL RENTCAR LLC",
                     "ru": "ООО «TRAVEL RENTCAR»",
-                    "uz": "«TRAVEL RENTCAR» MChJ"
+                    "uz": "«TRAVEL RENTCAR» MChJ",
+                    "en": "TRAVEL RENTCAR LLC"
                 },
                 "inn": "308291281",
                 "type": "legal",
@@ -4826,9 +4826,9 @@
                 "phone": "+99893-331-31-13",
                 "email": null,
                 "address": {
-                    "en": "г.Самарканд, ул. Б.И.Йули, 99/34.",
                     "ru": "г.Самарканд, ул. Б.И.Йули, 99/34.",
-                    "uz": "г.Самарканд, ул. Б.И.Йули, 99/34."
+                    "uz": "г.Самарканд, ул. Б.И.Йули, 99/34.",
+                    "en": "г.Самарканд, ул. Б.И.Йули, 99/34."
                 },
                 "director_name": "А.Х. Ахатов",
                 "bank_accounts": [
@@ -4867,9 +4867,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "NEGEN-TOUR LLC",
                     "ru": "ООО «NEGEN-TOUR»",
-                    "uz": "«NEGEN-TOUR» MChJ"
+                    "uz": "«NEGEN-TOUR» MChJ",
+                    "en": "NEGEN-TOUR LLC"
                 },
                 "inn": "309292350",
                 "type": "legal",
@@ -4877,9 +4877,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "г. Самарканд, ул. Фирдавсий, 35",
                     "ru": "г. Самарканд, ул. Фирдавсий, 35",
-                    "uz": "г. Самарканд, ул. Фирдавсий, 35"
+                    "uz": "г. Самарканд, ул. Фирдавсий, 35",
+                    "en": "г. Самарканд, ул. Фирдавсий, 35"
                 },
                 "director_name": "Рустамова П.Ж.",
                 "bank_accounts": [
@@ -4918,9 +4918,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Beyond Expectations JV",
                     "ru": "СП «Beyond Expectations»",
-                    "uz": "\"Beyond Expectations\" QK"
+                    "uz": "\"Beyond Expectations\" QK",
+                    "en": "Beyond Expectations JV"
                 },
                 "inn": "304415856",
                 "type": "legal",
@@ -4928,9 +4928,9 @@
                 "phone": "+998 90 955 94 31",
                 "email": "beyondexpectations.uz@gmail.com",
                 "address": {
-                    "en": "Rakat 1-13, Yakkasaray District, Tashkent",
                     "ru": "г. Ташкент, Яккасарайский район, Ракат 1-13",
-                    "uz": "Toshkent shahri, Yakkasaroy tumani, Rakat 1-13"
+                    "uz": "Toshkent shahri, Yakkasaroy tumani, Rakat 1-13",
+                    "en": "Rakat 1-13, Yakkasaray District, Tashkent"
                 },
                 "director_name": "О.О. Хакимова",
                 "bank_accounts": [
@@ -4969,9 +4969,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT STAR GROUP LLC",
                     "ru": "ООО «ORIENT STAR GROUP»",
-                    "uz": "\"ORIENT STAR GROUP\" MChJ"
+                    "uz": "\"ORIENT STAR GROUP\" MChJ",
+                    "en": "ORIENT STAR GROUP LLC"
                 },
                 "inn": "303722254",
                 "type": "legal",
@@ -4979,9 +4979,9 @@
                 "phone": "+99897-722-22-26; +998974441555",
                 "email": "welcome@orientstar.uz",
                 "address": {
-                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
                     "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
-                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6",
+                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011"
                 },
                 "director_name": "С. Х. Бегматов",
                 "bank_accounts": [
@@ -5036,9 +5036,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZAMIN DESTINATION LLC",
                     "ru": "ООО «ZAMIN DESTINATION»",
-                    "uz": "«ZAMIN DESTINATION» MChJ"
+                    "uz": "«ZAMIN DESTINATION» MChJ",
+                    "en": "ZAMIN DESTINATION LLC"
                 },
                 "inn": "310442497",
                 "type": "legal",
@@ -5046,9 +5046,9 @@
                 "phone": "+998-99-575-50-50",
                 "email": "inbound@asialuxe.uz",
                 "address": {
-                    "en": "г. Ташкент, Мирабадский район, ул. А.Темура, дом24/2",
                     "ru": "г. Ташкент, Мирабадский район, ул. А.Темура, дом24/2",
-                    "uz": "г. Ташкент, Мирабадский район, ул. А.Темура, дом24/2"
+                    "uz": "г. Ташкент, Мирабадский район, ул. А.Темура, дом24/2",
+                    "en": "г. Ташкент, Мирабадский район, ул. А.Темура, дом24/2"
                 },
                 "director_name": "Т.А.Ходжаев",
                 "bank_accounts": [
@@ -5087,9 +5087,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "MODERNTRAVEL LLC",
                     "ru": "ООО «MODERNTRAVEL»",
-                    "uz": "«MODERNTRAVEL» MChJ"
+                    "uz": "«MODERNTRAVEL» MChJ",
+                    "en": "MODERNTRAVEL LLC"
                 },
                 "inn": "312001822",
                 "type": "legal",
@@ -5097,9 +5097,9 @@
                 "phone": "(99) 988 77 74",
                 "email": null,
                 "address": {
-                    "en": "Г.Ташкент Юнксабадский р-н ул. Беназир, 12 дом",
                     "ru": "Г.Ташкент Юнксабадский р-н ул. Беназир, 12 дом",
-                    "uz": "Г.Ташкент Юнксабадский р-н ул. Беназир, 12 дом"
+                    "uz": "Г.Ташкент Юнксабадский р-н ул. Беназир, 12 дом",
+                    "en": "Г.Ташкент Юнксабадский р-н ул. Беназир, 12 дом"
                 },
                 "director_name": "А. Рахимжонов",
                 "bank_accounts": [
@@ -5138,9 +5138,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Dolores Travel Services JV LLC",
                     "ru": "СП ООО «Dolores Travel Services»",
-                    "uz": "\"Dolores Travel Services\" QK MChJ"
+                    "uz": "\"Dolores Travel Services\" QK MChJ",
+                    "en": "Dolores Travel Services JV LLC"
                 },
                 "inn": "205424619",
                 "type": "legal",
@@ -5148,9 +5148,9 @@
                 "phone": "(99871) 1208883; +99855 515-88-83; (99875) 5158883; (99878) 1208883; (998 78) 1208873",
                 "email": "info@dolores.uz",
                 "address": {
-                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent",
                     "ru": "104 А, ул. Кичик Бешагач, Яккасарайский р-он, г. Ташкент",
-                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent"
+                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent",
+                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent"
                 },
                 "director_name": "Байзакова Ш.Б.",
                 "bank_accounts": [
@@ -5189,9 +5189,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "TASHKENT TRAVEL HUB LLC",
                     "ru": "ООО «TASHKENT TRAVEL HUB»",
-                    "uz": "«TASHKENT TRAVEL HUB» MChJ"
+                    "uz": "«TASHKENT TRAVEL HUB» MChJ",
+                    "en": "TASHKENT TRAVEL HUB LLC"
                 },
                 "inn": "311997415",
                 "type": "legal",
@@ -5199,9 +5199,9 @@
                 "phone": "+998 95 289-60-66",
                 "email": null,
                 "address": {
-                    "en": "Республика Узбекистан, г Ташкент, Укчи-Олмазор МФЙ, Фаргона йули кучаси, 44-уй, 21-хонадон",
                     "ru": "Республика Узбекистан, г Ташкент, Укчи-Олмазор МФЙ, Фаргона йули кучаси, 44-уй, 21-хонадон",
-                    "uz": "Республика Узбекистан, г Ташкент, Укчи-Олмазор МФЙ, Фаргона йули кучаси, 44-уй, 21-хонадон"
+                    "uz": "Республика Узбекистан, г Ташкент, Укчи-Олмазор МФЙ, Фаргона йули кучаси, 44-уй, 21-хонадон",
+                    "en": "Республика Узбекистан, г Ташкент, Укчи-Олмазор МФЙ, Фаргона йули кучаси, 44-уй, 21-хонадон"
                 },
                 "director_name": "О.Ю. Юсуфов",
                 "bank_accounts": [
@@ -5240,9 +5240,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "UZBEKISTAN AIRWAYS JSC",
                     "ru": "АО «UZBEKISTAN AIRWAYS»",
-                    "uz": "«UZBEKISTAN AIRWAYS» AJ"
+                    "uz": "«UZBEKISTAN AIRWAYS» AJ",
+                    "en": "UZBEKISTAN AIRWAYS JSC"
                 },
                 "inn": "306628114",
                 "type": "legal",
@@ -5250,9 +5250,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
                     "ru": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
-                    "uz": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,"
+                    "uz": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
+                    "en": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,"
                 },
                 "director_name": "У.А. Хусанов",
                 "bank_accounts": [
@@ -5299,9 +5299,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "UZBEKISTAN AIRWAYS JSC",
                     "ru": "АО «UZBEKISTAN AIRWAYS»",
-                    "uz": "«UZBEKISTAN AIRWAYS» AJ"
+                    "uz": "«UZBEKISTAN AIRWAYS» AJ",
+                    "en": "UZBEKISTAN AIRWAYS JSC"
                 },
                 "inn": "306628114",
                 "type": "legal",
@@ -5309,9 +5309,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
                     "ru": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
-                    "uz": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,"
+                    "uz": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
+                    "en": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,"
                 },
                 "director_name": "У.А. Хусанов",
                 "bank_accounts": [
@@ -5358,9 +5358,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "PEOPLETRAVEL LLC",
                     "ru": "ООО «PEOPLETRAVEL»",
-                    "uz": "\"PEOPLETRAVEL\" MChJ"
+                    "uz": "\"PEOPLETRAVEL\" MChJ",
+                    "en": "PEOPLETRAVEL LLC"
                 },
                 "inn": "207071194",
                 "type": "legal",
@@ -5368,9 +5368,9 @@
                 "phone": "+998 71 232 23 33",
                 "email": "info@peopletravel.uz",
                 "address": {
-                    "en": "47/1 M. Keuja Street, Tashkent",
                     "ru": "г. Ташкент, ул. М. Кеужа, 47/1",
-                    "uz": "Toshkent, M. Keuja koʻchasi, 47/1"
+                    "uz": "Toshkent, M. Keuja koʻchasi, 47/1",
+                    "en": "47/1 M. Keuja Street, Tashkent"
                 },
                 "director_name": "Султанов У.А.",
                 "bank_accounts": [
@@ -5409,9 +5409,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT STAR GROUP LLC",
                     "ru": "ООО «ORIENT STAR GROUP»",
-                    "uz": "\"ORIENT STAR GROUP\" MChJ"
+                    "uz": "\"ORIENT STAR GROUP\" MChJ",
+                    "en": "ORIENT STAR GROUP LLC"
                 },
                 "inn": "303722254",
                 "type": "legal",
@@ -5419,9 +5419,9 @@
                 "phone": "+99897-722-22-26; +998974441555",
                 "email": "welcome@orientstar.uz",
                 "address": {
-                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
                     "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
-                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6",
+                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011"
                 },
                 "director_name": "С. Х. Бегматов",
                 "bank_accounts": [
@@ -5476,9 +5476,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "CENTRAL ASIA TRAVEL LLC",
                     "ru": "ООО «CENTRAL ASIA TRAVEL»",
-                    "uz": "\"CENTRAL ASIA TRAVEL\" MChJ"
+                    "uz": "\"CENTRAL ASIA TRAVEL\" MChJ",
+                    "en": "CENTRAL ASIA TRAVEL LLC"
                 },
                 "inn": "206976184",
                 "type": "legal",
@@ -5486,9 +5486,9 @@
                 "phone": "71 20002 99; +99871 2525008; +998 71 252 50 07",
                 "email": "info@centralasia-travel.com",
                 "address": {
-                    "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan",
                     "ru": "Улица Ойбек 40, офис 3, Ташкент, Узбекистан",
-                    "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston"
+                    "uz": "Oybek koʻchasi 40, ofis 3, Toshkent, Oʻzbekiston",
+                    "en": "40 Oybek Street, Office 3, Tashkent, Uzbekistan"
                 },
                 "director_name": "Н.А. Сербин",
                 "bank_accounts": [
@@ -5527,9 +5527,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Dolores Travel Services JV LLC",
                     "ru": "СП ООО «Dolores Travel Services»",
-                    "uz": "\"Dolores Travel Services\" QK MChJ"
+                    "uz": "\"Dolores Travel Services\" QK MChJ",
+                    "en": "Dolores Travel Services JV LLC"
                 },
                 "inn": "205424619",
                 "type": "legal",
@@ -5537,9 +5537,9 @@
                 "phone": "(99871) 1208883; +99855 515-88-83; (99875) 5158883; (99878) 1208883; (998 78) 1208873",
                 "email": "info@dolores.uz",
                 "address": {
-                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent",
                     "ru": "104 А, ул. Кичик Бешагач, Яккасарайский р-он, г. Ташкент",
-                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent"
+                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent",
+                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent"
                 },
                 "director_name": "Байзакова Ш.Б.",
                 "bank_accounts": [
@@ -5578,9 +5578,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "GLOBAL EXPLORE LLC",
                     "ru": "ООО «GLOBAL EXPLORE»",
-                    "uz": "\"GLOBAL EXPLORE\" MChJ"
+                    "uz": "\"GLOBAL EXPLORE\" MChJ",
+                    "en": "GLOBAL EXPLORE LLC"
                 },
                 "inn": "308716494",
                 "type": "legal",
@@ -5588,9 +5588,9 @@
                 "phone": "+99897 444 45 33",
                 "email": "info@uzbekistandiscovery.com",
                 "address": {
-                    "en": "Y квартал 3/82, Chilanzar District, Tashkent",
                     "ru": "Чиланзарский район, Е квартал, 3/82, г. Ташкент",
-                    "uz": "Chilonzor tumani, Y kvartal, 3/82, Toshkent"
+                    "uz": "Chilonzor tumani, Y kvartal, 3/82, Toshkent",
+                    "en": "Y квартал 3/82, Chilanzar District, Tashkent"
                 },
                 "director_name": "И.Н.Курбонов",
                 "bank_accounts": [
@@ -5629,9 +5629,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Inter MICE Asia LLC",
                     "ru": "ООО «Inter MICE Asia»",
-                    "uz": "«Inter MICE Asia» MChJ"
+                    "uz": "«Inter MICE Asia» MChJ",
+                    "en": "Inter MICE Asia LLC"
                 },
                 "inn": "303380705",
                 "type": "legal",
@@ -5639,9 +5639,9 @@
                 "phone": "+998902714429",
                 "email": "info@mice-uzbekistan.uz",
                 "address": {
-                    "en": "Узбекистан, г. Самарканд 140100, ул. Узбекистанская 116Г",
                     "ru": "Узбекистан, г. Самарканд 140100, ул. Узбекистанская 116Г",
-                    "uz": "Узбекистан, г. Самарканд 140100, ул. Узбекистанская 116Г"
+                    "uz": "Узбекистан, г. Самарканд 140100, ул. Узбекистанская 116Г",
+                    "en": "Узбекистан, г. Самарканд 140100, ул. Узбекистанская 116Г"
                 },
                 "director_name": "Агзамова Ш.",
                 "bank_accounts": [
@@ -5680,9 +5680,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "MEGA TOUR LLC",
                     "ru": "ООО «MEGA TOUR»",
-                    "uz": "\"MEGA TOUR\" MChJ"
+                    "uz": "\"MEGA TOUR\" MChJ",
+                    "en": "MEGA TOUR LLC"
                 },
                 "inn": "205886850",
                 "type": "legal",
@@ -5690,9 +5690,9 @@
                 "phone": "+99890-185-33-33",
                 "email": "megatour@mail.com",
                 "address": {
-                    "en": "235 A Buyuk Ipak Yoli Street, Tashkent",
                     "ru": "г. Ташкент, ул. Буюк Ипак Йули, 235 А",
-                    "uz": "Toshkent, Buyuk Ipak Yoʻli koʻchasi, 235 A"
+                    "uz": "Toshkent, Buyuk Ipak Yoʻli koʻchasi, 235 A",
+                    "en": "235 A Buyuk Ipak Yoli Street, Tashkent"
                 },
                 "director_name": "А.В. Хабарова",
                 "bank_accounts": [
@@ -5731,9 +5731,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Uktamxon Tour LLC",
                     "ru": "ООО «Uktamxon Tour»",
-                    "uz": "\"Uktamxon Tour\" MChJ"
+                    "uz": "\"Uktamxon Tour\" MChJ",
+                    "en": "Uktamxon Tour LLC"
                 },
                 "inn": "310148514",
                 "type": "legal",
@@ -5741,9 +5741,9 @@
                 "phone": "(97) 577 07 57",
                 "email": "uktamxontour01@gmail.com",
                 "address": {
-                    "en": "31 Mirzo Ulugbek Street, Samarkand",
                     "ru": "г. Самарканд, ул. Мирзо Улугбек-31",
-                    "uz": "Samarqand, Mirzo Ulugʻbek koʻchasi 31"
+                    "uz": "Samarqand, Mirzo Ulugʻbek koʻchasi 31",
+                    "en": "31 Mirzo Ulugbek Street, Samarkand"
                 },
                 "director_name": "Махсудов М.У.",
                 "bank_accounts": [
@@ -5782,9 +5782,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Sapphire Asia LLC",
                     "ru": "ООО «Sapphire Asia»",
-                    "uz": "«Sapphire Asia» MChJ"
+                    "uz": "«Sapphire Asia» MChJ",
+                    "en": "Sapphire Asia LLC"
                 },
                 "inn": "302588595",
                 "type": "legal",
@@ -5792,9 +5792,9 @@
                 "phone": "+998972880088",
                 "email": "info@sapphireasiatours.com",
                 "address": {
-                    "en": "г. Самарканд, ул. Рудаки 179",
                     "ru": "г. Самарканд, ул. Рудаки 179",
-                    "uz": "г. Самарканд, ул. Рудаки 179"
+                    "uz": "г. Самарканд, ул. Рудаки 179",
+                    "en": "г. Самарканд, ул. Рудаки 179"
                 },
                 "director_name": "Х. Б. Шайманов",
                 "bank_accounts": [
@@ -5833,9 +5833,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "IMRAN-TOURS LLC",
                     "ru": "ООО «IMRAN-TOURS»",
-                    "uz": "\"IMRAN-TOURS\" MChJ"
+                    "uz": "\"IMRAN-TOURS\" MChJ",
+                    "en": "IMRAN-TOURS LLC"
                 },
                 "inn": "309963464",
                 "type": "legal",
@@ -5843,9 +5843,9 @@
                 "phone": "+998977376060; +99897 548 33 33",
                 "email": "assalom.tour@mail.ru",
                 "address": {
-                    "en": "2 Kichik Xalqa Yoli Street, Apartment 2, Tashkent",
                     "ru": "г. Ташкент, Кичик Халка Йули, 2-уй, 2-хонадон",
-                    "uz": "Toshkent, Kichik Xalqa Yoʻli, 2-uy, 2-xonadon"
+                    "uz": "Toshkent, Kichik Xalqa Yoʻli, 2-uy, 2-xonadon",
+                    "en": "2 Kichik Xalqa Yoli Street, Apartment 2, Tashkent"
                 },
                 "director_name": "Дадаходжаев.С.Ф",
                 "bank_accounts": [
@@ -5884,9 +5884,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SAMARCANDA ADVENTURES LLC",
                     "ru": "ООО «SAMARCANDA ADVENTURES»",
-                    "uz": "\"SAMARCANDA ADVENTURES\" MChJ"
+                    "uz": "\"SAMARCANDA ADVENTURES\" MChJ",
+                    "en": "SAMARCANDA ADVENTURES LLC"
                 },
                 "inn": "311728344",
                 "type": "legal",
@@ -5894,9 +5894,9 @@
                 "phone": "+998-50-444-17-17",
                 "email": "info@samarcanda.uz",
                 "address": {
-                    "en": "Avisozlar-3, 50, Yashnabad District, Tashkent",
                     "ru": "Ависозлар-3, 50, Яшнабадский р-н г. Ташкент",
-                    "uz": "Avisozlar-3, 50, Yashnobod tumani, Toshkent"
+                    "uz": "Avisozlar-3, 50, Yashnobod tumani, Toshkent",
+                    "en": "Avisozlar-3, 50, Yashnabad District, Tashkent"
                 },
                 "director_name": "А.К. Муминов",
                 "bank_accounts": [
@@ -5935,9 +5935,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT STAR GROUP LLC",
                     "ru": "ООО «ORIENT STAR GROUP»",
-                    "uz": "\"ORIENT STAR GROUP\" MChJ"
+                    "uz": "\"ORIENT STAR GROUP\" MChJ",
+                    "en": "ORIENT STAR GROUP LLC"
                 },
                 "inn": "303722254",
                 "type": "legal",
@@ -5945,9 +5945,9 @@
                 "phone": "+99897-722-22-26; +998974441555",
                 "email": "welcome@orientstar.uz",
                 "address": {
-                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
                     "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
-                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6",
+                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011"
                 },
                 "director_name": "С. Х. Бегматов",
                 "bank_accounts": [
@@ -6002,9 +6002,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Geo Tour Service LLC",
                     "ru": "ООО «Geo Tour Service»",
-                    "uz": "\"Geo Tour Service\" MChJ"
+                    "uz": "\"Geo Tour Service\" MChJ",
+                    "en": "Geo Tour Service LLC"
                 },
                 "inn": "303906847",
                 "type": "legal",
@@ -6012,9 +6012,9 @@
                 "phone": "+998 71 288 44 48; +998 99 575 5050; +99890 9600150; +99899 7610150",
                 "email": "info@orientmice.com",
                 "address": {
-                    "en": "9 Mavze, 12, Apartment 1, Chilanzar District, Tashkent",
                     "ru": "г. Ташкент, Чиланзарский район, 9 квартал, дом 12, квартира 1",
-                    "uz": "Toshkent, Chilonzor tumani, 9-mavze, 12-uy, 1-xonadon"
+                    "uz": "Toshkent, Chilonzor tumani, 9-mavze, 12-uy, 1-xonadon",
+                    "en": "9 Mavze, 12, Apartment 1, Chilanzar District, Tashkent"
                 },
                 "director_name": "Ш. Пардаев",
                 "bank_accounts": [
@@ -6053,9 +6053,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Dolores Travel Services JV LLC",
                     "ru": "СП ООО «Dolores Travel Services»",
-                    "uz": "\"Dolores Travel Services\" QK MChJ"
+                    "uz": "\"Dolores Travel Services\" QK MChJ",
+                    "en": "Dolores Travel Services JV LLC"
                 },
                 "inn": "205424619",
                 "type": "legal",
@@ -6063,9 +6063,9 @@
                 "phone": "(99871) 1208883; +99855 515-88-83; (99875) 5158883; (99878) 1208883; (998 78) 1208873",
                 "email": "info@dolores.uz",
                 "address": {
-                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent",
                     "ru": "104 А, ул. Кичик Бешагач, Яккасарайский р-он, г. Ташкент",
-                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent"
+                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent",
+                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent"
                 },
                 "director_name": "Байзакова Ш.Б.",
                 "bank_accounts": [
@@ -6104,9 +6104,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "HOLIDAYTRAVEL LLC",
                     "ru": "ООО «HOLIDAYTRAVEL»",
-                    "uz": "«HOLIDAYTRAVEL» MChJ"
+                    "uz": "«HOLIDAYTRAVEL» MChJ",
+                    "en": "HOLIDAYTRAVEL LLC"
                 },
                 "inn": "308945946",
                 "type": "legal",
@@ -6114,9 +6114,9 @@
                 "phone": "+998972621661",
                 "email": "info@uzholiday.com",
                 "address": {
-                    "en": "Узбекистон Овози 21, г. Ташкент",
                     "ru": "Узбекистон Овози 21, г. Ташкент",
-                    "uz": "Узбекистон Овози 21, г. Ташкент"
+                    "uz": "Узбекистон Овози 21, г. Ташкент",
+                    "en": "Узбекистон Овози 21, г. Ташкент"
                 },
                 "director_name": "З.Х. Бабаева",
                 "bank_accounts": [
@@ -6155,9 +6155,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Samarkanda Travel and Tours LLC",
                     "ru": "ООО «Samarkanda Travel and Tours»",
-                    "uz": "«Samarkanda Travel and Tours» MChJ"
+                    "uz": "«Samarkanda Travel and Tours» MChJ",
+                    "en": "Samarkanda Travel and Tours LLC"
                 },
                 "inn": "206930939",
                 "type": "legal",
@@ -6165,9 +6165,9 @@
                 "phone": "+998977650105",
                 "email": "aziza@samarkanda-travel.com",
                 "address": {
-                    "en": "100100, г.Ташкент, ул. Коракум 2, дом 19",
                     "ru": "100100, г.Ташкент, ул. Коракум 2, дом 19",
-                    "uz": "100100, г.Ташкент, ул. Коракум 2, дом 19"
+                    "uz": "100100, г.Ташкент, ул. Коракум 2, дом 19",
+                    "en": "100100, г.Ташкент, ул. Коракум 2, дом 19"
                 },
                 "director_name": "К.А. ?",
                 "bank_accounts": [
@@ -6206,9 +6206,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SARBON TOURS LLC",
                     "ru": "ООО «SARBON TOURS»",
-                    "uz": "«SARBON TOURS» MChJ"
+                    "uz": "«SARBON TOURS» MChJ",
+                    "en": "SARBON TOURS LLC"
                 },
                 "inn": "204130068",
                 "type": "legal",
@@ -6216,9 +6216,9 @@
                 "phone": "+998 78-147-04-77",
                 "email": "sarbontour@gmail.com",
                 "address": {
-                    "en": "Тошкент ш. 100060, Шахрисабз кўчаси 38/3",
                     "ru": "Тошкент ш. 100060, Шахрисабз кўчаси 38/3",
-                    "uz": "Тошкент ш. 100060, Шахрисабз кўчаси 38/3"
+                    "uz": "Тошкент ш. 100060, Шахрисабз кўчаси 38/3",
+                    "en": "Тошкент ш. 100060, Шахрисабз кўчаси 38/3"
                 },
                 "director_name": "Н.Р.Маматкулов",
                 "bank_accounts": [
@@ -6257,9 +6257,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "TOUR EAST LLC",
                     "ru": "ООО «TOUR EAST»",
-                    "uz": "«TOUR EAST» MChJ"
+                    "uz": "«TOUR EAST» MChJ",
+                    "en": "TOUR EAST LLC"
                 },
                 "inn": "306151418",
                 "type": "legal",
@@ -6267,9 +6267,9 @@
                 "phone": "+998997778020",
                 "email": "toureastorg@yandex.com",
                 "address": {
-                    "en": "г.Бухара ул.Мустакиллик 33/31",
                     "ru": "г.Бухара ул.Мустакиллик 33/31",
-                    "uz": "г.Бухара ул.Мустакиллик 33/31"
+                    "uz": "г.Бухара ул.Мустакиллик 33/31",
+                    "en": "г.Бухара ул.Мустакиллик 33/31"
                 },
                 "director_name": "В.Б. Розикович",
                 "bank_accounts": [
@@ -6308,9 +6308,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "AFSONA TRAVEL LLC",
                     "ru": "ООО «AFSONA TRAVEL»",
-                    "uz": "«AFSONA TRAVEL» MChJ"
+                    "uz": "«AFSONA TRAVEL» MChJ",
+                    "en": "AFSONA TRAVEL LLC"
                 },
                 "inn": "202822781",
                 "type": "legal",
@@ -6318,9 +6318,9 @@
                 "phone": "+998 90 809 26 01",
                 "email": null,
                 "address": {
-                    "en": "140100 Самарканд, массив Конигил",
                     "ru": "140100 Самарканд, массив Конигил",
-                    "uz": "140100 Самарканд, массив Конигил"
+                    "uz": "140100 Самарканд, массив Конигил",
+                    "en": "140100 Самарканд, массив Конигил"
                 },
                 "director_name": "Сайдаминова Ш.Х.",
                 "bank_accounts": [
@@ -6359,9 +6359,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "UZBEKISTAN AIRWAYS JSC",
                     "ru": "АО «UZBEKISTAN AIRWAYS»",
-                    "uz": "«UZBEKISTAN AIRWAYS» AJ"
+                    "uz": "«UZBEKISTAN AIRWAYS» AJ",
+                    "en": "UZBEKISTAN AIRWAYS JSC"
                 },
                 "inn": "306628114",
                 "type": "legal",
@@ -6369,9 +6369,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
                     "ru": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
-                    "uz": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,"
+                    "uz": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,",
+                    "en": "Республика Узбекистан, г. Ташкент, 100060, проспект Амира Темура 41,"
                 },
                 "director_name": "У.А. Хусанов",
                 "bank_accounts": [
@@ -6418,9 +6418,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Dolores Travel Services JV LLC",
                     "ru": "СП ООО «Dolores Travel Services»",
-                    "uz": "\"Dolores Travel Services\" QK MChJ"
+                    "uz": "\"Dolores Travel Services\" QK MChJ",
+                    "en": "Dolores Travel Services JV LLC"
                 },
                 "inn": "205424619",
                 "type": "legal",
@@ -6428,9 +6428,9 @@
                 "phone": "(99871) 1208883; +99855 515-88-83; (99875) 5158883; (99878) 1208883; (998 78) 1208873",
                 "email": "info@dolores.uz",
                 "address": {
-                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent",
                     "ru": "104 А, ул. Кичик Бешагач, Яккасарайский р-он, г. Ташкент",
-                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent"
+                    "uz": "104A, Kichik Beshagach koʻchasi, Yakkasaroy tumani, Toshkent",
+                    "en": "104A Kichik Beshagach Street, Yakkasaray District, Tashkent"
                 },
                 "director_name": "Байзакова Ш.Б.",
                 "bank_accounts": [
@@ -6469,9 +6469,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "TRAVEL ISTAN LLC",
                     "ru": "ООО «TRAVEL ISTAN»",
-                    "uz": "«TRAVEL ISTAN» MChJ"
+                    "uz": "«TRAVEL ISTAN» MChJ",
+                    "en": "TRAVEL ISTAN LLC"
                 },
                 "inn": "311123576",
                 "type": "legal",
@@ -6479,9 +6479,9 @@
                 "phone": "+998909060052",
                 "email": "sanjar.azizov@travelistan.uz",
                 "address": {
-                    "en": "ул. Ахмад Дониш 62, Ташкент, Узбекистан, 100170",
                     "ru": "ул. Ахмад Дониш 62, Ташкент, Узбекистан, 100170",
-                    "uz": "ул. Ахмад Дониш 62, Ташкент, Узбекистан, 100170"
+                    "uz": "ул. Ахмад Дониш 62, Ташкент, Узбекистан, 100170",
+                    "en": "ул. Ахмад Дониш 62, Ташкент, Узбекистан, 100170"
                 },
                 "director_name": "С.Я. Азизов",
                 "bank_accounts": [
@@ -6520,9 +6520,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Sanat Travel Experts JV",
                     "ru": "СП «Sanat Travel Experts»",
-                    "uz": "\"Sanat Travel Experts\" QK"
+                    "uz": "\"Sanat Travel Experts\" QK",
+                    "en": "Sanat Travel Experts JV"
                 },
                 "inn": "305072628",
                 "type": "legal",
@@ -6530,9 +6530,9 @@
                 "phone": "+998 99 807 06 08",
                 "email": "timur@ste.uz",
                 "address": {
-                    "en": "2 Chatqol Street, Mirzo Ulugbek District, Tashkent, 100007",
                     "ru": "г. Ташкент, Мирзо-Улугбекский район, ул. Чаткол 2, индекс 100007",
-                    "uz": "Toshkent shahri, Mirzo Ulugʻbek tumani, Chatqol koʻchasi 2, 100007"
+                    "uz": "Toshkent shahri, Mirzo Ulugʻbek tumani, Chatqol koʻchasi 2, 100007",
+                    "en": "2 Chatqol Street, Mirzo Ulugbek District, Tashkent, 100007"
                 },
                 "director_name": "Ишмухаметов Тимур",
                 "bank_accounts": [
@@ -6571,9 +6571,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT STAR GROUP LLC",
                     "ru": "ООО «ORIENT STAR GROUP»",
-                    "uz": "\"ORIENT STAR GROUP\" MChJ"
+                    "uz": "\"ORIENT STAR GROUP\" MChJ",
+                    "en": "ORIENT STAR GROUP LLC"
                 },
                 "inn": "303722254",
                 "type": "legal",
@@ -6581,9 +6581,9 @@
                 "phone": "+99897-722-22-26; +998974441555",
                 "email": "welcome@orientstar.uz",
                 "address": {
-                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011",
                     "ru": "100011, г. Ташкент, Шайхонтохурский район, ул. Анхор буйи, 6",
-                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6"
+                    "uz": "100011, Toshkent, Shayxontohur tumani, Anhor boʻyi koʻchasi, 6",
+                    "en": "6 Anhor Boʻyi Street, Shaykhantakhur District, Tashkent, 100011"
                 },
                 "director_name": "С. Х. Бегматов",
                 "bank_accounts": [
@@ -6638,9 +6638,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Ariana Tours LLC",
                     "ru": "ООО «Ariana Tours»",
-                    "uz": "«Ariana Tours» MChJ"
+                    "uz": "«Ariana Tours» MChJ",
+                    "en": "Ariana Tours LLC"
                 },
                 "inn": "304790036",
                 "type": "legal",
@@ -6648,9 +6648,9 @@
                 "phone": "+99897-9183055",
                 "email": "info@arianatours.uz",
                 "address": {
-                    "en": "Шота Руставели 4А/1, Самарканд 140100 Узбекистан",
                     "ru": "Шота Руставели 4А/1, Самарканд 140100 Узбекистан",
-                    "uz": "Шота Руставели 4А/1, Самарканд 140100 Узбекистан"
+                    "uz": "Шота Руставели 4А/1, Самарканд 140100 Узбекистан",
+                    "en": "Шота Руставели 4А/1, Самарканд 140100 Узбекистан"
                 },
                 "director_name": "Шаднева Г.Э.",
                 "bank_accounts": [
@@ -6689,9 +6689,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "GLOBAL EXPLORE LLC",
                     "ru": "ООО «GLOBAL EXPLORE»",
-                    "uz": "\"GLOBAL EXPLORE\" MChJ"
+                    "uz": "\"GLOBAL EXPLORE\" MChJ",
+                    "en": "GLOBAL EXPLORE LLC"
                 },
                 "inn": "308716494",
                 "type": "legal",
@@ -6699,9 +6699,9 @@
                 "phone": "+99897 444 45 33",
                 "email": "info@uzbekistandiscovery.com",
                 "address": {
-                    "en": "Y квартал 3/82, Chilanzar District, Tashkent",
                     "ru": "Чиланзарский район, Е квартал, 3/82, г. Ташкент",
-                    "uz": "Chilonzor tumani, Y kvartal, 3/82, Toshkent"
+                    "uz": "Chilonzor tumani, Y kvartal, 3/82, Toshkent",
+                    "en": "Y квартал 3/82, Chilanzar District, Tashkent"
                 },
                 "director_name": "И.Н.Курбонов",
                 "bank_accounts": [
@@ -6740,9 +6740,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ORIENT VOYAGES LLC",
                     "ru": "ООО «ORIENT VOYAGES»",
-                    "uz": "«ORIENT VOYAGES» MChJ"
+                    "uz": "«ORIENT VOYAGES» MChJ",
+                    "en": "ORIENT VOYAGES LLC"
                 },
                 "inn": "202960778",
                 "type": "legal",
@@ -6750,9 +6750,9 @@
                 "phone": null,
                 "email": null,
                 "address": {
-                    "en": "140120 г.Самарканд ул.Дагбитская 33",
                     "ru": "140120 г.Самарканд ул.Дагбитская 33",
-                    "uz": "140120 г.Самарканд ул.Дагбитская 33"
+                    "uz": "140120 г.Самарканд ул.Дагбитская 33",
+                    "en": "140120 г.Самарканд ул.Дагбитская 33"
                 },
                 "director_name": "М. Сайдаминов",
                 "bank_accounts": [
@@ -6791,9 +6791,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ZAMIN DMC LLC",
                     "ru": "ООО «ZAMIN DMC»",
-                    "uz": "\"ZAMIN DMC\" MChJ"
+                    "uz": "\"ZAMIN DMC\" MChJ",
+                    "en": "ZAMIN DMC LLC"
                 },
                 "inn": "311343097",
                 "type": "legal",
@@ -6801,9 +6801,9 @@
                 "phone": "+998 99 575 50 50; +99899 5750550",
                 "email": "info@zamindmc.uz",
                 "address": {
-                    "en": "22 A. Temur Street, Mirabad District, Tashkent",
                     "ru": "г. Ташкент, Мирабадский район, ул. А. Темура, дом 22",
-                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22"
+                    "uz": "Toshkent shahri, Mirabod tumani, A. Temur koʻchasi, 22",
+                    "en": "22 A. Temur Street, Mirabad District, Tashkent"
                 },
                 "director_name": "Ходжаев Т.А.",
                 "bank_accounts": [
@@ -6866,9 +6866,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "ANUR TOUR LLC",
                     "ru": "ООО «ANUR TOUR»",
-                    "uz": "\"ANUR TOUR\" MChJ"
+                    "uz": "\"ANUR TOUR\" MChJ",
+                    "en": "ANUR TOUR LLC"
                 },
                 "inn": "202232646",
                 "type": "legal",
@@ -6876,9 +6876,9 @@
                 "phone": "+99855 501 22 60; +99871 2302260",
                 "email": "info@anurtour.com",
                 "address": {
-                    "en": "C-5, 65, Apartment 185, Tashkent, 100017",
                     "ru": "г. Ташкент, Ц-5, дом-65, кв-185, 100017",
-                    "uz": "Toshkent, C-5, 65-uy, 185-xonadon, 100017"
+                    "uz": "Toshkent, C-5, 65-uy, 185-xonadon, 100017",
+                    "en": "C-5, 65, Apartment 185, Tashkent, 100017"
                 },
                 "director_name": "М.К. Раубаев",
                 "bank_accounts": [
@@ -6917,9 +6917,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Akbar Travel Asia LLC",
                     "ru": "ООО «Akbar Travel Asia»",
-                    "uz": "«Akbar Travel Asia» MChJ"
+                    "uz": "«Akbar Travel Asia» MChJ",
+                    "en": "Akbar Travel Asia LLC"
                 },
                 "inn": "306620600",
                 "type": "legal",
@@ -6927,9 +6927,9 @@
                 "phone": null,
                 "email": "info@akbartraveluz.com",
                 "address": {
-                    "en": "220100, 62/3, улица Ханкинская, город Ургенч, Узбекистан",
                     "ru": "220100, 62/3, улица Ханкинская, город Ургенч, Узбекистан",
-                    "uz": "220100, 62/3, улица Ханкинская, город Ургенч, Узбекистан"
+                    "uz": "220100, 62/3, улица Ханкинская, город Ургенч, Узбекистан",
+                    "en": "220100, 62/3, улица Ханкинская, город Ургенч, Узбекистан"
                 },
                 "director_name": "Матчанов Б.Ю",
                 "bank_accounts": [
@@ -6968,9 +6968,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "SITARA INTERNATIONAL LTD LLC",
                     "ru": "ИП ООО «SITARA INTERNATIONAL LTD»",
-                    "uz": "\"SITARA INTERNATIONAL LTD\" IP MChJ"
+                    "uz": "\"SITARA INTERNATIONAL LTD\" IP MChJ",
+                    "en": "SITARA INTERNATIONAL LTD LLC"
                 },
                 "inn": "201904269",
                 "type": "legal",
@@ -6978,9 +6978,9 @@
                 "phone": "+99871 2814148; (+99871) 255-35-04",
                 "email": "tashkent@sitara.com",
                 "address": {
-                    "en": "45 Shota Rustaveli Street, Tashkent, 100100",
                     "ru": "100100 г. Ташкент, ул. Шота Руставели, 45",
-                    "uz": "100100 Toshkent, Shota Rustaveli koʻchasi, 45"
+                    "uz": "100100 Toshkent, Shota Rustaveli koʻchasi, 45",
+                    "en": "45 Shota Rustaveli Street, Tashkent, 100100"
                 },
                 "director_name": "Н.Б. Сангилова",
                 "bank_accounts": [
@@ -7019,9 +7019,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "MY FREIGHTER LLC",
                     "ru": "ООО «MY FREIGHTER»",
-                    "uz": "«MY FREIGHTER» MChJ"
+                    "uz": "«MY FREIGHTER» MChJ",
+                    "en": "MY FREIGHTER LLC"
                 },
                 "inn": "306985993",
                 "type": "legal",
@@ -7029,9 +7029,9 @@
                 "phone": "+99891-030-82-21",
                 "email": "a.osintsev@centrum-air.com",
                 "address": {
-                    "en": "ул. Буюк Ипак Йули, 262, Мирзо Улугбекский район, Ташкент, Узбекистан, 100187.",
                     "ru": "ул. Буюк Ипак Йули, 262, Мирзо Улугбекский район, Ташкент, Узбекистан, 100187.",
-                    "uz": "ул. Буюк Ипак Йули, 262, Мирзо Улугбекский район, Ташкент, Узбекистан, 100187."
+                    "uz": "ул. Буюк Ипак Йули, 262, Мирзо Улугбекский район, Ташкент, Узбекистан, 100187.",
+                    "en": "ул. Буюк Ипак Йули, 262, Мирзо Улугбекский район, Ташкент, Узбекистан, 100187."
                 },
                 "director_name": "А.А.Абдурахманов",
                 "bank_accounts": [
@@ -7070,9 +7070,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Think Strawberries MENA LLC",
                     "ru": "Think Strawberries MENA LLC",
-                    "uz": "Think Strawberries MENA LLC"
+                    "uz": "Think Strawberries MENA LLC",
+                    "en": "Think Strawberries MENA LLC"
                 },
                 "inn": null,
                 "type": "legal",
@@ -7128,9 +7128,9 @@
             "responsible_email": "mr.silverwind1998@gmail.com",
             "contact": {
                 "name": {
-                    "en": "Think Strawberries MENA LLC",
                     "ru": "Think Strawberries MENA LLC",
-                    "uz": "Think Strawberries MENA LLC"
+                    "uz": "Think Strawberries MENA LLC",
+                    "en": "Think Strawberries MENA LLC"
                 },
                 "inn": null,
                 "type": "legal",
@@ -7176,8 +7176,19 @@
     ],
     "orders": [
         {
+            "number": "49-AF",
+            "scope": "pr_center",
+            "basis_number": null,
+            "title": "Об организации пресс-туров и информационных туров в 2026 году",
+            "description": null,
+            "issued_at": "2026-01-01",
+            "file_path": null,
+            "status": true
+        },
+        {
             "number": "119-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии в международной туристической выставке «ATM-2025» в городе Дубай (ОАЭ)",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз об обеспечении участия в международной туристической выставке «ATM-2025», проходящей 28 апреля — 1 мая 2025 г. в Дубае (ОАЭ). Утверждается список членов делегации (приложение 1) и смета расходов, связанных с участием (приложение 2). ГУП «Milliy PR-markazi» поручается организовать национальный стенд Узбекистана, продвигать туристический потенциал страны через раздаточные материалы и привлечь к выставке субъектов предпринимательства в сфере туризма.",
             "issued_at": "2025-04-23",
@@ -7187,6 +7198,7 @@
         {
             "number": "06-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии в международной туристической выставке «FITUR 2025» в городе Мадрид (Испания)",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз об обеспечении участия в международной туристической выставке «FITUR 2025», проходящей 22–26 января 2025 г. в Мадриде (Испания). Утверждается список ответственных лиц/участников делегации (приложение 1) и смета расходов, связанных с участием (приложение 2). Ответственные члены делегации направляются в командировку в Мадрид 20–27 января, остальные участники — 21–27 января 2025 г. ГУП «Milliy PR-markazi» поручается организовать национальный стенд Узбекистана, продвигать туристический потенциал страны через раздаточные материалы, привлечь к выставке субъектов предпринимательства в сфере туризма, покрыть расходы, связанные с участием своих сотрудников (согласно приложению 2), и в течение 7 дней после завершения выставки представить Комитету отчёт о принятых мерах.",
             "issued_at": "2025-01-06",
@@ -7196,6 +7208,7 @@
         {
             "number": "142-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "О проведении «GITF» международной туристической выставки в городе Гуанчжоу (КНР) и организации «роуд-шоу» в рамках «Года туризма Узбекистана в Китае»",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз, изданный во исполнение поручения Кабинета Министров РУз от 27 января 2025 г. № 22/33-65, об обеспечении участия в международной туристической выставке «GITF», проходящей 13–22 мая 2025 г. в Гуанчжоу (КНР), а также организации «роуд-шоу» мероприятий в городах Пекин, Чжэнчжоу и Синдао в рамках «Года туризма Узбекистана в Китае». Утверждается список членов делегации, направляемой в КНР (приложение 1), и смета расходов на организацию мероприятий (приложение 2). К руководству и исполнению принимаются поручения Кабинета Министров от 27 января 2025 г. № 22/33-65 и от 25 марта 2025 г. № 22/1-2006. Ответственным по вопросам повышения эффективности духовно-просветительской работы и соблюдения законодательства о государственном языке назначен советник Раиса Ф. Додиев.",
             "issued_at": "2025-05-12",
@@ -7205,6 +7218,7 @@
         {
             "number": "292-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии в международной туристической выставке «IFTM Top Resa-2025» и Каннском фестивале в городе Париж (Франция)",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз, изданный во исполнение поручения Кабинета Министров РУз от 27 января 2025 г. № 22/33-65 и поручения Комитета от 13 мая 2025 г. № 388, об обеспечении участия узбекистанских туристических компаний с национальным стендом Узбекистана в международной туристической выставке «IFTM Top Resa-2025», проходящей 23–25 сентября 2025 г. в Париже (Франция), а также участия делегации Узбекистана в Каннском фестивале. Утверждается список членов делегации (приложение 1) и смета расходов, связанных с участием (приложение 2). Члены делегации направляются в командировку в Париж и Канны на 22–26 сентября 2025 г. ГУП «Milliy PR-markazi» поручается организовать национальный стенд Узбекистана, продвигать туристический потенциал страны через раздаточные материалы и видеоролики, привлечь к выставке субъектов предпринимательства в сфере туризма, а также покрыть связанные расходы согласно приложению 2 в установленном порядке.",
             "issued_at": "2025-08-26",
@@ -7214,6 +7228,7 @@
         {
             "number": "34-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии в международной туристической выставке «ITB Berlin 2025» в городе Берлин (ФРГ)",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз об обеспечении участия в международной туристической выставке «ITB Berlin 2025», проходящей 4–6 марта 2025 г. в Берлине (ФРГ). Утверждается список членов делегации (приложение 1) и смета расходов, связанных с участием (приложение 2). Ответственный за организационные вопросы делегации (Шаипов) направляется в командировку в Берлин 2–7 марта 2025 г. ГУП «Milliy PR-markazi» поручается организовать национальный стенд Узбекистана и продвигать туристический потенциал страны через раздаточные материалы.",
             "issued_at": "2025-07-07",
@@ -7223,6 +7238,7 @@
         {
             "number": "74-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии с национальным стендом Узбекистана на международных туристических ярмарках",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз о заблаговременной подготовке к участию в международных туристических ярмарках 2025 года с национальным стендом Узбекистана. Утверждается перечень международных туристических ярмарок, в которых планируется участие Комитета в 2025 году (приложение 1), и расходы на аренду земли/площади и строительство стенда (приложение 2). Управлению финансов и экономики (Махмудов) поручено финансирование расходов согласно приложению 2 за счёт средств внебюджетного фонда поддержки развития туризма при Комитете, с перечислением средств ГУП «Milliy PR-markazi». Отделу комплаенс-контроля, противодействия коррупции и внутреннего аудита (Равшанов) совместно с ГУП «Milliy PR-markazi» поручено координировать вопросы, связанные с арендой земли и строительством стендов на ярмарках. ГУП «Milliy PR-markazi» (Муродуллаев) поручено обеспечить участие с национальным стендом на международных туристических ярмарках согласно приложению 2 и представлять Комитету отчёт по итогам каждой ярмарки, а также в течение недели после каждой ярмарки представлять в Управление финансов и экономики финансовый отчёт по понесённым расходам и меры по возврату сэкономленных средств. Отделу информационной службы (Асилходжаева) поручено обеспечить широкое освещение хода выставки на официальных веб-сайтах и в социальных сетях Комитета и ОАВ.",
             "issued_at": "2025-03-13",
@@ -7232,6 +7248,7 @@
         {
             "number": "301-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии в международной туристической выставке «Matta Fair 2025» в городе Куала-Лумпур (Малайзия)",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз об обеспечении участия в международной туристической выставке «Matta Fair 2025», проходящей 5–7 сентября 2025 г. в Куала-Лумпуре (Малайзия). Утверждается список членов делегации (приложение 1) и смета расходов, связанных с участием (приложение 2). Члены делегации направляются в командировку в Куала-Лумпур на 4–8 сентября 2025 г. ГУП «Milliy PR-markazi» (Муродуллаев) поручается организовать строительство национального стенда Узбекистана и проконтролировать все организационные вопросы, направить своих сотрудников в командировку для подготовки к выставке, привлечь к выставке субъектов предпринимательства в сфере туризма, а также в течение 7 дней после завершения выставки представить Комитету отчёт.",
             "issued_at": "2025-08-28",
@@ -7241,6 +7258,7 @@
         {
             "number": "73-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии в международной туристической выставке «MITT 2025» в городе Москва (Российская Федерация)",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз об обеспечении участия в международной туристической выставке «MITT 2025», проходящей 18–20 марта 2025 г. в Москве (РФ). Утверждается список членов делегации (приложение 1) и смета расходов, связанных с участием (приложение 2). Ответственный за организационные вопросы делегации (Гафуров) направляется в командировку в Москву 16–21 марта 2025 г. ГУП «Milliy PR-markazi» (Муродуллаев) поручается организовать национальный стенд Узбекистана, продвигать туристический потенциал страны через раздаточные материалы, привлечь к выставке субъектов предпринимательства в сфере туризма, покрыть расходы согласно приложению 2 в установленном порядке (при этом расходы на командировку сотрудников центра осуществляются за счёт собственных средств организации), а также в течение 3 дней после завершения выставки представить Комитету отчёт.",
             "issued_at": "2025-03-13",
@@ -7250,6 +7268,7 @@
         {
             "number": "39-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии в международной туристической выставке «SATTE 2025» в городе Нью-Дели (Индия)",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз об обеспечении участия в международной туристической выставке «SATTE 2025», проходящей 19–21 февраля 2025 г. в Нью-Дели (Индия). Утверждается список членов делегации (приложение 1) и смета расходов, связанных с участием (приложение 2). Ответственные за организационные вопросы члены делегации направляются в командировку в Нью-Дели 18–22 февраля 2025 г. ГУП «Milliy PR-markazi» (Муродуллаев) поручается организовать национальный стенд Узбекистана, продвигать туристический потенциал страны через раздаточные материалы, привлечь к выставке субъектов предпринимательства в сфере туризма, покрыть расходы, связанные с участием своих сотрудников, согласно приложению 2 в установленном порядке, а также в течение 3 дней после завершения выставки представить Комитету отчёт. Управлению финансов и экономики (Махмудов) поручено обеспечить финансирование расходов согласно приложению 2 за счёт средств внебюджетного фонда поддержки развития туризма при Комитете (за исключением командировочных расходов сотрудников «Milliy PR-markazi»).",
             "issued_at": "2025-02-10",
@@ -7259,6 +7278,7 @@
         {
             "number": "110-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "О «SCITE Sichuan 2025» международной туристической выставке в провинции Сычуань (КНР) и организации «роуд-шоу» в рамках «Года туризма Узбекистана в Китае»",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз, изданный во исполнение поручения Кабинета Министров РУз от 27 января 2025 г. № 22/33-65, об обеспечении участия в международной туристической выставке «SCITE Sichuan 2025», проходящей 24 апреля – 1 мая 2025 г. в провинции Сычуань (КНР), а также организации «роуд-шоу» мероприятий в городах Чанша и Чунцин в рамках «Года туризма Узбекистана в Китае». К руководству и исполнению принимаются поручения Кабинета Министров от 27 января 2025 г. № 22/33-65 и от 25 марта 2025 г. № 22/1-2006. Утверждается список членов делегации, направляемой в КНР (приложение 1), и смета расходов на организацию мероприятий (приложение 2). Советнику по вопросам повышения эффективности духовно-просветительской работы и соблюдения законодательства о государственном языке Ф. Додиеву поручено координировать организационные вопросы мероприятия. УП «Ipak yo'li ofisi» (Валиджанов) поручено проработать организационные вопросы, связанные с визитом делегации, и разработать проект маршрута, освещающего туристический потенциал Узбекистана.",
             "issued_at": "2025-04-18",
@@ -7268,6 +7288,7 @@
         {
             "number": "166-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии в международной туристической выставке «SITF 2025» в городе Сеул (Республика Корея)",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз об обеспечении участия в международной туристической выставке «SITF 2025», проходящей 5–8 июня 2025 г. в Сеуле (Республика Корея), а также в бизнес-форуме «Туристический потенциал Узбекистана», который состоится 9 июня в здании посольства Узбекистана в Корее. Утверждается список сотрудников Комитета и ГУП «Milliy PR-markazi», участвующих в выставке и форуме (приложение 1), и смета расходов, связанных с участием (приложение 2). Ответственные за организационные вопросы делегации направляются в командировку в Сеул 4–10 июня 2025 г. ГУП «Milliy PR-markazi» (Муродуллаев) поручается организовать национальный стенд Узбекистана и продвигать туристический потенциал страны через раздаточные материалы.",
             "issued_at": "2025-05-27",
@@ -7277,6 +7298,7 @@
         {
             "number": "306-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии в международной туристической выставке «TT Warsaw 2025» в городе Варшава (Польша)",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз об обеспечении участия в международной туристической выставке «TT Warsaw 2025», проходящей 10–12 октября 2025 г. в Варшаве (Польша). Утверждается список членов делегации (приложение 1) и смета расходов, связанных с участием (приложение 2). Члены делегации направляются в командировку в Варшаву на 9–13 октября 2025 г. ГУП «Milliy PR-markazi» (Муродуллаев) поручается организовать строительство национального стенда Узбекистана и проконтролировать все организационные вопросы, направить своих сотрудников в командировку для подготовки к выставке, привлечь к выставке субъектов предпринимательства в сфере туризма, а также в течение 3 дней после завершения выставки представить Комитету отчёт. Управлению финансов и экономики (Махмудов) поручено финансирование командировочных расходов сотрудников ГУП «Milliy PR-markazi», ОАВ и участников культурной программы за счёт средств внебюджетного фонда поддержки развития туризма при Комитете.",
             "issued_at": "2025-09-03",
@@ -7286,11 +7308,210 @@
         {
             "number": "359-AF",
             "scope": "committee",
+            "basis_number": null,
             "title": "Об участии в международной туристической выставке «World Travel Market» в городе Лондон (Великобритания)",
             "description": "Приказ Комитета по туризму при Министерстве экологии, охраны окружающей среды и изменения климата РУз, изданный во исполнение поручения Кабинета Министров РУз от 27 января 2025 г. № 22/33-65, об обеспечении участия делегации Узбекистана в международной туристической выставке «World Travel Market», проходящей 4–6 ноября 2025 г. в Лондоне (Великобритания). Утверждается список членов делегации (приложение 1) и смета расходов, связанных с участием (приложение 2). Члены делегации направляются в командировку в Лондон на 2–7 ноября 2025 г. ГУП «Milliy PR-markazi» (Муродуллаев) поручается организовать национальный стенд Узбекистана, продвигать туристический потенциал страны через раздаточные материалы и видеоролики, привлечь к выставке субъектов предпринимательства в сфере туризма, а также организовать зону «Uzbekistan VR» с необходимым оборудованием.",
             "issued_at": "2025-10-21",
             "file_path": "uploads/files/orders/2026/07/01KXZ0YK37YNWJ76XD4S1YHNZF.pdf",
             "status": true
+        }
+    ],
+    "project_payments": [],
+    "requisitions": [
+        {
+            "number": "ЗВ-2026-001",
+            "title": "Закупка выставочного оборудования для стенда ATM Dubai",
+            "description": "Требуется закупить модульные стеновые панели, подсветку и стойку ресепшн для национального стенда.\n\nСмета: 42 800 000 сум. Поставка до 15 марта, монтаж силами подрядчика.",
+            "project": "SITF 2025",
+            "author_email": "manager@test.uz",
+            "status": "approved",
+            "submitted_at": "2026-08-31 20:06:35",
+            "approvals": [
+                {
+                    "user_email": "legal@test.uz",
+                    "order": 1,
+                    "round": 1,
+                    "status": "approved",
+                    "original_status": null,
+                    "comment": null,
+                    "acted_at": "2026-08-31 20:06:35",
+                    "due_at": "2026-09-03 20:06:35"
+                },
+                {
+                    "user_email": "accounting@test.uz",
+                    "order": 2,
+                    "round": 1,
+                    "status": "approved",
+                    "original_status": null,
+                    "comment": null,
+                    "acted_at": "2026-08-31 20:06:35",
+                    "due_at": "2026-09-03 20:06:35"
+                }
+            ]
+        },
+        {
+            "number": "ЗВ-2026-002",
+            "title": "Перевод и печать каталога «Узбекистан — открытая страна»",
+            "description": "Перевод каталога на английский и арабский, вёрстка и печать тиража 3 000 экземпляров.\n\nТираж делится поровну между выставками ATM Dubai и WTM London.",
+            "project": "MITT-2025",
+            "author_email": "manager@test.uz",
+            "status": "in_review",
+            "submitted_at": "2026-08-31 20:06:35",
+            "approvals": [
+                {
+                    "user_email": "legal@test.uz",
+                    "order": 1,
+                    "round": 1,
+                    "status": "approved",
+                    "original_status": null,
+                    "comment": "Замечаний нет.",
+                    "acted_at": "2026-08-31 20:06:35",
+                    "due_at": "2026-09-03 20:06:35"
+                },
+                {
+                    "user_email": "accounting@test.uz",
+                    "order": 2,
+                    "round": 1,
+                    "status": "pending",
+                    "original_status": null,
+                    "comment": null,
+                    "acted_at": null,
+                    "due_at": "2026-09-03 20:06:35"
+                },
+                {
+                    "user_email": "director@test.uz",
+                    "order": 3,
+                    "round": 1,
+                    "status": "queued",
+                    "original_status": null,
+                    "comment": null,
+                    "acted_at": null,
+                    "due_at": null
+                }
+            ]
+        },
+        {
+            "number": "ЗВ-2026-003",
+            "title": "Аренда транспорта для пресс-тура по Самарканду и Бухаре",
+            "description": "Два микроавтобуса на 6 дней с водителями, включая топливо и парковку.\n\nГруппа: 14 журналистов из Германии, Франции и Южной Кореи.",
+            "project": "\"KITF-2026\"",
+            "author_email": "manager@test.uz",
+            "status": "in_review",
+            "submitted_at": "2026-08-31 20:06:35",
+            "approvals": [
+                {
+                    "user_email": "legal@test.uz",
+                    "order": 1,
+                    "round": 1,
+                    "status": "approved",
+                    "original_status": null,
+                    "comment": "Замечаний нет.",
+                    "acted_at": "2026-08-31 20:06:35",
+                    "due_at": "2026-09-03 20:06:35"
+                },
+                {
+                    "user_email": "accounting@test.uz",
+                    "order": 2,
+                    "round": 1,
+                    "status": "pending",
+                    "original_status": null,
+                    "comment": null,
+                    "acted_at": null,
+                    "due_at": "2026-09-03 20:06:35"
+                },
+                {
+                    "user_email": "director@test.uz",
+                    "order": 3,
+                    "round": 1,
+                    "status": "queued",
+                    "original_status": null,
+                    "comment": null,
+                    "acted_at": null,
+                    "due_at": null
+                }
+            ]
+        },
+        {
+            "number": "ЗВ-2026-004",
+            "title": "Продление лицензий на фотобанк и видеомонтаж",
+            "description": "Годовая подписка на фотобанк и пакет лицензий для монтажа промо-роликов.\n\nТекущие лицензии истекают в конце месяца.",
+            "project": "«Orol baliqlaridan 99 turdagi taomlar» — гастрономический фестиваль",
+            "author_email": "manager@test.uz",
+            "status": "rejected",
+            "submitted_at": "2026-08-31 20:06:35",
+            "approvals": [
+                {
+                    "user_email": "legal@test.uz",
+                    "order": 1,
+                    "round": 1,
+                    "status": "rejected",
+                    "original_status": null,
+                    "comment": "Смета превышает лимит, утверждённый на квартал. Нужен пересчёт по позициям аренды.",
+                    "acted_at": "2026-08-31 20:06:35",
+                    "due_at": "2026-09-03 20:06:35"
+                },
+                {
+                    "user_email": "accounting@test.uz",
+                    "order": 2,
+                    "round": 1,
+                    "status": "invalidated",
+                    "original_status": "queued",
+                    "comment": null,
+                    "acted_at": null,
+                    "due_at": null
+                },
+                {
+                    "user_email": "director@test.uz",
+                    "order": 3,
+                    "round": 1,
+                    "status": "invalidated",
+                    "original_status": "queued",
+                    "comment": null,
+                    "acted_at": null,
+                    "due_at": null
+                }
+            ]
+        },
+        {
+            "number": "ЗВ-2026-005",
+            "title": "Закупка сувенирной продукции к WTM London",
+            "description": "Брендированные блокноты, флешки и упаковка для подарочных наборов.\n\nОриентировочный объём — 500 наборов, финальные макеты в работе.",
+            "project": "QTM-2025",
+            "author_email": "manager@test.uz",
+            "status": "draft",
+            "submitted_at": null,
+            "approvals": [
+                {
+                    "user_email": "legal@test.uz",
+                    "order": 1,
+                    "round": 1,
+                    "status": "queued",
+                    "original_status": null,
+                    "comment": null,
+                    "acted_at": null,
+                    "due_at": null
+                },
+                {
+                    "user_email": "accounting@test.uz",
+                    "order": 2,
+                    "round": 1,
+                    "status": "queued",
+                    "original_status": null,
+                    "comment": null,
+                    "acted_at": null,
+                    "due_at": null
+                },
+                {
+                    "user_email": "director@test.uz",
+                    "order": 3,
+                    "round": 1,
+                    "status": "queued",
+                    "original_status": null,
+                    "comment": null,
+                    "acted_at": null,
+                    "due_at": null
+                }
+            ]
         }
     ]
 }
