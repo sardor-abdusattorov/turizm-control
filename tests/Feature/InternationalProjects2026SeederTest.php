@@ -17,7 +17,6 @@ function seed2026Registry(): void
 it('imports the 2026 international exhibition shells with venues', function () {
     seed2026Registry();
 
-    // Shells only — venue/dates/costs; participation income is entered by hand.
     expect(Project::count())->toBe(14);
 
     $fitur = Project::where('name', 'like', 'FITUR-2026%')->firstOrFail();
@@ -29,8 +28,6 @@ it('imports the 2026 international exhibition shells with venues', function () {
         ->and($fitur->standCurrency?->short_name)->toBe('UZS')
         ->and($fitur->contracts()->count())->toBe(0);
 
-    // KITF is priced in tenge — the currency added to the seeder for it.
-    // The registry name carries literal quotes («"KITF-2026"»), so match loosely.
     $kitf = Project::where('name', 'like', '%KITF-2026%')->firstOrFail();
     expect($kitf->venue)->toBe('Алматы, Казахстан');
 });

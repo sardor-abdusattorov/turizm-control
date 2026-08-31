@@ -9,12 +9,6 @@ use function Pest\Laravel\artisan;
 
 uses(RefreshDatabase::class);
 
-/**
- * The director stage (IN_REVIEW_DIRECTOR) must behave like the regular chain
- * stage everywhere a pending step surfaces: the «Ожидают меня» scope and the
- * SLA reminder command. Both used to filter on IN_REVIEW only, so a contract
- * sent to the director silently vanished from their queue and reminders.
- */
 function directorStageContract(): array
 {
     $chain = ContractApprover::factory()->approved()->create(['order' => 1]);

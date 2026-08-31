@@ -49,10 +49,6 @@ class RequisitionResource extends Resource
         return parent::getEloquentQuery()->visibleTo();
     }
 
-    /**
-     * The badge counts what is actually waiting on the viewer, not the whole
-     * registry — a number nobody has to act on is noise.
-     */
     public static function getNavigationBadge(): ?string
     {
         $waiting = static::getEloquentQuery()->awaiting()->count();

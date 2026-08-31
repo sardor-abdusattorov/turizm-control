@@ -12,8 +12,8 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class);
 
 it('flags a counterparty as supplier and/or client from its contract directions', function () {
-    $expenseType = ContractType::factory()->create();          // Expense — we pay them
-    $incomeType = ContractType::factory()->income()->create(); // Income — they pay us
+    $expenseType = ContractType::factory()->create();
+    $incomeType = ContractType::factory()->income()->create();
 
     $supplier = Contact::factory()->create();
     $client = Contact::factory()->create();

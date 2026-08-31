@@ -88,8 +88,6 @@ class PressToursTable
                     ->icon(fn (PressTourState $state): string => $state->icon())
                     ->sortable(),
 
-                // A tour that has happened owes a report pack; an empty count
-                // on a held tour is the thing the programme needs to chase.
                 TextColumn::make('attachments_count')
                     ->label(__('app.label.press_tour_documents'))
                     ->counts('attachments')
@@ -127,8 +125,6 @@ class PressToursTable
                     ->label(__('app.label.press_tour_state'))
                     ->options(PressTourState::options()),
 
-                // The working question after a trip: what has happened and
-                // still has nothing filed against it.
                 Filter::make('awaiting_documents')
                     ->label(__('app.label.press_tour_documents_missing'))
                     ->query(fn (Builder $query): Builder => $query

@@ -7,11 +7,6 @@ use Filament\Forms\Components\FileUpload;
 
 class PaymentFilesUpload
 {
-    /**
-     * Proof-of-payment uploads: bank screenshots and PDF payment orders,
-     * several per payment. Shared by the payment form and the contract
-     * view's quick "record payment" action.
-     */
     public static function make(string $field = 'screenshots'): FileUpload
     {
         return FileUpload::make($field)

@@ -48,10 +48,6 @@ class ContractAttachment extends Model
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
-    /**
-     * Signed expiring link, mirroring the gallery/payment-screenshot pattern —
-     * the private disk serves files only through temporary URLs.
-     */
     public function url(): ?string
     {
         if (! $this->file_path || ! Storage::disk('local')->exists($this->file_path)) {
@@ -73,10 +69,6 @@ class ContractAttachment extends Model
         return $extension !== '' ? $extension : null;
     }
 
-    /**
-     * Types the browser previews itself (with print and save built in).
-     * Everything else — Word files above all — only offers a download.
-     */
     public function isBrowserViewable(): bool
     {
         return in_array($this->extension(), ['pdf', 'jpg', 'jpeg', 'png'], true);

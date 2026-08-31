@@ -75,7 +75,6 @@ it('creates approvers in the order they were picked', function () {
 
     contractCreatorActing();
 
-    // Pick second-then-first to prove the chain follows the selection order.
     Livewire::test(CreateContract::class)
         ->fillForm([
             'number' => 'C-900',

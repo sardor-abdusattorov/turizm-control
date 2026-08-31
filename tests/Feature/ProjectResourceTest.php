@@ -125,8 +125,6 @@ it('shows the gallery read-only on the view page and never mutates the record', 
     Livewire::test(MediaLibrary::class, ['variant' => 'project-gallery', 'recordId' => $project->id])
         ->assertSuccessful();
 
-    // The viewer is display-only: no save/persist path exists, so the gallery
-    // is untouched — editing lives on the Edit page's writable FileUpload.
     expect(method_exists(MediaLibrary::class, 'save'))->toBeFalse()
         ->and($project->fresh()->gallery)->toBe(['uploads/images/projects/2025/01/a.jpg']);
 });
@@ -226,8 +224,6 @@ it('scopes the project contracts badge totals to what the viewer may see', funct
 
     actingAs($manager);
 
-    // The manager only counts their own contract; the totals never leak the
-    // other manager's amount.
     $totals = $project->visibleContractTotalsByCurrency();
 
     expect($project->visibleContracts())->toHaveCount(1)
@@ -258,8 +254,6 @@ it('scopes the breakdown view to one role and totals it per currency', function 
 
     actingAs(userWithPermission('view_any_project', 'view_all_contracts'));
 
-    // The sponsors breakdown must not leak participant fees — and vice versa:
-    // each role totals its own income contracts, per currency.
     $sponsorTotals = $project->incomeTotalsByCurrency(true);
     $feeTotals = $project->incomeTotalsByCurrency(false);
 

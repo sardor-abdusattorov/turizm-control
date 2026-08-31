@@ -7,11 +7,6 @@ use App\Models\Contract;
 use App\Models\User;
 use Filament\Actions\Action;
 
-/**
- * Shared building blocks for the contract/payment notifiers: the "open
- * contract" database-notification action and the Telegram mirror. Both
- * notifiers expose a public TelegramService `$telegram` the trait reaches.
- */
 trait InteractsWithContractNotifications
 {
     use RendersInRecipientLocale;
@@ -37,8 +32,6 @@ trait InteractsWithContractNotifications
             ]];
         }
 
-        // The full interactive card without leaving Telegram, plus the web
-        // link for the desktop.
         $keyboard[] = [[
             'text' => __('app.telegram.open_in_bot'),
             'callback_data' => "view:{$contract->id}",
@@ -49,9 +42,6 @@ trait InteractsWithContractNotifications
             'url' => $url,
         ]];
 
-        // Queued (afterCommit): notifications must never hold the workflow's
-        // DB transaction open on a slow Telegram round-trip, nor fire for a
-        // transaction that ends up rolled back.
         $this->telegram->queue(
             $recipient->telegram?->chat_id,
             "<b>{$title}</b>\n{$body}",

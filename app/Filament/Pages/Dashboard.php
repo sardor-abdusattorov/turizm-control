@@ -11,12 +11,6 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Contracts\View\View;
 
-/**
- * The dashboard is a plain Filament widget stack: the greeting card, the
- * project stats, and two native tables (contracts / participants). The
- * project choice lives in the standard dashboard FilterAction slide-over —
- * widgets read it through InteractsWithPageFilters.
- */
 class Dashboard extends BaseDashboard
 {
     use HasFiltersAction;
@@ -25,8 +19,6 @@ class Dashboard extends BaseDashboard
 
     public function mount(): void
     {
-        // Land on the nearest upcoming project so the dashboard is never
-        // empty on arrival; the filters can change or clear it.
         $this->filters ??= [];
         $this->filters['projectId'] ??= Project::dashboardDefault()?->id;
         $this->filters['type'] ??= self::ALL;
@@ -59,8 +51,6 @@ class Dashboard extends BaseDashboard
                         ->live()
                         ->afterStateUpdated(fn (Set $set) => $set('projectId', null)),
 
-                    // Filters first, the project after: narrowing type/year
-                    // clears the pick and reloads this list.
                     Select::make('projectId')
                         ->label(__('app.label.project_single'))
                         ->options(fn (Get $get): array => Project::groupedOptions(
@@ -78,11 +68,6 @@ class Dashboard extends BaseDashboard
         return 2;
     }
 
-    /**
-     * No page header at all — the greeting widget is the top of the page and
-     * the «Фильтры» trigger lives on the project strip. The FilterAction
-     * stays registered in getHeaderActions() so the strip can mount it.
-     */
     public function getHeader(): ?View
     {
         return view('filament.pages.dashboard-blank-header');
@@ -100,9 +85,6 @@ class Dashboard extends BaseDashboard
         return [self::ALL => __('app.label.all_years')] + $years;
     }
 
-    /**
-     * The «Все» sentinel means "no filter" — map it to null for queries.
-     */
     public static function filterValue(mixed $state): ?string
     {
         return blank($state) || $state === self::ALL ? null : (string) $state;

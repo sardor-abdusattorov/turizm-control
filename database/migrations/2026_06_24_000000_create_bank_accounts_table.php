@@ -7,23 +7,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * A counterparty keeps one bank account per currency (a real contract lists
-     * separate UZS / USD / EUR / RUB accounts in the same bank), so the single
-     * flat set of columns on `contacts` moves into its own table. Any account
-     * already entered is carried across as one currency-agnostic row, then the
-     * flat columns are dropped.
-     */
     public function up(): void
     {
         Schema::create('bank_accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('contact_id')->constrained()->cascadeOnDelete();
             $table->foreignId('currency_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('account_number', 34); // IBAN is up to 34 chars
+            $table->string('account_number', 34);
             $table->string('bank_name')->nullable();
-            // Foreign requisites carry the bank's own address (e.g. RX
-            // France); Uzbek ones leave it blank.
+
             $table->string('bank_address')->nullable();
             $table->string('mfo', 20)->nullable();
             $table->string('swift', 20)->nullable();
@@ -33,7 +25,6 @@ return new class extends Migration
             $table->index('contact_id');
         });
 
-        // Carry every existing flat account across before the columns vanish.
         if (Schema::hasColumn('contacts', 'bank_account')) {
             DB::table('contacts')
                 ->whereNotNull('bank_account')
@@ -68,7 +59,6 @@ return new class extends Migration
             $table->string('swift', 20)->nullable();
         });
 
-        // Fold the primary (lowest-sort) account back onto the contact.
         DB::table('bank_accounts')
             ->orderBy('contact_id')
             ->orderBy('sort')

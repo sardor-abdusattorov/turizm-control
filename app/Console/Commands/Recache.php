@@ -8,7 +8,6 @@ use Illuminate\Console\Command;
 
 final class Recache extends Command
 {
-
     protected $signature = 'project:cache';
 
     protected $description = 'Project Cache Refresh';

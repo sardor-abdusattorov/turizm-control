@@ -60,11 +60,6 @@ class ApprovalWorkflow
         });
     }
 
-    /**
-     * A refusal ends the round: the rest of the queue is voided so nobody is
-     * left holding a step on a document that is already going back, and the
-     * verdict with its reason stays on the record forever.
-     */
     public function reject(Model $record, User $user, ?string $comment = null): void
     {
         $approval = $this->actionableApproval($record, $user, allowQueued: true);
@@ -84,10 +79,6 @@ class ApprovalWorkflow
         });
     }
 
-    /**
-     * The author pulls the document back out of the flow — nobody is asked any
-     * more and it returns to a draft they can work on.
-     */
     public function recall(Model $record): void
     {
         if ($record->status === RequisitionStatus::Draft) {
@@ -104,10 +95,6 @@ class ApprovalWorkflow
         });
     }
 
-    /**
-     * A settled document that gets edited goes back to draft: the verdicts it
-     * collected were given on text that no longer exists.
-     */
     public function resetAfterEdit(Model $record): void
     {
         if (! in_array($record->status, [RequisitionStatus::Approved, RequisitionStatus::Rejected], true)) {
@@ -121,11 +108,6 @@ class ApprovalWorkflow
         });
     }
 
-    /**
-     * An edit lands mid-review: the round that was running is voided and the
-     * same people are asked again from the top. The user list is read before
-     * the void so people dropped from the chain earlier are not dragged back.
-     */
     public function restartAfterEdit(Model $record): void
     {
         if ($record->status !== RequisitionStatus::InReview) {

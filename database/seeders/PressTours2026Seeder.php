@@ -8,26 +8,11 @@ use App\Models\PressTour;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-/**
- * One-off import of the «Список пресс, блогер и инфо-туров в 2026 году»
- * registry — 21 tours in three sections: foreign media hosted here (7),
- * domestic regional tours (13) and local media sent abroad (1).
- *
- * The registry gives no real dates, only «август» / «11-18 Август», so the
- * wording is preserved verbatim in `period` and only the opening month is
- * parsed out for sorting. Headcounts behave the same way: «6+11» stays a
- * note, plain numbers become a count. The domestic block all cites приказ
- * № 49-АФ, which is created here if the buyruq registry does not have it yet.
- * Idempotent: a tour that already exists by (direction, name) is left alone.
- */
 class PressTours2026Seeder extends Seeder
 {
     public function run(): void
     {
         foreach ($this->tours() as $data) {
-            // Same-named tours recur in different months — Самарканд is
-            // presented in both October and November — so the period is part
-            // of a tour's identity, not just a detail.
             PressTour::firstOrCreate(
                 [
                     'direction' => $data['direction'],
@@ -50,15 +35,6 @@ class PressTours2026Seeder extends Seeder
         }
     }
 
-    /**
-     * The buyruq the domestic tours rest on. It belongs to the press-tour
-     * programme rather than to any exhibition, so the registry seeders never
-     * create it — resolve it here, adding it once if missing.
-     *
-     * A buyruq must name its author, so this needs at least one user to
-     * exist; DatabaseSeeder runs UserSeeder first. Run standalone against an
-     * empty database the tours are still imported, just without the basis.
-     */
     private function orderId(string $number): ?int
     {
         $creator = User::query()->firstWhere('email', 'manager@test.uz')
@@ -80,13 +56,11 @@ class PressTours2026Seeder extends Seeder
         )->id;
     }
 
-    /**
-     * @return list<array<string, mixed>>
-     */
+    /** @return list<array<string, mixed>> */
     private function tours(): array
     {
         return [
-            // № | направление | название | место | период | мес | чел | прим. | ответственный | куратор | иностр. партнёр | приказ | заметки
+
             ['direction' => 'inbound', 'name' => 'Визит СМИ и блогеров Азербайджана в Узбекистан', 'place' => 'Азербайджан', 'period' => 'август', 'starts_month' => 8, 'people_count' => null, 'people_note' => null, 'responsible' => 'Национальный ПР центр', 'curator' => 'Хаёт Хамраев', 'foreign_partner' => null, 'order' => null, 'notes' => 'Из таблицы проектов. Тур в Ташкент-Самарканд, Бухара-Хива'],
             ['direction' => 'inbound', 'name' => 'Компания Travco Holidays организует пресс-тур для журналистов и блогеров', 'place' => 'Египет', 'period' => 'июль-август', 'starts_month' => 7, 'people_count' => 10, 'people_note' => null, 'responsible' => 'Шерзод Султонов', 'curator' => 'Хаёт Хамраев', 'foreign_partner' => 'Посольство Узбекистана в Египте', 'order' => null, 'notes' => 'Инфа от маркетинга'],
             ['direction' => 'inbound', 'name' => 'Визит Грузинский СМИ и турагенты на Узбекской и Грузинский туристический форум', 'place' => 'Грузия', 'period' => '11-18 Август', 'starts_month' => 8, 'people_count' => null, 'people_note' => '6+11', 'responsible' => 'Умида Талипова', 'curator' => 'Хаёт Хамраев', 'foreign_partner' => null, 'order' => null, 'notes' => 'Инфа от маркетинга'],

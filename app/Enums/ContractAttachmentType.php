@@ -4,12 +4,6 @@ namespace App\Enums;
 
 use App\Enums\Concerns\HasOptions;
 
-/**
- * Papers that make up a real contract dossier, straight from the scanned
- * 2025 packages: the signed contract, the buyruq it rests on, competitors'
- * proposals, stand sketches, the invoice, the SWIFT slip, the acceptance act
- * and the bank-fee statement.
- */
 enum ContractAttachmentType: string
 {
     use HasOptions;

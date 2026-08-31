@@ -9,11 +9,6 @@ use App\Models\Project;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\Widget;
 
-/**
- * The strip between the greeting and the numbers: the picked project's name,
- * dates and counts on the left, the «Фильтры» button on the right — it mounts
- * the page's FilterAction slide-over.
- */
 class ProjectOverviewWidget extends Widget
 {
     use InteractsWithPageFilters;

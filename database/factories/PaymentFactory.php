@@ -9,14 +9,10 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<Payment>
- */
+/** @extends Factory<Payment> */
 class PaymentFactory extends Factory
 {
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public function definition(): array
     {
         return [
@@ -38,10 +34,6 @@ class PaymentFactory extends Factory
         return $this->state(['contract_id' => $contract->id]);
     }
 
-    /**
-     * Project spending that never went through a contract: an absolute sum in
-     * its own currency, with no share of anything.
-     */
     public function forProject(?Project $project = null): self
     {
         return $this->state(fn (): array => [

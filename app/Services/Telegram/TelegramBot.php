@@ -14,11 +14,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Throwable;
 
-/**
- * Webhook dispatcher: turns Telegram updates into bot actions. Delegates
- * rendering to BotMenuBuilder, transient state to BotConversationState, and
- * business operations to ContractWorkflow.
- */
 class TelegramBot
 {
     private const LINK_TTL_MIN = 15;
@@ -47,10 +42,6 @@ class TelegramBot
     /** @param  array<string, mixed>  $update */
     public function handleUpdate(array $update): void
     {
-        // Telegram redelivers an update when it doesn't get a fast 200 (and
-        // this handler makes live API calls before responding). Cache::add is
-        // atomic — a redelivered update_id is dropped instead of approving or
-        // rejecting a contract twice.
         $updateId = $update['update_id'] ?? null;
 
         if ($updateId !== null && ! Cache::add("telegram:update:{$updateId}", true, now()->addDay())) {
@@ -80,7 +71,6 @@ class TelegramBot
 
         $this->touchPresence($chatId, $message['from'] ?? []);
 
-        // /start [<token>] — link or just say hi
         if (Str::startsWith($text, '/start')) {
             $token = trim(Str::after($text, '/start'));
             $this->handleStart($chatId, $token);
@@ -114,15 +104,12 @@ class TelegramBot
             return;
         }
 
-        // Conversation continuation — the reject-reason or approve-comment flow.
         $state = $this->state->get($chatId);
 
         if ($state === null) {
             return;
         }
 
-        // A sticker/photo/voice arrives with no text — ask for text instead of
-        // silently finishing the flow with an empty reason.
         if ($text === '') {
             $this->withUserLocale($chatId, function () use ($chatId): void {
                 $this->telegram->send($chatId, __('app.telegram.text_required'));
@@ -159,9 +146,6 @@ class TelegramBot
             return;
         }
 
-        // Peek — do NOT consume the token yet. Linking happens only after the
-        // person in the chat confirms the account name: a forwarded deep link
-        // must not silently hand a stranger's chat all of the notifications.
         $userId = Cache::get($this->linkKey($token));
         $user = $userId ? User::find($userId) : null;
 
@@ -171,9 +155,6 @@ class TelegramBot
             return;
         }
 
-        // If the user is already linked to THIS chat, the deep link they just
-        // followed was a no-op — consume the token and drop them straight
-        // into the main menu without the confirm/locale dance.
         $existing = $user->telegram;
 
         if ($existing && (string) $existing->chat_id === $chatId) {
@@ -202,15 +183,7 @@ class TelegramBot
         );
     }
 
-    /**
-     * The "Yes, it's me" tap that actually writes the link. Runs BEFORE the
-     * usual linked-user gate (the chat is by definition not linked yet).
-     * Consumes the one-time token, frees the chat id from any other account
-     * (a phone reassigned to a new employee) and records the sender's
-     * username for the admin broadcast table.
-     *
-     * @param  array<string, mixed>  $from
-     */
+    /** @param  array<string, mixed>  $from */
     private function handleLinkCallback(string $callbackId, string $chatId, ?int $messageId, string $data, array $from): void
     {
         if ($data === 'lnkc') {
@@ -231,9 +204,6 @@ class TelegramBot
             return;
         }
 
-        // One chat — one account: the unique index on chat_id would reject
-        // the write anyway; releasing the old row makes the takeover an
-        // explicit re-link instead of a 500 inside the webhook.
         TelegramUser::query()
             ->where('chat_id', $chatId)
             ->where('user_id', '!=', $user->id)
@@ -267,8 +237,6 @@ class TelegramBot
         $messageId = isset($callback['message']['message_id']) ? (int) $callback['message']['message_id'] : null;
         $data = (string) ($callback['data'] ?? '');
 
-        // Link confirmation comes from a chat that is NOT linked yet — it
-        // must bypass the linked-user gate below.
         if ($data === 'lnkc' || Str::startsWith($data, 'lnk:')) {
             $this->handleLinkCallback($callbackId, $chatId, $messageId, $data, $callback['from'] ?? []);
 
@@ -448,11 +416,6 @@ class TelegramBot
         }
     }
 
-    /**
-     * Tapping "Approve" opens an optional comment step (mirrors the web panel,
-     * where approval carries an optional note). The approver either types the
-     * comment as the next message or taps "Approve without comment".
-     */
     private function startApproveFlow(string $callbackId, string $chatId, ?int $messageId, int $contractId, User $user): void
     {
         $contract = Contract::find($contractId);
@@ -475,10 +438,6 @@ class TelegramBot
         $this->telegram->answerCallbackQuery($callbackId);
     }
 
-    /**
-     * Apply the approval together with the comment the approver just typed —
-     * triggered by the next text message after the approve prompt.
-     */
     private function finishApproveFlow(string $chatId, int $contractId, string $comment): void
     {
         $user = $this->resolveUser($chatId);
@@ -508,10 +467,6 @@ class TelegramBot
         });
     }
 
-    /**
-     * The "approve without a comment" shortcut on the prompt keyboard. The
-     * comment is optional, so this approves straight away and stamps the card.
-     */
     private function approveWithoutComment(string $callbackId, string $chatId, ?int $messageId, int $contractId, User $user): void
     {
         $contract = Contract::find($contractId);
@@ -634,10 +589,6 @@ class TelegramBot
         $this->telegram->editMessage($chatId, $messageId, $card['text'], $card['keyboard']);
     }
 
-    /**
-     * The same rule the register uses: the author, anybody on the chain, and
-     * oversight.
-     */
     private function canViewRequisition(Requisition $requisition, User $user): bool
     {
         return $requisition->author_id === $user->id
@@ -645,10 +596,6 @@ class TelegramBot
             || $user->can('view_all_requisitions');
     }
 
-    /**
-     * Approving carries an optional note, so the tap opens a comment step with
-     * a way to skip it — mirroring the contract flow and the web panel.
-     */
     private function startRequisitionApproveFlow(string $callbackId, string $chatId, ?int $messageId, int $requisitionId, User $user): void
     {
         $requisition = Requisition::query()->with('approvals')->find($requisitionId);
@@ -674,10 +621,6 @@ class TelegramBot
         $this->telegram->answerCallbackQuery($callbackId);
     }
 
-    /**
-     * A refusal always costs a reason, so there is no skip here — the flow
-     * waits for the text.
-     */
     private function startRequisitionRejectFlow(string $callbackId, string $chatId, ?int $messageId, int $requisitionId, User $user): void
     {
         $requisition = Requisition::query()->with('approvals')->find($requisitionId);
@@ -722,9 +665,7 @@ class TelegramBot
         );
     }
 
-    /**
-     * @param  callable(Requisition, User): void  $decide
-     */
+    /** @param  callable(Requisition, User): void  $decide */
     private function settleRequisition(
         string $chatId,
         int $requisitionId,
@@ -833,8 +774,6 @@ class TelegramBot
 
     private function finishUnlink(string $callbackId, string $chatId, ?int $messageId, User $user): void
     {
-        // Drop the row so the backend stops sending notifications. The user
-        // can always reconnect from the profile page in the web panel.
         $user->telegram()->delete();
         $this->state->clear($chatId);
 
@@ -867,12 +806,7 @@ class TelegramBot
         return User::whereHas('telegram', fn ($q) => $q->where('chat_id', $chatId))->first();
     }
 
-    /**
-     * Keep the linked row's username and last-seen stamp fresh — the admin
-     * broadcast table shows both, and until now they were never written.
-     *
-     * @param  array<string, mixed>  $from
-     */
+    /** @param  array<string, mixed>  $from */
     private function touchPresence(string $chatId, array $from, ?User $user = null): void
     {
         $telegram = ($user ?? $this->resolveUser($chatId))?->telegram;
@@ -885,8 +819,7 @@ class TelegramBot
             'username' => $from['username'] ?? null,
             'last_seen_at' => now(),
         ]))
-            // Talking to the bot proves the chat is alive again — lift the
-            // blocked mark set by a 403 so notifications resume.
+
             ->forceFill(['blocked_at' => null])
             ->saveQuietly();
     }

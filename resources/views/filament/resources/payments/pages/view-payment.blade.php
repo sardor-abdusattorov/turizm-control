@@ -32,7 +32,7 @@
 
 <x-filament-panels::page>
 <div class="pv">
-    {{-- HERO --}}
+
     <section class="pv-hero">
         <div class="pv-hero__l">
             <div class="pv-hero__meta">
@@ -51,7 +51,6 @@
         <span class="pv-amount">{{ $record->valueLabel() }}</span>
     </section>
 
-    {{-- INFORMATION TABLE --}}
     <section class="pv-card">
         <div class="pv-hd">
             <span class="pv-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span>
@@ -78,8 +77,6 @@
         </div>
     </section>
 
-    {{-- PROOF FILES: native Filament FileUpload, in place. Hidden entirely when
-         no proof file is present, so the view never shows an empty card. --}}
     @livewire(\App\Livewire\MediaLibrary::class, ['variant' => 'payment-screenshots', 'recordId' => $record->id, 'hideWhenEmpty' => true], key('payment-proof-'.$record->id))
 </div>
 

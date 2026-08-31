@@ -60,7 +60,7 @@ it('publishes the command menu when installing the webhook', function () {
     artisan('telegram:webhook:install', ['--url' => 'https://example.test/hook'])
         ->assertSuccessful();
 
-    Http::assertSentCount(4); // setWebhook + setMyCommands ×3 (default, ru, uz)
+    Http::assertSentCount(4);
     Http::assertSent(fn ($request) => str_contains($request->url(), 'setMyCommands'));
 });
 

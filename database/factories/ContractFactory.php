@@ -12,9 +12,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Storage;
 
-/**
- * @extends Factory<Contract>
- */
+/** @extends Factory<Contract> */
 class ContractFactory extends Factory
 {
     protected $model = Contract::class;
@@ -52,10 +50,6 @@ class ContractFactory extends Factory
         return $this->state(fn () => ['status' => Contract::STATUS_REJECTED]);
     }
 
-    /**
-     * A sponsorship income contract: signed with a Sponsor (no contact),
-     * under a sponsorship-kind ContractType.
-     */
     public function sponsorship(): static
     {
         return $this->state(fn () => [
@@ -65,11 +59,6 @@ class ContractFactory extends Factory
         ]);
     }
 
-    /**
-     * File one scan into the contract's dossier. Use whenever a test calls
-     * submit() — the workflow refuses to send a contract for approval whose
-     * dossier is empty.
-     */
     public function withDossier(string $body = 'fake-scan'): static
     {
         return $this->afterCreating(function (Contract $contract) use ($body): void {

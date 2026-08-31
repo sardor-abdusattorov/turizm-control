@@ -7,18 +7,9 @@ use App\Models\ContractApprover;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * The contract list queries behind the bot menus. Kept out of BotMenuBuilder
- * so that class can stay pure presentation, as its docblock promises.
- */
 class BotContractQueries
 {
-    /**
-     * Contracts the user has already decided on (approved or rejected),
-     * ordered by their action time so the most recent verdict is on top.
-     *
-     * @return Builder<Contract>
-     */
+    /** @return Builder<Contract> */
     public function history(User $user): Builder
     {
         return Contract::query()
@@ -43,23 +34,13 @@ class BotContractQueries
             );
     }
 
-    /**
-     * Every contract this user is entitled to see, newest first. The menu only
-     * surfaces this list to oversight roles, but the scope is still applied so
-     * the result respects per-user visibility (e.g. other authors' drafts).
-     *
-     * @return Builder<Contract>
-     */
+    /** @return Builder<Contract> */
     public function all(User $user): Builder
     {
         return Contract::query()->visibleTo($user)->orderByDesc('id');
     }
 
-    /**
-     * Contracts awaiting this user's decision right now.
-     *
-     * @return Builder<Contract>
-     */
+    /** @return Builder<Contract> */
     public function awaiting(User $user): Builder
     {
         return Contract::query()
@@ -70,11 +51,7 @@ class BotContractQueries
             ->orderByDesc('id');
     }
 
-    /**
-     * The user's own contracts.
-     *
-     * @return Builder<Contract>
-     */
+    /** @return Builder<Contract> */
     public function mine(User $user): Builder
     {
         return Contract::query()

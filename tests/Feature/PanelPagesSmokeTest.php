@@ -8,11 +8,6 @@ use function Pest\Laravel\get;
 
 uses(RefreshDatabase::class);
 
-/**
- * Every register in the panel, opened by somebody allowed to see it. Guards
- * the two failures Filament keeps quiet about: a page that only breaks once
- * rendered, and a translation key rendering as its own name.
- */
 it('opens every register without an error or a raw translation key', function (string $slug, string $permission) {
     actingAs(userWithPermission($permission));
 

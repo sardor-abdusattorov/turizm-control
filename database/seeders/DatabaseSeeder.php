@@ -9,13 +9,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // Reference data + accounts — the defaults the app can't run
-            // without. Orders and contracts are entered by hand in the UI, so
-            // their seeders stay runnable on their own for showcases.
-            // Counterparties come from the contract requisites: ContactSeeder
-            // holds the domestic tour agents, ForeignPartnerSeeder the foreign
-            // stand/land legal entities, SponsorsSeeder the carriers/venues that
-            // fund the national stands.
+
             PositionSeeder::class,
             DepartmentSeeder::class,
             CurrencySeeder::class,
@@ -27,19 +21,13 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             TestUsersSeeder::class,
             SettingsSeeder::class,
-            // Project shells from the exhibition / local-event registries —
-            // venue, dates and costs only. Participation income is entered by
-            // hand as income contracts against each project.
+
             Exhibitions2025Seeder::class,
             InternationalProjects2026Seeder::class,
             LocalEvents2026Seeder::class,
-            // The press / blogger / info-tour registry — a separate programme
-            // from the exhibitions, resting on its own buyruq (№ 49-АФ).
+
             PressTours2026Seeder::class,
-            // Replays database/seeders/data/contracts-snapshot.json (written
-            // by `php artisan contracts:snapshot` BEFORE a rebuild) so the
-            // hand-entered contracts survive migrate:fresh verbatim. A no-op
-            // when no snapshot file exists.
+
             HandEnteredContractsSeeder::class,
         ]);
     }

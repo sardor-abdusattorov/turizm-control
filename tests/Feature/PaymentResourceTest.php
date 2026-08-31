@@ -55,8 +55,6 @@ it('hides the proof card on the payment view when no proof file is on disk', fun
 
     $contract = Contract::factory()->approved()->create();
 
-    // A stored path with no file behind it (e.g. after a snapshot rebuild) must
-    // not surface as an empty, broken proof card.
     $payment = Payment::factory()->create([
         'contract_id' => $contract->id,
         'percent' => 100,
@@ -85,7 +83,6 @@ it('shows payment proof read-only on the view page and never mutates the record'
     Livewire::test(MediaLibrary::class, ['variant' => 'payment-screenshots', 'recordId' => $payment->id])
         ->assertSuccessful();
 
-    // Display-only: the proof set is untouched — editing lives on the Edit page.
     expect($payment->fresh()->screenshots)->toBe(['uploads/files/payments/proof.png']);
 });
 
@@ -198,9 +195,6 @@ it('edits an existing payment and resyncs the contract paid percent', function (
 });
 
 it('forbids the edit page for users without update_payment', function () {
-    // view_all_contracts lets them resolve the record (the resource hides
-    // payments they can't see), so the 403 comes from the missing
-    // update_payment ability, not a 404.
     $user = userWithPermission('view_any_payment', 'view_payment', 'view_all_contracts');
     actingAs($user);
 

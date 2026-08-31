@@ -39,8 +39,6 @@ it('builds the chain from the settings queue in order, excluding the director', 
 
     $created = $contract->buildApprovalChainFromFlow();
 
-    // The director is a separate manual final stage and is never auto-added,
-    // even though the seeded flow still lists "direction".
     expect($created)->toBe(2);
 
     $chain = $contract->approvers()->with('user')->orderBy('order')->get();

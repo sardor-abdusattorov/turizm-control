@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('press_tour_attachments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('press_tour_id')->constrained()->cascadeOnDelete();
-            // Report, media coverage, photos, programme, participant list, act.
+
             $table->string('type', 30)->nullable();
             $table->string('file_path');
             $table->string('original_name');

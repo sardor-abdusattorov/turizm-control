@@ -11,10 +11,6 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * The PR-centre buyruqs issued on the strength of a committee one — the second
- * half of the chain, read-only, on the committee order's view page.
- */
 class DerivedOrdersTableWidget extends TableWidget
 {
     public int $orderId;

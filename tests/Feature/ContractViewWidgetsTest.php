@@ -60,7 +60,7 @@ it('keeps a dropped approver reachable at the foot of the chain table', function
         'contract_id' => $contract->id, 'user_id' => $stillIn->id, 'order' => 1,
         'status' => ContractApprover::STATUS_PENDING,
     ]);
-    // Was in the chain, got cancelled out of it — no active row left.
+
     ContractApprover::factory()->create([
         'contract_id' => $contract->id, 'user_id' => $dropped->id, 'order' => 2,
         'status' => ContractApprover::STATUS_INVALIDATED,
@@ -94,7 +94,6 @@ it('opens the counterparty dossier as a native Filament modal', function () {
         ->mountAction('contactDetails')
         ->assertActionMounted('contactDetails');
 
-    // The hand-rolled Alpine overlay is gone — no cw-modal chrome left.
     expect($page->html())->not->toContain('cw-modal')
         ->and($page->html())->not->toContain('contactOpen');
 

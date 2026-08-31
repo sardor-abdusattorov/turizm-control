@@ -11,12 +11,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * Internal and international projects are two full-fledged sidebar resources
- * over the same Project model: each subclass pins its ProjectType, scopes its
- * queries to it and stamps it on create — no type field, no list tabs.
- * Filament Shield keys permissions by model, so both share the *_project set.
- */
 abstract class BaseProjectResource extends Resource
 {
     protected static ?string $model = Project::class;
@@ -40,12 +34,7 @@ abstract class BaseProjectResource extends Resource
         return (string) Project::query()->where('type', static::projectType())->count();
     }
 
-    /**
-     * The concrete resource a record belongs to — for links rendered in
-     * shared contexts (table recordUrl, breakdown modals).
-     *
-     * @return class-string<self>
-     */
+    /** @return class-string<self> */
     public static function resourceFor(Project $record): string
     {
         return $record->type === ProjectType::Internal

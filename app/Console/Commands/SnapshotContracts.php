@@ -9,19 +9,6 @@ use App\Models\Requisition;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
-/**
- * Dumps every hand-entered record — contracts with their counterparties, bank
- * accounts, dossier attachments and payments; buyruqs with the basis link
- * between them; payments filed straight against a project; and requisitions —
- * into a JSON file that HandEnteredContractsSeeder replays after
- * `migrate:fresh --seed`. File paths are stored verbatim: the uploads/ tree on
- * the server is never touched, so the restored records point at the same files.
- *
- * Records are named by their number, not their id: a rebuild reassigns ids,
- * so every cross-reference in here is by the natural key instead.
- *
- * Run BEFORE rebuilding the database:  php artisan contracts:snapshot
- */
 class SnapshotContracts extends Command
 {
     protected $signature = 'contracts:snapshot {--path=}';
@@ -85,9 +72,6 @@ class SnapshotContracts extends Command
                     ])->all(),
             ]);
 
-        // Orders entered by hand ride along — the dossier seeder only knows
-        // the 2025 registry ones. The basis is named by number: ids are
-        // reassigned on a rebuild, so the link has to survive by natural key.
         $orders = Order::query()->with('basisOrder')->orderBy('id')->get()
             ->map(fn (Order $order): array => [
                 'number' => $order->number,
@@ -100,8 +84,6 @@ class SnapshotContracts extends Command
                 'status' => (bool) $order->status,
             ]);
 
-        // Payments filed straight against a project hang off no contract, so
-        // the nested loop above never sees them — they need their own list.
         $projectPayments = Payment::query()
             ->whereNull('contract_id')
             ->with(['project', 'currency', 'creator'])

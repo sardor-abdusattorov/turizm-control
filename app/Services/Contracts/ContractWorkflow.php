@@ -12,23 +12,11 @@ class ContractWorkflow
 {
     public function __construct(public ContractNotifier $notifier) {}
 
-    /**
-     * The admin switch (Settings → Согласование): when off, contracts skip
-     * the digital approval chain entirely — they are filed as already signed
-     * paper and the whole submit/approve machinery stays dormant.
-     */
     public static function approvalEnabled(): bool
     {
         return (bool) settings('approval.enabled', true);
     }
 
-    /**
-     * Lock the contract row and re-read its state. Actions arrive from two
-     * channels (web and the Telegram bot), so every workflow transition
-     * re-checks its gate under this lock — a double tap or a concurrent
-     * approve/reject must see the first action's result, not the stale state
-     * it was rendered from. No-op on SQLite (tests), a real row lock on MySQL.
-     */
     private function lockAndRefresh(Contract $contract): bool
     {
         if (! Contract::query()->lockForUpdate()->find($contract->getKey())) {
@@ -59,10 +47,6 @@ class ContractWorkflow
 
             $current = $this->advanceToActiveApprover($contract);
 
-            // No one can actually review this — an empty chain, or every
-            // approver is a deactivated user. Don't strand the contract in
-            // review with no current approver: roll back so the attempt
-            // changes nothing and the author can fix the chain first.
             if (! $current) {
                 DB::rollBack();
 
@@ -139,9 +123,7 @@ class ContractWorkflow
             if ($next) {
                 $next->startReview($this->slaDays());
                 $this->notifier->notifyApprovalRequested($next);
-                // Keep the manager in the loop on every step, not just the
-                // final sign-off: "approved by the lawyer, now with the
-                // accountant".
+
                 $this->notifier->notifyStepApproved($contract, $current);
             }
 
@@ -166,8 +148,6 @@ class ContractWorkflow
         if ($fresh->directorUser() && ! $fresh->hasDirectorApprover()) {
             $contract->update(['status' => Contract::STATUS_PENDING_DIRECTOR]);
 
-            // Legal + accounting are done — nudge the manager that it's
-            // their turn to hand the contract to the director.
             $this->notifier->notifyStepApproved($contract, $current);
 
             $this->logWorkflowEvent(
@@ -205,9 +185,6 @@ class ContractWorkflow
 
             $director = $contract->appendDirectorApprover();
 
-            // The director is already in the active chain (or a double click
-            // raced us) — nothing was sent, so say so instead of a false
-            // "sent" confirmation.
             if (! $director) {
                 return false;
             }
@@ -255,11 +232,6 @@ class ContractWorkflow
         });
     }
 
-    /**
-     * Bring a rejected contract back to Draft with its chain re-queued, so the
-     * responsible can fix the remarks and resubmit. Previously this only
-     * happened as a side effect of saving the edit form.
-     */
     public function returnToWork(Contract $contract, ?User $user = null): bool
     {
         $user ??= auth()->user();
@@ -290,11 +262,6 @@ class ContractWorkflow
         });
     }
 
-    /**
-     * Replace the current (stuck) approver with another user: the old PENDING
-     * row is marked skipped for the audit trail and a fresh row with the same
-     * order takes over, SLA restarted. Admin-only — the UI gates it.
-     */
     public function reassignCurrentApprover(Contract $contract, User $newApprover, ?User $actor = null): bool
     {
         $actor ??= auth()->user();
@@ -352,9 +319,7 @@ class ContractWorkflow
         return $days > 0 ? $days : 2;
     }
 
-    /**
-     * @param  array<string, mixed>  $properties
-     */
+    /** @param  array<string, mixed>  $properties */
     private function logWorkflowEvent(string $event, Contract $contract, ?User $user, array $properties = []): void
     {
         FilamentLogger::log(

@@ -12,12 +12,6 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * The full approval chain of a contract as a stock Filament table — every row
- * (queued, pending, approved, returned, rejected, invalidated, skipped) in the
- * order it happened, a chronological audit log. Embedded in the "approval
- * chain" modal opened from the contracts list, replacing the hand-rolled table.
- */
 class ContractApproversTableWidget extends TableWidget
 {
     public int $contractId;
@@ -30,8 +24,7 @@ class ContractApproversTableWidget extends TableWidget
         $isDraft = $contract?->status === Contract::STATUS_DRAFT;
 
         return $table
-            // No heading (the modal title carries the contract name) and no
-            // column-manager toolbar — a read-only audit log, not configurable.
+
             ->heading(null)
             ->columnManager(false)
             ->query(fn (): Builder => ContractApprover::query()
@@ -54,8 +47,7 @@ class ContractApproversTableWidget extends TableWidget
                     ->label(__('app.label.comment'))
                     ->placeholder(__('app.label.not_set'))
                     ->wrap()
-                    // The system note ("cancelled — document was edited") rides
-                    // under the human comment as a muted description.
+
                     ->description(fn (ContractApprover $record): ?string => $record->system_comment
                         ? __('app.label.system_note').': '.$record->systemNoteLabel()
                         : null),
@@ -83,9 +75,7 @@ class ContractApproversTableWidget extends TableWidget
                     ->placeholder(__('app.label.not_set')),
             ])
             ->filters([
-                // Matches what the Статус column actually shows (displayStatus):
-                // an invalidated row with a preserved original verdict filters
-                // under that verdict, not under "Отменено".
+
                 SelectFilter::make('status')
                     ->label(__('app.label.status'))
                     ->options(ContractApproverStatus::options())

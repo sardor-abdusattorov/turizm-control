@@ -10,8 +10,6 @@ uses(RefreshDatabase::class);
 it('persists bank accounts entered while creating a counterparty inline', function () {
     $uzs = Currency::factory()->create(['short_name' => 'UZS']);
 
-    // The shape the inline (plain) repeater submits: rows keyed by their item
-    // UUID, each holding the account fields.
     $contact = ContactForm::createWithBankAccounts([
         'type' => Contact::TYPE_LEGAL,
         'name' => ['ru' => 'ООО Тест', 'uz' => 'Test MChJ', 'en' => 'Test LLC'],

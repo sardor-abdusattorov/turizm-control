@@ -5,11 +5,6 @@ namespace Database\Seeders;
 use App\Models\Sponsor;
 use Illuminate\Database\Seeder;
 
-/**
- * Real sponsors from the exhibition registries: the carriers and venues that
- * fund the national stands (Uzbekistan Airways rows in the registries are
- * sponsor contributions). Contact data researched from official sites.
- */
 class SponsorsSeeder extends Seeder
 {
     public function run(): void
@@ -22,9 +17,7 @@ class SponsorsSeeder extends Seeder
         }
     }
 
-    /**
-     * @return list<array<string, string|null>>
-     */
+    /** @return list<array<string, string|null>> */
     private function sponsors(): array
     {
         return [

@@ -32,7 +32,7 @@ it('splits contract totals by direction and currency', function () {
     Contract::factory()->create(['project_id' => $project->id, 'contract_type_id' => $expense->id, 'currency_id' => $eur->id, 'amount' => 47890]);
     Contract::factory()->create(['project_id' => $project->id, 'contract_type_id' => $expense->id, 'currency_id' => $usd->id, 'amount' => 25000]);
     Contract::factory()->create(['project_id' => $project->id, 'contract_type_id' => $income->id, 'currency_id' => $usd->id, 'amount' => 38000]);
-    // Rejected contracts stay out of the totals.
+
     Contract::factory()->rejected()->create(['project_id' => $project->id, 'contract_type_id' => $expense->id, 'currency_id' => $usd->id, 'amount' => 99999]);
 
     expect($project->contractTotalsByCurrency(ContractDirection::Expense))
@@ -68,7 +68,6 @@ it('shows visible-contract expense totals and the photo report on the view page'
     $expense = ContractType::factory()->create();
     $uzs = Currency::factory()->create(['short_name' => 'UZS']);
 
-    // The viewer is responsible for this contract, so visibleTo() keeps it.
     Contract::factory()->create([
         'project_id' => $project->id,
         'contract_type_id' => $expense->id,

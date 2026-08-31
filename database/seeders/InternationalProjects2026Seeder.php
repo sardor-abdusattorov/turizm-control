@@ -7,12 +7,6 @@ use App\Models\Currency;
 use App\Models\Project;
 use Illuminate\Database\Seeder;
 
-/**
- * Import of the «Реестр Международных выставок 2026 года» registry (14
- * exhibitions, incl. venues). Only the project shells are seeded — venue,
- * dates, площадь and стенд costs; participation income is entered by hand as
- * income contracts against each project. Idempotent by (type, name).
- */
 class InternationalProjects2026Seeder extends Seeder
 {
     public function run(): void
@@ -41,9 +35,7 @@ class InternationalProjects2026Seeder extends Seeder
         }
     }
 
-    /**
-     * @return list<array<string, mixed>>
-     */
+    /** @return list<array<string, mixed>> */
     private function exhibitions(): array
     {
         return [

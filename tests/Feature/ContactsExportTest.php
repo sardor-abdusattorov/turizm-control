@@ -35,7 +35,7 @@ it('disables the export button while the filtered table has nothing to export', 
 
     Livewire::test(ListContacts::class)
         ->assertTableActionEnabled('exportXlsx')
-        // An active filter that matches nothing greys the button out again.
+
         ->filterTable('type', Contact::TYPE_INDIVIDUAL)
         ->assertTableActionDisabled('exportXlsx');
 });
@@ -99,12 +99,10 @@ it('keeps individual-only fields out of the legal sheet and vice versa', functio
 
     [$legal, $individual] = (new ContactsExport(Contact::query()))->sheets();
 
-    // Legal sheet carries requisites but never the PINFL.
     expect($legal->headings())
         ->toContain(__('app.label.inn'), __('app.label.mfo').' / SWIFT', __('app.label.director_name'))
         ->not->toContain(__('app.label.pinfl'));
 
-    // Individual sheet carries PINFL but none of the legal-only columns.
     expect($individual->headings())
         ->toContain(__('app.label.pinfl'))
         ->not->toContain(__('app.label.inn'), __('app.label.director_name'), __('app.label.mfo').' / SWIFT');
@@ -129,8 +127,8 @@ it('numbers rows sequentially per sheet and routes the type value to its column'
     $sheet = new ContactsSheet(Contact::query(), Contact::TYPE_LEGAL);
     $row = $sheet->map($legal->fresh());
 
-    expect($row[0])->toBe(1)             // sequential №, not the model id
-        ->and($row[3])->toBe('301234567'); // INN sits in its own column
+    expect($row[0])->toBe(1)
+        ->and($row[3])->toBe('301234567');
 });
 
 it('still emits both sheets when there are no contacts to export', function () {
@@ -155,8 +153,6 @@ it('exports EVERY bank account of a company, prefixed with its currency', functi
     $sheet = new ContactsSheet(Contact::query(), Contact::TYPE_LEGAL);
     $row = $sheet->map($sheet->query()->first());
 
-    // Both accounts land in the cell, the USD one labelled; the shared bank
-    // collapses to one line; SWIFT fills in where a foreign account has no MFO.
     expect($row[11])->toBe("20208000900123456001\nUSD: 20208840900123456002")
         ->and($row[12])->toBe('Ипак Йули')
         ->and($row[13])->toBe("00444\nUSD: INIPUZ22");

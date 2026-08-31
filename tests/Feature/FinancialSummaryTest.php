@@ -16,9 +16,8 @@ it('aggregates approved value, collected and outstanding in UZS', function () {
     $admin->assignRole(Role::findOrCreate('super_admin', 'web'));
     actingAs($admin->fresh());
 
-    $currency = Currency::factory()->create(['value' => 1000]); // 1 unit = 1000 UZS
+    $currency = Currency::factory()->create(['value' => 1000]);
 
-    // 1000 * 1000 = 1,000,000 UZS, half paid.
     Contract::factory()->create([
         'status' => Contract::STATUS_APPROVED,
         'currency_id' => $currency->id,
@@ -26,7 +25,6 @@ it('aggregates approved value, collected and outstanding in UZS', function () {
         'paid_percent' => 50,
     ]);
 
-    // 500 * 1000 = 500,000 UZS, nothing paid.
     Contract::factory()->create([
         'status' => Contract::STATUS_APPROVED,
         'currency_id' => $currency->id,
@@ -34,7 +32,6 @@ it('aggregates approved value, collected and outstanding in UZS', function () {
         'paid_percent' => 0,
     ]);
 
-    // A draft must not count toward the totals.
     Contract::factory()->create([
         'status' => Contract::STATUS_DRAFT,
         'currency_id' => $currency->id,
@@ -49,9 +46,6 @@ it('aggregates approved value, collected and outstanding in UZS', function () {
 });
 
 it('aggregates without a column-ambiguity error for a non-oversight finance role', function () {
-    // An accountant is not an oversight role, so visibleTo() adds a `status`
-    // filter — which, joined against currencies (also has `status`), used to
-    // throw "ambiguous column". This pins the table-qualified fix.
     $accountant = User::factory()->create();
     $accountant->assignRole(Role::findOrCreate('accountant', 'web'));
     actingAs($accountant->fresh());

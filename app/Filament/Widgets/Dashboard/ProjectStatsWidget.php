@@ -12,11 +12,6 @@ use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Collection;
 
-/**
- * The numbers of the project picked in the dashboard FilterAction: fees,
- * contract expense, contract count and participants — all derived from the
- * viewer-visible contracts, same rules as the project view page.
- */
 class ProjectStatsWidget extends StatsOverviewWidget
 {
     use InteractsWithPageFilters;
@@ -25,7 +20,6 @@ class ProjectStatsWidget extends StatsOverviewWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    // Two money cards → 50% each, not squeezed into a four-column grid.
     protected int|array|null $columns = 2;
 
     protected ?string $pollingInterval = null;
@@ -62,8 +56,6 @@ class ProjectStatsWidget extends StatsOverviewWidget
         $paidTotal = $project->paidTotal();
         $paidPercent = $feesTotal > 0 ? round($paidTotal / $feesTotal * 100) : 0;
 
-        // Two money cards only (counts live on the project strip above), each
-        // with the demo-style trend line: monthly totals of its direction.
         return [
             Stat::make(__('app.label.fees_total'), $income->isNotEmpty() ? $moneyLines($income) : __('app.label.not_set'))
                 ->description(__('app.label.paid').': '.Money::format($paidTotal).' · '.$paidPercent.'%')
@@ -82,10 +74,6 @@ class ProjectStatsWidget extends StatsOverviewWidget
     }
 
     /**
-     * Monthly contract totals for the sparkline. Currency-blind by design:
-     * the line draws the shape of activity, the exact figures live in the
-     * value above it.
-     *
      * @param  Collection<int, Contract>  $contracts
      * @return list<float>
      */
@@ -100,7 +88,6 @@ class ProjectStatsWidget extends StatsOverviewWidget
             ->values()
             ->all();
 
-        // A flat baseline still draws a line — one lone point would not.
         return count($points) > 1 ? $points : [0, ...($points ?: [0])];
     }
 

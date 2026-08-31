@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Append-only audit of every content-bearing message the bot sends out
-     * (sendMessage / editMessageText) — who got it, what it said, and
-     * whether Telegram accepted it. Powers the "Telegram log" admin screen.
-     */
     public function up(): void
     {
         Schema::create('telegram_message_logs', function (Blueprint $table) {

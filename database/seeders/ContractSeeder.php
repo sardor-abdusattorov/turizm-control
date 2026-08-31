@@ -17,13 +17,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
-/**
- * Seeds a realistic showcase dataset: a handful of curated contracts plus a
- * generated batch spread across the last six months, covering every workflow
- * status, matching approval chains, SLA states (some overdue), and payments.
- * Each contract gets a scanned dossier file, and paid ones a real receipt
- * screenshot, so the demo has files on disk rather than broken links.
- */
 class ContractSeeder extends Seeder
 {
     public function run(): void
@@ -98,8 +91,6 @@ class ContractSeeder extends Seeder
 
         $this->seedDossier($contract, $manager);
 
-        // Promote to the final status and backdate via a raw update so the
-        // contract observer's edit-invalidation never fires.
         Contract::query()->whereKey($contract->id)->update([
             'status' => $status->value,
             'signed_at' => $signedAt?->toDateString(),
@@ -113,15 +104,7 @@ class ContractSeeder extends Seeder
         $this->seedPayments($contract, $paymentAuthor, $spec['currency']->short_name, $spec['payments'] ?? [], $signedAt ?? $createdAt);
     }
 
-    /**
-     * The approver rows that match a contract's status: a draft already carries
-     * its queued chain (legal → accounting), just like one created through the
-     * form; an in-review chain has a live pending approver ahead of queued ones;
-     * a fully approved chain has every step signed off; a rejected one carries
-     * the verdict that bounced it.
-     *
-     * @param  array{legal: ?User, accounting: ?User, director: ?User}  $chain
-     */
+    /** @param  array{legal: ?User, accounting: ?User, director: ?User}  $chain */
     private function seedApprovers(Contract $contract, array $chain, ContractStatus $status, bool $overdue, Carbon $createdAt): void
     {
         ['legal' => $legal, 'accounting' => $accounting, 'director' => $director] = $chain;
@@ -175,8 +158,6 @@ class ContractSeeder extends Seeder
 
         $actedAt = $hasVerdict ? $createdAt->copy()->addDays($order * 2) : null;
 
-        // Decided rows carry a due date too, so the dashboard's on-time rate
-        // has something to measure; roughly one in five came in late.
         $dueAt = match (true) {
             $status === ContractApprover::STATUS_PENDING => $overdue ? now()->subDays(2) : now()->addDays(2),
             $actedAt !== null => $actedAt->copy()->addDays(($contract->id + $order) % 5 === 0 ? -2 : 2),
@@ -194,9 +175,7 @@ class ContractSeeder extends Seeder
         ]);
     }
 
-    /**
-     * @param  list<int>  $percentages
-     */
+    /** @param  list<int>  $percentages */
     private function seedPayments(Contract $contract, User $author, string $currencyShort, array $percentages, Carbon $baseDate): void
     {
         $amountLabel = number_format((float) $contract->amount, 0, '.', ' ').' '.$currencyShort;
@@ -223,11 +202,6 @@ class ContractSeeder extends Seeder
         }
     }
 
-    /**
-     * The signed scan every contract is filed with — the dossier now carries
-     * what the generated draft used to, and the workflow refuses to submit a
-     * contract without one.
-     */
     private function seedDossier(Contract $contract, User $uploader): void
     {
         $path = 'uploads/files/contract-attachments/demo/'.$contract->id.'/scan.pdf';
@@ -246,9 +220,6 @@ class ContractSeeder extends Seeder
     }
 
     /**
-     * Five hand-written contracts that anchor the demo with recognisable,
-     * round-number deals.
-     *
      * @param  Collection<string, Currency>  $currencies
      * @param  Collection<int, ContractType>  $types
      * @param  Collection<int, Contact>  $contacts
@@ -319,10 +290,6 @@ class ContractSeeder extends Seeder
     }
 
     /**
-     * The generated batch: a spread of tourism-business contracts across the
-     * last six months, one per title, with status, currency, amount, dates and
-     * payments derived deterministically so the dataset is stable between runs.
-     *
      * @param  Collection<string, Currency>  $currencies
      * @param  Collection<int, ContractType>  $types
      * @param  Collection<int, Contact>  $contacts
@@ -365,9 +332,6 @@ class ContractSeeder extends Seeder
             'Чартерный авиарейс Ташкент — Стамбул',
         ];
 
-        // Older deals are mostly finished (approved / rejected); recent ones are
-        // still moving through review, awaiting the director, or drafts. This
-        // ordering also feeds a believable six-month trend chart.
         $statusPlan = [
             ContractStatus::Approved, ContractStatus::Approved, ContractStatus::Approved,
             ContractStatus::Rejected, ContractStatus::Approved, ContractStatus::Approved,
@@ -421,9 +385,7 @@ class ContractSeeder extends Seeder
         return $specs;
     }
 
-    /**
-     * @param  Collection<string, Currency>  $currencies
-     */
+    /** @param  Collection<string, Currency>  $currencies */
     private function pickCurrency(Collection $currencies, int $index): Currency
     {
         $short = match (true) {
@@ -446,12 +408,7 @@ class ContractSeeder extends Seeder
         };
     }
 
-    /**
-     * A varied payment history for an approved contract — some unpaid, some
-     * partial, some paid in full — keyed off the index so it stays stable.
-     *
-     * @return list<int>
-     */
+    /** @return list<int> */
     private function paymentPlan(int $index): array
     {
         return match ($index % 5) {

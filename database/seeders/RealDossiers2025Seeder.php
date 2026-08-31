@@ -15,14 +15,6 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 
-/**
- * The real 2025 paper trail, transcribed from the scanned dossiers in
- * documents/: 13 committee buyruqs, 21 foreign contractors and the 26
- * expense contracts (space rental / stand construction / services / agency)
- * they signed — amounts, currencies and dates exactly as in the packages.
- * Dossier PDFs are attached and buyruq scans copied outside of tests only,
- * so the suite never shuffles ~350 MB of scans around.
- */
 class RealDossiers2025Seeder extends Seeder
 {
     public function run(): void
@@ -40,13 +32,7 @@ class RealDossiers2025Seeder extends Seeder
         $this->seedContracts($orders, $contacts, $responsible);
     }
 
-    /**
-     * Committee buyruqs (приказы-основания). The annual 74-АФ and 110-АФ have
-     * no standalone scan — only copies stitched into the dossiers — so their
-     * file stays empty.
-     *
-     * @return array<string, Order>
-     */
+    /** @return array<string, Order> */
     protected function seedOrders(): array
     {
         $rows = [
@@ -92,12 +78,7 @@ class RealDossiers2025Seeder extends Seeder
         return $orders;
     }
 
-    /**
-     * The foreign organisers, stand builders and intermediaries the centre
-     * actually signed with in 2025, straight from the contract requisites.
-     *
-     * @return array<string, Contact>
-     */
+    /** @return array<string, Contact> */
     protected function seedContractors(): array
     {
         $rows = [
@@ -128,8 +109,6 @@ class RealDossiers2025Seeder extends Seeder
 
         foreach ($rows as [$name, $address, $note]) {
             if (! Contact::query()->where('name->ru', $name)->exists()) {
-                // $note documents the row for the reader; contacts carry no
-                // free-text column, the role is visible from the contracts.
                 Contact::create([
                     'type' => Contact::TYPE_LEGAL,
                     'name' => ['ru' => $name, 'uz' => $name, 'en' => $name],
@@ -164,8 +143,6 @@ class RealDossiers2025Seeder extends Seeder
             return;
         }
 
-        // number · signed · contractor · kind · amount · currency · buyruq ·
-        // project match · subject · dossier scan
         $rows = [
             ['2/FITUR 2025 Space', '2025-02-17', 'IFEMA Madrid', $rental, 16595.41, 'EUR', '06-АФ', 'FITUR', 'Аренда необорудованной выставочной площади 76,5 кв.м', 'documents/Fitur/+207127843204799073250200016 IFEMA MADRID 06-AF.pdf'],
             ['1 FITUR 2025', '2025-01-09', 'Stand Up Arquitectura Efimera SL', $stand, 47890.00, 'EUR', '06-АФ', 'FITUR', 'Застройка выставочного стенда 76,5 кв.м (9×8,5 м)', 'documents/Fitur/+207127843204799073250200001_Stand_Up_Arquitectura_Efimera_06_AF.pdf'],
@@ -227,8 +204,6 @@ class RealDossiers2025Seeder extends Seeder
                 ]);
                 $contract->save();
 
-                // The dossier arrived signed on paper — file it as approved
-                // without waking the approval machinery.
                 $contract->forceFill(['status' => Contract::STATUS_APPROVED])->saveQuietly();
             }
 
@@ -249,10 +224,6 @@ class RealDossiers2025Seeder extends Seeder
         }
     }
 
-    /**
-     * Copy a repository document into the private uploads disk, returning the
-     * stored relative path.
-     */
     protected function copyFile(string $sourcePath, string $directory): string
     {
         $target = $directory.'/'.basename($sourcePath);

@@ -54,10 +54,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function canAccessPanel(Panel $panel): bool
     {
-        // A user whose role grants no permissions at all has nothing to do in
-        // the panel — keep them out instead of dropping them on an empty
-        // dashboard. super_admin passes via its wildcard role even before any
-        // permissions are synced onto it.
         return $this->hasRole('super_admin') || $this->getAllPermissions()->isNotEmpty();
     }
 
@@ -68,11 +64,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             : null;
     }
 
-    /**
-     * An avatar URL that always resolves — the uploaded photo when present,
-     * otherwise a generated initials avatar. Used wherever a name is shown
-     * alongside a face (approval chain, contract list).
-     */
     public function avatarUrl(): string
     {
         return $this->getFilamentAvatarUrl()
@@ -110,9 +101,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->defaultRecipients()->pluck('users.id')->toArray();
     }
 
-    /**
-     * @return array<string, array<int, string>>
-     */
+    /** @return array<string, array<int, string>> */
     public static function approverOptionsGroupedByDepartment(?int $excludeId = null): array
     {
         return static::optionsGroupedByDepartment(
@@ -121,13 +110,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         );
     }
 
-    /**
-     * Every active user, grouped by department — the picker for roles the
-     * approval flow knows nothing about, such as the supply officer who checks
-     * requisitions.
-     *
-     * @return array<string, array<int, string>>
-     */
+    /** @return array<string, array<int, string>> */
     public static function activeOptionsGroupedByDepartment(?int $excludeId = null): array
     {
         return static::optionsGroupedByDepartment($excludeId);

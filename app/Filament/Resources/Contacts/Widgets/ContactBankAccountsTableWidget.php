@@ -8,12 +8,6 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * A contact's bank requisites as a stock Filament table — one row per
- * account (currency, number, bank, МФО, SWIFT). Embedded on the contact
- * view page's «Банковские реквизиты» tab; the tab label names it, so no
- * heading, search or pagination.
- */
 class ContactBankAccountsTableWidget extends TableWidget
 {
     public int $contactId;
@@ -23,8 +17,7 @@ class ContactBankAccountsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            // No heading (the tab names it) and no column-manager toolbar —
-            // a short read-only requisites list, not a data grid to configure.
+
             ->heading(null)
             ->columnManager(false)
             ->query(fn (): Builder => BankAccount::query()

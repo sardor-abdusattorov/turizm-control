@@ -11,7 +11,6 @@ use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
-/** A single active user holding the director role. */
 function makeDirector(): User
 {
     Role::firstOrCreate(['name' => Contract::DIRECTOR_ROLE, 'guard_name' => 'web']);
@@ -23,11 +22,7 @@ function makeDirector(): User
     return $director;
 }
 
-/**
- * An in-review contract with a lawyer (pending) + accountant (queued) chain.
- *
- * @return array{Contract, User, User, User}
- */
+/** @return array{Contract, User, User, User} */
 function inReviewWithLawyerAccountant(): array
 {
     $responsible = User::factory()->create();
@@ -53,7 +48,6 @@ function inReviewWithLawyerAccountant(): array
     return [$contract->refresh(), $responsible, $lawyer, $accountant];
 }
 
-/** Approve through the lawyer + accountant stage. */
 function approveLawyerAndAccountant(Contract $contract, User $lawyer, User $accountant): void
 {
     $workflow = app(ContractWorkflow::class);
@@ -73,7 +67,6 @@ it('parks the contract in pending_director after lawyer + accountant approve', f
 
     $contract->refresh();
 
-    // Not auto-sent to the director and not approved — parked for a manual hand-off.
     expect($contract->status)->toBe(Contract::STATUS_PENDING_DIRECTOR)
         ->and($contract->hasDirectorApprover())->toBeFalse()
         ->and($contract->canBeSentToDirectorBy($responsible))->toBeTrue();
@@ -85,7 +78,6 @@ it('sends to the director manually and finalizes on the director sign-off', func
 
     approveLawyerAndAccountant($contract, $lawyer, $accountant);
 
-    // Manager hands it to the director.
     actingAs($responsible);
     expect(app(ContractWorkflow::class)->submitToDirector($contract->fresh()))->toBeTrue();
 
@@ -98,7 +90,6 @@ it('sends to the director manually and finalizes on the director sign-off', func
         ->and($directorRow->status)->toBe(ContractApprover::STATUS_PENDING)
         ->and($directorRow->order)->toBe(3);
 
-    // Director signs off → fully approved.
     actingAs($director);
     app(ContractWorkflow::class)->approve($contract->fresh(), $director);
 
@@ -111,18 +102,15 @@ it('freezes editing for the author from the pending_director stage onward', func
     $director = makeDirector();
     [$contract, $responsible, $lawyer, $accountant] = inReviewWithLawyerAccountant();
 
-    // While the lawyer + accountant are reviewing the author can still edit.
     expect($contract->canBeEditedBy($responsible))->toBeTrue();
 
     approveLawyerAndAccountant($contract, $lawyer, $accountant);
 
-    // Parked for the director → editing frozen.
     expect($contract->fresh()->canBeEditedBy($responsible))->toBeFalse();
 
     actingAs($responsible);
     app(ContractWorkflow::class)->submitToDirector($contract->fresh());
 
-    // With the director reviewing → still frozen.
     expect($contract->fresh()->canBeEditedBy($responsible))->toBeFalse();
 });
 

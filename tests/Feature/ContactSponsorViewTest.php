@@ -32,10 +32,6 @@ it('renders the contact view with all its data', function () {
 
     $project = Project::factory()->international()->create(['name' => 'ZAMIN-EXPO']);
 
-    // Approved, not a draft — drafts are private to their author even for a
-    // view_all_contracts holder, which is exactly the security rule at work.
-    // An income (fee) contract tied to the project, so it surfaces both in the
-    // contracts table and in the projects section of the contact view.
     Contract::factory()->create([
         'contact_id' => $contact->id,
         'project_id' => $project->id,
@@ -45,10 +41,10 @@ it('renders the contact view with all its data', function () {
 
     Livewire::test(ViewContact::class, ['record' => $contact->id])
         ->assertOk()
-        ->assertSee('311343097')                 // INN row
-        ->assertSee('20208000107076480001')       // bank account table
-        ->assertSee('ZAMIN-CONTRACT-1')           // contracts table
-        ->assertSee('ZAMIN-EXPO');                // projects table
+        ->assertSee('311343097')
+        ->assertSee('20208000107076480001')
+        ->assertSee('ZAMIN-CONTRACT-1')
+        ->assertSee('ZAMIN-EXPO');
 });
 
 it('shows a manager only their own contracts on the contact view', function () {

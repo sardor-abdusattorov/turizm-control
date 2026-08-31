@@ -87,13 +87,6 @@ class CurrencySeeder extends Seeder
         $this->pruneRetiredCurrencies();
     }
 
-    /**
-     * An earlier revision seeded ten extra exhibition-geography currencies;
-     * the registry keeps the core six (KZT is used by a foreign stand partner).
-     * Remove the remaining retired codes from existing installs — but never a
-     * currency that is already referenced by a contract, project or
-     * bank-account row.
-     */
     private function pruneRetiredCurrencies(): void
     {
         $retired = ['CNY', 'AED', 'JPY', 'KRW', 'INR', 'MYR', 'PLN', 'TRY', 'AZN'];

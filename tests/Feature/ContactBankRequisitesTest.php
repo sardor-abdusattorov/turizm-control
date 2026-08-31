@@ -105,8 +105,6 @@ it('rejects an account that is too short', function () {
 });
 
 it('accepts a short foreign account with a bank address', function () {
-    // RX France: an 11-digit account (not the Uzbek 20) plus a bank address —
-    // both must go through, so the old minLength(20) is gone.
     Livewire::test(CreateContact::class)
         ->fillForm([
             'type' => Contact::TYPE_LEGAL,

@@ -4,13 +4,6 @@ namespace App\Services\Telegram;
 
 use Illuminate\Support\Facades\Cache;
 
-/**
- * Per-chat short-lived state for multi-step bot flows (currently: "I tapped
- * Reject, now waiting for you to type the reason"). Backed by cache, expires
- * after an hour so abandoned flows don't trap the chat. The window is generous
- * on purpose — the prompts no longer mention a deadline, so a reply that lands
- * a while later should still be picked up rather than silently dropped.
- */
 class BotConversationState
 {
     private const TTL_MINUTES = 60;

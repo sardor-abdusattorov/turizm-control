@@ -20,11 +20,6 @@ use Filament\Schemas\Schema;
 
 class ProjectForm
 {
-    /**
-     * The form is shared by both typed resources; the page's resource pins
-     * the type (BaseProjectResource::projectType), so visibility of the
-     * local-event vs exhibition fields keys off the hosting Livewire page.
-     */
     protected static function isInternal($livewire): bool
     {
         return $livewire::getResource()::projectType() === ProjectType::Internal;
@@ -52,9 +47,6 @@ class ProjectForm
                                     ->maxLength(255)
                                     ->columnSpanFull(),
 
-                                // The buyruq the participation rests on — its
-                                // contracts inherit the basis from here, so it
-                                // is picked once per project, not per deal.
                                 Select::make('order_id')
                                     ->label(__('app.label.order_basis'))
                                     ->options(fn (): array => Order::basisOptions())
@@ -81,9 +73,6 @@ class ProjectForm
                                             ->afterOrEqual('starts_on'),
                                     ]),
 
-                                // Local events keep only the photo-report link —
-                                // all money and participation figures come from
-                                // the project's contracts now.
                                 Grid::make(['default' => 1, 'md' => 2])
                                     ->visible(self::isInternal(...))
                                     ->schema([
@@ -106,8 +95,7 @@ class ProjectForm
 
                         Tabs\Tab::make(__('app.label.project_costs'))
                             ->icon('heroicon-o-banknotes')
-                            // Area and stand money belong to exhibitions; a
-                            // local event's money lives in estimate/final.
+
                             ->visible(fn ($livewire): bool => ! self::isInternal($livewire))
                             ->schema([
                                 TextInput::make('area_sqm')
@@ -122,9 +110,6 @@ class ProjectForm
                                     ->label(__('app.label.area_is_free'))
                                     ->live(),
 
-                                // One currency drives both cost fields; the stand
-                                // gets its own only when it genuinely differs
-                                // (e.g. ITB-2025: area in EUR, stand in USD).
                                 Select::make('area_currency_id')
                                     ->label(__('app.label.currency_single'))
                                     ->options(fn () => Currency::getActive())

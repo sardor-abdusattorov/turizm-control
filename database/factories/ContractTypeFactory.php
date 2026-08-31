@@ -7,9 +7,7 @@ use App\Enums\CounterpartyKind;
 use App\Models\ContractType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<ContractType>
- */
+/** @extends Factory<ContractType> */
 class ContractTypeFactory extends Factory
 {
     protected $model = ContractType::class;
@@ -33,9 +31,6 @@ class ContractTypeFactory extends Factory
         return $this->state(fn () => ['direction' => ContractDirection::Income->value]);
     }
 
-    /**
-     * Sponsorship kind: income-direction and signed with a Sponsor.
-     */
     public function sponsorship(): static
     {
         return $this->state(fn () => [

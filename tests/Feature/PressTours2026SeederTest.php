@@ -9,10 +9,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-/**
- * The buyruq the domestic tours cite records its author, so the seeder needs
- * a user — DatabaseSeeder runs UserSeeder well before this one.
- */
 beforeEach(function () {
     User::factory()->create();
 });
@@ -20,7 +16,6 @@ beforeEach(function () {
 it('imports the 2026 press, blogger and info-tour registry', function () {
     $this->seed(PressTours2026Seeder::class);
 
-    // 7 hosted foreign visits + 13 domestic tours + 1 trip abroad.
     expect(PressTour::count())->toBe(21)
         ->and(PressTour::where('direction', PressTourDirection::Inbound->value)->count())->toBe(7)
         ->and(PressTour::where('direction', PressTourDirection::Local->value)->count())->toBe(13)
@@ -30,8 +25,6 @@ it('imports the 2026 press, blogger and info-tour registry', function () {
 it('keeps the registry wording for periods and headcounts', function () {
     $this->seed(PressTours2026Seeder::class);
 
-    // «11-18 Август» is preserved verbatim while the sortable month is parsed
-    // out of it, and «6+11» (two groups) survives as a note, not a number.
     $georgia = PressTour::where('place', 'Грузия')->firstOrFail();
 
     expect($georgia->period)->toBe('11-18 Август')
@@ -40,7 +33,6 @@ it('keeps the registry wording for periods and headcounts', function () {
         ->and($georgia->people_note)->toBe('6+11')
         ->and($georgia->peopleLabel())->toBe('6+11');
 
-    // A plain number still reads as a number.
     $melon = PressTour::where('name', 'like', '%Праздник дыни%')->firstOrFail();
     expect($melon->people_count)->toBe(36)
         ->and($melon->peopleLabel())->toBe('36');
@@ -69,7 +61,6 @@ it('rests every domestic tour on the press-tour buyruq', function () {
 it('keeps same-named tours that recur in different months apart', function () {
     $this->seed(PressTours2026Seeder::class);
 
-    // Самарканд is presented twice — October and November.
     $samarkand = PressTour::where('name', 'like', '%Самаркандской%')->get();
 
     expect($samarkand)->toHaveCount(2)

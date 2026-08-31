@@ -42,10 +42,6 @@ class Payment extends Model
     protected static function booted(): void
     {
         static::creating(function (self $payment): void {
-            // In HTTP context the creator is always the authenticated user —
-            // overriding (not just defaulting) so a mass-assigned
-            // `created_by` from the request body cannot spoof attribution.
-            // CLI / seeders / factories keep whatever they passed in.
             if (! app()->runningInConsole() && auth()->check()) {
                 $payment->created_by = (int) auth()->id();
 
@@ -71,12 +67,7 @@ class Payment extends Model
         return str_ends_with(strtolower($path), '.pdf');
     }
 
-    /**
-     * The proof files as signed expiring links, split by kind for the views:
-     * images go to thumbnails/lightboxes, PDFs to plain document links.
-     *
-     * @return list<array{url: string, name: string, pdf: bool}>
-     */
+    /** @return list<array{url: string, name: string, pdf: bool}> */
     public function screenshotFiles(): array
     {
         return array_values(array_map(
@@ -109,18 +100,11 @@ class Payment extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    /**
-     * Whether this payment settles a project directly rather than a contract.
-     */
     public function isDirect(): bool
     {
         return $this->contract_id === null;
     }
 
-    /**
-     * The project the money belongs to: named outright on a direct payment,
-     * inherited from the contract otherwise.
-     */
     public function resolvedProject(): ?Project
     {
         return $this->project ?? $this->contract?->project;
@@ -133,10 +117,6 @@ class Payment extends Model
             : trim(($this->contract?->number ?? '').' · '.($this->contract?->title ?? ''), ' ·');
     }
 
-    /**
-     * What the payment is worth as one line: a share for a contract payment,
-     * a sum in its own currency for a direct one.
-     */
     public function valueLabel(): string
     {
         if (! $this->isDirect()) {
@@ -154,16 +134,10 @@ class Payment extends Model
             return $query->whereRaw('0 = 1');
         }
 
-        // Same rule as contracts: oversight roles and anyone granted the
-        // `view_all_contracts` permission see every payment. Everyone else —
-        // managers included — only the payments on contracts they are
-        // responsible for. Access is permission-driven, not tied to a role.
         if ($user->hasAnyRole(Contract::OVERSIGHT_ROLES) || $user->can('view_all_contracts')) {
             return $query;
         }
 
-        // A direct project payment has no responsible contract to inherit
-        // visibility from, so it stays with whoever filed it.
         return $query->where(fn (Builder $inner) => $inner
             ->whereHas('contract', fn (Builder $contract) => $contract->where('responsible_id', $user->id))
             ->orWhere(fn (Builder $direct) => $direct

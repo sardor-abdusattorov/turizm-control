@@ -29,11 +29,6 @@ trait HandlesApprovalChain
         $this->record->unsetRelation('approvals');
     }
 
-    /**
-     * The edit side effects, in the order the round expects them: a settled
-     * record is voided back to draft first, then the chain syncs, then a live
-     * round restarts from the first step.
-     */
     protected function settleRound(): void
     {
         $workflow = app(ApprovalWorkflow::class);

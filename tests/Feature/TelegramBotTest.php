@@ -46,8 +46,6 @@ it('asks for confirmation and links the chat only after «yes, it is me»', func
         ],
     ]);
 
-    // A forwarded deep link must never bind a chat silently — nothing is
-    // linked until the person in the chat confirms the account name.
     expect($user->fresh()->telegram)->toBeNull();
 
     app(TelegramBot::class)->handleUpdate([
@@ -108,7 +106,6 @@ it('a consumed confirmation token cannot be replayed', function () {
     $confirm('333');
     expect($user->fresh()->telegram?->chat_id)->toBe('333');
 
-    // Replaying the same token from another chat must not re-link.
     $confirm('444');
     expect($user->fresh()->telegram?->chat_id)->toBe('333');
 });
@@ -136,8 +133,6 @@ it('re-linking a chat that belonged to another user releases the old row', funct
 it('rejects the webhook without the secret header and accepts a fully signed call', function () {
     post('/telegram/webhook/wrong-secret', [])->assertForbidden();
 
-    // The right path secret alone is not enough — the header must match too:
-    // the path can leak into proxy access logs, the header cannot.
     post('/telegram/webhook/hook-secret', [
         'message' => ['chat' => ['id' => 1], 'text' => '/start'],
     ])->assertForbidden();
@@ -156,7 +151,6 @@ it('opens a comment step on approve and stores the typed comment', function () {
         'order' => 1,
     ]);
 
-    // Tapping approve must NOT decide yet — it opens the optional comment step.
     app(TelegramBot::class)->handleUpdate([
         'callback_query' => [
             'id' => 'cb1',
@@ -167,7 +161,6 @@ it('opens a comment step on approve and stores the typed comment', function () {
 
     expect($contract->fresh()->status)->toBe(Contract::STATUS_IN_REVIEW);
 
-    // The next message is taken as the approval comment and finalises it.
     app(TelegramBot::class)->handleUpdate([
         'message' => [
             'chat' => ['id' => 555],
@@ -241,8 +234,6 @@ it('keeps the reject flow open when a non-text message arrives', function () {
         ],
     ]);
 
-    // A sticker has no text — the flow must ask for text, not finalise with
-    // an empty reason.
     app(TelegramBot::class)->handleUpdate([
         'message' => [
             'chat' => ['id' => 557],
@@ -288,6 +279,5 @@ it('ignores a redelivered update with the same update_id', function () {
     Http::fake(['*' => Http::response(['ok' => true])]);
     app(TelegramBot::class)->handleUpdate($update);
 
-    // The redelivery is dropped before any handler runs — no Telegram call.
     Http::assertNothingSent();
 });

@@ -66,8 +66,7 @@ class UserForm
 
                 Section::make(__('app.label.security'))
                     ->schema([
-                        // Passwords are write-only: on the read-only view page
-                        // they would render as two empty disabled boxes.
+
                         TextInput::make('password')
                             ->label(__('app.label.password'))
                             ->password()
@@ -96,13 +95,7 @@ class UserForm
             ]);
     }
 
-    /**
-     * Positions available for the chosen department (via the department_position
-     * pivot). With no department picked yet, fall back to every active position
-     * so the field is never empty.
-     *
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     private static function positionOptions(mixed $departmentId): array
     {
         if (! $departmentId) {

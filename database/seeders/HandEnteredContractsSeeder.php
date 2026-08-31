@@ -18,18 +18,8 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
-/**
- * Replays the JSON written by `php artisan contracts:snapshot`: contracts,
- * their counterparties (with bank accounts), dossier attachments, payments
- * and hand-entered orders survive a `migrate:fresh --seed` exactly as they
- * were. File paths are relinked verbatim — the uploads/ tree on disk is
- * expected to be untouched by the rebuild.
- *
- * Silently does nothing when no snapshot file exists.
- */
 class HandEnteredContractsSeeder extends Seeder
 {
-    /** Overridable so tests replay a scratch file, never the real snapshot. */
     public static ?string $path = null;
 
     public function run(): void
@@ -74,15 +64,11 @@ class HandEnteredContractsSeeder extends Seeder
                 ],
             );
 
-            // The workflow already happened in a previous life — file the
-            // status verbatim, quietly, with no chains and no notifications.
             $contract->forceFill([
                 'status' => $data['status'],
                 'signed_at' => $data['signed_at'],
             ])->saveQuietly();
 
-            // The basis buyruq lives on the project now; the first contract
-            // naming one hands it over, the rest confirm it.
             if (($data['order_number'] ?? null) && $contract->project_id) {
                 $orderId = Order::query()->firstWhere('number', $data['order_number'])?->id;
 
@@ -108,9 +94,6 @@ class HandEnteredContractsSeeder extends Seeder
             }
 
             foreach ($data['payments'] ?? [] as $payment) {
-                // whereDate, not a plain where: paid_at is stored as a full
-                // timestamp, so matching it against the snapshot's 'Y-m-d'
-                // never hits and a second replay would file the payment twice.
                 $alreadyFiled = $contract->payments()
                     ->where('percent', $payment['percent'])
                     ->whereDate('paid_at', $payment['paid_at'])
@@ -133,12 +116,7 @@ class HandEnteredContractsSeeder extends Seeder
         $this->restoreRequisitions($snapshot['requisitions'] ?? []);
     }
 
-    /**
-     * A rebuild reassigns ids, so the snapshot names a buyruq's basis by its
-     * number — and the link can only be tied once every order exists.
-     *
-     * @param  array<int, array<string, mixed>>  $orders
-     */
+    /** @param  array<int, array<string, mixed>>  $orders */
     protected function relinkOrderBases(array $orders): void
     {
         foreach ($orders as $data) {
@@ -149,19 +127,13 @@ class HandEnteredContractsSeeder extends Seeder
             $order = Order::query()->firstWhere('number', $data['number']);
             $basisId = Order::query()->where('number', $data['basis_number'])->value('id');
 
-            // Never let a snapshot point an order at itself.
             if ($order && $basisId && $order->getKey() !== $basisId) {
                 $order->forceFill(['basis_order_id' => $basisId])->saveQuietly();
             }
         }
     }
 
-    /**
-     * Project spending filed without a contract — it hangs off no contract, so
-     * it is restored on its own rather than inside the contract loop.
-     *
-     * @param  array<int, array<string, mixed>>  $payments
-     */
+    /** @param  array<int, array<string, mixed>>  $payments */
     protected function restoreProjectPayments(array $payments): void
     {
         foreach ($payments as $data) {
@@ -197,9 +169,7 @@ class HandEnteredContractsSeeder extends Seeder
         }
     }
 
-    /**
-     * @param  array<int, array<string, mixed>>  $requisitions
-     */
+    /** @param  array<int, array<string, mixed>>  $requisitions */
     protected function restoreRequisitions(array $requisitions): void
     {
         foreach ($requisitions as $data) {
@@ -215,8 +185,6 @@ class HandEnteredContractsSeeder extends Seeder
                 ],
             );
 
-            // The rounds already happened in a previous life: file their state
-            // verbatim rather than replaying the workflow.
             $requisition->forceFill([
                 'status' => $data['status'] ?? RequisitionStatus::Draft->value,
                 'submitted_at' => $data['submitted_at'] ?? null,
@@ -302,11 +270,6 @@ class HandEnteredContractsSeeder extends Seeder
         return User::query()->orderBy('id')->value('id');
     }
 
-    /**
-     * Snapshots taken before the buyruq registries were renamed still say
-     * internal / external — replay them as PR-centre / committee rather than
-     * refusing to restore hand-entered data.
-     */
     protected function scopeFrom(?string $scope): string
     {
         return match ($scope) {

@@ -8,8 +8,6 @@ use Spatie\Permission\Models\Role;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // syncRole only assigns permissions that already exist, so create the ones
-    // these assertions touch (Shield would generate them via shield:generate).
     foreach ([
         'approve_contracts',
         'view_all_contracts',

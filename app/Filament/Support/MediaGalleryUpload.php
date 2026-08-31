@@ -6,13 +6,7 @@ use Filament\Forms\Components\FileUpload;
 
 class MediaGalleryUpload
 {
-    /**
-     * Photo + video gallery. Video uploads are also capped by the Livewire
-     * temporary-upload rules (config/livewire.php) and the server's
-     * upload_max_filesize / post_max_size.
-     *
-     * @var list<string>
-     */
+    /** @var list<string> */
     public const ACCEPTED_MIMES = [
         'image/jpeg',
         'image/png',

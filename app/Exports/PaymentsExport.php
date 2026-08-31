@@ -18,11 +18,6 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-/**
- * The payments registry export: every payment the user is allowed to see —
- * already scoped by the filtered table query — on a single sheet, sharing the
- * blue registry look with the contacts export.
- */
 class PaymentsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadings, WithMapping, WithStyles, WithTitle
 {
     use Exportable;

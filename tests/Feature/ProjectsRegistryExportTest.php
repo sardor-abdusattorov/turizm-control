@@ -44,7 +44,6 @@ it('reproduces the registry block format', function () {
         'stand_currency_id' => $eur->id,
     ]);
 
-    // Income = fee contracts against the project (ordered by id in the export).
     $fee = fn (Project $project, Contact $contact, float $amount) => Contract::factory()->create([
         'project_id' => $project->id,
         'contact_id' => $contact->id,
@@ -56,7 +55,6 @@ it('reproduces the registry block format', function () {
     $fee($fitur, $rocket, 38000000);
     $fee($fitur, $zamin, 38000000);
 
-    // Cross-month dates + free area, like ATM / SCITE in the source registry.
     $atm = Project::factory()->international()->create([
         'name' => 'ATM-2025',
         'starts_on' => '2025-04-28',
@@ -72,7 +70,6 @@ it('reproduces the registry block format', function () {
 
     $rows = (new ProjectsRegistryExport(Project::query(), ProjectType::International))->array();
 
-    // Header + FITUR block (2 rows) + Итог + ATM block (1 row) + Итог.
     expect($rows)->toHaveCount(6)
         ->and($rows[0][1])->toBe('Название выставки')
         ->and($rows[1][0])->toBe(1)

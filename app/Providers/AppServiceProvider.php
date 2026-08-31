@@ -33,16 +33,10 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // Set the scheme before the panel provider registers — Filament
-        // evaluates asset() for the brand logo eagerly, so https must be forced
-        // first or the logo URL gets baked as http (mixed content).
         $this->configureUrl();
 
         Gate::policy(Activity::class, ActivityPolicy::class);
 
-        // Override the Shield-generated ContractPolicy with our subclass so the
-        // delete status rule survives `project:init` / `shield:generate`, which
-        // overwrite the generated policy file.
         Gate::policy(Contract::class, ContractAccessPolicy::class);
 
         $this->app->scoped(DashboardContext::class);
@@ -52,8 +46,6 @@ class AppServiceProvider extends ServiceProvider
 
     private function configureRenderHooks(): void
     {
-        // SEO + Open Graph tags from the Settings page (localised title /
-        // description / keywords, the indexing toggle and the OG image).
         FilamentView::registerRenderHook(
             'panels::head.start',
             fn (): string => $this->renderSeoHead(),
@@ -76,15 +68,6 @@ class AppServiceProvider extends ServiceProvider
         );
     }
 
-    /**
-     * Build the SEO / Open Graph `<head>` tags from the Settings page. Title,
-     * description and keywords are localised (fall back to the Russian copy);
-     * `seo.indexing_enabled` drives the robots tag (so an admin can allow or
-     * block search indexing without code), and `seo.og_image` powers link
-     * previews when the URL is shared (Telegram, etc.). We always emit an
-     * `og:image` — falling back to the brand icon when none is uploaded —
-     * because Telegram only renders a preview card when it finds an image.
-     */
     private function renderSeoHead(): string
     {
         $locale = app()->getLocale();
@@ -161,11 +144,6 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands($this->app->environment('production'));
     }
 
-    /**
-     * Behind the TLS-terminating reverse proxy the app is served over HTTPS, so
-     * force generated URLs (assets, links) to https in production — otherwise
-     * asset() emits http:// and the browser flags mixed content.
-     */
     private function configureUrl(): void
     {
         if ($this->app->isProduction()) {
@@ -180,17 +158,6 @@ class AppServiceProvider extends ServiceProvider
         Model::unguard();
     }
 
-    /**
-     * Keep permission keys spelled `view_any_press_tour`.
-     *
-     * Shield 4.3 rejects `separator: _` with `case: snake` — on its own it can
-     * no longer tell where the affix ends and the subject begins. Our keys are
-     * written that way in every policy, seeder, test and role row, so instead
-     * of renaming them we take over the composition: the affix and the subject
-     * are snake-cased and joined by an underscore, exactly as Shield did
-     * before. Custom keys (`export_contract`) are already final and pass
-     * through untouched.
-     */
     private function configureShieldPermissionKeys(): void
     {
         FilamentShield::buildPermissionKeyUsing(
@@ -237,15 +204,11 @@ class AppServiceProvider extends ServiceProvider
                     'uz' => __('app.label.uz'),
                     'en' => __('app.label.en'),
                 ])
-                // A fresh session (new browser, other device) opens in the
-                // language the user last picked, not the .env default.
+
                 ->userPreferredLocale(fn () => auth()->user()?->locale)
                 ->visible(outsidePanels: true);
         });
 
-        // Remember the picked language on the profile: notifications are
-        // rendered per RECIPIENT, and their saved locale is the only way to
-        // know which language to use when someone ELSE triggers the send.
         Event::listen(LocaleChanged::class, function (LocaleChanged $event): void {
             $user = auth()->user();
 

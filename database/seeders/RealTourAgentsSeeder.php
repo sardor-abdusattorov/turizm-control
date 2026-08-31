@@ -5,11 +5,6 @@ namespace Database\Seeders;
 use App\Models\Contact;
 use Illuminate\Database\Seeder;
 
-/**
- * Real tour operators from the 2025/2026 exhibition registries, under their
- * canonical names. Websites/phones researched from official sources; unknown
- * fields stay null.
- */
 class RealTourAgentsSeeder extends Seeder
 {
     public function run(): void
@@ -31,9 +26,7 @@ class RealTourAgentsSeeder extends Seeder
         }
     }
 
-    /**
-     * @return list<array<string, mixed>>
-     */
+    /** @return list<array<string, mixed>> */
     private function agents(): array
     {
         return [

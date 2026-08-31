@@ -4,11 +4,6 @@ namespace App\Enums;
 
 use App\Enums\Concerns\HasOptions;
 
-/**
- * Where a requisition stands: written by its author, sitting with the supply
- * officer, then settled either way. A rejected one goes back to draft when the
- * author picks it up again.
- */
 enum RequisitionStatus: string
 {
     use HasOptions;
@@ -43,11 +38,6 @@ enum RequisitionStatus: string
         };
     }
 
-    /**
-     * A settled document is not edited in place: an approved one is the record,
-     * and a rejected one goes back to draft first so the round it collects next
-     * is a new one.
-     */
     public function isEditable(): bool
     {
         return in_array($this, [self::Draft, self::Rejected], true);

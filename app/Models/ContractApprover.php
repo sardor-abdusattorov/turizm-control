@@ -45,21 +45,11 @@ class ContractApprover extends Model
 
     public const STATUS_INVALIDATED = ContractApproverStatus::Invalidated;
 
-    /**
-     * System notes are stored as bare translation keys so they render in each
-     * viewer's language rather than whatever locale the writer happened to be
-     * in (a queued job has no session and used to store English).
-     */
     private const SYSTEM_NOTE_KEYS = [
         'invalidated_on_edit',
         'invalidated_on_document_save',
     ];
 
-    /**
-     * The system note translated into the active locale. New rows store a bare
-     * key; older rows stored the already-translated text in some language —
-     * both resolve here, and any unknown free text is shown unchanged.
-     */
     public function systemNoteLabel(): ?string
     {
         $note = $this->system_comment;
@@ -72,8 +62,6 @@ class ContractApprover extends Model
             return __('app.message.'.$note);
         }
 
-        // Legacy rows: map the stored translation (in any locale) back to its
-        // key so it still renders in the viewer's language.
         foreach (self::SYSTEM_NOTE_KEYS as $key) {
             foreach (['en', 'ru', 'uz'] as $locale) {
                 if ($note === __('app.message.'.$key, [], $locale)) {

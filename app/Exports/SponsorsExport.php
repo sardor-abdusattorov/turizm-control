@@ -92,7 +92,7 @@ class SponsorsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHeadi
             AfterSheet::class => fn (AfterSheet $event) => $this->applyLayout(
                 $event,
                 __('app.export.sponsors_title', ['year' => now()->year]),
-                ['C', 'E'], // INN, phone stay text
+                ['C', 'E'],
             ),
         ];
     }

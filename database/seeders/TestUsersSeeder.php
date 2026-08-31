@@ -67,9 +67,6 @@ class TestUsersSeeder extends Seeder
                 ]
             );
 
-            // Back-fill org placement on demo users seeded before they had one
-            // (the manager originally had no department), without clobbering a
-            // value an admin may have set by hand.
             $backfill = [];
 
             if ($user->department_id === null && $department) {
@@ -99,10 +96,6 @@ class TestUsersSeeder extends Seeder
         $legal = User::firstWhere('email', 'legal@test.uz');
         $accounting = User::firstWhere('email', 'accounting@test.uz');
 
-        // A manager's contracts auto-route through legal + accounting only.
-        // The director is NOT a default recipient — they sign off as a
-        // separate manual hand-off (Pending director → Send to director),
-        // so they must stay out of the auto-built chain.
         $reviewers = collect([$legal, $accounting])->filter()->pluck('id')->all();
 
         User::firstWhere('email', 'manager@test.uz')?->defaultRecipients()->sync($reviewers);

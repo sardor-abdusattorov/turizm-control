@@ -30,11 +30,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectsTable
 {
-    /**
-     * Currency suffix for the fee columns — a project's income contracts are
-     * signed in a single currency in practice (the registry), so the first
-     * code labels the total; a mixed project gets no (misleading) suffix.
-     */
     protected static function feeCurrencySuffix(Project $record): string
     {
         $codes = $record->incomeContracts->pluck('currency.short_name')->filter()->unique();
@@ -42,10 +37,6 @@ class ProjectsTable
         return $codes->count() === 1 ? ' '.$codes->first() : '';
     }
 
-    /**
-     * The table is shared by both typed list pages; local-event columns
-     * (смета/итог/чел) only make sense on the internal listing.
-     */
     protected static function isInternalList($livewire): bool
     {
         return $livewire::getResource()::projectType() === ProjectType::Internal;
@@ -250,11 +241,6 @@ class ProjectsTable
             ]);
     }
 
-    /**
-     * Role-scoped breakdown behind the participants / sponsors count badge —
-     * a stock Filament table (ProjectParticipantsTableWidget) scoped to one
-     * income kind, the same table the project view page's tab embeds.
-     */
     private static function participantBreakdownAction(string $name, bool $sponsors, string $icon): Action
     {
         return Action::make($name)

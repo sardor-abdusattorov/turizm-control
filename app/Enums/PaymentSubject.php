@@ -4,11 +4,6 @@ namespace App\Enums;
 
 use App\Enums\Concerns\HasOptions;
 
-/**
- * What a payment settles. A contract payment is a share of that contract's
- * total; a project payment is money spent on a project that never went through
- * a contract, so it carries its own sum.
- */
 enum PaymentSubject: string
 {
     use HasOptions;

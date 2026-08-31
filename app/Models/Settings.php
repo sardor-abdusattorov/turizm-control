@@ -51,9 +51,6 @@ class Settings extends Model
             ['value' => $value]
         );
 
-        // Both the settings() helper and static::get() cache under this key
-        // (for an hour and a day respectively) — without the bust, a flipped
-        // switch keeps serving the stale value until the cache expires.
         Cache::forget("settings.{$key}");
     }
 }

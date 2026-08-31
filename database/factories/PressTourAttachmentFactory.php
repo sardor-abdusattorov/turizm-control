@@ -7,16 +7,12 @@ use App\Models\PressTour;
 use App\Models\PressTourAttachment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<PressTourAttachment>
- */
+/** @extends Factory<PressTourAttachment> */
 class PressTourAttachmentFactory extends Factory
 {
     protected $model = PressTourAttachment::class;
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public function definition(): array
     {
         $name = fake()->unique()->slug(3).'.pdf';

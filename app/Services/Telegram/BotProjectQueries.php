@@ -5,15 +5,9 @@ namespace App\Services\Telegram;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * The project register as the bot browses it: active projects, the ones
- * running or coming up first, so a phone-sized list leads with what matters.
- */
 class BotProjectQueries
 {
-    /**
-     * @return Builder<Project>
-     */
+    /** @return Builder<Project> */
     public function active(): Builder
     {
         return Project::query()

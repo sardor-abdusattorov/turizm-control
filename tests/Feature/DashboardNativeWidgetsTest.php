@@ -98,7 +98,6 @@ it('asks to pick a project when the filters leave the selection empty', function
 it('lists the project contracts with counterparties in the native table', function () {
     [$project, $viewer] = dashboardProject();
 
-    // Someone else's contract in the same project must stay invisible.
     Contract::factory()->create([
         'project_id' => $project->id,
         'responsible_id' => User::factory()->create()->id,

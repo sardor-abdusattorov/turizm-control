@@ -14,9 +14,6 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        // Custom (non-resource) permissions come from the Shield config —
-        // ensure they exist even when shield:generate hasn't been re-run, so
-        // the role editor can offer them and super_admin picks them up below.
         foreach ((array) config('filament-shield.custom_permissions') as $customPermission) {
             Permission::findOrCreate($customPermission, 'web');
         }
@@ -24,9 +21,6 @@ class RolesAndPermissionsSeeder extends Seeder
         $superAdmin = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
         $superAdmin->syncPermissions(Permission::where('guard_name', 'web')->pluck('name'));
 
-        // The director only consumes the work that reaches them: every
-        // contract (to review + sign off), plus orders and payments. No
-        // settings or reference data management.
         $this->syncRole('director', [
             'view_all_contracts',
             'approve_contracts',
@@ -65,9 +59,6 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('requisition', ['view_any', 'view', 'create', 'update', 'delete']),
         ]);
 
-        // Legal + accounting review and approve contracts; they do not author
-        // them, so create/update access stays with the manager who builds
-        // contracts and the super admin.
         $this->syncRole('legal_officer', [
             'view_all_contracts',
             'approve_contracts',
@@ -94,12 +85,7 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
     }
 
-    /**
-     * Assign $permissions to a role, only those that actually exist in the DB
-     * — keeps the seeder green even before Shield has been regenerated.
-     *
-     * @param  list<string>  $permissions
-     */
+    /** @param  list<string>  $permissions */
     protected function syncRole(string $name, array $permissions): void
     {
         $role = Role::firstOrCreate(['name' => $name, 'guard_name' => 'web']);
@@ -114,10 +100,6 @@ class RolesAndPermissionsSeeder extends Seeder
     }
 
     /**
-     * Build Shield-style permission names for a resource, e.g.
-     *   resourcePermissions('contract', ['view_any', 'update'])
-     *     => ['view_any_contract', 'update_contract']
-     *
      * @param  list<string>  $abilities
      * @return list<string>
      */

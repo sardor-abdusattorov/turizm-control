@@ -29,7 +29,6 @@
             @endif
         </div>
 
-        {{-- Mounts the page's FilterAction — the same slide-over as the docs. --}}
         <button type="button" class="pjo__filters" wire:click="$parent.mountAction('filter')">
             @svg('heroicon-o-funnel', 'pjo__filters-ic')
             {{ __('app.label.filters') }}

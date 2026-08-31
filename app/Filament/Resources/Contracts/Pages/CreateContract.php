@@ -29,8 +29,6 @@ class CreateContract extends CreateRecord
         $this->approverChain = array_values(array_filter(array_map('intval', (array) ($data['approver_chain'] ?? []))));
         unset($data['approver_chain']);
 
-        // Legacy import switch: keep the flag aside, the record is flipped to
-        // approved after create. The signing date only applies in that case.
         $this->alreadySigned = (bool) ($data['already_signed'] ?? false);
         unset($data['already_signed']);
 
@@ -38,30 +36,21 @@ class CreateContract extends CreateRecord
             unset($data['signed_at']);
         }
 
-        // Scans uploaded on the form become dossier attachments in afterCreate.
         return $this->extractAttachmentUploads($data);
     }
 
     protected function afterCreate(): void
     {
-        // A rebuilt database can hand a new contract the id of a deleted one
-        // whose folder survived on disk — without this sweep the fresh
-        // contract would inherit a stranger's files.
         app(ContractFiles::class)->purge($this->record);
 
         $this->storeFormAttachments();
 
-        // A legacy contract is already signed on paper: file it as approved
-        // straight away — no chain, no notifications (same quiet path the
-        // dossier importer uses).
         if ($this->alreadySigned) {
             $this->record->forceFill(['status' => Contract::STATUS_APPROVED])->saveQuietly();
 
             return;
         }
 
-        // With approval switched off (Settings → Согласование) the contract
-        // is just filed — no chain to build, nothing to submit.
         if (! ContractWorkflow::approvalEnabled()) {
             return;
         }

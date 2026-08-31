@@ -24,52 +24,26 @@ use InvalidArgumentException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
-/**
- * A record's file dossier as Filament's own FileUpload panel — drag-and-drop,
- * thumbnails, open and download, all in the component the edit forms already
- * use. It replaces the hand-built file tables: files are files, not rows of
- * metadata.
- *
- * Two variants share the plumbing, both backed by a HasMany of attachment
- * rows kept in step by SyncAttachments: the contract dossier
- * (`contract-dossier`) and a press tour's report pack
- * (`press-tour-documents`).
- *
- * A viewer who may not manage the files gets the same panel, locked.
- */
 class AttachmentPanel extends Component implements HasForms
 {
-    // Aliased because the guard below has to call Filament's own
-    // implementation, and `parent::` cannot reach a trait method.
     use InteractsWithForms {
         isFileUploadForSchemaComponent as private schemaOwnsFileUpload;
     }
     use RestrictsFileUploadsToSchemaComponents;
 
-    /**
-     * Locked: mount() authorises the record once, and Livewire would otherwise
-     * let the client repoint these on any later request — after which no gate
-     * runs again.
-     */
     #[Locked]
     public string $variant;
 
     #[Locked]
     public int $recordId;
 
-    /**
-     * @var array<string, mixed>
-     */
+    /** @var array<string, mixed> */
     public ?array $data = [];
 
     private ?Model $panelRecord = null;
 
     public function mount(): void
     {
-        // $recordId arrives from the client, so the panel carries its own view
-        // gate rather than trusting the page that embedded it — otherwise any
-        // signed-in user could mount it against someone else's record and read
-        // the file list (and its signed URLs).
         abort_unless(Gate::allows('view', $this->record()), 403);
 
         $this->form->fill($this->currentState());
@@ -85,23 +59,13 @@ class AttachmentPanel extends Component implements HasForms
             ->statePath('data');
     }
 
-    /**
-     * The submitted panel IS the dossier: new chips are filed and removed
-     * chips take their attachment — and its file — with them.
-     */
     public function save(): void
     {
-        // The button is merely hidden on a locked panel; save() is a public
-        // Livewire method anyone can call, so both gates live here too.
         abort_unless(Gate::allows('view', $this->record()), 403);
         abort_unless($this->canManage(), 403);
 
         $data = $this->form->getState();
 
-        // A disabled field is not dehydrated, so getState() drops its key
-        // entirely. In a writer that treats the submitted list as the whole
-        // dossier, reading that absence as "no files" would wipe everything —
-        // refuse instead.
         abort_unless(array_key_exists($this->field(), $data), 409);
 
         app(SyncAttachments::class)->sync(
@@ -111,8 +75,6 @@ class AttachmentPanel extends Component implements HasForms
             $this->attributesForNewFiles($data),
         );
 
-        // Re-fill from the database: freshly stored paths replace the upload
-        // objects, so a second save does not re-file the same files.
         $this->form->fill($this->currentState());
 
         Notification::make()->title(__('app.message.attachments_uploaded'))->success()->send();
@@ -120,11 +82,6 @@ class AttachmentPanel extends Component implements HasForms
         $this->dispatch('attachments-saved');
     }
 
-    /**
-     * Filament's own restriction only checks that a matching upload component
-     * exists in the schema — never whether it is disabled. Without this a
-     * read-only viewer could still push temporary files at a locked panel.
-     */
     public function isFileUploadForSchemaComponent(string $name): bool
     {
         return $this->canManage() && $this->schemaOwnsFileUpload($name);
@@ -139,11 +96,6 @@ class AttachmentPanel extends Component implements HasForms
         };
     }
 
-    /**
-     * Why the panel is locked, when the reason is worth saying out loud. A
-     * contract dossier freezes mid-approval so approvers review a fixed set
-     * of files; missing permission needs no explanation.
-     */
     public function lockedNotice(): ?string
     {
         if ($this->canManage() || $this->variant !== 'contract-dossier') {
@@ -186,31 +138,18 @@ class AttachmentPanel extends Component implements HasForms
 
         return $field
             ->hiddenLabel()
-            // Locked panels still show the pack and let a viewer open or
-            // download it — only writing is off.
+
             ->disabled(! $canManage)
             ->deletable($canManage)
             ->openable()
             ->downloadable()
-            // Filament passes string entries in the panel's state through
-            // unchanged, and they are client-controllable. Everything in this
-            // app shares one private disk, so without this an ordinary user
-            // could point the panel at another module's file — reading it
-            // through a signed URL, and unlinking it by removing the chip.
-            // The allow-callback is not optional: the panel's schema binds no
-            // model, so Filament's own whitelist would come back empty and
-            // reject every legitimate file.
+
             ->preventFilePathTampering(allowFilePathUsing: fn (string $file): bool => $this->relation()
                 ->where('file_path', $file)
                 ->exists())
             ->columnSpanFull();
     }
 
-    /**
-     * A tour's pack is catalogued — report, media coverage, photos, programme,
-     * participant list, act — so the kind is picked once for the batch being
-     * added. A contract dossier has no such question: files are just files.
-     */
     private function typeField(): ?Select
     {
         if ($this->variant !== 'press-tour-documents' || ! $this->canManage()) {
@@ -236,17 +175,13 @@ class AttachmentPanel extends Component implements HasForms
             : [];
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     private function currentState(): array
     {
         $attachments = $this->relation()->get();
 
         return [
-            // Only feed the panel files that actually exist on disk: a stale
-            // path would render as an empty, broken tile — and worse, its
-            // absence from the next submit would read as a removal.
+
             $this->field() => $attachments
                 ->filter(fn (Model $attachment): bool => Storage::disk('local')->exists((string) $attachment->file_path))
                 ->pluck('file_path')
@@ -274,9 +209,7 @@ class AttachmentPanel extends Component implements HasForms
         };
     }
 
-    /**
-     * @return HasMany<Model, Model>
-     */
+    /** @return HasMany<Model, Model> */
     private function relation(): HasMany
     {
         return $this->record()->attachments();

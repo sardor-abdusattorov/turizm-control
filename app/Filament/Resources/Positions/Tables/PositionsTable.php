@@ -20,8 +20,7 @@ class PositionsTable
     public static function configure(Table $table): Table
     {
         return $table
-            // Eager-load the relation columns; without it every row on the
-            // page fires its own query for them.
+
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['departments']))
             ->columns([
                 TextColumn::make('name')

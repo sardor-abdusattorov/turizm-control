@@ -88,8 +88,6 @@
         @endif
     </div>
 
-    {{-- One row per record. The live attempt reads normally; cancelled /
-         skipped rows are dimmed but keep the verdict and comment. --}}
     <div class="cw-rt-wrap">
         <table class="cw-rt">
             <thead>

@@ -13,17 +13,10 @@ use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * The picked project's contracts as a stock Filament table — the same
- * columns the contracts index leads with (type, counterparty, money,
- * status, paid share), the same visibleTo() scoping as everywhere else.
- * Doubles as the «Контракты» tab table on the project view page.
- */
 class ProjectContractsTableWidget extends TableWidget
 {
     use InteractsWithPageFilters;
 
-    /** Suppress the table heading when embedded in a tab/modal that already names it. */
     public bool $hideHeading = false;
 
     protected static ?int $sort = 1;

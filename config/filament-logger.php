@@ -219,10 +219,7 @@ return [
         'color' => 'success',
 
         'exclude' => [
-            // Contracts, Orders and Projects are already tracked
-            // by the ModelLogger via Eloquent events; logging the Filament UI
-            // actions on top of that produced duplicate Created / Updated
-            // entries in the Execution history.
+
             ContractResource::class,
             ContractTypeResource::class,
             PrCenterOrderResource::class,
@@ -235,10 +232,10 @@ return [
             'remember_token',
         ],
         'ignore_for_models' => [
-            // App\Models\User::class => ['last_seen_at', 'login_count'],
+
         ],
         'ignore_for_resources' => [
-            // App\Filament\Resources\UserResource::class => ['last_seen_at', 'login_count'],
+
         ],
         'cluster' => null,
         'navigation_group' => 'Settings',
@@ -290,12 +287,7 @@ return [
         ],
         'ignore_for' => [
             User::class => ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'],
-            // Bookkeeping columns that change as a side effect of an action
-            // that is already logged elsewhere — the document build after
-            // create (document_file/key), the workflow transitions which log
-            // their own "Submitted/Approved/…" entries (status, signed_at),
-            // and PDF generation (pdf_file). Ignoring them stops a duplicate
-            // "Contract Updated" landing next to the real entry.
+
             Contract::class => ['document_file', 'document_key', 'pdf_file', 'signed_at', 'status'],
             Requisition::class => ['submitted_at'],
         ],

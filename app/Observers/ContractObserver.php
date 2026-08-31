@@ -18,9 +18,6 @@ class ContractObserver
     {
         $this->files->purge($contract);
 
-        // The DB cascade would drop the rows without firing model events, so
-        // delete through Eloquent to let each attachment and payment remove
-        // its files (scans / payment proofs) from disk.
         $contract->attachments()->get()->each->delete();
         $contract->payments()->get()->each->delete();
     }

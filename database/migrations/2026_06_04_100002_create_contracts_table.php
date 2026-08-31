@@ -12,8 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('number', 50)->unique();
             $table->foreignId('contract_type_id')->nullable()->constrained()->nullOnDelete();
-            // A contract faces exactly one counterparty: a Contact OR a
-            // Sponsor, chosen by its type's counterparty_kind.
+
             $table->foreignId('contact_id')->nullable()->constrained()->restrictOnDelete();
             $table->foreignId('sponsor_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('project_id')->nullable()->constrained()->nullOnDelete();

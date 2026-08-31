@@ -19,11 +19,6 @@ use Filament\Schemas\Schema;
 
 class PressTourForm
 {
-    /**
-     * An example value while filling the form in, nothing while reading it —
-     * on the read-only view page a greyed-out sample sits in an empty box
-     * exactly where a real value would and reads as data.
-     */
     protected static function hintUnlessViewing(string $example): Closure
     {
         return fn (string $operation): ?string => $operation === 'view' ? null : $example;
@@ -32,8 +27,7 @@ class PressTourForm
     public static function configure(Schema $schema): Schema
     {
         return $schema
-            // One column at the top level: stacked side-by-side sections tiled
-            // as a ragged two-column masonry, leaving half the page empty.
+
             ->columns(1)
             ->components([
                 Tabs::make('press_tour')
@@ -58,15 +52,12 @@ class PressTourForm
 
                                 Grid::make(['default' => 1, 'md' => 2])
                                     ->schema([
-                                        // Domestic tours name a region here,
-                                        // foreign ones a country.
+
                                         TextInput::make('place')
                                             ->label(__('app.label.press_tour_place'))
                                             ->placeholder(self::hintUnlessViewing('Самарканд'))
                                             ->maxLength(255),
 
-                                        // The buyruq the tour rests on — the
-                                        // domestic programme sits under № 49-АФ.
                                         Select::make('order_id')
                                             ->label(__('app.label.order_basis'))
                                             ->options(fn (): array => Order::basisOptions())
@@ -90,10 +81,7 @@ class PressTourForm
                             ->schema([
                                 Grid::make(['default' => 1, 'md' => 2])
                                     ->schema([
-                                        // The registry writes «11-18 Август» or
-                                        // «сентябрь - декабрь», so the wording
-                                        // is kept verbatim and the month picked
-                                        // separately to give the list a sort key.
+
                                         TextInput::make('period')
                                             ->label(__('app.label.press_tour_period'))
                                             ->placeholder(self::hintUnlessViewing('11-18 Август'))
@@ -110,9 +98,6 @@ class PressTourForm
                                             ->minValue(0)
                                             ->maxValue(65535),
 
-                                        // «6+11» means two groups travelling
-                                        // together — a plain number cannot
-                                        // carry that.
                                         TextInput::make('people_note')
                                             ->label(__('app.label.press_tour_people_note'))
                                             ->placeholder(self::hintUnlessViewing('6+11'))
@@ -140,12 +125,6 @@ class PressTourForm
                                     ->columnSpanFull(),
                             ]),
 
-                        // Plan → fact. The registry is drawn up a year ahead,
-                        // so the actual date only exists once the tour is held.
-                        // The report pack is NOT edited here: a tour is created
-                        // as a plan months before it runs and its documents
-                        // arrive after, so they are filed on the view page's
-                        // Documents tab, where each one gets its own type.
                         Tabs\Tab::make(__('app.label.press_tour_progress'))
                             ->icon('heroicon-o-check-circle')
                             ->schema([

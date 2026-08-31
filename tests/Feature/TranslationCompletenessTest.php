@@ -2,13 +2,7 @@
 
 use Illuminate\Support\Facades\Lang;
 
-/**
- * Every static __('app...') key referenced anywhere in the codebase must
- * resolve in all three locales — a missing entry silently renders the raw
- * key in the UI (e.g. «app.label.counterparty» as a table header).
- *
- * @return array<string, array<int, string>> key => files using it
- */
+/** @return array<string, array<int, string>> key => files using it */
 function collectUsedAppTranslationKeys(): array
 {
     $keys = [];
@@ -28,8 +22,6 @@ function collectUsedAppTranslationKeys(): array
             );
 
             foreach ($matches[1] as $key) {
-                // Keys built by concatenation ('app.status.'.$value) end at a
-                // dot here and cannot be checked statically.
                 if (! str_ends_with($key, '.')) {
                     $keys[$key][] = str_replace(base_path().'/', '', $file->getPathname());
                 }

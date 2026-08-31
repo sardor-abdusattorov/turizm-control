@@ -16,8 +16,6 @@ use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
-// No manual cache bust here on purpose: Settings::set() must invalidate the
-// settings cache itself, otherwise the admin toggle takes an hour to apply.
 function setApprovalEnabled(bool $enabled): void
 {
     Settings::set('approval.enabled', $enabled);

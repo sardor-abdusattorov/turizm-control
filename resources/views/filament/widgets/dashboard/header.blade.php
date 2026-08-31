@@ -19,7 +19,7 @@
                 @if ($chips === [])
                     <p class="dh__summary">{{ $h['summary'] }}</p>
                 @else
-                    {{-- One tap from each counter to the exact list it counts. --}}
+
                     <div class="dh__chips">
                         @foreach ($chips as $chip)
                             <a href="{{ $chip['url'] }}" class="dh__chip dh__chip--{{ $chip['tone'] }}" wire:navigate>

@@ -44,14 +44,9 @@ class ContractNotifier
                 ->sendToDatabase($recipient, isEventDispatched: true);
         });
 
-        // Rich Telegram card (amount + responsible + Approve/Reject/Open),
-        // built by the bot menu builder so the format stays in sync with
-        // what the bot itself renders.
         $this->inRecipientTelegramLocale($recipient, function () use ($recipient, $contract): void {
             $screen = $this->botMenu->notificationApprovalRequested($contract);
 
-            // Queued (afterCommit) — submit()/approve() call this inside an
-            // open DB transaction.
             $this->telegram->queue(
                 $recipient->telegram?->chat_id,
                 $screen['text'],
@@ -96,13 +91,6 @@ class ContractNotifier
         });
     }
 
-    /**
-     * Tell the manager that one approval step passed — who approved it, when,
-     * and the comment they left — so they can follow the contract down the
-     * chain without opening the panel. Fires on every non-final approval (the
-     * final one already gets notifyApproved). The approver themselves is
-     * never notified about their own click.
-     */
     public function notifyStepApproved(Contract $contract, ContractApprover $approver): void
     {
         $recipient = $contract->responsible;
@@ -167,10 +155,6 @@ class ContractNotifier
         });
     }
 
-    /**
-     * "Next it goes to the director / to <name>" — translated at CALL time so
-     * each locale wrapper renders it in its own language.
-     */
     private function stepTail(?Contract $fresh): string
     {
         return match (true) {
@@ -255,12 +239,6 @@ class ContractNotifier
         });
     }
 
-    /**
-     * "Alisher Yuldoshev · Legal Department" — the actor's name with their
-     * department. Refetched with the relation because the passed-in approver
-     * may not have its user/department hydrated, and strict mode would throw
-     * on the lazy load.
-     */
     private function approverLabel(ContractApprover $approver): string
     {
         $user = User::with('department')->find($approver->user_id);
@@ -274,10 +252,6 @@ class ContractNotifier
         return ($approver->acted_at ?? now())->format('d.m.Y H:i');
     }
 
-    /**
-     * Escape free-form text (approver comments, rejection reasons) before it
-     * goes into a Telegram HTML message — only &, <, > as Telegram requires.
-     */
     private function escapeForTelegram(string $value): string
     {
         return TelegramText::escape($value);

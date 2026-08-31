@@ -158,11 +158,9 @@ it('keeps a decided requisition reachable by the approver who decided it', funct
 
     $menu = app(BotMenuBuilder::class);
 
-    // It has left "awaiting me", and the approver is not its author…
     expect($menu->requisitionAwaitingList($approver, 1)['text'])->not->toContain($requisition->number)
         ->and($menu->requisitionMineList($approver, 1)['text'])->not->toContain($requisition->number);
 
-    // …so without the decisions bucket it would be unreachable from the bot.
     expect($menu->requisitionHistoryList($approver, 1)['text'])->toContain($requisition->number);
 
     expect(collect($menu->mainMenu($approver->fresh())['keyboard'])->flatten(1)->pluck('callback_data'))

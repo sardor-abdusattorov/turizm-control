@@ -13,8 +13,6 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class);
 
 it('aggregates a contact income contracts by currency', function () {
-    // visibleTo() drives the totals, so the viewer must be able to see the
-    // (non-draft) income contracts — view_all_contracts sees the whole pipeline.
     actingAs(userWithPermission('view_all_contracts'));
 
     $uzs = Currency::factory()->create(['short_name' => 'UZS']);
@@ -22,9 +20,6 @@ it('aggregates a contact income contracts by currency', function () {
     $contact = Contact::factory()->create();
     $feeType = ContractType::factory()->income()->create();
 
-    // paidAmount() = amount * paid_percent / 100 (contracts carry no absolute
-    // paid column), so these percents reproduce the old participant paid sums:
-    // UZS paid = 15M + 15M = 30M, USD paid = 0.
     Contract::factory()->create([
         'contact_id' => $contact->id,
         'contract_type_id' => $feeType->id,

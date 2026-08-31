@@ -15,11 +15,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-/**
- * The press / blogger / info-tour registry. Kept as one resource with the
- * direction as a column: unlike projects, the three sections are short and
- * read as a single chronological list.
- */
 class PressTourResource extends Resource
 {
     protected static ?string $model = PressTour::class;

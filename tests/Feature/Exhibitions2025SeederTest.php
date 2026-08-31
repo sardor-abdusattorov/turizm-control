@@ -12,8 +12,6 @@ it('imports the 2025 international exhibition shells', function () {
     $this->seed(CurrencySeeder::class);
     $this->seed(Exhibitions2025Seeder::class);
 
-    // Shells only: venue/площадь/stand costs from the registry, no income —
-    // participant fees are entered by hand as income contracts.
     expect(Project::count())->toBe(16);
 
     $fitur = Project::where('name', 'FITUR-2025')->firstOrFail();
@@ -25,15 +23,12 @@ it('imports the 2025 international exhibition shells', function () {
         ->and($fitur->contracts()->count())->toBe(0)
         ->and($fitur->feesTotal())->toBe(0.0);
 
-    // Every 2025 exhibition now carries a host city (the registry omits it).
     expect(Project::whereNull('venue')->count())->toBe(0);
 
-    // WTM is priced in pounds — the currency added to the seeder for it.
     $wtm = Project::where('name', 'World Travel Market-2025')->firstOrFail();
     expect($wtm->areaCurrency?->short_name)->toBe('GBP')
         ->and($wtm->standCurrency?->short_name)->toBe('GBP');
 
-    // SCITE had a free exhibition area.
     $scite = Project::where('name', 'SCITE Sichuan 2025')->firstOrFail();
     expect($scite->area_is_free)->toBeTrue()
         ->and($scite->area_cost)->toBeNull();

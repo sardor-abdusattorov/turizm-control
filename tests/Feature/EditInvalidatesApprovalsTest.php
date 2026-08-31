@@ -52,7 +52,6 @@ function inReviewContractWithChain(): array
         ]);
     }
 
-    // First approver already said yes
     $contract->approvers()->where('order', 1)->first()->markApproved();
 
     return [$contract->refresh(), $responsible, $approvers];
@@ -80,7 +79,6 @@ it('rebuilds the approver queue from the settings flow when submit runs against 
     settingsFlowAvailable();
     [$contract, $responsible] = inReviewContractWithChain();
 
-    // Edit -> all invalidated, back to draft
     $contract->update(['title' => 'Re-titled']);
 
     actingAs($responsible);

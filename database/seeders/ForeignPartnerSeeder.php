@@ -6,20 +6,12 @@ use App\Models\Contact;
 use App\Models\Currency;
 use Illuminate\Database\Seeder;
 
-/**
- * Foreign legal entities taken from the stand-construction and land/venue
- * contracts (exhibition organisers, stand builders and lessors abroad). They
- * share the contacts registry with the domestic tour agents but are seeded
- * separately: none has an Uzbek INN, so each is keyed by name, and their
- * accounts are IBAN/SWIFT based. Bank routing with no account number printed
- * on the card is kept with a «—» placeholder so nothing is lost.
- */
 class ForeignPartnerSeeder extends Seeder
 {
     public function run(): void
     {
         $partners = [
-            // 1. Think Strawberries MENA LLC — ОАЭ (Дубай) — земля/площадка
+
             [
                 'legal_form' => 'LLC',
                 'name' => 'Think Strawberries MENA LLC',
@@ -32,7 +24,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 2. Stand Up Arquitectura Efimera SL — Испания — застройка стенда
             [
                 'legal_form' => 'SL',
                 'name' => 'Stand Up Arquitectura Efimera SL',
@@ -45,7 +36,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 3. IFEMA Madrid — Испания — организатор выставки
             [
                 'legal_form' => null,
                 'name' => 'IFEMA Madrid',
@@ -58,7 +48,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 4. Hannover Milano Fairs Shanghai Ltd., Guangzhou Branch — Китай — организатор
             [
                 'legal_form' => 'Ltd.',
                 'name' => 'Hannover Milano Fairs Shanghai Ltd., Guangzhou Branch',
@@ -71,7 +60,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 5. Shanghai Marking Exhibition Service Limited — Китай — застройка
             [
                 'legal_form' => 'Limited',
                 'name' => 'Shanghai Marking Exhibition Service Limited',
@@ -84,7 +72,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 6. RX France S.A.S. — Франция — организатор выставки
             [
                 'legal_form' => 'S.A.S.',
                 'name' => 'RX France S.A.S.',
@@ -97,7 +84,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 7. D.M.C.E Exhibitions & Events L.L.C — ОАЭ (Дубай) — название с печати
             [
                 'legal_form' => 'L.L.C',
                 'name' => 'D.M.C.E Exhibitions & Events L.L.C',
@@ -110,7 +96,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 8. ITE Eurasian Exhibitions FZ-LLC — ОАЭ (Дубай) — организатор
             [
                 'legal_form' => 'FZ-LLC',
                 'name' => 'ITE Eurasian Exhibitions FZ-LLC',
@@ -123,7 +108,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 9. TKS Exhibition Services Ltd — Гонконг — организатор
             [
                 'legal_form' => 'Ltd',
                 'name' => 'TKS Exhibition Services Ltd',
@@ -136,7 +120,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 10. MICEM SDN BHD — Малайзия — организатор (MATTA)
             [
                 'legal_form' => 'SDN BHD',
                 'name' => 'MICEM SDN BHD',
@@ -149,7 +132,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 11. DESSO MIMARLIK ... LTD ŞTI — Турция — застройка
             [
                 'legal_form' => 'LTD ŞTI',
                 'name' => 'DESSO MIMARLIK TAS. TAN. ORG. DEK. FUAR SAN. VE TIC. LTD. STI.',
@@ -162,7 +144,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 12. ООО «СЕЙС» (Seys International) — Россия (Москва)
             [
                 'legal_form' => 'ООО',
                 'name' => 'ООО «СЕЙС»',
@@ -175,7 +156,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 13. Blinkbrand Solutions Private Limited — Индия (Дели) — застройка/аренда
             [
                 'legal_form' => 'Private Limited',
                 'name' => 'Blinkbrand Solutions Private Limited',
@@ -188,7 +168,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 14. Urumqi Rubber Tree Trade Events Co., Ltd — Китай (Синьцзян)
             [
                 'legal_form' => 'Co., Ltd',
                 'name' => 'Urumqi Rubber Tree Trade Events Co., Ltd',
@@ -201,7 +180,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 15. Silk Road Hesheng (Beijing) International Trading Co., Ltd. — Китай (Пекин)
             [
                 'legal_form' => 'Co., Ltd.',
                 'name' => 'Silk Road Hesheng (Beijing) International Trading Co., Ltd.',
@@ -214,7 +192,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 16. Shaanxi Feijing International Travel Agency CO.,LTD — Китай (Сиань)
             [
                 'legal_form' => 'CO.,LTD',
                 'name' => 'Shaanxi Feijing International Travel Agency CO.,LTD',
@@ -227,7 +204,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 17. KOTFA CO.,LTD — Южная Корея (Сеул)
             [
                 'legal_form' => 'CO.,LTD',
                 'name' => 'KOTFA CO.,LTD',
@@ -240,7 +216,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 18. ООО «EVERBLOOM PROMO» — Казахстан (Алматы), адрес Гонконг
             [
                 'legal_form' => 'ООО',
                 'name' => 'ООО «EVERBLOOM PROMO»',
@@ -256,7 +231,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 19. Japan Association of Travel Agents (JATA) — Япония (Токио)
             [
                 'legal_form' => null,
                 'name' => 'Japan Association of Travel Agents',
@@ -269,7 +243,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 20. PTAK WARSAW EXPO Sp. z o.o. — Польша (Варшава) — организатор
             [
                 'legal_form' => 'Sp. z o.o.',
                 'name' => 'PTAK WARSAW EXPO Limited Liability Company',
@@ -282,7 +255,6 @@ class ForeignPartnerSeeder extends Seeder
                 ],
             ],
 
-            // 21. Insight Exp FZE — ОАЭ (Дубай) — на карточке нет номера счёта
             [
                 'legal_form' => 'FZE',
                 'name' => 'Insight Exp FZE',
@@ -305,9 +277,6 @@ class ForeignPartnerSeeder extends Seeder
             $name = $data['name'];
             $data['name'] = ['ru' => $name, 'uz' => $name, 'en' => $name];
 
-            // Foreign entities have no Uzbek INN, so identity is the name; any
-            // foreign registration number (Russian ИНН, Kazakh БИН, Polish NIP)
-            // is kept in the `inn` column for reference only.
             $contact = Contact::where('name->ru', $name)->first()
                 ?? Contact::create(array_merge($data, [
                     'type' => Contact::TYPE_LEGAL,

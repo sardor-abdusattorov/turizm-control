@@ -4,11 +4,6 @@ namespace App\Enums;
 
 use App\Enums\Concerns\HasOptions;
 
-/**
- * Where a tour stands against its plan. The registry is written a year ahead,
- * so a tour lives as a plan first and only later becomes a fact — and the
- * report documents are expected once it has been held.
- */
 enum PressTourState: string
 {
     use HasOptions;

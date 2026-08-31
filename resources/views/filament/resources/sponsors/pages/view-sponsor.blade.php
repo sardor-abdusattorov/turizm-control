@@ -23,7 +23,6 @@
 <div class="pj pj-tabwrap"
      x-data="{ tab: 'overview', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }">
 
-    {{-- Native Filament tabs — the same layout the contact page uses. --}}
     <div class="rec-tabs-row">
         <x-filament::tabs>
             <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
@@ -38,7 +37,6 @@
         </x-filament::tabs>
     </div>
 
-    {{-- ---------- OVERVIEW ---------- --}}
     <div x-show="tab === 'overview'" x-cloak class="pj-panel">
         <section class="ow-card">
             <header class="ow-hd">
@@ -66,7 +64,6 @@
         </section>
     </div>
 
-    {{-- ---------- CONTRACTS / PROJECTS: stock Filament tables ---------- --}}
     <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
         @livewire(\App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget::class, ['sponsorId' => $record->id], key('sponsor-contracts-'.$record->id))
     </div>

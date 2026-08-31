@@ -24,9 +24,7 @@ abstract class BaseViewOrder extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            // Office files have no in-browser viewer any more, so the single
-            // action just serves the file — the browser previews what it can
-            // (PDF, images) and downloads the rest.
+
             Action::make('viewFile')
                 ->label(__('app.action.open_file'))
                 ->icon('heroicon-o-eye')

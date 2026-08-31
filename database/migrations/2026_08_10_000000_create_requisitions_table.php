@@ -10,8 +10,7 @@ return new class extends Migration
     {
         Schema::create('requisitions', function (Blueprint $table) {
             $table->id();
-            // Generated on create — a requisition is internal paperwork and
-            // nobody hands out numbers for it the way they do for buyruqs.
+
             $table->string('number', 30)->unique();
             $table->string('title');
             $table->text('description');

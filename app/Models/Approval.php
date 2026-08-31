@@ -95,11 +95,6 @@ class Approval extends Model
         ]);
     }
 
-    /**
-     * What the row should read as. A voided round keeps showing the verdict it
-     * carried — that is the point of keeping it — but a row voided while its
-     * owner was still deciding reads as voided, not as "under review".
-     */
     public function displayStatus(): ApprovalStatus
     {
         return $this->status === ApprovalStatus::Invalidated && (bool) $this->original_status?->isFinal()

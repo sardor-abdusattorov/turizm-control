@@ -8,9 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
 
-/**
- * @property-read Collection<int, Approval> $approvals
- */
+/** @property-read Collection<int, Approval> $approvals */
 trait HasApprovals
 {
     public function approvals(): MorphMany
@@ -18,9 +16,7 @@ trait HasApprovals
         return $this->morphMany(Approval::class, 'approvable')->orderBy('order')->orderBy('id');
     }
 
-    /**
-     * @return Collection<int, Approval>
-     */
+    /** @return Collection<int, Approval> */
     public function activeApprovals(): Collection
     {
         return $this->approvals->reject(
@@ -28,10 +24,6 @@ trait HasApprovals
         )->values();
     }
 
-    /**
-     * The step the document is sitting in right now. Read from the loaded
-     * relation so a table column never fires a query per row.
-     */
     public function currentApproval(): ?Approval
     {
         return $this->activeApprovals()
@@ -50,11 +42,6 @@ trait HasApprovals
         return $this->approvalFor($user)?->status === ApprovalStatus::Pending;
     }
 
-    /**
-     * A veto may come from anyone still in the queue, not only from whoever
-     * holds the current step: an approver who can already see the answer is no
-     * should not have to wait their turn to say so.
-     */
     public function acceptsRejectionFrom(?User $user): bool
     {
         return in_array(

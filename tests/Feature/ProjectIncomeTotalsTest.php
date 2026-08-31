@@ -12,8 +12,6 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // view_all_contracts keeps visibleTo() from short-circuiting, so the real
-    // grouped query runs.
     actingAs(userWithPermission('view_all_contracts'));
 });
 
@@ -40,9 +38,6 @@ it('computes the per-currency income totals with derived paid', function () {
 });
 
 it('builds the grouped per-currency queries without an inherited ORDER BY (MySQL only_full_group_by safe)', function () {
-    // The Project income relations carry a default ORDER BY created_at. Grouping
-    // by currency while that order-by is present is legal in SQLite but fails on
-    // MySQL under only_full_group_by. These methods must clear it (->reorder()).
     $project = Project::factory()->create();
     $uzs = Currency::factory()->create(['short_name' => 'UZS']);
     $feeType = ContractType::factory()->income()->create();

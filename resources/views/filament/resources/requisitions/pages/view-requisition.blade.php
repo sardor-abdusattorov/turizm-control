@@ -38,9 +38,6 @@
 <x-filament-panels::page>
 <div class="ow" x-data="{ tab: 'overview' }">
 
-    {{-- Native Filament tabs, with the status pill riding on the right so it
-         stays visible whichever tab is open — the same shape the contract
-         page uses. --}}
     <div class="rec-tabs-row">
         <x-filament::tabs>
             <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="tab = 'overview'">
@@ -62,8 +59,6 @@
         </span>
     </div>
 
-    {{-- Why it came back leads every tab: the author must not have to hunt
-         for it. --}}
     @if (filled($reason))
         <section class="ow-card rq-reject">
             <div class="ow-hd">

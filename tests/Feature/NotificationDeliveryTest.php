@@ -40,11 +40,9 @@ it('notifies the manager AND the next approver when a step is approved', functio
     actingAs($lawyer);
     app(ContractWorkflow::class)->approve($contract->fresh(), $lawyer);
 
-    // The manager hears that the step passed...
     expect($manager->fresh()->notifications->pluck('data.title'))
         ->toContain(__('app.notification.step_approved.title'));
 
-    // ...and the next approver is asked to review.
     expect($accountant->fresh()->notifications->pluck('data.title'))
         ->toContain(__('app.notification.approval_requested.title'));
 });
@@ -124,8 +122,6 @@ it('sends the Telegram step-approved message in the recipient locale, not the se
         'status' => ContractApprover::STATUS_QUEUED,
     ]);
 
-    // Lawyer is browsing the panel in English — that must NOT leak into the
-    // Telegram message that goes to the manager (who picked Russian in the bot).
     App::setLocale('en');
     actingAs($lawyer);
     app(ContractWorkflow::class)->approve($contract->fresh(), $lawyer, 'окей');
@@ -145,9 +141,6 @@ it('sends the Telegram step-approved message in the recipient locale, not the se
 });
 
 it('renders the bell notification in the recipient saved panel locale, not the sender locale', function () {
-    // The manager works in Uzbek; the lawyer approves while browsing in
-    // English. The bell must land in Uzbek — and the sender's locale must
-    // be restored afterwards.
     $manager = User::factory()->create(['locale' => 'uz']);
     $lawyer = asApprover(User::factory()->create(['status' => User::STATUS_ACTIVE]));
 

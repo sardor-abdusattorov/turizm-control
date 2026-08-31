@@ -13,9 +13,7 @@ use Throwable;
 
 class ApprovalActions
 {
-    /**
-     * @return array<int, Action>
-     */
+    /** @return array<int, Action> */
     public static function make(): array
     {
         return [
@@ -62,11 +60,6 @@ class ApprovalActions
             ));
     }
 
-    /**
-     * A veto is offered to anyone still in the queue, not only to whoever holds
-     * the open step — and it always costs a reason, because the author has to
-     * know what to fix.
-     */
     public static function reject(): Action
     {
         return Action::make('reject')

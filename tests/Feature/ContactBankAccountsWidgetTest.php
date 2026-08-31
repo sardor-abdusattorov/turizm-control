@@ -32,7 +32,7 @@ it('renders the bank requisites as a native Filament table, no auto class-name h
         ->assertSee('20208840900565085002')
         ->assertSee('АКБ Hamkorbank')
         ->assertSee('KHKKUZ22XXX')
-        // The auto-generated English class-name heading must not leak through.
+
         ->assertDontSee('Contact Bank Accounts Table');
 });
 

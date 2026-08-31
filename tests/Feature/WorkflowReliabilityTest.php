@@ -140,7 +140,6 @@ it('reassigns the stuck current approver to another user with the SLA restarted'
         ->and($skipped->user_id)->toBe($approvers[0]->id)
         ->and($current->order)->toBe($skipped->order);
 
-    // The replacement can actually act.
     expect($workflow->approve($contract->fresh(), $replacement))->toBeTrue();
 });
 

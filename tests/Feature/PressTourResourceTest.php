@@ -191,7 +191,7 @@ it('flags a held tour that still owes its report pack', function () {
 
     expect($held->awaitsDocuments())->toBeTrue()
         ->and($documented->awaitsDocuments())->toBeFalse()
-        // A tour that has not happened yet owes nothing.
+
         ->and($planned->awaitsDocuments())->toBeFalse();
 });
 
@@ -237,11 +237,11 @@ it('reads a tour on a designed page, not a disabled form', function () {
 
     Livewire::test(ViewPressTour::class, ['record' => $tour->id])
         ->assertSuccessful()
-        // The facts card and the report-pack panel live under native tabs.
+
         ->assertSee('Хорезм')
         ->assertSee('Хаёт Хамраев')
         ->assertSeeLivewire(AttachmentPanel::class)
-        // A held tour with nothing filed says so out loud.
+
         ->assertSee(__('app.message.press_tour_documents_pending'));
 });
 
@@ -256,8 +256,6 @@ it('shows the filed report pack in the documents upload panel', function () {
     ]);
     Storage::disk('local')->put($document->file_path, 'pdf');
 
-    // Filament's own FileUpload panel is prefilled with the stored pack, and
-    // a viewer without update rights gets it locked.
     $panel = Livewire::test(AttachmentPanel::class, ['variant' => 'press-tour-documents', 'recordId' => $tour->id])
         ->assertSuccessful()
         ->assertFormSet(['document_files' => [$document->file_path]]);

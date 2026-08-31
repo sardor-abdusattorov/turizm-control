@@ -119,16 +119,10 @@ it('lets the author fix fields on an approved legacy contract without losing the
     $contract->forceFill(['signed_at' => '2024-05-20'])->saveQuietly();
     $author = legacySwitchAuthor($contract);
 
-    // Reopening a filed contract takes the dedicated permission on top of
-    // the usual update rights.
     Permission::findOrCreate('update_approved_contract', 'web');
     $author->givePermissionTo('update_approved_contract');
     actingAs($author->fresh());
 
-    // The switch prefills ON for an approved contract — a plain typo fix must
-    // keep the status without the author touching anything else. title is a
-    // reapproval-trigger field: without preserveApprovedOnNextSave the
-    // observer would bounce the contract to draft and build a junk chain.
     Livewire::test(EditContract::class, ['record' => $contract->id])
         ->assertFormSet(['already_signed' => true])
         ->fillForm([
@@ -156,9 +150,6 @@ it('refuses the edit page for the author without the reopen permission', functio
 it('never lets a fresh contract inherit files from a recycled id', function () {
     Storage::fake('local');
 
-    // A rebuilt database reuses ids while old folders survive on disk — the
-    // first contract this test creates will get id 1, so plant a stranger's
-    // draft there beforehand.
     Storage::disk('local')->put('uploads/files/contracts/1/draft.docx', 'ghost from a previous database');
 
     $contractType = ContractType::factory()->create();

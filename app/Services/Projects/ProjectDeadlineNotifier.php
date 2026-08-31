@@ -11,12 +11,6 @@ use App\Services\Notifications\RendersInRecipientLocale;
 use App\Services\Telegram\TelegramService;
 use Illuminate\Support\Collection;
 
-/**
- * «До выставки X осталось N дней» — the pre-event countdown. Directors get
- * the project summary (how many contracts are still not approved, how much
- * of the participant fees is actually paid); each responsible manager gets
- * only THEIR unfinished contracts — the same visibility rule as everywhere.
- */
 class ProjectDeadlineNotifier
 {
     use RendersInRecipientLocale;
@@ -39,9 +33,6 @@ class ProjectDeadlineNotifier
             ? (int) round((float) $project->paidTotal() / $feesTotal * 100)
             : null;
 
-        // whereHas instead of the role() scope: Spatie throws when the role
-        // has never been created, and a missing director role should mean
-        // "nobody to notify", not a crashed scheduler run.
         $recipients = User::query()
             ->whereHas('roles', fn ($query) => $query->where('name', Contract::DIRECTOR_ROLE))
             ->where('status', User::STATUS_ACTIVE)
@@ -123,11 +114,6 @@ class ProjectDeadlineNotifier
         }
     }
 
-    /**
-     * The project's contracts that have not finished approval — drafts and
-     * everything mid-chain. Rejected ones are excluded: they are a closed
-     * verdict, not a hanging tail someone must chase before the event.
-     */
     private function pendingContractsQuery(Project $project)
     {
         return $project->contracts()->whereNotIn('status', [

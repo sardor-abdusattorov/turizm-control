@@ -7,9 +7,7 @@ use App\Models\ContractApprover;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<ContractApprover>
- */
+/** @extends Factory<ContractApprover> */
 class ContractApproverFactory extends Factory
 {
     protected $model = ContractApprover::class;

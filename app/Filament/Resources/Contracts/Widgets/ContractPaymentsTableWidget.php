@@ -9,12 +9,6 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * Payments recorded against a contract as a stock Filament table — the share
- * paid, when it landed, who filed it and the bank slips attached to it.
- * Read-only: filing a payment is the «Add payment» action in the page header,
- * which owns the remaining-percent validation.
- */
 class ContractPaymentsTableWidget extends TableWidget
 {
     public int $contractId;
@@ -24,8 +18,7 @@ class ContractPaymentsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            // No heading / column manager: the card header names it and this
-            // is a fixed ledger, not a configurable list.
+
             ->heading(null)
             ->columnManager(false)
             ->query(fn (): Builder => Payment::query()

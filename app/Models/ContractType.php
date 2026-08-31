@@ -11,12 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
-/**
- * Kind of a contract — the hard nomenclature the registry is built from
- * (space rental, stand construction, services… vs participant fees,
- * sponsorship). Carries the money direction so project income/expense
- * aggregates fall out of the classification for free.
- */
 class ContractType extends Model
 {
     use HasActiveOptions;
@@ -41,21 +35,12 @@ class ContractType extends Model
         'status' => 'boolean',
     ];
 
-    /**
-     * Whether contracts of this kind are signed with a {@see Sponsor}
-     * (sponsorship) rather than a {@see Contact}.
-     */
     public function usesSponsor(): bool
     {
         return $this->counterparty_kind === CounterpartyKind::Sponsor;
     }
 
-    /**
-     * Ids of the active contract types that face a Sponsor — used by the
-     * contract form to decide which counterparty picker to show.
-     *
-     * @return array<int, int>
-     */
+    /** @return array<int, int> */
     public static function sponsorFacingIds(): array
     {
         return static::query()
@@ -65,11 +50,7 @@ class ContractType extends Model
             ->all();
     }
 
-    /**
-     * Active contract types as id => localized title pairs (for Select::options).
-     *
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     public static function getActive(): array
     {
         return static::activeOptions('title');

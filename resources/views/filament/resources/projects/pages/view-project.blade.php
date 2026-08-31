@@ -74,7 +74,6 @@
 <x-filament-panels::page>
 <div class="pj">
 
-    {{-- HERO --}}
     <section class="pj-hero pj-hero--{{ $heroVariant }}">
         <div class="pj-hero__l">
             <div class="pj-hero__meta">
@@ -99,7 +98,6 @@
         </div>
     </section>
 
-    {{-- METRIC TILES --}}
     <section class="pj-stats">
         @unless ($isInternalProject)
             <div class="pj-stat">
@@ -128,10 +126,6 @@
         </div>
     </section>
 
-    {{-- TABS --}}
-    {{-- go() pins the viewport to the tab strip when switching from a long
-         panel to a short one — otherwise the browser keeps the old scroll
-         offset and the page appears to jump. --}}
     <div class="pj-tabwrap"
          x-data="{ tab: 'overview', go(t) { this.tab = t; if (this.$root.getBoundingClientRect().top < 0) this.$root.scrollIntoView(); } }">
         <div class="rec-tabs-row">
@@ -154,14 +148,13 @@
             </x-filament::tabs>
         </div>
 
-        {{-- ---------- OVERVIEW ---------- --}}
         <div x-show="tab === 'overview'" x-cloak class="pj-panel">
             <section class="ow-card">
                 <header class="ow-hd">
                     <span class="ow-hd__ic">{!! $ic('heroicon-o-information-circle', 18) !!}</span>
                     <h2 class="ow-hd__t">{{ __('app.label.basic_information') }}</h2>
                 </header>
-                {{-- The same row-per-fact table the order view uses. --}}
+
                 @php $basisOrders = collect([$record->order])->filter(); @endphp
                 <div class="ow-dets">
                     <div class="ow-row">
@@ -213,10 +206,6 @@
                 </div>
             </section>
 
-            {{-- The (visibility-scoped) contract money flows. Fees and payment
-                 progress already live in the hero, so this card only adds what
-                 the hero can't: expense/income by contracts and, for mixed
-                 currency projects, the honest per-currency fee split. --}}
             @if ($expenseTotals->isNotEmpty() || $incomeTotals->isNotEmpty() || $feeTotalsByCurrency->count() > 1)
                 <section class="ow-card">
                     <header class="ow-hd">
@@ -254,18 +243,14 @@
             @endif
         </div>
 
-        {{-- ---------- CONTRACTS: the same stock Filament table the dashboard
-             embeds — search, sorting and pagination for free. ---------- --}}
         <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
             @livewire(\App\Filament\Widgets\Dashboard\ProjectContractsTableWidget::class, ['pageFilters' => ['projectId' => $record->id], 'hideHeading' => true], key('project-contracts-'.$record->id))
         </div>
 
-        {{-- ---------- PARTICIPANTS (income counterparties, native table) ---------- --}}
         <div x-show="tab === 'participants'" x-cloak class="pj-panel">
             @livewire(\App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget::class, ['pageFilters' => ['projectId' => $record->id]], key('project-participants-'.$record->id))
         </div>
 
-        {{-- ---------- GALLERY: native Filament FileUpload, in place ---------- --}}
         <div x-show="tab === 'gallery'" x-cloak class="pj-panel">
             @livewire(\App\Livewire\MediaLibrary::class, ['variant' => 'project-gallery', 'recordId' => $record->id], key('project-gallery-'.$record->id))
         </div>

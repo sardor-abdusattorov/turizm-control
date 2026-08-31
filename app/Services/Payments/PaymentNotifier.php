@@ -17,13 +17,6 @@ class PaymentNotifier
 
     public function __construct(public TelegramService $telegram) {}
 
-    /**
-     * Tell the contract's responsible manager that a payment landed (or that
-     * the contract is now paid in full), and hand the accounting department
-     * the same fact together with the bank screenshot — they are the ones
-     * reconciling the money. The payment recorder is never notified about
-     * their own entry.
-     */
     public function notifyPaymentRecorded(Payment $payment): void
     {
         $contract = $payment->contract?->fresh();
@@ -36,11 +29,6 @@ class PaymentNotifier
         $this->notifyAccounting($payment, $contract);
     }
 
-    /**
-     * Nudge the responsible manager that an approved contract is still not
-     * fully paid — «согласован N дней назад, оплачено 40%». Fired by the
-     * scheduled contracts:send-payment-reminders command.
-     */
     public function notifyPaymentOverdue(Contract $contract, int $daysSinceApproval): void
     {
         $recipient = $contract->responsible;
@@ -119,13 +107,6 @@ class PaymentNotifier
         });
     }
 
-    /**
-     * The proof files go to the accounting department only — the people who
-     * reconcile bank money — never to a wider circle: the files live on the
-     * private disk and payment sums are sensitive. The first file carries the
-     * caption and the open-contract button; the rest follow bare. Images ride
-     * as photos, PDF payment orders as documents.
-     */
     private function notifyAccounting(Payment $payment, Contract $contract): void
     {
         foreach ($this->accountingRecipients($payment, $contract) as $recipient) {
@@ -162,12 +143,7 @@ class PaymentNotifier
         }
     }
 
-    /**
-     * Active, Telegram-linked accountants — minus the person who recorded the
-     * payment and the responsible manager (who already got their own message).
-     *
-     * @return Collection<int, User>
-     */
+    /** @return Collection<int, User> */
     private function accountingRecipients(Payment $payment, Contract $contract): Collection
     {
         return User::query()

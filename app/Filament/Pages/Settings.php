@@ -72,9 +72,7 @@ class Settings extends Page implements HasForms
         $this->form->fill($data);
     }
 
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     protected function getApproverDepartmentOptions(): array
     {
         $names = Department::query()
@@ -179,8 +177,7 @@ class Settings extends Page implements HasForms
 
                         Tabs\Tab::make(__('app.label.tab_approval_flow'))
                             ->schema([
-                                // The master switch: off — contracts are filed
-                                // as already-signed paper, no chain, no SLA.
+
                                 Toggle::make('approval.enabled')
                                     ->label(__('app.label.approval_enabled'))
                                     ->helperText(__('app.helper.approval_enabled'))

@@ -58,8 +58,6 @@ class OrderForm
                             ->label(__('app.label.description'))
                             ->rows(4),
 
-                        // Optional: the annual 74-АФ exists only as copies in
-                        // the dossiers — a buyruq record must not demand a scan.
                         DocumentUpload::make('orders', 'file_path')
                             ->label(__('app.label.order_file'))
                             ->helperText(__('app.helper.order_file_optional')),

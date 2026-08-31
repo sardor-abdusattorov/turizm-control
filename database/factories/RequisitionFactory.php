@@ -9,9 +9,7 @@ use App\Models\User;
 use App\Services\Approvals\ApprovalChain;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<Requisition>
- */
+/** @extends Factory<Requisition> */
 class RequisitionFactory extends Factory
 {
     protected $model = Requisition::class;
@@ -27,11 +25,7 @@ class RequisitionFactory extends Factory
         ];
     }
 
-    /**
-     * Queue a chain of approvers, as the form does on save.
-     *
-     * @param  array<int, User|int>  $users
-     */
+    /** @param  array<int, User|int>  $users */
     public function withChain(array $users = []): static
     {
         return $this->afterCreating(function (Requisition $requisition) use ($users): void {
@@ -43,11 +37,7 @@ class RequisitionFactory extends Factory
         });
     }
 
-    /**
-     * A chain already handed over: the first step is open, the rest queued.
-     *
-     * @param  array<int, User|int>  $users
-     */
+    /** @param  array<int, User|int>  $users */
     public function inReview(array $users = []): static
     {
         return $this->withChain($users)->afterCreating(function (Requisition $requisition): void {

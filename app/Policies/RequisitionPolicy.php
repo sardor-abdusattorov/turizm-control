@@ -17,11 +17,6 @@ class RequisitionPolicy
         return $authUser->can('view_any_requisition');
     }
 
-    /**
-     * Beyond the permission, a requisition is only visible to the two people
-     * it concerns — its author and its reviewer — unless the user holds
-     * oversight over the whole registry.
-     */
     public function view(AuthUser $authUser, Requisition $requisition): bool
     {
         if (! $authUser->can('view_requisition')) {

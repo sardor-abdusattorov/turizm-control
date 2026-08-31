@@ -5,25 +5,13 @@ namespace Database\Seeders;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-/**
- * Generates lightweight placeholder media for the demo dataset — initials
- * avatars and "payment receipt" screenshots — so the showcase has real files
- * on disk instead of broken image links. Pure GD; degrades to a flat block of
- * colour when the bundled font is unavailable.
- */
 class DemoMedia
 {
     private const FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 
     private const FONT_REGULAR = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
 
-    /**
-     * Real portrait photos for the named demo users, mapped by e-mail. The
-     * files live in database/seeders/media/avatars and are copied onto the
-     * disk as-is; anyone without a mapping falls back to an initials avatar.
-     *
-     * @var array<string, string>
-     */
+    /** @var array<string, string> */
     private const PORTRAITS = [
         'mr.silverwind1998@gmail.com' => 'man-1.jpg',
         'director@test.uz' => 'man-2.jpg',
@@ -32,11 +20,6 @@ class DemoMedia
         'accounting@test.uz' => 'woman-1.jpg',
     ];
 
-    /**
-     * The best avatar for a user: a real portrait when one is mapped to their
-     * e-mail, otherwise a generated initials avatar. Returns the stored
-     * relative path on the local disk (or null when nothing could be produced).
-     */
     public static function avatarFor(string $email, string $name): ?string
     {
         $portrait = self::PORTRAITS[$email] ?? null;
@@ -48,10 +31,6 @@ class DemoMedia
         return self::avatar($name);
     }
 
-    /**
-     * Copy a bundled portrait photo onto the local disk under the user's slug,
-     * returning the stored path (or null when the source file is absent).
-     */
     private static function copyPortrait(string $file, string $name): ?string
     {
         $source = database_path('seeders/media/avatars/'.$file);
@@ -67,10 +46,6 @@ class DemoMedia
         return $path;
     }
 
-    /**
-     * An initials avatar on a colour derived from the name. Returns the stored
-     * relative path on the local disk (or null if GD is unavailable).
-     */
     public static function avatar(string $name): ?string
     {
         if (! function_exists('imagecreatetruecolor')) {
@@ -91,12 +66,6 @@ class DemoMedia
         return $path;
     }
 
-    /**
-     * A payment-confirmation screenshot styled like a mobile-bank "success"
-     * screen (Payme / Click / Uzum), with the amount, contract, date and a
-     * generated transaction reference. Returns the stored relative path on the
-     * local disk (or null if GD is unavailable).
-     */
     public static function paymentReceipt(string $number, string $amount, string $percent, string $date): ?string
     {
         if (! function_exists('imagecreatetruecolor')) {
@@ -118,14 +87,12 @@ class DemoMedia
 
         imagefilledrectangle($img, 0, 0, $w, $h, $bg);
 
-        // Status bar: clock on the left, a little battery on the right.
         self::write($img, '9:41', 28, 40, $dark, 20, bold: true);
         imagerectangle($img, $w - 60, 24, $w - 34, 40, $muted);
         imagefilledrectangle($img, $w - 33, 29, $w - 30, 35, $muted);
         imagefilledrectangle($img, $w - 58, 26, $w - 42, 38, $dark);
         self::write($img, '87%', $w - 70, 40, $muted, 18, align: 'right');
 
-        // Success badge: a soft halo, a solid disc, and a white check mark.
         $cx = intdiv($w, 2);
         $cy = 210;
         imagefilledellipse($img, $cx, $cy, 176, 176, $greenSoft);
@@ -139,7 +106,6 @@ class DemoMedia
         self::write($img, 'Средства успешно зачислены', $cx, 402, $muted, 19, align: 'center');
         self::write($img, $amount, $cx, 482, $dark, self::fitSize($amount, 44, $w - 64), bold: true, align: 'center');
 
-        // Details card.
         self::roundedRect($img, 36, 532, $w - 36, 866, 28, $white);
 
         $rows = [
@@ -163,7 +129,6 @@ class DemoMedia
             $y += 60;
         }
 
-        // "Done" button.
         self::roundedRect($img, 36, 912, $w - 36, 976, 24, $green);
         self::write($img, 'Готово', $cx, 952, $white, 22, bold: true, align: 'center');
 
@@ -183,10 +148,6 @@ class DemoMedia
         Storage::disk('local')->put($path, $bytes);
     }
 
-    /**
-     * Draw a line of text at the given baseline. $align positions $x as the
-     * left edge (default), the horizontal centre, or the right edge.
-     */
     private static function write(\GdImage $img, string $text, int $x, int $baseline, int $color, int $size, bool $bold = false, string $align = 'left'): void
     {
         $font = $bold ? self::FONT : self::FONT_REGULAR;
@@ -216,7 +177,6 @@ class DemoMedia
         imagefilledellipse($img, $x2 - $radius, $y2 - $radius, $radius * 2, $radius * 2, $color);
     }
 
-    /** Largest point size (down from $size) at which $text fits in $maxWidth. */
     private static function fitSize(string $text, int $size, int $maxWidth): int
     {
         if (! is_file(self::FONT)) {
@@ -236,7 +196,6 @@ class DemoMedia
         return $size;
     }
 
-    /** A grouped 12-digit transaction reference derived from the payment data. */
     private static function reference(string $seed): string
     {
         return implode(' ', str_split(sprintf('%012u', crc32($seed) % 1_000_000_000_000), 4));

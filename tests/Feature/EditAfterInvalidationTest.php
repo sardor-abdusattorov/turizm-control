@@ -70,7 +70,6 @@ it('keeps the invalidated chain visible and pre-fills the picker from the mirror
         'status' => ContractApprover::STATUS_QUEUED,
     ]);
 
-    // Author edits a trigger field (title) and saves while it's in review.
     Livewire::test(EditContract::class, ['record' => $contract->id])
         ->fillForm(['title' => 'Edited title'])
         ->call('save')
@@ -78,15 +77,10 @@ it('keeps the invalidated chain visible and pre-fills the picker from the mirror
 
     $contract->refresh();
 
-    // 1) The hook flipped status to DRAFT, marked the old rows INVALIDATED
-    //    (audit), AND rebuilt fresh QUEUED rows mirroring the old chain —
-    //    so the manager can see what will run on the next submit.
     expect($contract->status)->toBe(Contract::STATUS_DRAFT);
     expect($contract->approvers()->where('status', ContractApprover::STATUS_INVALIDATED)->count())->toBe(2);
     expect($contract->approvers()->where('status', ContractApprover::STATUS_QUEUED)->count())->toBe(2);
 
-    // 2) Reopen edit — picker pre-fills with the mirrored queued chain (same
-    //    people as before the edit) rather than the author's profile defaults.
     Livewire::test(EditContract::class, ['record' => $contract->id])
         ->assertFormSet(['approver_chain' => [$oldLegal->id, $oldAccounting->id]]);
 });

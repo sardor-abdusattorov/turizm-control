@@ -17,37 +17,24 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-/**
- * Reproduces the PR Centre's hand-made yearly registry sheet one-to-one:
- * a merged title banner, the 12-column header, one merged block per project
- * (participants listed row by row in columns I/J) and an «Итог» separator
- * after each block — so the export replaces the copied-by-hand template.
- */
 class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents, WithTitle
 {
     use Exportable;
 
-    /** Row-index spans (0-based within the data array) per project block. */
     private array $blocks = [];
 
-    /** 0-based data-array indexes of the «Итог» separator rows. */
     private array $totalRows = [];
 
     private array $rows = [];
 
     private string $registryTitle = '';
 
-    /**
-     * Month names in the genitive case, as the registry writes its date
-     * ranges («22-26-января», «28-апреля-1-мая»).
-     */
     private const MONTHS = [
         1 => 'января', 2 => 'февраля', 3 => 'марта', 4 => 'апреля',
         5 => 'мая', 6 => 'июня', 7 => 'июля', 8 => 'августа',
         9 => 'сентября', 10 => 'октября', 11 => 'ноября', 12 => 'декабря',
     ];
 
-    /** The registry's own currency spellings. */
     private const CURRENCY_LABELS = [
         'EUR' => 'EURO',
         'GBP' => 'Фунт ст',
@@ -86,16 +73,12 @@ class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents,
         ]];
 
         foreach ($projects as $index => $project) {
-            // Income side is the project's non-rejected income contracts (fees
-            // + sponsorship) — one registry row per contract, its counterparty
-            // in column I. Rejected deals are dropped so the «Итог» (feesTotal)
-            // equals the sum of the rows listed.
             $income = $project->incomeContracts
                 ->reject(fn (Contract $contract): bool => $contract->status === Contract::STATUS_REJECTED)
                 ->sortBy('id')
                 ->values();
             $span = max(1, $income->count());
-            $start = count($this->rows) - 1; // 0-based data index of the block's first row
+            $start = count($this->rows) - 1;
 
             for ($i = 0; $i < $span; $i++) {
                 $contract = $income[$i] ?? null;
@@ -127,7 +110,7 @@ class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents,
             $this->blocks[] = ['start' => $start, 'span' => $span];
 
             $this->rows[] = [__('app.export.registry_total'), null, null, null, null, null, null, null, null, null, null, null];
-            $this->totalRows[] = count($this->rows) - 2; // 0-based data index of the «Итог» row
+            $this->totalRows[] = count($this->rows) - 2;
         }
 
         return $this->rows;
@@ -154,7 +137,6 @@ class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents,
                 $sheet = $event->sheet->getDelegate();
                 $lastRow = $sheet->getHighestRow();
 
-                // Title banner above everything (shifts all rows down by one).
                 $sheet->insertNewRowBefore(1, 1);
                 $sheet->mergeCells('A1:L1');
                 $sheet->setCellValue('A1', $this->registryTitle);
@@ -179,7 +161,6 @@ class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents,
 
                 $sheet->getStyle('E3:L'.($lastRow + 1))->getNumberFormat()->setFormatCode('#,##0');
 
-                // Data index i sits on sheet row i + 3 (title + header offset).
                 foreach ($this->blocks as $block) {
                     $top = $block['start'] + 3;
                     $bottom = $top + $block['span'] - 1;
@@ -215,10 +196,6 @@ class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents,
             : __('app.export.registry_title_internal', ['year' => $year]);
     }
 
-    /**
-     * «22-26-января» when the range stays inside one month,
-     * «28-апреля-1-мая» when it crosses one — exactly as the registry writes.
-     */
     private function formatDates(Project $project): ?string
     {
         if (! $project->starts_on) {
@@ -239,7 +216,6 @@ class ProjectsRegistryExport implements FromArray, WithColumnWidths, WithEvents,
         return $start->day.'-'.self::MONTHS[$start->month].'-'.$end->day.'-'.self::MONTHS[$end->month];
     }
 
-    /** «76,5м2» — decimal comma, trailing zeros trimmed. */
     private function formatArea(Project $project): ?string
     {
         if ($project->area_sqm === null) {

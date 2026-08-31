@@ -249,12 +249,6 @@ class ContractsTable
             ]);
     }
 
-    /**
-     * The "Responsible" filter only makes sense for users who can see more
-     * than their own contracts. A manager's list is already scoped to
-     * themselves, so the picker would be a confusing no-op — show it to
-     * oversight (and view_all_contracts holders) only.
-     */
     private static function canFilterByResponsible(): bool
     {
         $user = auth()->user();

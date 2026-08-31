@@ -7,12 +7,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Pull the Telegram link out of the users row into its own table so we
-     * can track per-bot data (locale, last-seen, username) without bloating
-     * the user model. Backfill any existing linked chat ids in the same
-     * step and drop the now-redundant users.telegram_chat_id column.
-     */
     public function up(): void
     {
         Schema::create('telegram_users', function (Blueprint $table) {
@@ -26,8 +20,7 @@ return new class extends Migration
             $table->string('locale', 5)->nullable();
             $table->timestamp('linked_at')->nullable();
             $table->timestamp('last_seen_at')->nullable();
-            // Set when Telegram answers 403 (user blocked the bot); cleared
-            // the moment they talk to the bot again.
+
             $table->timestamp('blocked_at')->nullable();
             $table->timestamps();
         });

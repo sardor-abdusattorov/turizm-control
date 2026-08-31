@@ -33,9 +33,7 @@ class Sponsor extends Model
         'status' => 'boolean',
     ];
 
-    /**
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     public static function getActive(): array
     {
         return static::query()
@@ -45,26 +43,12 @@ class Sponsor extends Model
             ->all();
     }
 
-    /**
-     * This sponsor's sponsorship contracts — «Спонсорство» income deals point
-     * at a Sponsor through contracts.sponsor_id (only sponsorship contracts
-     * ever set it, so the FK alone is the filter). Replaces the old manual
-     * project participations.
-     */
     public function sponsorshipContracts(): HasMany
     {
         return $this->hasMany(Contract::class);
     }
 
-    /**
-     * Per-currency totals of this sponsor's sponsorship contracts the given
-     * user may see (defaults to the current one): one row per currency with the
-     * count, pledged and paid sums, ordered by count. Rejected contracts are
-     * dropped and "paid" is derived from the paid percent. Powers the "projects"
-     * badge breakdown on the sponsors list — mixed currencies stay apart.
-     *
-     * @return Collection<int, array{currency: string, count: int, total: float, paid: float}>
-     */
+    /** @return Collection<int, array{currency: string, count: int, total: float, paid: float}> */
     public function projectTotalsByCurrency(?User $user = null): Collection
     {
         return $this->contractsByCurrency(

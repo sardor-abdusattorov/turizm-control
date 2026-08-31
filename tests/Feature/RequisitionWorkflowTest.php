@@ -137,7 +137,7 @@ it('stops the whole chain when somebody rejects', function () {
     expect($requisition->status)->toBe(RequisitionStatus::Rejected)
         ->and($rows->firstWhere('user_id', $first->id)->status)->toBe(ApprovalStatus::Rejected)
         ->and($rows->firstWhere('user_id', $first->id)->comment)->toBe('Нет обоснования суммы.')
-        // Nobody is left holding a step on a document that is already going back.
+
         ->and($rows->firstWhere('user_id', $second->id)->status)->toBe(ApprovalStatus::Invalidated)
         ->and($rows->firstWhere('user_id', $third->id)->status)->toBe(ApprovalStatus::Invalidated);
 });
@@ -176,11 +176,11 @@ it('keeps the rejected verdict readable after the author edits and it goes round
 
     expect($requisition->status)->toBe(RequisitionStatus::Draft)
         ->and($rounds)->toHaveCount(2)
-        // The old round is history and still carries what it decided.
+
         ->and($rounds->get(1)->first()->isVoided())->toBeTrue()
         ->and($rounds->get(1)->first()->displayStatus())->toBe(ApprovalStatus::Rejected)
         ->and($rounds->get(1)->first()->comment)->toBe('Уточните смету.')
-        // The new round is a clean queue.
+
         ->and($rounds->get(2)->first()->status)->toBe(ApprovalStatus::Queued);
 });
 
@@ -201,7 +201,7 @@ it('restarts a live round from the top when the author edits mid-review', functi
 
     expect($requisition->status)->toBe(RequisitionStatus::InReview)
         ->and($live)->toHaveCount(2)
-        // The verdict given on text that no longer exists does not carry over.
+
         ->and($live->firstWhere('user_id', $first->id)->status)->toBe(ApprovalStatus::Pending)
         ->and($live->firstWhere('user_id', $second->id)->status)->toBe(ApprovalStatus::Queued);
 });
@@ -349,11 +349,11 @@ it('lays the view page out as designed cards, not a bare field list', function (
     $html = Livewire::test(ViewRequisition::class, ['record' => $requisition->id])->html();
 
     expect($html)
-        // The chain leads: progress bar, who holds it now, the timeline table.
+
         ->toContain('rq-progress__bar')
         ->toContain('0/2')
         ->toContain($first->name)
-        // Then the record itself, as the card/details table the panel uses.
+
         ->toContain('ow-card')
         ->toContain('ow-dets')
         ->toContain('Закупка канцелярии')

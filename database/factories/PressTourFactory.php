@@ -7,16 +7,12 @@ use App\Enums\PressTourState;
 use App\Models\PressTour;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<PressTour>
- */
+/** @extends Factory<PressTour> */
 class PressTourFactory extends Factory
 {
     protected $model = PressTour::class;
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public function definition(): array
     {
         $month = fake()->numberBetween(1, 12);

@@ -6,18 +6,12 @@ use App\Models\Contact;
 use App\Models\Currency;
 use Illuminate\Database\Seeder;
 
-/**
- * Counterparties (tour agents, suppliers and foreign legal entities) taken from
- * the requisites cards supplied for the exhibition contracts. Trilingual name and
- * address are curated for the long-standing agents and generated for the rest;
- * every bank account on file is attached, one row per currency.
- */
 class ContactSeeder extends Seeder
 {
     public function run(): void
     {
         $contacts = [
-            // 1. ООО «BEYOND DMC»  (ИНН 311687587)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -40,7 +34,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000907160357001', 'currency' => 'UZS', 'bank_name' => 'АТБ «УзсаноатКурилишбанк» ф-л Ракат', 'mfo' => '00440', 'swift' => 'UJSIUZ22', 'bank_address' => null],
                 ],
             ],
-            // 2. СП «Beyond Expectations»  (ИНН 304415856)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'СП',
@@ -63,7 +57,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000200690529001', 'currency' => 'UZS', 'bank_name' => 'в Яккасарайском фил. Давр банк', 'mfo' => '01069', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 3. ООО «ASIA LUXE TRAVEL»  (ИНН 305855245)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -86,7 +80,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000604996690001', 'currency' => 'UZS', 'bank_name' => 'АТIB "IPOTEKA BANK" Юнусабадский Ф-л', 'mfo' => '00837', 'swift' => 'UZHOUZ22', 'bank_address' => null],
                 ],
             ],
-            // 4. ООО «Rezbook Global International»  (ИНН 311247643)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -109,7 +103,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000907044121001', 'currency' => 'UZS', 'bank_name' => '«Asia Alliance Bank» городской филиал г. Ташкент', 'mfo' => '00981', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 5. ООО «VERSAILLES TRAVEL»  (ИНН 207153986)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -132,7 +126,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000604996690001', 'currency' => 'UZS', 'bank_name' => 'в ОАИКБ "Ипак Йули" Яккасарай Ф-л', 'mfo' => '01028', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 6. СП «Sanat Travel Experts»  (ИНН 305072628)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'СП',
@@ -155,7 +149,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000500802685001', 'currency' => 'UZS', 'bank_name' => 'ЧАБ "TRASTBANK" Филиал Дархан', 'mfo' => '00954', 'swift' => null, 'bank_address' => 'Город Ташкент, Мирзо-Улугбекский район, площадь Хамида Алимджана, 5 Б, западная сторона'],
                 ],
             ],
-            // 7. ООО «ZAMIN DMC»  (ИНН 311343097)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -181,7 +175,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208643507076480001', 'currency' => 'RUB', 'bank_name' => 'АКБ «Капитал банк» городской филиал г. Ташкента', 'mfo' => '00445', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 8. ООО «Rocket DMC Registan»  (ИНН 310367653)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -204,7 +198,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000705631732001', 'currency' => 'UZS', 'bank_name' => 'Самаркандское отд, Национального банка ВЭД РУз', 'mfo' => '00450', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 9. ООО «SAMARCANDA ADVENTURES»  (ИНН 311728344)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -227,7 +221,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000607167211001', 'currency' => 'UZS', 'bank_name' => 'ОПЕРУ АИКБ Яшнабадский ф-л КАПИТАЛБАНК', 'mfo' => '01136', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 10. ООО «ZAMIN TRAVEL»  (ИНН 205315190)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -250,7 +244,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000704368503001', 'currency' => 'UZS', 'bank_name' => 'СО НБ ВЭД Р. Уз', 'mfo' => '00278', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 11. СП ООО «Dolores Travel Services»  (ИНН 205424619)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -273,7 +267,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20214000804383781001', 'currency' => 'UZS', 'bank_name' => '«HAMKORBANK» АТБ Ташкент региональный ОБУ', 'mfo' => '00083', 'swift' => null, 'bank_address' => 'Узбекистан, г. Ташкент, ул. Фуркат 14'],
                 ],
             ],
-            // 12. ООО «GLOBAL EXPLORE»  (ИНН 308716494)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -296,7 +290,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000405418270001', 'currency' => 'UZS', 'bank_name' => null, 'mfo' => '00401', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 13. ООО «Sonder Voyage»  (ИНН 311240258)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -319,7 +313,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000107085063001', 'currency' => 'UZS', 'bank_name' => 'ОПЕРУ АИКБ Кибрай т. ЧЭКИ «INVEST FINANCE BANK»', 'mfo' => '01056', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 14. ООО «ADVANTOUR»  (ИНН 204702676)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -342,7 +336,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000504288840001', 'currency' => 'UZS', 'bank_name' => 'АО КДБ Банк Узбекистан', 'mfo' => '00842', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 15. ООО «OLIMPIK TURSERVIS»  (ИНН 204511749)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -365,7 +359,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000904262013001', 'currency' => 'UZS', 'bank_name' => 'АКБ «Азия Альянс банк»', 'mfo' => '01095', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 16. ООО «EL MUNDO TOUR»  (ИНН 206752534)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -388,7 +382,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000104537447001', 'currency' => 'UZS', 'bank_name' => 'г.Ташкент., «УЗСАНОАТКУРИЛИШБАНКИ» АКБ Головной филиал', 'mfo' => '00440', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 17. ООО «ORIENT STAR GROUP»  (ИНН 303722254)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -413,7 +407,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208978200565085002', 'currency' => 'EUR', 'bank_name' => 'АКБ "Hamkorbank" Яккасарайский филиал', 'mfo' => '00083', 'swift' => 'KHKKUZ22XXX', 'bank_address' => null],
                 ],
             ],
-            // 18. ООО «CAUCASSIA TRAVEL»  (ИНН 310711881)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -436,7 +430,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000405702929001', 'currency' => 'UZS', 'bank_name' => 'ЧАБ «TRASTBANK» Дарханский ф-л.', 'mfo' => '01061', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 19. ИП ООО «UZTUR INVESTMENT AND DEVELOPMENT»  (ИНН 306777698)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ИП ООО',
@@ -459,7 +453,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000905132507009', 'currency' => 'UZS', 'bank_name' => '\'\'IpotekaBank\'\' OTB Group', 'mfo' => '00937', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 20. ООО «SunRoad»  (ИНН 311534832)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -482,7 +476,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000907123985001', 'currency' => 'UZS', 'bank_name' => '«Капитал» АТБ банк', 'mfo' => '01158', 'swift' => null, 'bank_address' => 'г. Ташкент'],
                 ],
             ],
-            // 21. ООО «Another Travel»  (ИНН 309484364)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -505,7 +499,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000805519373001', 'currency' => 'UZS', 'bank_name' => 'ЧАБ "TRASTBANK" Дарханский ф-л.', 'mfo' => '00954', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 22. АО «UZBEKISTAN AIRWAYS»  (ИНН 306628114)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'АО',
@@ -529,7 +523,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20210000305115307009', 'currency' => 'UZS', 'bank_name' => 'ОПЕРУ при ЧАКБ «Ориент Финанс»', 'mfo' => '01071', 'swift' => 'ORFBUZ22', 'bank_address' => 'Узбекистан, 100029, г. Ташкент, Мирзо-Улугбекский район, ул.Осие-5'],
                 ],
             ],
-            // 23. СП «East Asia Point»  (ИНН 207160718)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'Семейное предприятие',
@@ -553,7 +547,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208840605000278001', 'currency' => 'USD', 'bank_name' => 'Bank Asaka Nurafshan branch (в Асака Банк Нурафшон ф-л)', 'mfo' => '00873', 'swift' => 'ASBKUZ22XXX', 'bank_address' => null],
                 ],
             ],
-            // 24. ООО «ANUR TOUR»  (ИНН 202232646)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -576,7 +570,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000201522892001', 'currency' => 'UZS', 'bank_name' => 'г. ТАШКЕНТ, ГОЛОВНОЙ ОФИС АО БАНКА "ИПАК ЙУЛИ"', 'mfo' => '00444', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 25. ООО «KARAVAN TRAVEL»  (ИНН 300832523)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -599,7 +593,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000504706353001', 'currency' => 'UZS', 'bank_name' => 'Национальный банк внешнеэкономической деятельности Республики Узбекистан, Самаркандский филиал', 'mfo' => '00278', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 26. ООО «MEGA TOUR»  (ИНН 205886850)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -622,7 +616,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000004442549001', 'currency' => 'UZS', 'bank_name' => '"DAVR-BANK" Мирзо-Улугбекский ф-л', 'mfo' => '01072', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 27. ООО «SACRED EAST TRAVEL»  (ИНН 308308202)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -645,7 +639,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000605365263001', 'currency' => 'UZS', 'bank_name' => 'ЧАБ «Трастбанк» г.Ташкент', 'mfo' => '00491', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 28. ООО «Uktamxon Tour»  (ИНН 310148514)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -668,7 +662,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000305603836001', 'currency' => 'UZS', 'bank_name' => 'ХАТБ «Ипак йули банк»', 'mfo' => '00283', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 29. ООО «Selfie Travel»  (ИНН 305299709)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -691,7 +685,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000200843864001', 'currency' => 'UZS', 'bank_name' => 'ЦОО АКБ "Капиталбанк"', 'mfo' => '01088', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 30. ООО «CENTRAL ASIA TRAVEL»  (ИНН 206976184)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -714,7 +708,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000304736797001', 'currency' => 'UZS', 'bank_name' => '«АСАКА БАНК» Юнусабадского отд.', 'mfo' => '00873', 'swift' => null, 'bank_address' => 'Узбекистан, Ташкент, Юнус-Абад кв-л 2, дом 8.'],
                 ],
             ],
-            // 31. ЧП «EMERALD TRAVEL»  (ИНН 206228464)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ЧП',
@@ -737,7 +731,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000104477456001', 'currency' => 'UZS', 'bank_name' => '«Национальный банк» Филиал Академический, город Ташкент', 'mfo' => '00431', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 32. ООО «SEZAM TRAVEL»  (ИНН 301755974)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -760,7 +754,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000904879519001', 'currency' => 'UZS', 'bank_name' => 'ЧАБ Трастбанк офис ТОШКЕНТ', 'mfo' => '00491', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 33. ЧП «JALOL QUDUQ AVIA TRANS»  (ИНН 302076552)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ЧП',
@@ -783,7 +777,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208840104929827005', 'currency' => 'USD', 'bank_name' => 'TRASTBANK', 'mfo' => '01074', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 34. ООО «PEOPLETRAVEL»  (ИНН 207071194)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -806,7 +800,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000504848824001', 'currency' => 'UZS', 'bank_name' => 'ОПЕРУ АКБ «Asian Alliance Bank»', 'mfo' => '01095', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 35. СП «Antique Travel Experts»  (ИНН 310149060)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'СП',
@@ -829,7 +823,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000505603800001', 'currency' => 'UZS', 'bank_name' => '«Milly bank» BOSH Ofisi AJ', 'mfo' => '00450', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 36. ООО «IMRAN-TOURS»  (ИНН 309963464)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -852,7 +846,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000905579066001', 'currency' => 'UZS', 'bank_name' => 'Хамкор Банк Шайхантахур филиали', 'mfo' => '00083', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 37. ООО «Geo Tour Service»  (ИНН 303906847)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -875,7 +869,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000200611475001', 'currency' => 'UZS', 'bank_name' => 'Автотранспортный филиал банка «Асака»', 'mfo' => '01069', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 38. ООО «ZAMIN DESTINATION»  (ИНН 310442497)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -898,7 +892,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000605646416001', 'currency' => 'UZS', 'bank_name' => 'АКБ «УзПСБ» Лабзак филиал', 'mfo' => '00440', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 39. ИП ООО «SITARA INTERNATIONAL LTD»  (ИНН 201904269)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ИП ООО',
@@ -921,7 +915,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000300155609001', 'currency' => 'UZS', 'bank_name' => 'SQB "Uzpromstroybank" г. Ташкент', 'mfo' => '00440', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 40. ООО «IZEL»  (ИНН 311884303)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -944,7 +938,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000307196304001', 'currency' => 'UZS', 'bank_name' => 'ЯНГИЙУЛ Т.. "ИПАК ЙУЛИ" АИТ БАНКИНИНГ ЯНГИЙУЛ ФИЛИАЛИ', 'mfo' => '01081', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 41. ООО «ZIYARAH TRAVEL»  (ИНН 305282002)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -967,7 +961,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000500838807001', 'currency' => 'UZS', 'bank_name' => 'Наманганский филиал АКБ «Капиталбанк»', 'mfo' => '01085', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 42. ООО «SkyWay DMC»  (ИНН 311092054)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -990,7 +984,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000507006239001', 'currency' => 'UZS', 'bank_name' => '«Капитал банк» ат банкининг «Капитал 24» чакана бизнес филиал', 'mfo' => null, 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 43. WTFI INVESTMENTS L.L.C  (foreign, no ИНН)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => null,
@@ -1009,7 +1003,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '9878794616', 'currency' => null, 'bank_name' => 'Wio Bank PJSC', 'mfo' => null, 'swift' => 'WIOBAEADXXX', 'bank_address' => 'Etihad Airways Centre 5th Floor, Abu Dhabi, UAE'],
                 ],
             ],
-            // 44. ООО «TIMURWAY TOUR»  (ИНН 309957606)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1032,7 +1026,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000105579192001', 'currency' => 'UZS', 'bank_name' => 'Мирзо-Улугбекский ф-ал АКБ «ASIA ALLIANCE BANK»', 'mfo' => '01103', 'swift' => 'ASACUZ22', 'bank_address' => 'Tashkent, Uzbekistan'],
                 ],
             ],
-            // 45. ООО «Sole Vita»  (ИНН 300614889)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1055,7 +1049,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000904688880001', 'currency' => 'UZS', 'bank_name' => 'Микрокредит банк, Самаркандский филиал', 'mfo' => '00281', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 46. ООО «CATO MOTORS»  (ИНН 310109134)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1078,7 +1072,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000805599212001', 'currency' => 'UZS', 'bank_name' => 'АКБ Хамкор Банк', 'mfo' => '00083', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 47. ООО «MY-TRIPGUIDE»  (ИНН 309943434)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1101,7 +1095,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '2020800090577030001', 'currency' => 'UZS', 'bank_name' => 'Узсаноаткурилишбанк АТБ Хоразм', 'mfo' => '00440', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 48. ООО «FAYZ GRAND MINON»  (ИНН 309570052)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1124,7 +1118,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000305528854001', 'currency' => 'UZS', 'bank_name' => '"Asia Alliance Bank" AT Banki', 'mfo' => '01095', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 49. ООО «SULTAN TRAVEL UZBEKISTAN»  (ИНН 311367502)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1147,7 +1141,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000807083433001', 'currency' => 'UZS', 'bank_name' => '"Ипак йули банк"', 'mfo' => '01120', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 50. ООО «MIRAN TRIPS»  (ИНН 310635027)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1170,7 +1164,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '8000405672574001', 'currency' => 'UZS', 'bank_name' => null, 'mfo' => '00997', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 51. ООО «ONS Travel»  (ИНН 311530213)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1193,7 +1187,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000607123613001', 'currency' => 'UZS', 'bank_name' => null, 'mfo' => '01071', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 52. ООО «ENJOY TRAVEL»  (ИНН 302881501)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1216,7 +1210,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000500300189001', 'currency' => 'UZS', 'bank_name' => null, 'mfo' => null, 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 53. ООО «AKFA Dream World»  (ИНН 305163498)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1239,7 +1233,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000607123613001', 'currency' => 'UZS', 'bank_name' => null, 'mfo' => '01176', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 54. ООО «Right Flight»  (ИНН 311043178)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1262,7 +1256,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000605740548001', 'currency' => 'UZS', 'bank_name' => 'ЧАБ "Капиталбанк" ф-л. Города Ташкента', 'mfo' => '00445', 'swift' => 'KACHUZ22', 'bank_address' => null],
                 ],
             ],
-            // 55. ООО «EAST-STAR HOTEL»  (ИНН 309748074)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1286,7 +1280,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208840505552380001', 'currency' => 'USD', 'bank_name' => 'ORIENT FINANS BANK, Самарканд филиал', 'mfo' => '01071', 'swift' => 'ORFBUZ22', 'bank_address' => 'г. Самарканд, ул. Мирзо Улугбек, 48'],
                 ],
             ],
-            // 56. ООО «MY FREIGHTER»  (ИНН 306985993)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1309,7 +1303,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000805182960005', 'currency' => 'UZS', 'bank_name' => 'АО «KDB BANK UZBEKISTAN»', 'mfo' => '00842', 'swift' => null, 'bank_address' => 'ул. Бухара, 3, Ташкент, Узбекистан 100047'],
                 ],
             ],
-            // 57. ООО «INTURIZM»  (ИНН 311153864)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1332,7 +1326,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000707023815001', 'currency' => 'UZS', 'bank_name' => 'ТГФ АКБ «Капитал Банк»', 'mfo' => '01158', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 58. ООО «TRAVEL RENTCAR»  (ИНН 308291281)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1355,7 +1349,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000405369978001', 'currency' => 'UZS', 'bank_name' => 'Самаркандский областной филиал Invest Finance Bank', 'mfo' => '01133', 'swift' => null, 'bank_address' => 'г.Самарканд, ул. Узбекистанская, 22'],
                 ],
             ],
-            // 59. ООО «NEGEN-TOUR»  (ИНН 309292350)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1378,7 +1372,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000505492956001', 'currency' => 'UZS', 'bank_name' => 'АТИБ «Ипотека Банк» Филиал Кук-Сарой', 'mfo' => '00262', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 60. ООО «MODERNTRAVEL»  (ИНН 312001822)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1401,7 +1395,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000907217582001', 'currency' => 'UZS', 'bank_name' => 'Шайхантахурский филиал АКБ «ASIA ALLIANCE BANK»', 'mfo' => '01095', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 61. ООО «TASHKENT TRAVEL HUB»  (ИНН 311997415)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1424,7 +1418,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000907216618001', 'currency' => 'UZS', 'bank_name' => '"ОРИЕНТ ФИНАНС" ХАТ БАНКИ', 'mfo' => '01071', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 62. ООО «Inter MICE Asia»  (ИНН 303380705)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1447,7 +1441,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000600478554001', 'currency' => 'UZS', 'bank_name' => 'Самаркандский филиал ЧАБ «Трастбанк»', 'mfo' => '00491', 'swift' => null, 'bank_address' => 'Республика Узбекистан, г. Самарканд, ул. М. Улугбека 47А'],
                 ],
             ],
-            // 63. ООО «Sapphire Asia»  (ИНН 302588595)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1470,7 +1464,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '22614840100217421001', 'currency' => 'USD', 'bank_name' => 'г. Самарканд, «Агробанк» АТБ региональный филиал г. Самарканд', 'mfo' => '00279', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 64. ООО «HOLIDAYTRAVEL»  (ИНН 308945946)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1493,7 +1487,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000005447829001', 'currency' => 'UZS', 'bank_name' => 'Капитал Банк, АКБ, г. Ташкент', 'mfo' => '01088', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 65. ООО «Samarkanda Travel and Tours»  (ИНН 206930939)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1516,7 +1510,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000404644732001', 'currency' => 'UZS', 'bank_name' => 'АТБ «Asia Alliance Bank»', 'mfo' => '01095', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 66. ООО «SARBON TOURS»  (ИНН 204130068)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1539,7 +1533,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000004203222001', 'currency' => 'UZS', 'bank_name' => 'ГОО НБ ВЭД РУз', 'mfo' => '00450', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 67. ООО «TOUR EAST»  (ИНН 306151418)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1562,7 +1556,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000501030239001', 'currency' => 'UZS', 'bank_name' => 'АНДИЖОН Ш., ЧЕТ ЭЛ КАПИТАЛИ ИШТИРОКИДАГИ "HAMKORBANK" АТ БАНКИНИНГ БОШ ОФИСИ', 'mfo' => '00083', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 68. ООО «AFSONA TRAVEL»  (ИНН 202822781)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1585,7 +1579,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000903991804001', 'currency' => 'UZS', 'bank_name' => 'Уз НацБанк ВЭД', 'mfo' => '00450', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 69. ООО «TRAVEL ISTAN»  (ИНН 311123576)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1608,7 +1602,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000407012567001', 'currency' => 'UZS', 'bank_name' => 'АТ «Aloqabank»', 'mfo' => '00401', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 70. ООО «Ariana Tours»  (ИНН 304790036)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1631,7 +1625,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000000837410001', 'currency' => 'UZS', 'bank_name' => 'Самаркандский филиал ЧАБ «Трастбанк»', 'mfo' => '11977', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 71. ООО «ORIENT VOYAGES»  (ИНН 202960778)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1654,7 +1648,7 @@ class ContactSeeder extends Seeder
                     ['account_number' => '20208000204005764001', 'currency' => 'UZS', 'bank_name' => 'ЧАКБ «ORIENT FINANS BANK» Самарканд ЦБУ', 'mfo' => '01071', 'swift' => null, 'bank_address' => null],
                 ],
             ],
-            // 72. ООО «Akbar Travel Asia»  (ИНН 306620600)
+
             [
                 'type' => Contact::TYPE_LEGAL,
                 'legal_form' => 'ООО',
@@ -1685,8 +1679,6 @@ class ContactSeeder extends Seeder
             $accounts = $data['accounts'] ?? [];
             unset($data['accounts']);
 
-            // Legal entities are unique by INN; the one foreign entity with no INN
-            // is keyed by its Russian name instead.
             $contact = filled($data['inn'] ?? null)
                 ? Contact::firstOrCreate(['inn' => $data['inn']], array_merge($data, ['status' => true]))
                 : Contact::where('name->ru', $data['name']['ru'])->first()

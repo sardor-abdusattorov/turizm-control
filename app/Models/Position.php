@@ -30,11 +30,7 @@ class Position extends Model
         return $this->belongsToMany(Department::class, 'department_position');
     }
 
-    /**
-     * Active positions as id => localized name pairs (for Select::options).
-     *
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     public static function getActive(): array
     {
         return static::activeOptions('name');

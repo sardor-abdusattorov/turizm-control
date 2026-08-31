@@ -23,8 +23,7 @@
     </span>
 
     @if ($voided)
-        {{-- The verdict still stands in the record; it just no longer counts
-             towards the round that is running. --}}
+
         <span class="fi-approval-state__note">{{ __('app.approval.cancelled_after_edit') }}</span>
     @elseif ($record->isOverdue())
         <span class="fi-approval-state__late">{{ __('app.approval.overdue') }}</span>

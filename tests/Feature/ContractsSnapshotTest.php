@@ -19,8 +19,6 @@ use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
-// Tests snapshot into a scratch file — the REAL committed snapshot at
-// database/seeders/data/ must survive test runs untouched.
 beforeEach(function () {
     $this->snapshotPath = storage_path('framework/testing/contracts-snapshot-test.json');
     HandEnteredContractsSeeder::$path = $this->snapshotPath;
@@ -80,8 +78,6 @@ it('replays a snapshot after a wipe: contracts, contacts, attachments and paymen
 
     $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
 
-    // The rebuild: contract-side data vanishes, reference data survives
-    // (currencies / types / projects / users are re-seeded on fresh).
     Payment::query()->delete();
     $contract->attachments()->delete();
     Contract::query()->delete();
@@ -100,15 +96,15 @@ it('replays a snapshot after a wipe: contracts, contacts, attachments and paymen
         ->and($restored->contractType?->id)->toBe($type->id)
         ->and($restored->project?->id)->toBe($project->id)
         ->and($restored->responsible?->email)->toBe('author@test.uz')
-        // The counterparty is recreated by INN with its bank account intact.
+
         ->and($restored->contact?->inn)->toBe('301234567')
         ->and($restored->contact?->bankAccounts()->value('account_number'))->toBe('20208000900123456001')
-        // The dossier points at the SAME path — files on disk are untouched.
+
         ->and($restored->attachments()->value('file_path'))->toBe('uploads/files/contract-attachments/2026/07/scan.pdf')
         ->and($restored->attachments()->value('original_name'))->toBe('Эркин шаклдаги хужжат А-2.pdf')
         ->and((float) $restored->payments()->value('percent'))->toBe(40.0)
         ->and($restored->payments()->first()?->screenshots)->toBe(['uploads/images/payments/2026/07/proof.png'])
-        // No approval chain is conjured for a replayed contract.
+
         ->and($restored->approvers()->count())->toBe(0);
 });
 
@@ -122,7 +118,6 @@ it('hands the basis order to the project on replay', function () {
 
     $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
 
-    // The rebuild wipes the link; the replayed contract carries it back.
     $project->forceFill(['order_id' => null])->saveQuietly();
     Contract::query()->delete();
 
@@ -152,8 +147,7 @@ it('replaying the same snapshot twice never duplicates anything', function () {
     expect(Contract::query()->where('number', 'B-1')->count())->toBe(1)
         ->and($restored->attachments()->count())->toBe(1)
         ->and($restored->payments()->count())->toBe(1)
-        // The share must not have doubled either — a duplicated payment would
-        // quietly push the contract's paid percent past what was really paid.
+
         ->and((float) $restored->fresh()->paid_percent)->toBe(40.0);
 });
 
@@ -174,7 +168,6 @@ it('carries the committee → PR centre basis link across a wipe', function () {
 
     $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
 
-    // The rebuild: both orders go, ids will be handed out afresh.
     Order::query()->delete();
 
     $this->seed(HandEnteredContractsSeeder::class);
@@ -184,7 +177,7 @@ it('carries the committee → PR centre basis link across a wipe', function () {
     expect($restored)->not->toBeNull()
         ->and($restored->scope)->toBe(OrderScope::PrCenter)
         ->and($restored->basisOrder?->number)->toBe('06-АФ')
-        // Ids were reassigned, so the link resolved by number, not by id.
+
         ->and($restored->basis_order_id)->not->toBe($committee->id)
         ->and(Order::query()->firstWhere('number', '06-АФ')->basis_order_id)->toBeNull();
 });
@@ -252,7 +245,7 @@ it('carries requisitions across a wipe, review state and all', function () {
         ->and($restored->status)->toBe(RequisitionStatus::Rejected)
         ->and($restored->project?->name)->toBe('ATM 25')
         ->and($restored->author?->email)->toBe('author@test.uz')
-        // The chain comes back with its verdict and its reason intact.
+
         ->and($restored->approvals)->toHaveCount(1)
         ->and($restored->approvals->first()->user?->email)->toBe('supply@test.uz')
         ->and($restored->approvals->first()->status)->toBe(ApprovalStatus::Rejected)
@@ -283,8 +276,6 @@ it('snapshots the live data before project:init drops it', function () {
     $currency = Currency::factory()->create(['short_name' => 'UZS', 'status' => true]);
     Contract::factory()->create(['number' => 'LIVE-1', 'currency_id' => $currency->id]);
 
-    // project:init calls contracts:snapshot first — proven here by running the
-    // same command against the default path and reading what it wrote.
     $realPath = database_path('seeders/data/contracts-snapshot.json');
     $backup = File::exists($realPath) ? File::get($realPath) : null;
 

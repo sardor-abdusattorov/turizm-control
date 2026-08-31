@@ -7,12 +7,6 @@ use App\Enums\CounterpartyKind;
 use App\Models\ContractType;
 use Illuminate\Database\Seeder;
 
-/**
- * The six contract kinds distilled from the real 2025 dossiers: every one of
- * the 26 scanned expense contracts is a space rental, a stand construction,
- * a service or an agency deal; the income side is participant fees and
- * sponsorship from the exhibition registries.
- */
 class ContractTypeSeeder extends Seeder
 {
     public function run(): void
@@ -39,8 +33,7 @@ class ContractTypeSeeder extends Seeder
                 'sort' => 2,
             ],
             [
-                // We render the service, the participant pays — the type the
-                // hand-entered national-stand contracts actually need.
+
                 'title' => ['ru' => 'Оказание услуг', 'uz' => "Xizmat ko'rsatish", 'en' => 'Services'],
                 'description' => [
                     'ru' => 'Услуги участникам: организация участия на национальном стенде',

@@ -12,11 +12,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
 
-/**
- * Any document's execution history as a date-grouped timeline, fed by the
- * activity log. Takes the record's morph class and key, so a second document
- * type reuses it rather than growing its own copy.
- */
 class DocumentHistoryTimelineWidget extends TableWidget
 {
     public string $subjectType;
@@ -25,9 +20,7 @@ class DocumentHistoryTimelineWidget extends TableWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public static function paramsFor(Model $record): array
     {
         return [
@@ -39,7 +32,7 @@ class DocumentHistoryTimelineWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            // No heading: the tab label already names it.
+
             ->heading(null)
             ->query(fn (): Builder => Activity::query()
                 ->where('subject_type', $this->subjectType)

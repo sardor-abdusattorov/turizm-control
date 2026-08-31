@@ -11,11 +11,6 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * Every contract of a counterparty (contact OR sponsor) as a stock Filament
- * table — embedded on the contact and sponsor view pages with the same
- * visibleTo() scoping as the count badges. Pass exactly one of the two ids.
- */
 class CounterpartyContractsTableWidget extends TableWidget
 {
     public ?int $contactId = null;
@@ -27,7 +22,7 @@ class CounterpartyContractsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            // No heading: the tab label / modal title already names it.
+
             ->heading(null)
             ->query(fn (): Builder => $this->scopeCounterparty(Contract::query()
                 ->visibleTo()

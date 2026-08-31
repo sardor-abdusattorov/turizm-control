@@ -37,9 +37,6 @@ class ViewContract extends ViewRecord
     {
         parent::mount($record);
 
-        // The progress band counts approvers and names the current one — load
-        // them once instead of a query per row (N+1). The chain and payment
-        // tables are widgets and load their own relations.
         $this->record->loadMissing([
             'approvers.user',
             'activeApprovers.user',
@@ -68,15 +65,9 @@ class ViewContract extends ViewRecord
         return $created ? Carbon::parse($created) : null;
     }
 
-    /**
-     * Human-friendly time-remaining string for the current step (or null
-     * when the contract isn't in review).
-     *
-     * @return array{label: string, overdue: bool}|null
-     */
+    /** @return array{label: string, overdue: bool}|null */
     public function timeRemaining(): ?array
     {
-        // Both review stages — the director's SLA must surface here too.
         $inReview = in_array($this->record->status, [
             Contract::STATUS_IN_REVIEW,
             Contract::STATUS_IN_REVIEW_DIRECTOR,
@@ -249,8 +240,7 @@ class ViewContract extends ViewRecord
                         ->default(today())
                         ->required(),
                 ])
-                // Only offered when the approval flow is switched off: the
-                // paper was signed outside the system, filing it is enough.
+
                 ->visible(fn (): bool => ! ContractWorkflow::approvalEnabled()
                     && $this->record->status === Contract::STATUS_DRAFT
                     && $this->canManageAttachments())
@@ -269,12 +259,7 @@ class ViewContract extends ViewRecord
         ];
     }
 
-    /**
-     * Dossier scans of this contract, cached for the render pass (the tab
-     * badge and the list both read it).
-     *
-     * @return Collection<int, ContractAttachment>
-     */
+    /** @return Collection<int, ContractAttachment> */
     public function attachments(): Collection
     {
         return $this->cachedAttachments ??= $this->record->attachments()->with('uploader')->get();
@@ -282,10 +267,6 @@ class ViewContract extends ViewRecord
 
     private ?Collection $cachedAttachments = null;
 
-    /**
-     * The Attachments tab badge counts the dossier, so a file filed in the
-     * panel below has to invalidate the count this page cached.
-     */
     #[On('attachments-saved')]
     public function refreshAttachmentCount(): void
     {
@@ -297,11 +278,6 @@ class ViewContract extends ViewRecord
         return $this->record->attachmentsManageableBy();
     }
 
-    /**
-     * The counterparty's dossier as a native Filament modal, opened from the
-     * contact row in the sidebar. Fields are grouped exactly the way
-     * ContactForm splits them: identity, tax/legal, contacts, bank details.
-     */
     public function contactDetailsAction(): Action
     {
         return Action::make('contactDetails')
@@ -317,9 +293,7 @@ class ViewContract extends ViewRecord
             ->modalCancelAction(false);
     }
 
-    /**
-     * @return list<array{0: string, 1: list<array{0: string, 1: string, 2: string}>}>
-     */
+    /** @return list<array{0: string, 1: list<array{0: string, 1: string, 2: string}>}> */
     public function contactGroups(): array
     {
         $contact = $this->record->contact;
@@ -328,7 +302,6 @@ class ViewContract extends ViewRecord
             return [];
         }
 
-        // The account matching this contract's currency (falls back to a generic one).
         $bankAccount = $contact->bankAccountFor($this->record->currency_id);
         $contactType = $contact->type === Contact::TYPE_INDIVIDUAL
             ? __('app.contact.type.individual')
@@ -364,7 +337,6 @@ class ViewContract extends ViewRecord
             ]],
         ];
 
-        // Drop blank rows, then any group left empty by that filter.
         $groups = array_map(
             fn (array $group): array => [$group[0], array_values(array_filter(
                 $group[1],
@@ -392,17 +364,7 @@ class ViewContract extends ViewRecord
             ->get();
     }
 
-    /**
-     * Payment progress summary for the View page — the band above the ledger.
-     * The rows themselves come from ContractPaymentsTableWidget.
-     *
-     * @return array{
-     *     paid_percent: float,
-     *     remaining_percent: float,
-     *     status: PaymentStatus,
-     *     can_add: bool,
-     * }
-     */
+    /** @return array{ */
     public function paymentSummary(): array
     {
         $paid = (float) $this->record->paid_percent;
@@ -422,12 +384,7 @@ class ViewContract extends ViewRecord
             ?? 'https://ui-avatars.com/api/?name=%3F&background=E0E7FF&color=4338CA&size=80';
     }
 
-    /**
-     * Headline context for the hero: a status-aware one-liner plus the SLA
-     * state of the step currently in review.
-     *
-     * @return array{message: string, overdue: bool, due: ?Carbon}
-     */
+    /** @return array{message: string, overdue: bool, due: ?Carbon} */
     public function heroContext(): array
     {
         $contract = $this->record;

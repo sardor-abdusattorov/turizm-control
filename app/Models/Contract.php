@@ -64,14 +64,7 @@ class Contract extends Model
         return ContractStatus::options();
     }
 
-    /**
-     * Business fields whose change mid-flow must invalidate prior approvals.
-     * Bookkeeping columns (status, signed_at, …) are
-     * intentionally NOT in this list — they change as part of the workflow
-     * itself and must never trigger a cancel-on-edit cascade.
-     *
-     * @var array<int, string>
-     */
+    /** @var array<int, string> */
     public const REAPPROVAL_TRIGGER_FIELDS = [
         'number',
         'title',
@@ -148,12 +141,7 @@ class Contract extends Model
         return $this->approvalChain()->buildFromFlow($this);
     }
 
-    /**
-     * Preview of the approval chain the global flow would produce, as
-     * "Department — User" lines, for display on the create form.
-     *
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     public static function approvalChainPreview(): array
     {
         return app(ApprovalChain::class)->preview();
@@ -169,20 +157,11 @@ class Contract extends Model
         return $this->belongsTo(Contact::class);
     }
 
-    /**
-     * The sponsor this contract is signed with, on sponsorship («Спонсорство»)
-     * contracts. Mutually exclusive with {@see contact()} — the type's
-     * counterparty_kind decides which one is filled.
-     */
     public function sponsor(): BelongsTo
     {
         return $this->belongsTo(Sponsor::class);
     }
 
-    /**
-     * The counterparty this contract faces, whichever kind it is: the sponsor
-     * on sponsorship contracts, the contact otherwise.
-     */
     public function counterparty(): Contact|Sponsor|null
     {
         return $this->sponsor_id !== null ? $this->sponsor : $this->contact;
@@ -208,14 +187,7 @@ class Contract extends Model
         return $this->hasMany(ContractAttachment::class)->orderBy('sort')->orderBy('id');
     }
 
-    /**
-     * The dossier as a plain list of stored paths — the virtual field the
-     * contract form's FileUpload binds to. Filament reads it back when
-     * authorising submitted paths, which is the only reason it exists as an
-     * attribute at all; the rows themselves live in attachments().
-     *
-     * @return Attribute<list<string>, never>
-     */
+    /** @return Attribute<list<string>, never> */
     protected function attachmentFiles(): Attribute
     {
         return Attribute::get(fn (): array => $this->attachments()->pluck('file_path')->all());
@@ -235,8 +207,6 @@ class Contract extends Model
 
     public function currentApprover(): ?ContractApprover
     {
-        // Reuse the eager-loaded relation when present — table columns call
-        // this per row and must not issue a query each (N+1).
         if ($this->relationLoaded('activeApprovers')) {
             return $this->activeApprovers
                 ->where('status', ContractApprover::STATUS_PENDING)
@@ -266,10 +236,6 @@ class Contract extends Model
         ];
         $invalidated = ContractApprover::STATUS_INVALIDATED;
 
-        // Rows that already had a verdict need their `original_status`
-        // preserved (the audit trail still shows the original outcome).
-        // Iterate them per-row — they're typically 0-2 per contract and
-        // need to round-trip acted_at through the Eloquent date cast.
         $verdictCount = 0;
         foreach ($this->approvers()->whereIn('status', $decided)->get() as $approver) {
             $approver->update([
@@ -281,8 +247,6 @@ class Contract extends Model
             $verdictCount++;
         }
 
-        // Everything else can flip in a single batch UPDATE — no per-row
-        // state to preserve.
         $pending = $this->approvers()
             ->whereNotIn('status', array_merge($decided, [$invalidated]))
             ->update([
@@ -401,23 +365,18 @@ class Contract extends Model
             return false;
         }
 
-        // Super admin is the only universal exception — drafts included.
         if ($user->hasRole('super_admin')) {
             return true;
         }
 
-        // Your own contract is visible in any status, drafts included.
         if ($this->responsible_id === $user->id) {
             return true;
         }
 
-        // Someone else's draft is private to its author until it is submitted.
         if ($this->status === self::STATUS_DRAFT) {
             return false;
         }
 
-        // Past the draft stage: oversight and view_all_contracts see the whole
-        // pipeline; everyone else must sit in the approval chain.
         if ($user->hasAnyRole(self::OVERSIGHT_ROLES) || $user->can('view_all_contracts')) {
             return true;
         }
@@ -437,18 +396,10 @@ class Contract extends Model
             return true;
         }
 
-        // A filed (approved) contract only reopens for holders of the
-        // dedicated permission — granted per-role in Роли, so the admin
-        // decides who may fix archive entries; authorship alone is not
-        // enough. Saving then either keeps it filed via the «already signed»
-        // switch or honestly sends it back through approval; the signed
-        // document itself stays untouched either way.
         if ($this->status === self::STATUS_APPROVED) {
             return $user->can('update_approved_contract');
         }
 
-        // The responsible manager owns the document while it is a draft, in
-        // review, or has come back rejected.
         if ($this->responsible_id === $user->id
             && in_array($this->status, [
                 self::STATUS_DRAFT,
@@ -458,8 +409,6 @@ class Contract extends Model
             return true;
         }
 
-        // The approver whose turn it is may tweak the document before
-        // approving it.
         return $this->currentApprover()?->user_id === $user->id;
     }
 
@@ -472,11 +421,6 @@ class Contract extends Model
             && ($this->responsible_id === $user->id || $user->hasRole('super_admin'));
     }
 
-    /**
-     * Whether editing the document right now would invalidate the approvals and
-     * bounce the contract back to draft — true once it is anywhere in the
-     * approval flow. Used to warn the editor before they open the document.
-     */
     public function documentEditWouldResetApprovals(): bool
     {
         return in_array($this->status, [
@@ -486,13 +430,6 @@ class Contract extends Model
         ], true);
     }
 
-    /**
-     * Whoever may edit contract data may also curate its dossier. Unlike
-     * editing the contract's terms, this stays open AFTER full approval — the
-     * signed scan, SWIFT slip and act arrive once the contract is already
-     * approved. While the contract is mid-approval the dossier freezes:
-     * approvers must review a fixed set of files, not a moving target.
-     */
     public function attachmentsManageableBy(?User $user = null): bool
     {
         $user ??= auth()->user();
@@ -511,8 +448,7 @@ class Contract extends Model
         }
 
         return $query
-            // Both review stages: a director reviewing (IN_REVIEW_DIRECTOR)
-            // must see their queue too, not only the regular chain stage.
+
             ->whereIn('status', [self::STATUS_IN_REVIEW, self::STATUS_IN_REVIEW_DIRECTOR])
             ->whereIn('id', function ($sub) use ($user): void {
                 $sub->select('a1.contract_id')
@@ -557,12 +493,6 @@ class Contract extends Model
         return (float) $this->payments()->sum('percent');
     }
 
-    /**
-     * Money actually collected on this contract. Contracts track a paid
-     * *percent* (maintained by the payment observers), not an absolute figure,
-     * so the collected amount is derived from the total — kept as a helper so
-     * every project/contact/sponsor income breakdown reads it the same way.
-     */
     public function paidAmount(): float
     {
         return round((float) $this->amount * $this->paidPercent() / 100, 2);
@@ -584,9 +514,6 @@ class Contract extends Model
     }
 
     /**
-     * Contracts that can still take a payment: approved and not yet fully paid.
-     * The query-level counterpart of canAcceptPayment().
-     *
      * @param  Builder<Contract>  $query
      * @return Builder<Contract>
      */
@@ -609,23 +536,14 @@ class Contract extends Model
             return $query->whereRaw('0 = 1');
         }
 
-        // Super admin is the only universal exception — they see every
-        // contract, everyone's drafts included.
         if ($user->hasRole('super_admin')) {
             return $query;
         }
 
-        // A draft is private to its author until it is submitted for approval.
-        // Everyone else sees their own contracts (any status) plus the
-        // non-draft contracts they're entitled to: the whole live pipeline for
-        // oversight / view_all_contracts, otherwise just the ones they approve.
         $seesWholePipeline = $user->hasAnyRole(self::OVERSIGHT_ROLES)
             || $user->can('view_all_contracts');
 
         return $query->where(function (Builder $scoped) use ($user, $seesWholePipeline): void {
-            // Columns are table-qualified so the scope is safe to use on a
-            // query that joins another table carrying a `status` column (e.g.
-            // the financial summary joins `currencies`).
             $scoped->where('contracts.responsible_id', $user->id);
 
             $scoped->orWhere(function (Builder $pipeline) use ($user, $seesWholePipeline): void {

@@ -67,13 +67,9 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label(fn () => __('app.label.projects')),
 
-                // Counterparties and sponsors are day-to-day records, not
-                // reference data, so they get their own group above «Ресурсы».
                 NavigationGroup::make()
                     ->label(fn () => __('app.label.contacts')),
 
-                // Daily-work groups above stay open; the reference registry
-                // and admin sections start collapsed to keep the sidebar short.
                 NavigationGroup::make()
                     ->label(fn () => __('app.label.resources'))
                     ->collapsed(),
@@ -93,10 +89,7 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
-                // The dashboard is intentionally down to the greeting card
-                // alone while its contents are being reconsidered. The project
-                // widgets (overview / stats / contracts table) still exist and
-                // keep their tests; they are simply not registered here.
+
                 DashboardHeaderWidget::class,
             ])
             ->plugins([

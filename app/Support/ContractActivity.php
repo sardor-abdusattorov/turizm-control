@@ -2,12 +2,6 @@
 
 namespace App\Support;
 
-/**
- * Presentation helpers for the contract activity feed — the stored
- * description is a raw English event string ("Contract Awaiting Director"),
- * which reads as gibberish to a ru/uz user. Shared by the history timeline
- * widget and anything else that renders activity rows.
- */
 class ContractActivity
 {
     /** @return array{icon: string, color: string} */
@@ -31,7 +25,6 @@ class ContractActivity
         };
     }
 
-    /** Workflow milestones vs plain edits — powers the history filter. */
     public static function group(string $event): string
     {
         return in_array($event, self::workflowEvents(), true) ? 'workflow' : 'edit';
@@ -47,7 +40,6 @@ class ContractActivity
         ];
     }
 
-    /** Human, localized label for a timeline row. */
     public static function label(string $event, ?string $description = null): string
     {
         $key = match ($event) {

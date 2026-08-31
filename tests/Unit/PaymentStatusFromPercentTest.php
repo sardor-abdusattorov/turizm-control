@@ -2,11 +2,6 @@
 
 use App\Enums\PaymentStatus;
 
-/**
- * The boundary values around 0 and 100 are easy to get subtly wrong
- * — float rounding ("30 + 30 + 40.0000001") and seeded zero contracts
- * have both burned us. Lock them down.
- */
 it('returns NotPaid for zero and negative percent', function (float $percent) {
     expect(PaymentStatus::fromPercent($percent))->toBe(PaymentStatus::NotPaid);
 })->with([

@@ -6,13 +6,6 @@ use App\Enums\ProjectType;
 use App\Models\Project;
 use Illuminate\Database\Seeder;
 
-/**
- * The five filled rows of «Реестр локальных мероприятий 2026» (таблица по
- * мероприятиям 2026 (2)(2).xlsx, Sheet1): dates, venues, estimate budgets,
- * headcounts and photo-report links exactly as in the registry. Their buyruq
- * numbers and per-event contract counts live in the description until the
- * contractor details arrive.
- */
 class LocalEvents2026Seeder extends Seeder
 {
     public function run(): void

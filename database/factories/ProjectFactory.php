@@ -6,9 +6,7 @@ use App\Enums\ProjectType;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<Project>
- */
+/** @extends Factory<Project> */
 class ProjectFactory extends Factory
 {
     protected $model = Project::class;

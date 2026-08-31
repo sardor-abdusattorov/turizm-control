@@ -28,8 +28,6 @@
 <x-filament-panels::page>
     <div class="ow" x-data="{ tab: 'overview' }">
 
-        {{-- Native Filament tabs; the state pill rides on the right so it
-             stays visible whichever tab is open. --}}
         <div class="rec-tabs-row">
             <x-filament::tabs>
                 <x-filament::tabs.item
@@ -55,15 +53,13 @@
             </div>
         </div>
 
-        {{-- OVERVIEW --}}
         <div x-show="tab === 'overview'"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 -translate-y-1"
              x-transition:enter-end="opacity-100 translate-y-0">
 
             @if ($record->awaitsDocuments())
-                {{-- The tour has run but nothing has been filed — the one thing
-                     the programme still owes. --}}
+
                 <div class="ow-alert">
                     <span class="ow-alert__ic">{!! $ic('heroicon-o-exclamation-triangle', 18) !!}</span>
                     <span>{{ __('app.message.press_tour_documents_pending') }}</span>
@@ -100,7 +96,6 @@
             </section>
         </div>
 
-        {{-- DOCUMENTS — the report pack in Filament's own FileUpload panel. --}}
         <div x-show="tab === 'documents'" x-cloak
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 -translate-y-1"

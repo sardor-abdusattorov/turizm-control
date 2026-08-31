@@ -15,14 +15,6 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-/**
- * The press / blogger / info-tour registry export, laid out like the buyruq
- * it came from: a merged title banner, the document's own eight columns, and
- * a full-width separator row opening each of its three sections. The
- * plan-versus-fact columns (state, actual date, filed documents) are appended
- * on the right, so the sheet reads as the original with reporting added
- * rather than as a different table.
- */
 class PressToursExport implements FromArray, WithColumnWidths, WithEvents, WithTitle
 {
     use Exportable;
@@ -32,7 +24,6 @@ class PressToursExport implements FromArray, WithColumnWidths, WithEvents, WithT
     /** @var list<list<mixed>> */
     private array $rows = [];
 
-    /** 0-based data-array indexes of the section separator rows. */
     private array $sectionRows = [];
 
     /** @param  Builder<PressTour>  $query */
@@ -43,9 +34,7 @@ class PressToursExport implements FromArray, WithColumnWidths, WithEvents, WithT
         return __('app.export.press_tours_sheet');
     }
 
-    /**
-     * @return list<list<mixed>>
-     */
+    /** @return list<list<mixed>> */
     public function array(): array
     {
         $tours = (clone $this->query)
@@ -69,8 +58,6 @@ class PressToursExport implements FromArray, WithColumnWidths, WithEvents, WithT
 
         $number = 0;
 
-        // Sections in the buyruq's own order; one that the current filter left
-        // empty is skipped rather than printed as an empty heading.
         foreach (PressTourDirection::cases() as $direction) {
             $section = $tours->where('direction', $direction);
 
@@ -87,10 +74,9 @@ class PressToursExport implements FromArray, WithColumnWidths, WithEvents, WithT
                     $tour->name,
                     $tour->place,
                     $tour->period,
-                    // «6+11» is two groups, not a number — print what the
-                    // registry said.
+
                     $tour->peopleLabel(),
-                    // The document keeps both names in one cell, one per line.
+
                     implode("\n", $tour->responsibleNames()),
                     $tour->foreign_partner,
                     $tour->notes,
@@ -121,7 +107,6 @@ class PressToursExport implements FromArray, WithColumnWidths, WithEvents, WithT
                 $last = self::LAST_COLUMN;
                 $lastRow = $sheet->getHighestRow();
 
-                // Title banner above everything (shifts all rows down by one).
                 $sheet->insertNewRowBefore(1, 1);
                 $sheet->mergeCells("A1:{$last}1");
                 $sheet->setCellValue('A1', __('app.export.press_tours_title', ['year' => now()->year]));
@@ -144,8 +129,6 @@ class PressToursExport implements FromArray, WithColumnWidths, WithEvents, WithT
                     'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D9E1F2']],
                 ]);
 
-                // Section headings run the full width, as they do in the buyruq.
-                // Data index i sits on sheet row i + 3 (title + header offset).
                 foreach ($this->sectionRows as $index) {
                     $row = $index + 3;
                     $sheet->mergeCells("A{$row}:{$last}{$row}");

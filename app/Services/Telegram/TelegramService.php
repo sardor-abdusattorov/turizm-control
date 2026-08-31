@@ -13,15 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class TelegramService
 {
-    /**
-     * Queue an HTML message for delivery after the surrounding DB transaction
-     * commits. This is the path every NOTIFICATION should take — it keeps the
-     * 10-second Telegram timeout out of HTTP requests and open transactions.
-     * Interactive bot replies (webhook conversations) stay on send()/edit
-     * Message() because the user is waiting on the other side of the chat.
-     *
-     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
-     */
+    /** @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard */
     public function queue(?string $chatId, string $message, ?array $inlineKeyboard = null): void
     {
         if (! $this->token() || ! $chatId) {
@@ -31,11 +23,7 @@ class TelegramService
         SendTelegramMessage::dispatch($chatId, $message, $inlineKeyboard);
     }
 
-    /**
-     * Queue a photo (path relative to the private `local` disk) with a caption.
-     *
-     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
-     */
+    /** @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard */
     public function queuePhoto(?string $chatId, string $path, string $caption, ?array $inlineKeyboard = null): void
     {
         if (! $this->token() || ! $chatId) {
@@ -45,12 +33,7 @@ class TelegramService
         SendTelegramPhoto::dispatch($chatId, $path, $caption, $inlineKeyboard);
     }
 
-    /**
-     * Send an HTML message to a chat, optionally with an inline keyboard.
-     * Silently no-ops when the bot token or the chat id is missing.
-     *
-     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
-     */
+    /** @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard */
     public function send(?string $chatId, string $message, ?array $inlineKeyboard = null): bool
     {
         if (! $this->token() || ! $chatId) {
@@ -71,12 +54,7 @@ class TelegramService
         return $this->call('sendMessage', $payload);
     }
 
-    /**
-     * Replace the text + keyboard of an existing message. Used to mutate the
-     * notification bubble in place after an action (e.g. "→ ✅ Approved").
-     *
-     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
-     */
+    /** @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard */
     public function editMessage(?string $chatId, ?int $messageId, string $message, ?array $inlineKeyboard = null): bool
     {
         if (! $this->token() || ! $chatId || ! $messageId) {
@@ -98,14 +76,7 @@ class TelegramService
         return $this->call('editMessageText', $payload);
     }
 
-    /**
-     * Send a photo from the private `local` disk with an HTML caption. Falls
-     * back to a plain text message when the file no longer exists, so the
-     * notification survives a purged screenshot. Telegram caps captions at
-     * 1024 characters — longer ones are truncated.
-     *
-     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
-     */
+    /** @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard */
     public function sendPhoto(?string $chatId, string $path, string $caption, ?array $inlineKeyboard = null): bool
     {
         if (! $this->token() || ! $chatId) {
@@ -123,7 +94,6 @@ class TelegramService
         ];
 
         if ($inlineKeyboard !== null) {
-            // Multipart fields must be scalar — the keyboard rides as JSON.
             $payload['reply_markup'] = json_encode(['inline_keyboard' => $inlineKeyboard]);
         }
 
@@ -157,12 +127,7 @@ class TelegramService
         }
     }
 
-    /**
-     * Queue a document (path relative to the private `local` disk) with a
-     * caption — PDF payment orders ride this instead of sendPhoto.
-     *
-     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
-     */
+    /** @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard */
     public function queueDocument(?string $chatId, string $path, string $caption, ?array $inlineKeyboard = null): void
     {
         if (! $this->token() || ! $chatId) {
@@ -172,13 +137,7 @@ class TelegramService
         SendTelegramDocument::dispatch($chatId, $path, $caption, $inlineKeyboard);
     }
 
-    /**
-     * Send a file as a Telegram document with an HTML caption. Falls back to
-     * a text-only message when the file has vanished from disk, mirroring
-     * sendPhoto — the notification itself is never silently lost.
-     *
-     * @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard
-     */
+    /** @param  array<int, array<int, array{text: string, url?: string, callback_data?: string}>>|null  $inlineKeyboard */
     public function sendDocument(?string $chatId, string $path, string $caption, ?array $inlineKeyboard = null): bool
     {
         if (! $this->token() || ! $chatId) {
@@ -196,7 +155,6 @@ class TelegramService
         ];
 
         if ($inlineKeyboard !== null) {
-            // Multipart fields must be scalar — the keyboard rides as JSON.
             $payload['reply_markup'] = json_encode(['inline_keyboard' => $inlineKeyboard]);
         }
 
@@ -256,12 +214,7 @@ class TelegramService
         ], static fn ($value) => $value !== null));
     }
 
-    /**
-     * Publish the bot's command menu (the client's hamburger next to the
-     * input). Pass a language code to localise per client language.
-     *
-     * @param  array<int, array{command: string, description: string}>  $commands
-     */
+    /** @param  array<int, array{command: string, description: string}>  $commands */
     public function setMyCommands(array $commands, ?string $languageCode = null): bool
     {
         if (! $this->token()) {
@@ -289,11 +242,6 @@ class TelegramService
         return config('services.telegram.bot_token');
     }
 
-    /**
-     * A 403 from Telegram on a chat call means the user blocked the bot.
-     * Mark the link so reminders and broadcasts stop hammering a dead chat;
-     * the mark clears when the user talks to the bot again.
-     */
     private function markBlockedIfNeeded(int $status, mixed $chatId): void
     {
         if ($status !== 403 || ! $chatId) {
@@ -306,9 +254,7 @@ class TelegramService
             ->update(['blocked_at' => now()]);
     }
 
-    /**
-     * @param  array<string, mixed>  $payload
-     */
+    /** @param  array<string, mixed>  $payload */
     private function call(string $method, array $payload): bool
     {
         try {
@@ -340,11 +286,6 @@ class TelegramService
         }
     }
 
-    /**
-     * Strip the bot token out of an error string before it is logged or
-     * persisted — transport errors (e.g. cURL "could not resolve host")
-     * embed the full request URL, token and all.
-     */
     private function redactToken(?string $text): ?string
     {
         if ($text === null || $text === '') {
@@ -360,14 +301,7 @@ class TelegramService
         return preg_replace('#bot\d+:[A-Za-z0-9_-]+#', 'bot***', $text);
     }
 
-    /**
-     * Append a row to the Telegram message log for the content-bearing
-     * methods (the ones that actually deliver text to a person). The pure
-     * ACKs (answerCallbackQuery) and infra calls (setWebhook) are skipped —
-     * they have no "who got what message". Never lets logging break a send.
-     *
-     * @param  array<string, mixed>  $payload
-     */
+    /** @param  array<string, mixed>  $payload */
     private function record(string $method, array $payload, bool $ok, ?int $status, ?string $error): void
     {
         if (! in_array($method, ['sendMessage', 'editMessageText', 'sendPhoto'], true)) {
@@ -385,7 +319,6 @@ class TelegramService
                 'created_at' => now(),
             ]);
         } catch (\Throwable) {
-            // A logging failure must never take down the actual notification.
         }
     }
 }

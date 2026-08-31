@@ -14,21 +14,10 @@ use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * Participants of a project — the counterparties of its income contracts
- * (fees + sponsorship), with the payment state of each deal. Lives on the
- * project view page's «Участники» tab; the dashboard folds the same rows
- * into its single contracts table.
- */
 class ProjectParticipantsTableWidget extends TableWidget
 {
     use InteractsWithPageFilters;
 
-    /**
-     * Which income deals to show: 'participants' (fee contracts with a
-     * Contact), 'sponsors' (sponsorship contracts), or null for both. The
-     * project view tab shows both; the list-page count badges split them.
-     */
     public ?string $kind = null;
 
     protected int|string|array $columnSpan = 'full';
@@ -41,7 +30,7 @@ class ProjectParticipantsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            // No heading: the tab label / modal title already names it.
+
             ->heading(null)
             ->query(fn (): Builder => Contract::query()
                 ->visibleTo()

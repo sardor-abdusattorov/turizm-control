@@ -32,7 +32,6 @@ it('queues contract notifications instead of sending inline', function () {
     Queue::assertPushed(SendTelegramMessage::class, fn (SendTelegramMessage $job) => $job->chatId === '9001'
         && str_contains($job->message, $contract->number));
 
-    // Nothing hit the Telegram API from the request path itself.
     Http::assertNothingSent();
 });
 

@@ -39,9 +39,7 @@ class ContractForm
         return $schema
             ->columns(1)
             ->components([
-                // The reset warning is pointless while the «already signed»
-                // switch is on — saving then KEEPS the approved status, so the
-                // banner reacts to the live toggle and steps aside.
+
                 Section::make()
                     ->hiddenLabel()
                     ->visible(fn (?Contract $record, Get $get): bool => $record !== null
@@ -74,11 +72,7 @@ class ContractForm
                         Tab::make(__('app.label.basic_information'))
                             ->icon('heroicon-o-clipboard-document-list')
                             ->schema([
-                                // Legacy import switch: a signed paper contract is
-                                // filed as approved straight away — no chain, just
-                                // the signing date and the scans below. On edit it
-                                // converts a mistakenly-normal contract the same
-                                // way, invalidating whatever chain was queued.
+
                                 Toggle::make('already_signed')
                                     ->label(__('app.label.already_signed'))
                                     ->helperText(__('app.helper.already_signed'))
@@ -108,10 +102,6 @@ class ContractForm
                                     ->preload()
                                     ->live()
                                     ->afterStateUpdated(function (Set $set, mixed $state): void {
-                                        // The counterparty picker flips with the
-                                        // type; clear whichever party no longer
-                                        // applies so a contact contract never
-                                        // saves a stale sponsor and vice versa.
                                         if (self::typeUsesSponsor($state)) {
                                             $set('contact_id', null);
                                         } else {
@@ -120,10 +110,6 @@ class ContractForm
                                     })
                                     ->columnSpanFull(),
 
-                                // Counterparty — a Contact on most kinds, a
-                                // Sponsor on «Спонсорство». The type's
-                                // counterparty_kind toggles which picker shows;
-                                // exactly one of the two is filled and required.
                                 Select::make('contact_id')
                                     ->label(__('app.label.contact_single'))
                                     ->visible(fn (Get $get): bool => ! self::typeUsesSponsor($get('contract_type_id')))
@@ -159,9 +145,7 @@ class ContractForm
                                 Grid::make(['default' => 1, 'md' => 3])
                                     ->columnSpanFull()
                                     ->schema([
-                                        // Year first, then the (already shorter)
-                                        // project list — the two-step pick the
-                                        // registries are organised around.
+
                                         Select::make('project_year')
                                             ->label(__('app.label.project_year'))
                                             ->options(fn (): array => self::projectYearOptions())
@@ -185,9 +169,6 @@ class ContractForm
                                             ->columnSpan(['default' => 1, 'md' => 2]),
                                     ]),
 
-                                // Real contract subjects are long official
-                                // phrases — a growing textarea instead of a
-                                // one-line input.
                                 Textarea::make('title')
                                     ->label(__('app.label.contract_title'))
                                     ->required()
@@ -220,18 +201,8 @@ class ContractForm
                                         : null)
                                     ->columnSpanFull(),
 
-                                // The very same panel the view page's dossier
-                                // tab renders — one definition, so a scan looks
-                                // and behaves identically wherever it is filed.
-                                // No per-batch type question: files are just
-                                // files (лёгкость выше каталогизации).
                                 ContractDossierUpload::make()
-                                    // String entries in the panel's state are
-                                    // client-controllable paths on a private
-                                    // disk shared by every module, so only the
-                                    // contract's own scans may be named. On
-                                    // create there is no record yet and only
-                                    // fresh uploads can appear.
+
                                     ->preventFilePathTampering(allowFilePathUsing: fn (string $file, ?Contract $record): bool => (bool) $record?->attachments()
                                         ->where('file_path', $file)
                                         ->exists())
@@ -270,11 +241,6 @@ class ContractForm
             ]);
     }
 
-    /**
-     * Whether the chosen contract type faces a Sponsor rather than a Contact.
-     * Memoised for the request so the visible/required closures don't hit the
-     * database on every keystroke.
-     */
     protected static function typeUsesSponsor(mixed $contractTypeId): bool
     {
         if (blank($contractTypeId)) {
@@ -284,12 +250,7 @@ class ContractForm
         return in_array((int) $contractTypeId, ContractType::sponsorFacingIds(), true);
     }
 
-    /**
-     * Years that have active projects, newest first — the first step of the
-     * two-step project pick on the contract form.
-     *
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     protected static function projectYearOptions(): array
     {
         return Project::query()
@@ -303,13 +264,7 @@ class ContractForm
             ->all();
     }
 
-    /**
-     * Active projects grouped into optgroups by «тип · год», optionally
-     * narrowed to one year by the project_year step — the shared grouping
-     * lives on the Project model (the dashboard picker uses it too).
-     *
-     * @return array<string, array<int, string>>
-     */
+    /** @return array<string, array<int, string>> */
     protected static function projectOptionsGrouped(?string $year = null): array
     {
         return Project::groupedOptions($year);
@@ -339,12 +294,7 @@ class ContractForm
         }
     }
 
-    /**
-     * Pre-filled approver IDs (in order) from the manager's profile default
-     * recipients, falling back to the global settings flow when none are set.
-     *
-     * @return array<int, int>
-     */
+    /** @return array<int, int> */
     public static function defaultApproverIds(): array
     {
         $user = Auth::user();

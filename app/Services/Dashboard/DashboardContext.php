@@ -42,12 +42,7 @@ final class DashboardContext
         return $this->user?->hasAnyRole(['manager', 'super_admin']) ?? false;
     }
 
-    /**
-     * Contracts that are parked on THIS user right now — they're the current
-     * pending approver and no earlier step is still pending.
-     *
-     * @return Collection<int, Contract>
-     */
+    /** @return Collection<int, Contract> */
     public function awaitingMe(): Collection
     {
         return $this->memo['awaitingMe'] ??= Contract::query()
@@ -56,11 +51,7 @@ final class DashboardContext
             ->get();
     }
 
-    /**
-     * Subset of awaitingMe() whose review clock has already run out.
-     *
-     * @return Collection<int, Contract>
-     */
+    /** @return Collection<int, Contract> */
     public function overdueForMe(): Collection
     {
         return $this->memo['overdueForMe'] ??= $this->awaitingMe()
@@ -68,12 +59,7 @@ final class DashboardContext
             ->values();
     }
 
-    /**
-     * For managers: their own in-review contracts whose current approver has
-     * blown the SLA — "someone is sitting on my contract".
-     *
-     * @return Collection<int, Contract>
-     */
+    /** @return Collection<int, Contract> */
     public function myStalledContracts(): Collection
     {
         if (! $this->user) {
@@ -100,11 +86,7 @@ final class DashboardContext
                 && $a->status === ContractApprover::STATUS_PENDING);
     }
 
-    /**
-     * Counts that feed the manager's personal stat strip.
-     *
-     * @return array{drafts: int, in_review: int, rejected: int, stalled: int}
-     */
+    /** @return array{drafts: int, in_review: int, rejected: int, stalled: int} */
     public function managerCounts(): array
     {
         if (! $this->user) {

@@ -29,29 +29,13 @@ class Department extends Model
         'status' => 'boolean',
     ];
 
-    /**
-     * Department codes whose members may appear in an approval chain — feeds
-     * the approver pickers via scopeApprovers().
-     *
-     * @var array<int, string>
-     */
+    /** @var array<int, string> */
     public const APPROVER_CODES = ['legal', 'accounting', 'direction'];
 
-    /**
-     * Departments that MUST be represented in every contract approval chain —
-     * a chain is invalid unless it contains at least one approver from each.
-     *
-     * @var array<int, string>
-     */
+    /** @var array<int, string> */
     public const REQUIRED_APPROVER_CODES = ['legal', 'accounting'];
 
-    /**
-     * Department codes that form the auto-built sequential approval chain.
-     * The director is intentionally excluded — they join later as a separate,
-     * manually-triggered final sign-off (see Contract::appendDirectorApprover()).
-     *
-     * @var array<int, string>
-     */
+    /** @var array<int, string> */
     public const FLOW_CODES = ['legal', 'accounting'];
 
     public function head()
@@ -91,24 +75,13 @@ class Department extends Model
         return static::where('code', $code)->first();
     }
 
-    /**
-     * Active departments as id => localized name pairs (for Select::options).
-     *
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     public static function getActive(): array
     {
         return static::activeOptions('name');
     }
 
-    /**
-     * Canonical approval flow order: takes the admin-configured order
-     * from settings.approval.flow and falls back to FLOW_CODES when
-     * none is set or the saved one is empty. The director is never part of
-     * this chain — they are handed the contract manually as a final stage.
-     *
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     public static function approvalFlow(): array
     {
         $flow = settings('approval.flow');

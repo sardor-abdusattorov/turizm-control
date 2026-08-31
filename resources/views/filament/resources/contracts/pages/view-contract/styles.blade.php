@@ -275,7 +275,6 @@
             flex-shrink: 0;
         }
 
-
         /* document */
         .cw-doc {
             display: flex;

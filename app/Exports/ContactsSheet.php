@@ -16,16 +16,6 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-/**
- * One worksheet of the contacts export, scoped to a single contact type so a
- * column only ever appears where it applies: legal entities carry their
- * requisites (legal form, INN, OKED, director, bank details), individuals only
- * their PINFL. Shares the blue registry look with its sibling sheet.
- *
- * Fixed column widths (not ShouldAutoSize): auto-sizing stretched a column to
- * its longest value, so one long address blew the sheet up to unreadable
- * widths — wrapText inside a fixed grid reads far better.
- */
 class ContactsSheet implements FromQuery, WithColumnWidths, WithEvents, WithHeadings, WithMapping, WithStyles, WithTitle
 {
     use FormatsLocalizedValue;
@@ -135,14 +125,7 @@ class ContactsSheet implements FromQuery, WithColumnWidths, WithEvents, WithHead
         ];
     }
 
-    /**
-     * All bank accounts of a contact as three line-aligned multi-line cells
-     * (account / bank / МФО-SWIFT): line N of each cell describes the same
-     * account, prefixed with its currency so a company with UZS, USD and EUR
-     * accounts exports every requisite instead of a single arbitrary one.
-     *
-     * @return array{0: ?string, 1: ?string, 2: ?string}
-     */
+    /** @return array{0: ?string, 1: ?string, 2: ?string} */
     private function bankAccountColumns(Contact $contact): array
     {
         $accounts = $contact->bankAccounts;
@@ -155,8 +138,6 @@ class ContactsSheet implements FromQuery, WithColumnWidths, WithEvents, WithHead
             ? $account->currency->short_name.': '
             : '';
 
-        // One bank serving every account collapses to a single line; different
-        // banks stay per-line so line N still matches account line N.
         $banks = $accounts->map(fn ($a) => (string) $a->bank_name);
         $banks = $banks->unique()->count() === 1 ? $banks->take(1) : $banks;
 
@@ -167,12 +148,7 @@ class ContactsSheet implements FromQuery, WithColumnWidths, WithEvents, WithHead
         ];
     }
 
-    /**
-     * Fixed grid: long values (addresses, bank names) wrap inside their column
-     * instead of dragging the whole sheet into an unreadable width.
-     *
-     * @return array<string, int>
-     */
+    /** @return array<string, int> */
     public function columnWidths(): array
     {
         if ($this->isLegal()) {
@@ -208,17 +184,12 @@ class ContactsSheet implements FromQuery, WithColumnWidths, WithEvents, WithHead
         ];
     }
 
-    /**
-     * Columns whose digit strings must stay text so Excel keeps leading zeros
-     * and skips scientific notation: identifiers, phone and bank requisites.
-     *
-     * @return list<string>
-     */
+    /** @return list<string> */
     private function textColumns(): array
     {
         return $this->isLegal()
-            ? ['D', 'E', 'G', 'L', 'N'] // INN, OKED, phone, account number, MFO
-            : ['C', 'E'];               // PINFL, phone
+            ? ['D', 'E', 'G', 'L', 'N']
+            : ['C', 'E'];
     }
 
     private function isLegal(): bool

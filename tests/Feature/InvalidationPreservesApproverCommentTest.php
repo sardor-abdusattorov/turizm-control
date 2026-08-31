@@ -28,7 +28,6 @@ it('preserves an approver original comment when the chain is invalidated by an e
         'amount' => 1000,
     ]);
 
-    // The first approver already approved with their own comment.
     $approvedAt = now()->subHour();
     $row = ContractApprover::factory()->create([
         'contract_id' => $contract->id,
@@ -39,9 +38,6 @@ it('preserves an approver original comment when the chain is invalidated by an e
         'comment' => 'Looks good, ship it.',
     ]);
 
-    // The manager edits a trigger field — the chain should be invalidated
-    // but the original approver verdict, comment and timestamp must stay
-    // intact so the audit trail still reads "Approved · time · comment".
     $contract->update(['title' => 'Edited title']);
 
     $row->refresh();
@@ -116,12 +112,10 @@ it('rebuilds a fresh queued chain mirroring the previous one after an in-flow ed
         'status' => ContractApprover::STATUS_PENDING,
     ]);
 
-    // Trigger an in-flow edit on a re-approval field.
     $contract->update(['amount' => 5000]);
 
     $rows = $contract->approvers()->get();
 
-    // 4 rows total — two old INVALIDATED + two fresh QUEUED, same users + order.
     expect($rows)->toHaveCount(4)
         ->and($contract->fresh()->status)->toBe(Contract::STATUS_DRAFT)
         ->and($rows->where('status', ContractApprover::STATUS_INVALIDATED))->toHaveCount(2)

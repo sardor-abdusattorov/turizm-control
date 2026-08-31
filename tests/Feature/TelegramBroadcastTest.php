@@ -22,7 +22,7 @@ beforeEach(function () {
 it('sends the message to every linked telegram chat and counts them', function () {
     User::factory()->withTelegram('111')->create();
     User::factory()->withTelegram('222')->create();
-    User::factory()->create(); // not linked — must be skipped
+    User::factory()->create();
 
     $count = app(TelegramBroadcaster::class)->send('Plan o‘zgardi <important>');
 

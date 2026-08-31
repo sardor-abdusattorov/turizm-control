@@ -16,11 +16,6 @@ use App\Support\TelegramText;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * Renders every bot screen as ['text' => ..., 'keyboard' => ...]. Pure
- * presentation: no IO, no state, no decisions about what to send — those
- * live in TelegramBot. Easier to unit-test and to localise.
- */
 class BotMenuBuilder
 {
     public const PAGE_SIZE = 5;
@@ -135,12 +130,7 @@ class BotMenuBuilder
         ];
     }
 
-    /**
-     * Contracts the user already decided on (approved or rejected),
-     * sorted by their action time so the most recent verdict is on top.
-     *
-     * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
-     */
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
     public function historyList(User $user, int $page): array
     {
         return $this->renderContractList(
@@ -152,12 +142,7 @@ class BotMenuBuilder
         );
     }
 
-    /**
-     * All contracts visible system-wide — only super_admin / oversight
-     * roles see this entry from the main menu.
-     *
-     * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
-     */
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
     public function allContractsList(User $user, int $page): array
     {
         return $this->renderContractList(
@@ -169,11 +154,7 @@ class BotMenuBuilder
         );
     }
 
-    /**
-     * "Awaiting my decision" list.
-     *
-     * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
-     */
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
     public function awaitingList(User $user, int $page): array
     {
         return $this->renderContractList(
@@ -185,11 +166,7 @@ class BotMenuBuilder
         );
     }
 
-    /**
-     * Manager's own contracts.
-     *
-     * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
-     */
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
     public function myContractsList(User $user, int $page): array
     {
         return $this->renderContractList(
@@ -278,7 +255,6 @@ class BotMenuBuilder
                 $this->cbBtn('❌ '.__('app.approval.action.reject'), "rqr:{$requisition->id}"),
             ];
         } elseif ($requisition->acceptsRejectionFrom($viewer)) {
-            // Still queued behind somebody: a veto is offered, an approval is not.
             $keyboard[] = [$this->cbBtn('❌ '.__('app.approval.action.reject'), "rqr:{$requisition->id}")];
         }
 
@@ -431,12 +407,7 @@ class BotMenuBuilder
         return $icon.' '.$this->htmlEscape($requisition->status->label());
     }
 
-    /**
-     * The chain as one line per step, marked with where it stands — the same
-     * reading the register gives, sized for a phone.
-     *
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     private function renderApprovalChain(Requisition $requisition): array
     {
         return $requisition->activeApprovals()
@@ -546,11 +517,7 @@ class BotMenuBuilder
         ];
     }
 
-    /**
-     * Confirmation screen for unlinking the Telegram account.
-     *
-     * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
-     */
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
     public function unlinkConfirm(): array
     {
         return [
@@ -648,11 +615,6 @@ class BotMenuBuilder
     }
 
     /**
-     * One paginated register, whatever it holds: a numbered block per record,
-     * a row of index buttons that open the card, and page navigation. Every
-     * list in the bot goes through here so a second register is a query and a
-     * formatter, not another copy of this.
-     *
      * @param  array<int, string>  $eagerLoad
      * @param  callable(Model, int): string  $entry
      * @return array{text: string, keyboard: array<int, array<int, array<string, string>>>}
@@ -725,11 +687,6 @@ class BotMenuBuilder
         ];
     }
 
-    /**
-     * One compact-but-informative block per contract in a list: number +
-     * status on the first line, the title, then amount / responsible /
-     * counterparty so the row is meaningful without opening the card.
-     */
     private function contractListEntry(Contract $contract, int $position): string
     {
         $lines = [
@@ -844,10 +801,6 @@ class BotMenuBuilder
 
     private function htmlEscape(string $value): string
     {
-        // Telegram's HTML mode wants ONLY <, > and & escaped. Encoding
-        // quotes (ENT_QUOTES) turned "yoʻli" into "yo&apos;li" in the
-        // chat — the apostrophe entity is not in Telegram's accepted
-        // list, so it leaked through unescaped.
         return TelegramText::escape($value);
     }
 
@@ -858,10 +811,6 @@ class BotMenuBuilder
 
     private function panelUrl(): string
     {
-        // The Filament panel is mounted on the site root in this project
-        // (AdminPanelProvider::path('')), so don't slap an /admin suffix on
-        // top of it. Filament::getUrl() resolves the panel's actual path,
-        // so this stays correct if the path ever changes.
         return Filament::getUrl() ?: config('app.url');
     }
 

@@ -44,7 +44,6 @@ it('scopes the breakdown to the contracts the viewer is allowed to see', functio
     $contact = Contact::factory()->create();
     $manager = userWithPermission('view_any_contact');
 
-    // The manager's own contract — visible.
     Contract::factory()->create([
         'contact_id' => $contact->id,
         'currency_id' => $usd->id,
@@ -53,7 +52,6 @@ it('scopes the breakdown to the contracts the viewer is allowed to see', functio
         'responsible_id' => $manager->id,
     ]);
 
-    // Someone else's contract with the same counterparty — must not leak in.
     Contract::factory()->create([
         'contact_id' => $contact->id,
         'currency_id' => $usd->id,
@@ -82,7 +80,6 @@ it('scopes the visible contracts list to what the viewer may see', function () {
         'responsible_id' => $manager->id,
     ]);
 
-    // Someone else's contract with the same counterparty — must not leak.
     Contract::factory()->create([
         'contact_id' => $contact->id,
         'currency_id' => $usd->id,

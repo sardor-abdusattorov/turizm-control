@@ -18,7 +18,7 @@ class SendApprovalReminders extends Command
         $candidates = ContractApprover::query()
             ->where('status', ContractApprover::STATUS_PENDING)
             ->whereNotNull('due_at')
-            // Both review stages — the director's SLA must be reminded too.
+
             ->whereHas('contract', fn ($query) => $query->whereIn('status', [
                 Contract::STATUS_IN_REVIEW,
                 Contract::STATUS_IN_REVIEW_DIRECTOR,
@@ -29,8 +29,6 @@ class SendApprovalReminders extends Command
         $sent = 0;
 
         foreach ($candidates as $approver) {
-            // A deactivated user can't act — reminding them daily is noise;
-            // the admin resolves the stall via «Заменить согласующего».
             if (! $approver->user || ! $approver->user->status) {
                 continue;
             }

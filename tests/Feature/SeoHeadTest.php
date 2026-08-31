@@ -7,7 +7,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-/** Render the panel head-start hook (which carries the SEO/OG tags) to a string. */
 function seoHead(): string
 {
     clear_settings_cache();

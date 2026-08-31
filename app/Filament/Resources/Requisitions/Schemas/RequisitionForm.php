@@ -85,10 +85,6 @@ class RequisitionForm
             ]);
     }
 
-    /**
-     * The reason the last round came back, shown at the top of the form the
-     * author reopens — that is the whole point of them being here.
-     */
     protected static function lastVerdict(?Requisition $record): ?string
     {
         return $record?->approvals()

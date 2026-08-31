@@ -28,8 +28,7 @@ it('renders the contract history as a timeline with localized workflow labels', 
 
     Livewire::test(DocumentHistoryTimelineWidget::class, DocumentHistoryTimelineWidget::paramsFor($contract))
         ->assertOk()
-        // The stored raw English event renders through the app.activity.*
-        // translation, not verbatim.
+
         ->assertSee(__('app.activity.submitted'));
 });
 
@@ -51,14 +50,10 @@ it('opens the approver details as a native Filament modal', function () {
         'status' => ContractApprover::STATUS_PENDING,
     ]);
 
-    // The row action on the chain table mounts as a native Filament modal…
     Livewire::test(ContractApprovalChainTableWidget::class, ['contractId' => $contract->id])
         ->mountAction(TestAction::make('approverDetails')->table($approverRecord))
         ->assertActionMounted(TestAction::make('approverDetails')->table($approverRecord));
 
-    // …and its content view carries the step tile and the records table.
-    // (The modal body itself lives in a lazily-rendered wire:partial the
-    // test snapshot does not include, so the view renders directly.)
     $html = view('filament.resources.contracts.widgets.approver-details', [
         'record' => $contract->fresh()->loadMissing(['approvers.user', 'activeApprovers']),
         'userId' => $approver->id,

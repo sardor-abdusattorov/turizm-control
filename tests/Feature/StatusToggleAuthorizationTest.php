@@ -28,7 +28,5 @@ it('blocks the status toggle for a user without edit rights', function () {
     Livewire::test(ListContacts::class)
         ->call('updateTableColumnState', 'status', (string) $contact->getKey(), false);
 
-    // Rejected server-side — Filament short-circuits the write on a disabled
-    // column, so the status is untouched even though the request went through.
     expect($contact->fresh()->status)->toBeTrue();
 });

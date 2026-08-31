@@ -34,8 +34,6 @@ it('shows localized human labels in the history, not raw English event strings',
         'status' => Contract::STATUS_PENDING_DIRECTOR,
     ]);
 
-    // The accountant's approval that parked the contract for the director is
-    // stored as the raw event "Contract Awaiting Director".
     activity()
         ->performedOn($contract)
         ->event('Contract Awaiting Director')
@@ -102,27 +100,22 @@ it('keeps a cancelled approval verdict and comment in the per-approver modal', f
         'comment' => 'Looks good, ship it.',
     ]);
 
-    // Editing a trigger field cancels the chain; the verdict must survive.
     $contract->update(['title' => 'Edited mid-flow']);
 
     actingAs($user);
 
     $page = Livewire::test(ViewContract::class, ['record' => $contract->id]);
 
-    // The standalone history button/modal is gone — details live behind the
-    // chain table's row action.
     expect($page->html())->not->toContain('cw-history-btn');
 
-    // The per-approver modal keeps the cancelled verdict, the comment and
-    // the system note explaining WHY the row was cancelled.
     $modal = view('filament.resources.contracts.widgets.approver-details', [
         'record' => $contract->fresh()->loadMissing(['approvers.user', 'activeApprovers']),
         'userId' => $approver->id,
         'activities' => collect(),
     ])->render();
 
-    expect($modal)->toContain('Looks good, ship it.')  // their own comment
-        ->and($modal)->toContain('is-past')            // cancelled row, dimmed
+    expect($modal)->toContain('Looks good, ship it.')
+        ->and($modal)->toContain('is-past')
         ->and($modal)->toContain(__('app.message.invalidated_on_edit'));
 });
 
@@ -164,8 +157,6 @@ it('never offers a PDF preview — there is no converter any more', function () 
 
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
-    // The converter routes are gone. Match the paths themselves rather than a
-    // bare '/pdf', which the dossier panel's accepted MIME list now contains.
     expect($html)->not->toContain($contract->id.'/pdf')
         ->and($html)->not->toContain('pdf/inline')
         ->and($html)->not->toContain('pdf.download');
@@ -181,7 +172,6 @@ it('renders the approval chain as a Filament table with distinct step statuses',
         'status' => Contract::STATUS_IN_REVIEW,
     ]);
 
-    // First reviewing now, second still queued behind them.
     ContractApprover::factory()->create([
         'contract_id' => $contract->id, 'user_id' => $first->id, 'order' => 1,
         'status' => ContractApprover::STATUS_PENDING, 'due_at' => now()->addDays(2),
@@ -195,30 +185,26 @@ it('renders the approval chain as a Filament table with distinct step statuses',
 
     $html = Livewire::test(ViewContract::class, ['record' => $contract->id])->html();
 
-    // Native Filament tabs + Alpine state.
     expect($html)->toContain("tab: 'overview'")
         ->and($html)->toContain('fi-tabs')
         ->and($html)->toContain('rec-tabs-row')
-        // Status pill now rides on the tab bar instead of a separate strip.
+
         ->and($html)->toContain('rec-tabs-row__side')
         ->and($html)->not->toContain('cw-meta')
-        // Progress band: a single continuous fill track + status legend + the
-        // "Awaiting" tile (the old per-step segmented bar was replaced).
+
         ->and($html)->toContain('cw-prog__track')
         ->and($html)->toContain('cw-prog__fill')
         ->and($html)->toContain('cw-prog__legend')
         ->and($html)->toContain('cw-prog__await')
-        // The chain itself is a nested Filament table widget — the hand-rolled
-        // timeline (and its eye button) is gone.
+
         ->and($html)->not->toContain('cw-chain')
         ->and($html)->not->toContain('cw-eye');
 
-    // The chain widget renders both people and tells the two states apart.
     Livewire::test(ContractApprovalChainTableWidget::class, ['contractId' => $contract->id])
         ->assertOk()
         ->assertSee($first->name)
         ->assertSee($second->name)
-        // Queued step shows the "In queue" badge, current shows "Reviewing".
+
         ->assertSee(__('app.contract_approver.status.queued'))
         ->assertSee(__('app.contract_approver.status.pending'));
 });

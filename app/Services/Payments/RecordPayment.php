@@ -5,12 +5,6 @@ namespace App\Services\Payments;
 use App\Models\Contract;
 use App\Models\Payment;
 
-/**
- * Records a payment against a contract and fires the "payment recorded"
- * notification. Used by the contract view's quick action; the standalone
- * payment resource creates through Filament's own flow (which also calls the
- * notifier in afterCreate).
- */
 class RecordPayment
 {
     public function __construct(private PaymentNotifier $notifier) {}

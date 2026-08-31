@@ -59,13 +59,11 @@ it('lets the author swap the approver chain while the contract is a draft', func
         'status' => ContractApprover::STATUS_QUEUED,
     ]);
 
-    // Replace [first] with [newLawyer, accountant] — order matters, both depts present.
     Livewire::test(EditContract::class, ['record' => $contract->id])
         ->fillForm(['approver_chain' => [$newLawyer->id, $accountant->id]])
         ->call('save')
         ->assertHasNoFormErrors();
 
-    // The new chain is live, in order...
     $active = $contract->fresh()->activeApprovers()->orderBy('order')->get();
     expect($active)->toHaveCount(2)
         ->and($active[0]->user_id)->toBe($newLawyer->id)
@@ -74,7 +72,6 @@ it('lets the author swap the approver chain while the contract is a draft', func
         ->and($active[1]->user_id)->toBe($accountant->id)
         ->and($active[1]->order)->toBe(2);
 
-    // ...and the removed approver was INVALIDATED, never deleted.
     expect($contract->fresh()->approvers()
         ->where('user_id', $first->id)
         ->where('status', ContractApprover::STATUS_INVALIDATED)

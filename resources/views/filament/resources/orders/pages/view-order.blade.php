@@ -36,7 +36,6 @@
 <x-filament-panels::page>
 <div class="ow">
 
-    {{-- FILE CARD — FULL WIDTH --}}
     @if ($record->fileExists())
         <section class="ow-card">
             <div class="ow-hd">
@@ -71,8 +70,7 @@
                     </div>
                 </div>
             </div>
-            {{-- One primary action: serve the file. The browser previews what
-                 it can and downloads the rest. The header keeps the rest. --}}
+
             <div class="ow-file__act">
                 @if ($fileViewUrl)
                     <a href="{{ $fileViewUrl }}" target="_blank" rel="noopener" class="ow-btn ow-btn--primary">
@@ -84,7 +82,6 @@
         </section>
     @endif
 
-    {{-- INFORMATION — FULL WIDTH TABLE --}}
     <section class="ow-card">
         <div class="ow-hd">
             <span class="ow-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span>
@@ -125,7 +122,6 @@
         </div>
     </section>
 
-    {{-- The other half of the chain: what the centre issued on this basis. --}}
     @unless ($isPrCenter)
         <section class="ow-card">
             <div class="ow-hd">

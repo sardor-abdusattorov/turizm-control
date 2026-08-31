@@ -22,9 +22,7 @@ class ListRequisitions extends ListRecords
         ];
     }
 
-    /**
-     * @return array<string, Tab>
-     */
+    /** @return array<string, Tab> */
     public function getTabs(): array
     {
         $tabs = [
@@ -52,7 +50,6 @@ class ListRequisitions extends ListRecords
         return $tabs;
     }
 
-    /** Whatever is actually waiting on the viewer leads, when there is any. */
     public function getDefaultActiveTab(): string|int|null
     {
         return $this->awaitingMeCount() > 0 ? 'awaiting_me' : 'all';

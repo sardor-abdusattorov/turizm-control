@@ -44,9 +44,6 @@ class PaymentForm
                                     : PaymentSubject::Contract->value,
                             ))
                             ->afterStateUpdated(function (Set $set, mixed $state): void {
-                                // Exactly one side is ever filled — clear the
-                                // other so a switched subject cannot save a
-                                // stale contract next to a project.
                                 if ($state === PaymentSubject::Project->value) {
                                     $set('contract_id', null);
                                     $set('percent', null);
@@ -108,8 +105,6 @@ class PaymentForm
                             ->helperText(fn (Get $get): ?string => self::remainingHelper($get('contract_id')))
                             ->rule(static fn (Get $get) => new PaymentWithinRemaining(Contract::find($get('contract_id')))),
 
-                        // A project payment has no total to be a share of, so
-                        // it carries its own sum and currency instead.
                         Select::make('currency_id')
                             ->label(__('app.label.currency_single'))
                             ->options(fn () => Currency::query()->where('status', true)->pluck('short_name', 'id'))
@@ -152,11 +147,7 @@ class PaymentForm
         return $get('subject') === PaymentSubject::Project->value;
     }
 
-    /**
-     * Approved contracts that still have room for another instalment.
-     *
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     private static function approvedContractOptions(): array
     {
         return Contract::query()

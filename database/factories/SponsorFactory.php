@@ -5,9 +5,7 @@ namespace Database\Factories;
 use App\Models\Sponsor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<Sponsor>
- */
+/** @extends Factory<Sponsor> */
 class SponsorFactory extends Factory
 {
     protected $model = Sponsor::class;

@@ -41,8 +41,8 @@ it('renders the Approvers column with avatars that mount the contract flow actio
     $html = Livewire::test(ListContracts::class)->html();
 
     expect($html)
-        ->toContain('Alisher Lawyer')                       // name in avatar title/alt
-        ->toContain("mountTableAction('contractFlow'");     // whole cell opens the flow
+        ->toContain('Alisher Lawyer')
+        ->toContain("mountTableAction('contractFlow'");
 });
 
 it('renders the approval flow modal as a stepper of the active chain', function () {
@@ -82,7 +82,6 @@ it('lists invalidated attempts under previous attempts with comments preserved',
     $approver = User::factory()->create(['name' => 'Olim Repeated']);
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
 
-    // First attempt: approved then invalidated by an edit (comment preserved).
     ContractApprover::factory()->create([
         'contract_id' => $contract->id,
         'user_id' => $approver->id,
@@ -93,7 +92,6 @@ it('lists invalidated attempts under previous attempts with comments preserved',
         'acted_at' => now()->subDays(2),
     ]);
 
-    // Second attempt: currently reviewing again.
     ContractApprover::factory()->create([
         'contract_id' => $contract->id,
         'user_id' => $approver->id,
@@ -142,9 +140,6 @@ it('filters an invalidated row under the verdict it actually shows, not "invalid
     $approver = User::factory()->create(['name' => 'Kept Verdict']);
     $contract = Contract::factory()->create(['status' => Contract::STATUS_IN_REVIEW]);
 
-    // The Статус column renders this row's displayStatus() — the preserved
-    // "approved" verdict, not the raw "invalidated" status — so the filter
-    // must follow the same rule or it silently disagrees with what's on screen.
     $keptVerdict = ContractApprover::factory()->create([
         'contract_id' => $contract->id,
         'user_id' => $approver->id,

@@ -49,11 +49,11 @@ it('exports the visible payments with sequential numbering and mapped columns', 
 
     $row = $export->map(Payment::query()->where('percent', 40)->first());
 
-    expect($row[0])->toBe(1)                                              // sequential №
-        ->and($row[1])->toBe(PaymentSubject::Contract->label())           // what it settles
-        ->and($row[2])->toBe('DEMO-2026-001 · Office lease')              // the contract itself
-        ->and($row[3])->toBe('40%')                                       // formatted percent (canonical)
-        ->and($row[4])->toBeNull();                                       // no absolute sum on a contract payment
+    expect($row[0])->toBe(1)
+        ->and($row[1])->toBe(PaymentSubject::Contract->label())
+        ->and($row[2])->toBe('DEMO-2026-001 · Office lease')
+        ->and($row[3])->toBe('40%')
+        ->and($row[4])->toBeNull();
 });
 
 it('exports a direct project payment as a sum rather than a share', function () {

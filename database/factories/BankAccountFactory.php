@@ -6,9 +6,7 @@ use App\Models\BankAccount;
 use App\Models\Contact;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<BankAccount>
- */
+/** @extends Factory<BankAccount> */
 class BankAccountFactory extends Factory
 {
     protected $model = BankAccount::class;

@@ -48,8 +48,6 @@
             $submittedAt = $this->submittedAt();
         @endphp
 
-        {{-- Native Filament tabs — overall status pill rides on the right so
-             it stays visible on every tab without a redundant strip up top. --}}
         <div class="rec-tabs-row">
             <x-filament::tabs>
                 <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">

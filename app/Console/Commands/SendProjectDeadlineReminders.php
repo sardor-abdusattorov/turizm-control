@@ -12,13 +12,7 @@ use Illuminate\Console\Command;
 #[Description('Remind directors and managers about projects starting soon')]
 class SendProjectDeadlineReminders extends Command
 {
-    /**
-     * Days-before-start marks at which the countdown fires. The command runs
-     * once a day, and each project matches a mark exactly once — so nobody
-     * gets the same reminder twice.
-     *
-     * @var array<int, int>
-     */
+    /** @var array<int, int> */
     private const THRESHOLD_DAYS = [14, 7, 3, 1];
 
     public function handle(ProjectDeadlineNotifier $notifier): int

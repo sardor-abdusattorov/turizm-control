@@ -33,8 +33,7 @@ class PaymentsTable
     public static function configure(Table $table): Table
     {
         return $table
-            // Eager-load the relation columns; without it every row on the
-            // page fires its own query for them.
+
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['contract', 'project', 'currency', 'creator']))
             ->defaultSort('paid_at', 'desc')
             ->groups([
@@ -97,8 +96,7 @@ class PaymentsTable
 
                 ImageColumn::make('screenshots')
                     ->label(__('app.label.screenshot'))
-                    // Thumbnails render images only — a PDF payment order has
-                    // no preview and would show as a broken tile.
+
                     ->state(fn (Payment $record): array => array_values(array_filter(
                         $record->screenshots ?? [],
                         fn (string $path): bool => ! Payment::isPdf($path),

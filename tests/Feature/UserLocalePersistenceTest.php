@@ -27,8 +27,6 @@ it('overwrites a previously saved language on a new switch', function () {
 });
 
 it('ignores the event for guests', function () {
-    // The switch is also visible on the login page (outsidePanels) — a guest
-    // click must not crash the listener.
     event(new LocaleChanged('en'));
 
     expect(true)->toBeTrue();

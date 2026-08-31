@@ -320,20 +320,13 @@ class ProfileSettings extends Page implements HasActions, HasForms
             });
     }
 
-    /**
-     * @return array<int, array{id: string, ip_address: ?string, browser: string, platform: string, is_current_device: bool, last_active: string}>
-     */
+    /** @return array<int, array{id: string, ip_address: ?string, browser: string, platform: string, is_current_device: bool, last_active: string}> */
     public function getSessions(): array
     {
         return app(UserSessions::class)->forCurrentUser();
     }
 
-    /**
-     * Active users from approver departments only, grouped by department,
-     * with avatar markup so the Select can show photo + name.
-     *
-     * @return array<string, array<int, string>>
-     */
+    /** @return array<string, array<int, string>> */
     protected function getGroupedRecipientOptions(): array
     {
         return User::approverOptionsGroupedByDepartment(Auth::id());

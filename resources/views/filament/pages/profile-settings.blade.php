@@ -7,7 +7,6 @@
         {{ $this->passwordForm }}
     </form>
 
-    {{-- Browser Sessions Section --}}
     <x-filament::section class="mt-8" aside>
         <x-slot name="heading">
             {{ __('app.label.browser_sessions') }}

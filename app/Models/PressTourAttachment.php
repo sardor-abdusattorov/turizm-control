@@ -9,12 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
-/**
- * A paper a finished tour left behind — the report, the media coverage it
- * generated, photos, the programme, the participant list, an act. Mirrors
- * ContractAttachment: private disk, signed expiring links, file removed with
- * the record.
- */
 class PressTourAttachment extends Model
 {
     use HasFactory;
@@ -54,9 +48,6 @@ class PressTourAttachment extends Model
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
-    /**
-     * Signed expiring link — the private disk serves files only this way.
-     */
     public function url(): ?string
     {
         if (! $this->fileExists()) {

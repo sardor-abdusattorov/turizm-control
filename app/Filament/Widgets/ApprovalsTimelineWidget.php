@@ -14,10 +14,6 @@ use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
-/**
- * The whole audit trail of one document's chain: the round that is running
- * reads first, the rounds it replaced sit underneath as history.
- */
 class ApprovalsTimelineWidget extends TableWidget
 {
     public int $requisitionId;
@@ -37,8 +33,7 @@ class ApprovalsTimelineWidget extends TableWidget
                 ->orderBy('order')
                 ->orderBy('id'))
             ->description(fn (): string => $this->progressSummary())
-            // A voided round recedes into history rather than competing with
-            // the round that is actually running.
+
             ->recordClasses(fn (Approval $record): ?string => $record->isVoided() ? 'fi-approval-voided' : null)
             ->columns([
                 ViewColumn::make('approver')
@@ -79,10 +74,6 @@ class ApprovalsTimelineWidget extends TableWidget
             ->emptyStateIcon('heroicon-o-user-group');
     }
 
-    /**
-     * Everything the record holds about one person on this document — the row
-     * itself plus every other round they were asked in.
-     */
     protected function detailsAction(): Action
     {
         return Action::make('approverDetails')
@@ -101,9 +92,7 @@ class ApprovalsTimelineWidget extends TableWidget
             ->modalCancelAction(false);
     }
 
-    /**
-     * @return Collection<int, Approval>
-     */
+    /** @return Collection<int, Approval> */
     protected function attemptsOf(Approval $approval): Collection
     {
         return Approval::query()
@@ -115,7 +104,6 @@ class ApprovalsTimelineWidget extends TableWidget
             ->get();
     }
 
-    /** Steps in the round that is running — voided rounds must not inflate it. */
     protected function liveSteps(): int
     {
         return $this->record()?->activeApprovals()->pluck('order')->unique()->count() ?? 0;

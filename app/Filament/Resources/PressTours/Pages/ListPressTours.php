@@ -21,8 +21,7 @@ class ListPressTours extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            // The sheet handed upward once the tours have run; it exports
-            // whatever the table currently shows, filters and tab included.
+
             ExportXlsxAction::make()
                 ->visible(fn (): bool => ExportPermission::allows('export_press_tour'))
                 ->action(fn ($livewire) => Excel::download(
@@ -33,12 +32,7 @@ class ListPressTours extends ListRecords
         ];
     }
 
-    /**
-     * The registry's three sections, kept as tabs so the list opens the way
-     * the buyruq reads: everything, then hosted / domestic / sent abroad.
-     *
-     * @return array<string, Tab>
-     */
+    /** @return array<string, Tab> */
     public function getTabs(): array
     {
         $tabs = [

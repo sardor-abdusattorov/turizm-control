@@ -11,9 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * A request that goes round a chain of approvers before it counts as settled.
- */
 class Requisition extends Model
 {
     /** @use HasFactory<RequisitionFactory> */
@@ -52,19 +49,12 @@ class Requisition extends Model
         return $prefix.str_pad((string) $sequence, 3, '0', STR_PAD_LEFT);
     }
 
-    /**
-     * Days each approver gets, stamped onto their step the moment it opens —
-     * changing the setting never moves a deadline somebody is already working
-     * to.
-     */
     public static function reviewDays(): int
     {
         return max(1, (int) settings('requisition.review_days', 3));
     }
 
-    /**
-     * @return array<int, int>
-     */
+    /** @return array<int, int> */
     public static function defaultApproverIds(): array
     {
         $configured = settings('requisition.approver_ids', []);
@@ -116,10 +106,6 @@ class Requisition extends Model
     }
 
     /**
-     * Everyone sees their own requisitions and the ones they are asked about.
-     * Oversight — anyone holding `view_all_requisitions` — sees the register
-     * whole.
-     *
      * @param  Builder<Requisition>  $query
      * @return Builder<Requisition>
      */

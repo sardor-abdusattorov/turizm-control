@@ -113,10 +113,6 @@ class ContactForm
                             ->default(true),
                     ]),
 
-                // A counterparty holds one account per currency (UZS / USD / EUR
-                // / RUB); the generated contract pulls the account matching the
-                // deal's currency. Shown for legal entities on both the standalone
-                // form and the inline create-option.
                 Section::make(__('app.label.bank_requisites'))
                     ->collapsible()
                     ->visible(fn (Get $get) => $get('type') === Contact::TYPE_LEGAL)
@@ -126,13 +122,6 @@ class ContactForm
             ]);
     }
 
-    /**
-     * The bank-accounts editor. On the standalone contact form it binds to the
-     * HasMany relationship, so Filament persists the rows through the contact. In
-     * the inline create-option (adding a counterparty while drafting a contract)
-     * there is no saved contact to bind to yet, so it stays a plain repeater and
-     * ContactForm::createWithBankAccounts() writes the rows by hand.
-     */
     protected static function bankAccountsRepeater(bool $inline): Repeater
     {
         $repeater = Repeater::make('bankAccounts')
@@ -151,15 +140,11 @@ class ContactForm
                             ->placeholder(__('app.label.bank_account_any_currency'))
                             ->native(false),
 
-                        // No ->numeric() (Laravel would read max:N as "value <= N"
-                        // and reject a 20-digit account) and no strict minimum: a
-                        // foreign account can be short (RX France: 11 digits) while
-                        // an Uzbek one is 20.
                         TextInput::make('account_number')
                             ->label(__('app.label.bank_account'))
                             ->helperText(__('app.helper.bank_account'))
                             ->required()
-                            ->minLength(5) // a floor to catch typos, not a format
+                            ->minLength(5)
                             ->maxLength(34),
 
                         TextInput::make('bank_name')
@@ -167,8 +152,6 @@ class ContactForm
                             ->columnSpanFull()
                             ->maxLength(255),
 
-                        // Foreign requisites carry the bank's own address; Uzbek
-                        // ones leave it blank.
                         TextInput::make('bank_address')
                             ->label(__('app.label.bank_address'))
                             ->columnSpanFull()
@@ -186,8 +169,6 @@ class ContactForm
                     ]),
             ]);
 
-        // Only the standalone form has a persisted parent to bind the HasMany to;
-        // the inline create-option stays a plain repeater (persisted by hand).
         if (! $inline) {
             $repeater->relationship()->orderColumn('sort');
         }
@@ -195,14 +176,7 @@ class ContactForm
         return $repeater;
     }
 
-    /**
-     * Persist a counterparty created inline from the contract form together with
-     * the bank accounts entered in the same modal. The inline repeater is a plain
-     * one (no parent existed while it rendered), so its rows arrive as nested data
-     * and are written to the HasMany here. Empty rows are dropped.
-     *
-     * @param  array<string, mixed>  $data
-     */
+    /** @param  array<string, mixed>  $data */
     public static function createWithBankAccounts(array $data): Contact
     {
         $accounts = collect($data['bankAccounts'] ?? [])

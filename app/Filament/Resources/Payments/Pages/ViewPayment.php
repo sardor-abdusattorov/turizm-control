@@ -45,9 +45,7 @@ class ViewPayment extends ViewRecord
             : null;
     }
 
-    /**
-     * @return list<array{url: string, name: string, pdf: bool}>
-     */
+    /** @return list<array{url: string, name: string, pdf: bool}> */
     public function screenshotFiles(): array
     {
         return $this->record->screenshotFiles();

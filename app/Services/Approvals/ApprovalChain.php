@@ -12,16 +12,7 @@ use Illuminate\Support\Collection;
 
 class ApprovalChain
 {
-    /**
-     * Lay the chain out for the round that is currently running.
-     *
-     * Voided rows are history and are never touched: once a round is annulled
-     * its rows keep the verdicts they carried, and the next round is written
-     * as new rows. That is the only way a record can show that somebody
-     * rejected it, that it was corrected, and that it went round again.
-     *
-     * @param  array<int, int>  $userIds
-     */
+    /** @param  array<int, int>  $userIds */
     public function sync(Model $record, array $userIds): void
     {
         $userIds = array_values(array_unique(array_filter($userIds)));
@@ -63,14 +54,7 @@ class ApprovalChain
         $record->unsetRelation('approvals');
     }
 
-    /**
-     * Take everybody off the chain who is no longer on it. Somebody whose turn
-     * had already opened is voided — the record should show they were asked
-     * and then taken off — while somebody still waiting their turn never
-     * happened at all and leaves nothing behind. A verdict is never removed.
-     *
-     * @param  array<int, int>  $userIds
-     */
+    /** @param  array<int, int>  $userIds */
     protected function dropRemoved(Model $record, array $userIds): void
     {
         $record->approvals()
@@ -89,12 +73,7 @@ class ApprovalChain
             });
     }
 
-    /**
-     * The round the chain is on: the one the live rows already belong to, or
-     * the next one when every previous row has been voided.
-     *
-     * @param  Collection<int, Approval>  $live
-     */
+    /** @param  Collection<int, Approval>  $live */
     protected function currentRound(Model $record, Collection $live): int
     {
         if ($live->isNotEmpty()) {
@@ -105,10 +84,6 @@ class ApprovalChain
     }
 
     /**
-     * The chain runs in the order the author picked, the same way the contract
-     * chain does — the sequence is a statement of intent, not something to be
-     * re-sorted underneath them. Ids that name nobody are dropped.
-     *
      * @param  array<int, int>  $userIds
      * @return array<int, int>
      */
@@ -126,12 +101,7 @@ class ApprovalChain
         ));
     }
 
-    /**
-     * The step whose turn it is — every row sharing the lowest open order, so
-     * two people on the same step are asked together.
-     *
-     * @return Collection<int, Approval>
-     */
+    /** @return Collection<int, Approval> */
     public function nextInLine(Model $record): Collection
     {
         $pending = $record->approvals()

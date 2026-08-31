@@ -22,7 +22,7 @@ function runRule(?Contract $contract, mixed $value): ?string
 }
 
 it('fails when the percent exceeds the contract remaining', function () {
-    $contract = Contract::factory()->create(['paid_percent' => 80]); // 20% remaining
+    $contract = Contract::factory()->create(['paid_percent' => 80]);
 
     expect(runRule($contract, 25))->not->toBeNull();
 });

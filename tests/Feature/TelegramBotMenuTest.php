@@ -31,8 +31,6 @@ it('shows the locale picker after linking', function () {
     $url = app(TelegramBot::class)->connectUrl($user);
     $token = str($url)->after('start=')->value();
 
-    // Linking is a two-step handshake now: /start shows the confirmation,
-    // the «yes, it's me» tap completes it — and THEN the picker appears.
     app(TelegramBot::class)->handleUpdate([
         'message' => [
             'chat' => ['id' => 111],
@@ -235,7 +233,6 @@ it('renders contract title and amount inside the awaiting list body', function (
 it('confirms then deletes the telegram link on /unlink', function () {
     $user = User::factory()->withTelegram('888')->create();
 
-    // /unlink — bot replies with the confirmation card
     app(TelegramBot::class)->handleUpdate([
         'message' => [
             'chat' => ['id' => 888],
@@ -243,7 +240,6 @@ it('confirms then deletes the telegram link on /unlink', function () {
         ],
     ]);
 
-    // user taps the confirm button
     app(TelegramBot::class)->handleUpdate([
         'callback_query' => [
             'id' => 'cb',
@@ -283,7 +279,6 @@ it('hides the Telegram connect prompt once the user has linked', function () {
 it('shows the history menu item when the user has past approvals', function () {
     $approver = User::factory()->withTelegram('700')->create(['status' => User::STATUS_ACTIVE]);
 
-    // One approved + one rejected — both go into history.
     foreach ([
         [ContractApprover::STATUS_APPROVED, Contract::STATUS_APPROVED],
         [ContractApprover::STATUS_REJECTED, Contract::STATUS_REJECTED],

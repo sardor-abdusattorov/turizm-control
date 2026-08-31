@@ -116,10 +116,6 @@ class RequisitionsTable
             ->emptyStateIcon('heroicon-o-inbox-arrow-down');
     }
 
-    /**
-     * The chain at a glance — progress, the people on it and their verdicts —
-     * opening the full audit trail on click.
-     */
     protected static function approversColumn(): ViewColumn
     {
         return ViewColumn::make('approvers')
@@ -143,9 +139,7 @@ class RequisitionsTable
             );
     }
 
-    /**
-     * @return array<int, mixed>
-     */
+    /** @return array<int, mixed> */
     protected static function filters(): array
     {
         return [

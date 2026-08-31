@@ -24,16 +24,11 @@ class TelegramMessageLog extends Model
         'created_at' => 'datetime',
     ];
 
-    /** The Telegram account the message was sent to (if still linked). */
     public function telegramUser(): BelongsTo
     {
         return $this->belongsTo(TelegramUser::class, 'chat_id', 'chat_id');
     }
 
-    /**
-     * The message body as a human would read it: HTML tags stripped and
-     * entities decoded, so `Hello <b>team</b> &amp; co` becomes `Hello team & co`.
-     */
     protected function cleanText(): Attribute
     {
         return Attribute::get(fn (): ?string => $this->text === null
@@ -41,12 +36,6 @@ class TelegramMessageLog extends Model
             : trim(html_entity_decode(strip_tags($this->text), ENT_QUOTES | ENT_HTML5)));
     }
 
-    /**
-     * Telegram returns failures as a JSON blob
-     * (`{"ok":false,"error_code":400,"description":"Bad Request: ..."}`). Pull
-     * out just the human `description`; fall back to the raw string for
-     * non-JSON transport errors (timeouts, DNS, etc.).
-     */
     protected function humanError(): Attribute
     {
         return Attribute::get(function (): ?string {

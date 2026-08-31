@@ -47,10 +47,6 @@ class ViewRequisition extends ViewRecord
         ];
     }
 
-    /**
-     * The reason the last round came back — the first thing the author needs
-     * to see on a rejected requisition.
-     */
     public function rejectionReason(): ?string
     {
         if ($this->record->status !== RequisitionStatus::Rejected) {

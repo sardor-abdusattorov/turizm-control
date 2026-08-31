@@ -28,10 +28,6 @@ class TelegramUser extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Whether this chat's owner has blocked the bot (Telegram answered 403) —
-     * the delivery jobs skip such chats instead of burning retries on them.
-     */
     public static function isBlockedChat(string $chatId): bool
     {
         return static::query()

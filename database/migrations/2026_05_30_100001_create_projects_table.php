@@ -12,8 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('type', 20)->default('international');
             $table->string('name');
-            // The buyruq the participation rests on («на основании приказа
-            // № 119-АФ») — one per project; its contracts inherit the basis.
+
             $table->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
             $table->string('venue')->nullable();
             $table->date('starts_on')->nullable();
@@ -24,8 +23,7 @@ return new class extends Migration
             $table->foreignId('area_currency_id')->nullable()->constrained('currencies')->restrictOnDelete();
             $table->decimal('stand_cost', 15, 2)->nullable();
             $table->foreignId('stand_currency_id')->nullable()->constrained('currencies')->restrictOnDelete();
-            // Local events keep a photo-report link; every money and
-            // participation figure derives from the project's contracts.
+
             $table->string('photo_report_url')->nullable();
             $table->json('gallery')->nullable();
             $table->text('description')->nullable();

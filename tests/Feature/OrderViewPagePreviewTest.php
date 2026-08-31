@@ -53,8 +53,6 @@ it('renders the file card with a serve link for docx orders', function () {
 
     $html = Livewire::test(ViewPrCenterOrder::class, ['record' => $order->id])->html();
 
-    // Every file type now gets the same single action — serve the file; the
-    // browser previews what it can and downloads a docx.
     expect($html)->toContain('sample.docx')
         ->toContain('DOCX')
         ->toContain(route('orders.file.inline', ['order' => $order]))
@@ -71,8 +69,6 @@ it('hides the preview card when the order has no file on disk', function () {
 
     $html = Livewire::test(ViewPrCenterOrder::class, ['record' => $order->id])->html();
 
-    // No file -> the whole card is gated behind fileExists(), so the serve
-    // URL never appears.
     expect($html)->not->toContain('<iframe')
         ->not->toContain(route('orders.file.inline', ['order' => $order]));
 });

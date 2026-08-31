@@ -2,7 +2,7 @@
     use App\Models\Contract;
     use App\Models\ContractApprover;
 @endphp
-        {{-- Overview --}}
+
         <div x-show="tab === 'overview'"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 -translate-y-1"
@@ -25,11 +25,6 @@
                         <h2 class="cw-hd__t">{{ __('app.label.approval_chain') }}</h2>
                     </div>
 
-                    {{-- Progress band — one clean continuous fill (green =
-                         approved fraction), a plain "N of M approved" counter
-                         plus a status breakdown, and the "Awaiting X" tile while
-                         in review. The per-step detail lives in the timeline
-                         below, so the band stays a single legible bar. --}}
                     @if ($totalCount > 0)
                         @php
                             $rejectedCount = $active->where('status', ContractApprover::STATUS_REJECTED)->count();
@@ -66,15 +61,10 @@
                         </div>
                     @endif
 
-                    {{-- The chain itself is a stock Filament table: person,
-                         step, status, SLA and comment, with the per-approver
-                         history behind the row action. --}}
                     @livewire(\App\Filament\Resources\Contracts\Widgets\ContractApprovalChainTableWidget::class, ['contractId' => $record->id], key('contract-chain-'.$record->id))
                 </section>
                 @endif
 
-                {{-- Payments only exist once the contract is fully approved by
-                     the director, so the progress block is hidden until then. --}}
                 @if ($record->status === Contract::STATUS_APPROVED)
                 @php
                     $paymentSummary = $this->paymentSummary();
@@ -105,15 +95,11 @@
                         </div>
                     </div>
 
-                    {{-- Payment ledger as a stock Filament table; filing a new
-                         one stays the «Add payment» action in the page header,
-                         which owns the remaining-percent validation. --}}
                     @livewire(\App\Filament\Resources\Contracts\Widgets\ContractPaymentsTableWidget::class, ['contractId' => $record->id], key('contract-payments-'.$record->id))
                 </section>
                 @endif
             </div>
 
-            {{-- SIDEBAR: combined Document + Basic Information card --}}
             <div class="cw-side">
                 <section class="cw-card">
                     <div class="cw-hd"><span class="cw-hd__ic">{!! $ic('heroicon-o-clipboard-document-list') !!}</span><h2 class="cw-hd__t">{{ __('app.label.basic_information') }}</h2></div>

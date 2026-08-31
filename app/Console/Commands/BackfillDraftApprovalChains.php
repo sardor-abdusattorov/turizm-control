@@ -14,9 +14,6 @@ class BackfillDraftApprovalChains extends Command
 {
     public function handle(ApprovalChain $chain): int
     {
-        // Only drafts that never had a chain — leave anything with existing
-        // (even invalidated) approvers alone so a post-edit draft the author
-        // is re-picking isn't silently repopulated.
         $drafts = Contract::query()
             ->where('status', Contract::STATUS_DRAFT)
             ->whereDoesntHave('approvers')

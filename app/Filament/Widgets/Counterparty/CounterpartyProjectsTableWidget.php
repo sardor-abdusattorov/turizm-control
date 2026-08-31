@@ -12,12 +12,6 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * A counterparty's project participations (contact OR sponsor) — its income
- * contracts across exhibitions with the payment state of each. A row opens
- * the project; the contract number cell opens the contract. Pass exactly one
- * of the two ids.
- */
 class CounterpartyProjectsTableWidget extends TableWidget
 {
     public ?int $contactId = null;
@@ -29,7 +23,7 @@ class CounterpartyProjectsTableWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            // No heading: the tab label / modal title already names it.
+
             ->heading(null)
             ->query(fn (): Builder => $this->scopeCounterparty(Contract::query()
                 ->visibleTo()

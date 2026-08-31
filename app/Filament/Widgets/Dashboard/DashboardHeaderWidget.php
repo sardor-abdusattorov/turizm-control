@@ -17,13 +17,7 @@ class DashboardHeaderWidget extends Widget
 
     protected static bool $isLazy = false;
 
-    /**
-     * One personalised line that answers "what should I care about right now",
-     * picked by what is actually demanding the user's attention. The tone
-     * drives the soft glow on the card's left edge.
-     *
-     * @return array{greeting: string, summary: string, tone: string}
-     */
+    /** @return array{greeting: string, summary: string, tone: string} */
     public function headerData(): array
     {
         $context = app(DashboardContext::class);
@@ -47,20 +41,11 @@ class DashboardHeaderWidget extends Widget
         return ['greeting' => $greeting, 'summary' => $summary, 'tone' => $tone];
     }
 
-    /**
-     * The user's own photo for the greeting disc, when one is uploaded —
-     * the same source as the panel's top-bar avatar. Null falls back to
-     * the CSS initials disc.
-     */
     public function userAvatarUrl(): ?string
     {
         return auth()->user()?->getFilamentAvatarUrl();
     }
 
-    /**
-     * Initials for the local avatar disc — first letters of the first two
-     * name words. Rendered in CSS, so no external avatar service is needed.
-     */
     public function userInitials(): string
     {
         $words = preg_split('/\s+/', trim((string) auth()->user()?->name), -1, PREG_SPLIT_NO_EMPTY) ?: [];
@@ -73,13 +58,7 @@ class DashboardHeaderWidget extends Widget
         return implode('', $letters) !== '' ? implode('', $letters) : '·';
     }
 
-    /**
-     * Clickable "needs me" counters — each is one tap away from the exact
-     * contracts list tab it counts. Only non-zero chips render, so a clear
-     * day keeps the header to a single calm line.
-     *
-     * @return array<int, array{label: string, count: int, tone: string, url: string}>
-     */
+    /** @return array<int, array{label: string, count: int, tone: string, url: string}> */
     public function attentionChips(): array
     {
         $context = app(DashboardContext::class);
@@ -111,11 +90,6 @@ class DashboardHeaderWidget extends Widget
         return $chips;
     }
 
-    /**
-     * The "create contract" quick action for users who may author contracts —
-     * the dashboard is otherwise read-only, and a manager lands here to start
-     * work. Null hides the button for everyone else.
-     */
     public function createContractUrl(): ?string
     {
         return auth()->user()?->can('create_contract')
@@ -123,11 +97,6 @@ class DashboardHeaderWidget extends Widget
             : null;
     }
 
-    /**
-     * Whether to surface the "connect Telegram" prompt inside the greeting.
-     * It sits where the user starts their day; profile settings keep the
-     * permanent connect/disconnect actions.
-     */
     public function shouldOfferTelegram(): bool
     {
         $user = auth()->user();
@@ -136,7 +105,6 @@ class DashboardHeaderWidget extends Widget
             return false;
         }
 
-        // A link whose owner blocked the bot is dead — offer to reconnect.
         return ! $user->isTelegramLinked()
             || $user->telegram?->blocked_at !== null;
     }

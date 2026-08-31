@@ -8,12 +8,6 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-/**
- * Shared registry look for the XLSX exports: a bold blue heading row, a merged
- * title banner, thin grey borders, Times New Roman body, a frozen header and
- * digit columns coerced to text so Excel keeps leading zeros and skips
- * scientific notation.
- */
 trait StyledExportSheet
 {
     /** @return array<string, mixed> The bold blue heading-row style. */
@@ -29,12 +23,7 @@ trait StyledExportSheet
         ];
     }
 
-    /**
-     * Add the title banner, borders, body font, text-formatted columns and a
-     * frozen header to a freshly written sheet.
-     *
-     * @param  list<string>  $textColumns
-     */
+    /** @param  list<string>  $textColumns */
     private function applyLayout(AfterSheet $event, string $title, array $textColumns = []): void
     {
         $sheet = $event->sheet->getDelegate();

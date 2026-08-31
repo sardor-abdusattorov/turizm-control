@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait SearchesByTaxId
 {
-    /**
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     public static function searchOptions(?string $search = null, int $limit = 50): array
     {
         return static::query()
@@ -45,17 +43,13 @@ trait SearchesByTaxId
         return $name;
     }
 
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     protected static function taxIdColumns(): array
     {
         return ['inn' => 'app.label.inn'];
     }
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     protected static function taxIdSearchColumns(): array
     {
         return ['name', ...array_keys(static::taxIdColumns())];

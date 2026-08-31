@@ -103,8 +103,6 @@ it('stores scans uploaded on the create form as dossier attachments', function (
 it('keeps the normal draft flow when the legacy switch is off', function () {
     Storage::fake('local');
 
-    // Approval is on by default, so a valid chain (legal + accounting) is
-    // still required — the legacy switch must not weaken the normal path.
     $legalDept = Department::factory()->create(['code' => 'legal']);
     $accountingDept = Department::factory()->create(['code' => 'accounting']);
     $legal = User::factory()->create(['status' => User::STATUS_ACTIVE, 'department_id' => $legalDept->id]);
@@ -145,10 +143,9 @@ it('groups project and order options by type and year', function () {
         ContractForm::class,
         'projectOptionsGrouped',
     );
-    // The basis-order picker lives on the project form now.
+
     $orderGroups = Order::basisOptions();
 
-    // Every group key carries the type · year context; options nest inside.
     expect(collect($projectGroups)->keys()->filter(fn ($k) => str_contains($k, '2026'))->count())->toBeGreaterThan(0)
         ->and(collect($projectGroups)->flatten()->values()->all())->toContain('EXPO-INTL', 'LOCAL-FEST')
         ->and($orderGroups)->toHaveKey('2025')

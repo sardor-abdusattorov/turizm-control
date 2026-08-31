@@ -38,18 +38,10 @@ class ListContracts extends ListRecords
             return [];
         }
 
-        // The user-shaped feature flags that decide which tabs make sense:
-        //   • author  — anyone with create_contract, or who has ever been
-        //               the responsible_id on a contract (manager seat);
-        //   • approver — anyone who has ever sat in a contract approval
-        //               chain, in any status. We don't gate on a role
-        //               because in practice the same person can be both.
         $isAuthor = $user->can('create_contract')
             || Contract::query()->where('responsible_id', $user->id)->exists();
         $isApprover = ContractApprover::query()->where('user_id', $user->id)->exists();
 
-        // Oversight roles, plus finance & legal who hold view_all_contracts,
-        // get the full "All" list: every contract except other authors' drafts.
         $canViewAll = $user->hasAnyRole(Contract::OVERSIGHT_ROLES)
             || $user->can('view_all_contracts');
 
@@ -80,10 +72,6 @@ class ListContracts extends ListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->involvingApprover());
         }
 
-        // A pure author only ever gets the lone "My contracts" tab — and since
-        // their whole list already IS their contracts, that single tab is just
-        // noise. Hand them a clean, untabbed list. Approvers and oversight keep
-        // their tabs, where the choice between buckets actually matters.
         if (array_keys($tabs) === ['my_contracts']) {
             return [];
         }

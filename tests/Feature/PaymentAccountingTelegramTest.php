@@ -36,9 +36,7 @@ function accountingUser(string $chatId): User
     ]);
 }
 
-/**
- * @param  list<string>|null  $paths
- */
+/** @param  list<string>|null  $paths */
 function paymentWithScreenshot(Contract $contract, User $creator, ?array $paths = null): Payment
 {
     $paths ??= ['payments/shot.png'];

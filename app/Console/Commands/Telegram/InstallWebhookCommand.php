@@ -51,10 +51,6 @@ class InstallWebhookCommand extends Command
         return self::SUCCESS;
     }
 
-    /**
-     * Publish the bot's native command menu (the hamburger next to the input)
-     * per client language: ru and uz explicitly, English as the fallback.
-     */
     private function publishCommandMenu(TelegramService $telegram): void
     {
         $menus = [

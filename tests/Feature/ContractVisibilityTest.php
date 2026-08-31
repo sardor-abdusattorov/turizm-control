@@ -23,8 +23,6 @@ function contractUser(?string $role = null): User
     $user->givePermissionTo('view_any_contract');
 
     if ($role === 'manager') {
-        // Managers are the ones who author contracts — make sure they have
-        // the create permission so the "My contracts" tab is offered.
         Permission::findOrCreate('create_contract', 'web');
         $user->givePermissionTo('create_contract');
     }
@@ -99,7 +97,7 @@ it('hides the All tab from a manager but shows it to oversight roles', function 
     actingAs(contractUser('director'));
     $tabs = Livewire::test(ListContracts::class)->instance()->getTabs();
     expect($tabs)->toHaveKey('all')
-        ->and(array_key_first($tabs))->toBe('all'); // All leads for oversight
+        ->and(array_key_first($tabs))->toBe('all');
 });
 
 function financeReviewer(string $role): User
@@ -136,7 +134,7 @@ it('lets a finance reviewer see the live pipeline but not other authors drafts',
 it('lands a finance reviewer with nothing awaiting on the All tab', function () {
     $accountant = financeReviewer('accountant');
 
-    Contract::factory()->inReview()->create(); // pipeline exists, but not theirs to action
+    Contract::factory()->inReview()->create();
 
     actingAs($accountant);
 

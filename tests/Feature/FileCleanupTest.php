@@ -83,8 +83,6 @@ it('deletes payment proof files from disk when the contract is deleted', functio
 
     $contract->delete();
 
-    // The DB cascade alone would drop the row but strand the files — the
-    // observer must delete payments through Eloquent, like attachments.
     expect(Payment::query()->count())->toBe(0);
     Storage::disk('local')->assertMissing($proofs[0]);
     Storage::disk('local')->assertMissing($proofs[1]);

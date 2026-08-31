@@ -182,7 +182,7 @@
         title="{{ __('app.label.approval_chain') }}"
         class="ca"
     >
-        {{-- Header: one continuous fill bar + summary --}}
+
         @php
             $fillPct = $total > 0 ? round($approved / $total * 100) : 0;
             $fillColor = $hasRejected ? '#dc2626' : ($approved === $total && $total > 0 ? '#059669' : '#2563eb');
@@ -194,7 +194,6 @@
             <span class="ca__count" style="color:{{ $summaryColor }};">{{ $summary }}</span>
         </div>
 
-        {{-- Compact list: avatar/initials + name + status icon --}}
         <div class="ca__list">
             @foreach ($active->take(3) as $a)
                 @php

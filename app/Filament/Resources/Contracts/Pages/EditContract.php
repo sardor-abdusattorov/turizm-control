@@ -25,12 +25,7 @@ class EditContract extends EditRecord
     /** @var array<int, int> */
     protected array $approverChain = [];
 
-    /**
-     * The live chain (active approver user IDs, in order) BEFORE save — used
-     * to tell whether the author actually changed the chain on this edit.
-     *
-     * @var array<int, int>
-     */
+    /** @var array<int, int> */
     protected array $originalChain = [];
 
     protected bool $syncChain = false;
@@ -55,9 +50,6 @@ class EditContract extends EditRecord
 
     protected function getSaveFormAction(): Action
     {
-        // Evaluated when the modal opens, not when the page renders — the
-        // «already signed» switch is live, so the confirmation matches what
-        // saving will actually do right now.
         $keepsLegacy = fn (): bool => (bool) ($this->data['already_signed'] ?? false);
         $isMidFlow = fn (): bool => in_array($this->record?->status, [
             Contract::STATUS_IN_REVIEW,
@@ -68,8 +60,7 @@ class EditContract extends EditRecord
         return Action::make('save')
             ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
             ->keyBindings(['mod+s'])
-            // A legacy save keeps the approved status — nothing destructive
-            // to confirm, so the modal steps aside and saving is one click.
+
             ->modal(fn (): bool => ! $keepsLegacy())
             ->requiresConfirmation()
             ->modalIcon(fn (): string => $isMidFlow() ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-question-mark-circle')
@@ -94,15 +85,8 @@ class EditContract extends EditRecord
 
         $data['approver_chain'] = $ids;
 
-        // A reopened approved contract IS an already-signed paper one — the
-        // switch starts on so a typo fix keeps the status untouched. Flipping
-        // it off is the deliberate «send back through approval» move. Anyone
-        // reaching this page for an approved record holds the dedicated
-        // update_approved_contract permission (mount gates on it).
         $data['already_signed'] = $this->record->status === Contract::STATUS_APPROVED;
 
-        // The dossier files show inside the upload field and sync on save: a
-        // chip removed here deletes its attachment, a new file files one.
         $attachments = $this->record->attachments()->orderBy('sort')->get();
         $data['attachment_files'] = $attachments->pluck('file_path')->all();
         $data['attachment_names'] = $attachments->pluck('original_name', 'file_path')->all();
@@ -112,10 +96,6 @@ class EditContract extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        // The legacy switch flipped on mid-life: the contract is converted to
-        // an already-signed paper one in afterSave, chain and all. The
-        // observer must not fight that by resetting a reopened approved
-        // contract to draft and rebuilding a junk chain mid-save.
         $this->markAsSigned = (bool) ($data['already_signed'] ?? false);
         $this->legacySignedAt = $data['signed_at'] ?? now();
         unset($data['already_signed'], $data['signed_at']);
@@ -135,7 +115,6 @@ class EditContract extends EditRecord
             ->all();
         unset($data['approver_chain']);
 
-        // New dossier scans picked on the edit form are filed in afterSave.
         return $this->extractAttachmentUploads($data);
     }
 
@@ -144,9 +123,6 @@ class EditContract extends EditRecord
         $this->storeFormAttachments();
 
         if ($this->markAsSigned) {
-            // Converting to a legacy paper contract: every live chain row
-            // becomes audit (same shape resyncOnEdit writes), decided rows
-            // keep their verdicts, and the contract files as approved.
             $this->record->approvers()
                 ->whereIn('status', [ContractApprover::STATUS_QUEUED, ContractApprover::STATUS_PENDING])
                 ->update([
@@ -173,11 +149,6 @@ class EditContract extends EditRecord
             return;
         }
 
-        // The model observer (Contract::maybeInvalidateOnEdit) already did
-        // the reset + chain rebuild whenever a REAPPROVAL_TRIGGER_FIELD
-        // changed — the give-away is that status flipped to Draft on its
-        // own. If the picker wasn't touched, the observer's work is the
-        // final word; bail before re-cancelling its rebuilt queue.
         $observerHandledReset = $startedMidFlow
             && $this->record->status === Contract::STATUS_DRAFT;
 
@@ -185,10 +156,6 @@ class EditContract extends EditRecord
             return;
         }
 
-        // Going through the save modal on a mid-flow contract is an explicit
-        // promise to cancel the existing approval chain — honour it even
-        // when no visible field actually changed (the document on
-        // disk may have changed between load and save).
         app(ApprovalChain::class)->resyncOnEdit(
             $this->record,
             $chainChanged ? $this->approverChain : $this->originalChain,
@@ -196,11 +163,7 @@ class EditContract extends EditRecord
         );
     }
 
-    /**
-     * Active approver user IDs (excludes invalidated/skipped), in chain order.
-     *
-     * @return array<int, int>
-     */
+    /** @return array<int, int> */
     protected function liveChainIds(): array
     {
         return $this->record->activeApprovers()
@@ -225,12 +188,7 @@ class EditContract extends EditRecord
         ];
     }
 
-    /**
-     * Approve / Reject — visible only to the current approver.
-     * Reused by ViewContract so approvers can act without entering edit mode.
-     *
-     * @return array<int, Action>
-     */
+    /** @return array<int, Action> */
     public static function approvalActions(mixed $record): array
     {
         return [

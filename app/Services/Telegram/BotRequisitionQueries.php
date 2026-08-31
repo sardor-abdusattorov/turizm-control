@@ -8,17 +8,9 @@ use App\Models\Requisition;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * The requisition list queries behind the bot menus, mirroring
- * BotContractQueries so BotMenuBuilder stays pure presentation.
- */
 class BotRequisitionQueries
 {
-    /**
-     * Requisitions whose open step belongs to this user right now.
-     *
-     * @return Builder<Requisition>
-     */
+    /** @return Builder<Requisition> */
     public function awaiting(User $user): Builder
     {
         return Requisition::query()
@@ -26,11 +18,7 @@ class BotRequisitionQueries
             ->orderByDesc('id');
     }
 
-    /**
-     * The user's own requisitions.
-     *
-     * @return Builder<Requisition>
-     */
+    /** @return Builder<Requisition> */
     public function mine(User $user): Builder
     {
         return Requisition::query()
@@ -38,11 +26,7 @@ class BotRequisitionQueries
             ->orderByDesc('id');
     }
 
-    /**
-     * Requisitions this user has already decided on, most recent verdict first.
-     *
-     * @return Builder<Requisition>
-     */
+    /** @return Builder<Requisition> */
     public function history(User $user): Builder
     {
         return Requisition::query()

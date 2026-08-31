@@ -41,13 +41,7 @@ class Order extends Model
         return ($this->issued_at ?? $this->created_at)?->year;
     }
 
-    /**
-     * Active buyruqs a project can name as its basis, grouped into optgroups
-     * by issue year (newest first), labelled by number (falling back to the
-     * title for unnumbered drafts).
-     *
-     * @return array<string, array<int, string>>
-     */
+    /** @return array<string, array<int, string>> */
     public static function basisOptions(): array
     {
         return static::query()
@@ -120,17 +114,11 @@ class Order extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    /**
-     * The committee buyruq this one was issued on the strength of.
-     */
     public function basisOrder(): BelongsTo
     {
         return $this->belongsTo(self::class, 'basis_order_id');
     }
 
-    /**
-     * The PR-centre buyruqs issued on the strength of this committee one.
-     */
     public function derivedOrders(): HasMany
     {
         return $this->hasMany(self::class, 'basis_order_id')
@@ -143,12 +131,7 @@ class Order extends Model
         return trim(($this->number ? $this->number.' · ' : '').$this->title);
     }
 
-    /**
-     * Active committee buyruqs a PR-centre order can name as its basis,
-     * grouped into optgroups by issue year, newest first.
-     *
-     * @return array<string, array<int, string>>
-     */
+    /** @return array<string, array<int, string>> */
     public static function committeeBasisOptions(): array
     {
         return static::query()

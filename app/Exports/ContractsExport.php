@@ -25,11 +25,7 @@ class ContractsExport implements FromQuery, ShouldAutoSize, WithEvents, WithHead
 
     private int $rowNumber = 0;
 
-    /**
-     * @param  Builder<Contract>  $query  Already-filtered query straight off
-     *                                    the Filament table — keeps the export
-     *                                    in sync with what the user is seeing.
-     */
+    /** @param  Builder<Contract>  $query  Already-filtered query straight off */
     public function __construct(private readonly Builder $query) {}
 
     public function query(): Builder

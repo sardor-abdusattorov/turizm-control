@@ -7,15 +7,6 @@ use App\Models\Currency;
 use App\Models\Project;
 use Illuminate\Database\Seeder;
 
-/**
- * One-off import of the "Реестр Международных выставок 2025 года" registry
- * (16 international exhibitions). Only the project shells are seeded — venue,
- * dates, площадь and стенд costs; participation income is entered by hand as
- * income contracts against each project, so no participants are created here.
- * The 2025 registry has no «место проведения» column, so each venue is the
- * exhibition's known host city (matching the 2026 registry where it recurs).
- * Idempotent: a project that already exists by (type, name) is left untouched.
- */
 class Exhibitions2025Seeder extends Seeder
 {
     public function run(): void
@@ -44,9 +35,7 @@ class Exhibitions2025Seeder extends Seeder
         }
     }
 
-    /**
-     * @return list<array<string, mixed>>
-     */
+    /** @return list<array<string, mixed>> */
     private function exhibitions(): array
     {
         return [
