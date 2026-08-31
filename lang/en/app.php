@@ -593,6 +593,9 @@ return [
         'second_short' => 's',
     ],
     'telegram' => [
+        'menu_rq_history' => 'My requisition decisions',
+        'list_rq_history_title' => 'Requisitions you have decided on',
+        'list_rq_history_empty' => 'You have not decided on any requisitions yet.',
         'menu_rq_awaiting' => 'Requisitions to approve',
         'menu_rq_mine' => 'My requisitions',
         'menu_projects' => 'Projects',

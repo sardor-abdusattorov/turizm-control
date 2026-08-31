@@ -593,6 +593,9 @@ return [
         'second_short' => 'с',
     ],
     'telegram' => [
+        'menu_rq_history' => 'Мои решения по заявкам',
+        'list_rq_history_title' => 'Заявки, по которым вы приняли решение',
+        'list_rq_history_empty' => 'Вы ещё не принимали решений по заявкам.',
         'menu_rq_awaiting' => 'Заявки на согласование',
         'menu_rq_mine' => 'Мои заявки',
         'menu_projects' => 'Проекты',

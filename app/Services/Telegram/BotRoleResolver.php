@@ -2,6 +2,7 @@
 
 namespace App\Services\Telegram;
 
+use App\Enums\ApprovalStatus;
 use App\Models\Contract;
 use App\Models\ContractApprover;
 use App\Models\Requisition;
@@ -71,6 +72,20 @@ class BotRoleResolver
     public function myRequisitionsCount(User $user): int
     {
         return Requisition::query()->where('author_id', $user->id)->count();
+    }
+
+    /**
+     * Requisitions this approver has already decided on — without this bucket
+     * they vanish from the bot the moment the decision is made, since an
+     * approver is not their author.
+     */
+    public function requisitionHistoryCount(User $user): int
+    {
+        return Requisition::query()
+            ->whereHas('approvals', fn ($approvals) => $approvals
+                ->where('user_id', $user->id)
+                ->whereIn('status', [ApprovalStatus::Approved, ApprovalStatus::Rejected]))
+            ->count();
     }
 
     public function canSeeProjects(User $user): bool

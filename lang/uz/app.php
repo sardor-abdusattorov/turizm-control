@@ -593,6 +593,9 @@ return [
         'second_short' => ' son',
     ],
     'telegram' => [
+        'menu_rq_history' => 'Arizalar bo‘yicha qarorlarim',
+        'list_rq_history_title' => 'Siz qaror qabul qilgan arizalar',
+        'list_rq_history_empty' => 'Siz hali arizalar bo‘yicha qaror qabul qilmagansiz.',
         'menu_rq_awaiting' => 'Kelishuvdagi arizalar',
         'menu_rq_mine' => 'Mening arizalarim',
         'menu_projects' => 'Loyihalar',

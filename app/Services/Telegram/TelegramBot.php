@@ -397,6 +397,13 @@ class TelegramBot
 
                 return;
 
+            case 'rqh':
+                $page = max(1, (int) ($arg ?? 1));
+                $this->editToList($chatId, $messageId, $this->menu->requisitionHistoryList($user, $page));
+                $this->telegram->answerCallbackQuery($callbackId);
+
+                return;
+
             case 'rqv':
                 $this->openRequisitionCard($chatId, $messageId, (int) $arg, $user);
                 $this->telegram->answerCallbackQuery($callbackId);

@@ -109,6 +109,13 @@ class BotMenuBuilder
             )];
         }
 
+        if (($rqHistory = $this->roles->requisitionHistoryCount($user)) > 0) {
+            $rows[] = [$this->cbBtn(
+                '🗂 '.__('app.telegram.menu_rq_history')." · {$rqHistory}",
+                'rqh:1',
+            )];
+        }
+
         if ($this->roles->canSeeProjects($user)) {
             $rows[] = [$this->cbBtn(
                 '📆 '.__('app.telegram.menu_projects'),
@@ -215,6 +222,18 @@ class BotMenuBuilder
             __('app.telegram.list_rq_mine_title'),
             __('app.telegram.list_rq_mine_empty'),
             'rqm',
+        );
+    }
+
+    /** @return array{text: string, keyboard: array<int, array<int, array<string, string>>>} */
+    public function requisitionHistoryList(User $user, int $page): array
+    {
+        return $this->renderRequisitionList(
+            $this->requisitions->history($user),
+            $page,
+            __('app.telegram.list_rq_history_title'),
+            __('app.telegram.list_rq_history_empty'),
+            'rqh',
         );
     }
 
