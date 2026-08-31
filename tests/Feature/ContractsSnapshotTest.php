@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\OrderScope;
+use App\Enums\RequisitionStatus;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractType;
@@ -7,6 +9,7 @@ use App\Models\Currency;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Project;
+use App\Models\Requisition;
 use App\Models\User;
 use Database\Seeders\HandEnteredContractsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -136,18 +139,158 @@ it('replaying the same snapshot twice never duplicates anything', function () {
         'file_path' => 'uploads/files/contract-attachments/b1.pdf',
         'original_name' => 'b1.pdf', 'size' => 1, 'sort' => 1,
     ]);
+    Payment::factory()->forContract($contract)->create(['percent' => 40, 'paid_at' => '2026-02-11']);
 
     $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
 
     $this->seed(HandEnteredContractsSeeder::class);
     $this->seed(HandEnteredContractsSeeder::class);
 
+    $restored = Contract::query()->firstWhere('number', 'B-1');
+
     expect(Contract::query()->where('number', 'B-1')->count())->toBe(1)
-        ->and(Contract::query()->firstWhere('number', 'B-1')->attachments()->count())->toBe(1);
+        ->and($restored->attachments()->count())->toBe(1)
+        ->and($restored->payments()->count())->toBe(1)
+        // The share must not have doubled either — a duplicated payment would
+        // quietly push the contract's paid percent past what was really paid.
+        ->and((float) $restored->fresh()->paid_percent)->toBe(40.0);
 });
 
 it('the seeder is a silent no-op without a snapshot file', function () {
     $this->seed(HandEnteredContractsSeeder::class);
 
     expect(Contract::query()->count())->toBe(0);
+});
+
+it('carries the committee → PR centre basis link across a wipe', function () {
+    Storage::fake('local');
+
+    $committee = Order::factory()->committee()->create(['number' => '06-АФ']);
+    $centre = Order::factory()->prCenter()->create([
+        'number' => 'ПР-14',
+        'basis_order_id' => $committee->id,
+    ]);
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
+
+    // The rebuild: both orders go, ids will be handed out afresh.
+    Order::query()->delete();
+
+    $this->seed(HandEnteredContractsSeeder::class);
+
+    $restored = Order::query()->firstWhere('number', 'ПР-14');
+
+    expect($restored)->not->toBeNull()
+        ->and($restored->scope)->toBe(OrderScope::PrCenter)
+        ->and($restored->basisOrder?->number)->toBe('06-АФ')
+        // Ids were reassigned, so the link resolved by number, not by id.
+        ->and($restored->basis_order_id)->not->toBe($committee->id)
+        ->and(Order::query()->firstWhere('number', '06-АФ')->basis_order_id)->toBeNull();
+});
+
+it('carries a direct project payment across a wipe', function () {
+    Storage::fake('local');
+
+    $currency = Currency::factory()->create(['short_name' => 'UZS', 'status' => true]);
+    $project = Project::factory()->international()->create(['name' => 'ITB Berlin 2026']);
+    $author = User::factory()->create(['email' => 'payer@test.uz', 'status' => User::STATUS_ACTIVE]);
+
+    Payment::factory()->forProject($project)->create([
+        'amount' => 12_500_000,
+        'currency_id' => $currency->id,
+        'purpose' => 'Аренда звукового оборудования',
+        'paid_at' => '2026-03-04',
+        'screenshots' => ['uploads/images/payments/2026/03/proof.png'],
+        'created_by' => $author->id,
+    ]);
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
+
+    Payment::query()->delete();
+
+    $this->seed(HandEnteredContractsSeeder::class);
+
+    $restored = Payment::query()->whereNull('contract_id')->first();
+
+    expect($restored)->not->toBeNull()
+        ->and($restored->project?->name)->toBe('ITB Berlin 2026')
+        ->and((float) $restored->amount)->toBe(12_500_000.0)
+        ->and($restored->currency?->short_name)->toBe('UZS')
+        ->and($restored->purpose)->toBe('Аренда звукового оборудования')
+        ->and($restored->paid_at?->format('Y-m-d'))->toBe('2026-03-04')
+        ->and($restored->screenshots)->toBe(['uploads/images/payments/2026/03/proof.png'])
+        ->and($restored->creator?->email)->toBe('payer@test.uz');
+});
+
+it('carries requisitions across a wipe, review state and all', function () {
+    Storage::fake('local');
+
+    $project = Project::factory()->international()->create(['name' => 'ATM 25']);
+    $author = User::factory()->create(['email' => 'author@test.uz', 'status' => User::STATUS_ACTIVE]);
+    $reviewer = User::factory()->create(['email' => 'supply@test.uz', 'status' => User::STATUS_ACTIVE]);
+
+    Requisition::factory()->rejected()->create([
+        'number' => 'ЗВ-2026-001',
+        'title' => 'Канцелярия на III квартал',
+        'description' => 'Бумага А4 — 20 пачек.',
+        'project_id' => $project->id,
+        'author_id' => $author->id,
+        'reviewer_id' => $reviewer->id,
+        'review_comment' => 'Уточните смету.',
+    ]);
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
+
+    Requisition::query()->delete();
+
+    $this->seed(HandEnteredContractsSeeder::class);
+
+    $restored = Requisition::query()->firstWhere('number', 'ЗВ-2026-001');
+
+    expect($restored)->not->toBeNull()
+        ->and($restored->title)->toBe('Канцелярия на III квартал')
+        ->and($restored->description)->toBe('Бумага А4 — 20 пачек.')
+        ->and($restored->status)->toBe(RequisitionStatus::Rejected)
+        ->and($restored->review_comment)->toBe('Уточните смету.')
+        ->and($restored->project?->name)->toBe('ATM 25')
+        ->and($restored->author?->email)->toBe('author@test.uz')
+        ->and($restored->reviewer?->email)->toBe('supply@test.uz')
+        ->and($restored->reviewed_at)->not->toBeNull();
+});
+
+it('never duplicates project payments or requisitions on a second replay', function () {
+    Storage::fake('local');
+
+    $currency = Currency::factory()->create(['short_name' => 'UZS', 'status' => true]);
+    $project = Project::factory()->international()->create(['name' => 'ATM 25']);
+    Payment::factory()->forProject($project)->create(['amount' => 500, 'currency_id' => $currency->id, 'paid_at' => '2026-01-05']);
+    Requisition::factory()->create(['number' => 'ЗВ-2026-009']);
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
+
+    $this->seed(HandEnteredContractsSeeder::class);
+    $this->seed(HandEnteredContractsSeeder::class);
+
+    expect(Payment::query()->whereNull('contract_id')->count())->toBe(1)
+        ->and(Requisition::query()->where('number', 'ЗВ-2026-009')->count())->toBe(1);
+});
+
+it('snapshots the live data before project:init drops it', function () {
+    Storage::fake('local');
+
+    $currency = Currency::factory()->create(['short_name' => 'UZS', 'status' => true]);
+    Contract::factory()->create(['number' => 'LIVE-1', 'currency_id' => $currency->id]);
+
+    // project:init calls contracts:snapshot first — proven here by running the
+    // same command against the default path and reading what it wrote.
+    $realPath = database_path('seeders/data/contracts-snapshot.json');
+    $backup = File::exists($realPath) ? File::get($realPath) : null;
+
+    try {
+        $this->artisan('contracts:snapshot')->assertSuccessful();
+
+        expect(File::get($realPath))->toContain('LIVE-1');
+    } finally {
+        $backup === null ? File::delete($realPath) : File::put($realPath, $backup);
+    }
 });

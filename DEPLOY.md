@@ -56,7 +56,7 @@ cp .env.example .env
 composer install
 npm install
 php artisan key:generate
-php artisan project:init      # migrate:fresh + shield + сидеры + супер-админ
+php artisan project:init      # снапшот → migrate:fresh + shield + сидеры + супер-админ
 composer run dev              # сервер + очередь + логи + Vite одной командой
 ```
 
@@ -392,11 +392,36 @@ sudo systemctl reload php8.3-fpm
 
 | Команда | Что делает | Где можно |
 |---------|------------|-----------|
-| `project:init` | **сносит БД** (`migrate:fresh`) + shield + сидеры + супер-админ | только dev — в production падает с ошибкой |
+| `project:init` | `contracts:snapshot` → **сносит БД** (`migrate:fresh`) + shield + сидеры + супер-админ | только dev — в production падает с ошибкой |
 | `project:update` | `migrate` + `shield:generate --ignore-existing-policies` + кэш | прод |
+| `contracts:snapshot` | пишет `database/seeders/data/contracts-snapshot.json` | где угодно |
 | `project:cache` | config/route/view/event кэш | прод |
 
 На проде обновление — это `project:update`, а не `project:init`.
+
+### Что переживает `project:init`
+
+`project:init` сносит базу целиком, поэтому первым делом сам снимает снапшот —
+`contracts:snapshot` вызывается **до** `migrate:fresh`, вручную запускать его
+больше не нужно. Снапшот кладётся в `database/seeders/data/contracts-snapshot.json`,
+а `HandEnteredContractsSeeder` проигрывает его обратно в конце сидов.
+
+В снапшот попадает всё, что вводится руками:
+
+- договоры — с контрагентом, его банковскими счетами, досье и оплатами;
+- приказы — вместе со связкой «приказ комитета → приказ ПР центра»;
+- оплаты, заведённые напрямую на проект (без договора);
+- заявки — вместе с состоянием проверки.
+
+Ссылки внутри снапшота идут **по номерам, а не по id**: пересборка раздаёт id
+заново, поэтому основание приказа ищется по номеру, проект — по названию,
+пользователь — по e-mail.
+
+Файлы на диске снапшот не трогает: пути пишутся как есть, дерево `storage/app/private/uploads/`
+переживает пересборку, и восстановленные записи ссылаются на те же файлы.
+Поэтому `uploads/` нельзя чистить между снапшотом и сидом.
+
+Повторный прогон сидера ничего не дублирует — записи ищутся по своим ключам.
 
 ---
 

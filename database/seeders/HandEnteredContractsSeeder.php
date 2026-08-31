@@ -3,12 +3,15 @@
 namespace Database\Seeders;
 
 use App\Enums\OrderScope;
+use App\Enums\RequisitionStatus;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Project;
+use App\Models\Requisition;
 use App\Models\Sponsor;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -52,6 +55,8 @@ class HandEnteredContractsSeeder extends Seeder
                 ],
             );
         }
+
+        $this->relinkOrderBases($snapshot['orders'] ?? []);
 
         foreach ($snapshot['contracts'] ?? [] as $data) {
             $contract = Contract::updateOrCreate(
@@ -102,17 +107,125 @@ class HandEnteredContractsSeeder extends Seeder
             }
 
             foreach ($data['payments'] ?? [] as $payment) {
-                $contract->payments()->firstOrCreate(
-                    [
-                        'percent' => $payment['percent'],
-                        'paid_at' => $payment['paid_at'],
-                    ],
-                    [
-                        'screenshots' => $payment['screenshots'] ?? [],
-                        'created_by' => $this->userId($payment['created_by_email'] ?? null),
-                    ],
-                );
+                // whereDate, not a plain where: paid_at is stored as a full
+                // timestamp, so matching it against the snapshot's 'Y-m-d'
+                // never hits and a second replay would file the payment twice.
+                $alreadyFiled = $contract->payments()
+                    ->where('percent', $payment['percent'])
+                    ->whereDate('paid_at', $payment['paid_at'])
+                    ->exists();
+
+                if ($alreadyFiled) {
+                    continue;
+                }
+
+                $contract->payments()->create([
+                    'percent' => $payment['percent'],
+                    'paid_at' => $payment['paid_at'],
+                    'screenshots' => $payment['screenshots'] ?? [],
+                    'created_by' => $this->userId($payment['created_by_email'] ?? null),
+                ]);
             }
+        }
+
+        $this->restoreProjectPayments($snapshot['project_payments'] ?? []);
+        $this->restoreRequisitions($snapshot['requisitions'] ?? []);
+    }
+
+    /**
+     * A rebuild reassigns ids, so the snapshot names a buyruq's basis by its
+     * number — and the link can only be tied once every order exists.
+     *
+     * @param  array<int, array<string, mixed>>  $orders
+     */
+    protected function relinkOrderBases(array $orders): void
+    {
+        foreach ($orders as $data) {
+            if (blank($data['basis_number'] ?? null)) {
+                continue;
+            }
+
+            $order = Order::query()->firstWhere('number', $data['number']);
+            $basisId = Order::query()->where('number', $data['basis_number'])->value('id');
+
+            // Never let a snapshot point an order at itself.
+            if ($order && $basisId && $order->getKey() !== $basisId) {
+                $order->forceFill(['basis_order_id' => $basisId])->saveQuietly();
+            }
+        }
+    }
+
+    /**
+     * Project spending filed without a contract — it hangs off no contract, so
+     * it is restored on its own rather than inside the contract loop.
+     *
+     * @param  array<int, array<string, mixed>>  $payments
+     */
+    protected function restoreProjectPayments(array $payments): void
+    {
+        foreach ($payments as $data) {
+            $projectId = filled($data['project'] ?? null)
+                ? Project::query()->where('name', $data['project'])->value('id')
+                : null;
+
+            if (! $projectId) {
+                continue;
+            }
+
+            $alreadyFiled = Payment::query()
+                ->whereNull('contract_id')
+                ->where('project_id', $projectId)
+                ->where('amount', $data['amount'])
+                ->whereDate('paid_at', $data['paid_at'])
+                ->exists();
+
+            if ($alreadyFiled) {
+                continue;
+            }
+
+            Payment::create([
+                'contract_id' => null,
+                'project_id' => $projectId,
+                'amount' => $data['amount'],
+                'paid_at' => $data['paid_at'],
+                'currency_id' => Currency::query()->where('short_name', $data['currency'])->value('id'),
+                'purpose' => $data['purpose'] ?? null,
+                'screenshots' => $data['screenshots'] ?? [],
+                'created_by' => $this->userId($data['created_by_email'] ?? null),
+            ]);
+        }
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $requisitions
+     */
+    protected function restoreRequisitions(array $requisitions): void
+    {
+        foreach ($requisitions as $data) {
+            $requisition = Requisition::updateOrCreate(
+                ['number' => $data['number']],
+                [
+                    'title' => $data['title'],
+                    'description' => $data['description'] ?? '',
+                    'project_id' => filled($data['project'] ?? null)
+                        ? Project::query()->where('name', $data['project'])->value('id')
+                        : null,
+                    'author_id' => $this->userId($data['author_email'] ?? null),
+                    'reviewer_id' => filled($data['reviewer_email'] ?? null)
+                        ? User::query()->where('email', $data['reviewer_email'])->value('id')
+                        : null,
+                ],
+            );
+
+            // The review already happened in a previous life: file its state
+            // verbatim rather than replaying the workflow.
+            $requisition->forceFill([
+                'status' => $data['status'] ?? RequisitionStatus::Draft->value,
+                'submitted_at' => $data['submitted_at'] ?? null,
+                'due_at' => $data['due_at'] ?? null,
+                'reviewed_at' => $data['reviewed_at'] ?? null,
+                'review_comment' => $data['review_comment'] ?? null,
+            ])->saveQuietly();
         }
     }
 
