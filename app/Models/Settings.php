@@ -35,13 +35,25 @@ class Settings extends Model
         $this->attributes['value'] = json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 
+    public const CACHE_KEY = 'settings.all';
+
     public static function get(string $key, mixed $default = null): mixed
     {
-        return Cache::remember("settings.{$key}", 86400, function () use ($key, $default) {
-            $setting = static::where('key', $key)->first();
+        $map = static::map();
 
-            return $setting ? $setting->value : $default;
-        });
+        return array_key_exists($key, $map) ? $map[$key] : $default;
+    }
+
+    /** @return array<string, mixed> */
+    public static function map(): array
+    {
+        return Cache::remember(
+            static::CACHE_KEY,
+            86400,
+            fn (): array => static::query()->get()
+                ->mapWithKeys(fn (self $setting): array => [$setting->key => $setting->value])
+                ->all(),
+        );
     }
 
     public static function set(string $key, mixed $value): void
@@ -51,6 +63,11 @@ class Settings extends Model
             ['value' => $value]
         );
 
-        Cache::forget("settings.{$key}");
+        static::flush();
+    }
+
+    public static function flush(): void
+    {
+        Cache::forget(static::CACHE_KEY);
     }
 }

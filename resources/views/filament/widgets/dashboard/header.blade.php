@@ -101,9 +101,6 @@
     </div>
 
     <style>
-        /* Flat greeting card. The day's state is the solid line on the left
-           edge — green when clear, amber when reviews wait, red when
-           something is overdue — plus the counter chips. */
         .dh {
             position: relative;
             display: flex;
@@ -134,8 +131,6 @@
             align-items: center;
             gap: 0.9rem;
         }
-        /* The user's own photo when one is uploaded; otherwise a local
-           initials disc — no external avatar service on a closed network. */
         .dh__ava {
             flex-shrink: 0;
             width: 2.75rem;
@@ -172,8 +167,6 @@
             color: var(--m);
         }
 
-        /* "Needs me" counters — each links to the exact contracts-list tab it
-           counts. Colour lives only in the number (semantic state). */
         .dh__chips {
             display: flex;
             flex-wrap: wrap;
@@ -211,7 +204,6 @@
             outline: 2px solid var(--accent);
             outline-offset: 2px;
         }
-        /* Live clock — tabular digits keep the line width steady as it ticks. */
         .dh__date {
             font-size: 0.8rem;
             font-weight: 500;
@@ -245,9 +237,6 @@
         .dh__cta:hover { background: #1d4ed8; }
         .dh__cta-ic { width: 0.95rem; height: 0.95rem; }
 
-        /* Telegram connect prompt — a flat, Filament-style info row shown until
-           the account is linked. Lives inside the greeting so the offer sits
-           where the user starts their day. */
         .dh__tg {
             position: relative;
             display: flex;
@@ -334,16 +323,10 @@
             .dh { padding: 1rem 1.1rem; }
             .dh__date { display: none; }
             .dh__tg-sub { display: none; }
-            /* Drop the create action onto its own full-width row under the
-               greeting; the date is hidden so the cluster holds just the CTA. */
             .dh__top { flex-wrap: wrap; }
             .dh__top-r { flex: 1 0 100%; }
-            /* Without the CTA the right cluster holds only the (hidden)
-               clock — drop it so it doesn't leave a phantom gap. */
             .dh__top-r:not(:has(.dh__cta)) { display: none; }
             .dh__cta { flex: 1; justify-content: center; padding: 0.6rem; }
-            /* Stack the connect action onto its own full-width row, keep the
-               close button up on the title row. */
             .dh__tg-cta {
                 order: 1;
                 flex: 1 0 100%;

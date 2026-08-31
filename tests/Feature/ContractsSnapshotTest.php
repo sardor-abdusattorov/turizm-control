@@ -280,10 +280,36 @@ it('snapshots the live data before project:init drops it', function () {
     $backup = File::exists($realPath) ? File::get($realPath) : null;
 
     try {
-        $this->artisan('contracts:snapshot')->assertSuccessful();
+        $this->artisan('contracts:snapshot', ['--force' => true])->assertSuccessful();
 
         expect(File::get($realPath))->toContain('LIVE-1');
     } finally {
         $backup === null ? File::delete($realPath) : File::put($realPath, $backup);
     }
+});
+
+it('refuses to overwrite a snapshot with fewer records than it already holds', function () {
+    Contract::factory()->count(3)->create();
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
+
+    Contract::query()->delete();
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertFailed();
+
+    $kept = json_decode(File::get($this->snapshotPath), true);
+
+    expect($kept['contracts'])->toHaveCount(3);
+});
+
+it('overwrites a shrinking snapshot when forced', function () {
+    Contract::factory()->count(3)->create();
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
+
+    Contract::query()->delete();
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath, '--force' => true])->assertSuccessful();
+
+    expect(json_decode(File::get($this->snapshotPath), true)['contracts'])->toBeEmpty();
 });

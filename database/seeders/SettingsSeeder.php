@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Settings;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class SettingsSeeder extends Seeder
@@ -36,11 +37,21 @@ class SettingsSeeder extends Seeder
             'approval.sla_days' => 2,
 
             'requisition.review_days' => 3,
-            'requisition.approver_ids' => [],
+            'requisition.approver_ids' => $this->defaultRequisitionApprovers(),
         ];
 
         foreach ($values as $key => $value) {
             Settings::set($key, $value);
         }
+    }
+
+    /** @return list<int> */
+    private function defaultRequisitionApprovers(): array
+    {
+        return User::query()
+            ->whereIn('email', ['legal@test.uz', 'accounting@test.uz'])
+            ->orderByRaw("case when email = 'legal@test.uz' then 0 else 1 end")
+            ->pluck('id')
+            ->all();
     }
 }

@@ -2,10 +2,6 @@
         [x-cloak] {
             display: none !important;
         }
-        /* Base palette tokens (--s/--t/--m/--accent/...) live in theme.css.
-           The cw page tunes a few values for tighter contrast against the
-           chain/progress bars and keeps its page-specific extras (--track,
-           --accent-ring, --accent-on). */
         .cw {
             display: flex;
             flex-direction: column;
@@ -23,16 +19,12 @@
             --accent-softer: rgba(129,140,248,.08);
             --accent-ring: rgba(129,140,248,.25);
         }
-        /* Calm card — a clear hairline border, no drop shadow, matching the
-           order/payment/project pages. */
         .cw-card {
             background: var(--s);
             border: 1px solid var(--d);
             border-radius: .75rem;
             overflow: hidden;
         }
-        /* Same metrics as .ow-hd/.pv-hd — every view page's section header
-           reads identically. */
         .cw-hd {
             display: flex;
             align-items: center;
@@ -51,19 +43,7 @@
             margin: 0;
             flex: 1;
         }
-        .cw-hd__c {
-            font-size: 0.724rem;
-            font-weight: 600;
-            color: var(--m);
-            background: var(--soft);
-            padding: .18rem .6rem;
-            border-radius: 999px;
-        }
-        .cw-bd {
-            padding: 1.25rem;
-        }
 
-        /* layout */
         .cw-cols {
             display: flex;
             flex-direction: column;
@@ -81,9 +61,7 @@
             flex-direction: column;
             gap: 1.5rem;
         }
-        /* Tab strip lives in theme.css as the shared .rec-tabs block. */
 
-        /* pills */
         .cw-pill {
             display: inline-flex;
             align-items: center;
@@ -160,7 +138,6 @@
             color: #cbd5e1;
         }
 
-        /* approval chain — progress band */
         .cw-prog {
             display: flex;
             flex-direction: column;
@@ -231,8 +208,6 @@
             white-space: nowrap;
         }
 
-        /* Single continuous track + green fill — readable at a glance, no
-           ambiguous per-step segments. */
         .cw-prog__track {
             height: .5rem;
             border-radius: 999px;
@@ -275,68 +250,6 @@
             flex-shrink: 0;
         }
 
-        /* document */
-        .cw-doc {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .cw-doc__ic {
-            width: 3.25rem;
-            height: 3.25rem;
-            border-radius: .75rem;
-            background: var(--soft);
-            box-shadow: inset 0 0 0 1px var(--d);
-            color: var(--m);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .cw-doc__nm {
-            font-weight: 600;
-            color: var(--t);
-            font-size: 0.926rem;
-        }
-        .cw-doc__mt {
-            font-size: 0.784rem;
-            color: var(--m);
-            margin-top: .15rem;
-        }
-        .cw-doc__act {
-            margin-left: auto;
-            display: flex;
-            gap: .5rem;
-            flex-wrap: wrap;
-        }
-        .cw-pdf {
-            margin-top: 1.1rem;
-            border: 1px solid var(--d);
-            border-radius: .85rem;
-            overflow: hidden;
-        }
-        .cw-pdf iframe {
-            width: 100%;
-            height: 64vh;
-            min-height: 30rem;
-            background: #fff;
-            display: block;
-            border: 0;
-        }
-        .cw-empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: .6rem;
-            padding: 2.75rem 0;
-            color: var(--m2);
-        }
-        .cw-empty span {
-            font-size: 0.825rem;
-        }
-
-        /* details — table grid (label cell tinted, value cell) */
         .cw-dets {
             display: flex;
             flex-direction: column;
@@ -348,8 +261,6 @@
             align-items: stretch;
             border-bottom: 1px solid var(--d);
         }
-        /* Row atoms (icon, label, value, muted, :last-child) live in
-           theme.css. cw keeps its tighter k/v padding + value transition. */
         .cw-row__k {
             display: flex;
             align-items: center;
@@ -384,112 +295,8 @@
             align-items: center;
             gap: .35rem;
         }
-
-        /* combined card — file block */
-        .cw-file {
-            display: flex;
-            align-items: flex-start;
-            gap: 1.1rem;
-            padding: 1.25rem 1.5rem .5rem;
-        }
-        .cw-file__thumb {
-            position: relative;
-            width: 5rem;
-            height: 6rem;
-            flex-shrink: 0;
-            background: var(--soft);
-            border-radius: .7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: inset 0 0 0 1px var(--d);
-        }
-        .cw-file__thumb svg {
-            width: 60%;
-            height: auto;
-        }
-        .cw-file__ext {
-            position: absolute;
-            left: .45rem;
-            bottom: .55rem;
-            padding: .16rem .42rem;
-            border-radius: .3rem;
-            background: #475569;
-            color: #fff;
-            font-size: .6rem;
-            font-weight: 700;
-            letter-spacing: .04em;
-            line-height: 1;
-        }
         .dark .cw-file__ext {
             background: #64748b;
-        }
-        .cw-file__body {
-            display: flex;
-            flex-direction: column;
-            gap: .6rem;
-            min-width: 0;
-            flex: 1;
-            padding-top: .15rem;
-        }
-        .cw-file__field {
-            display: flex;
-            flex-direction: column;
-            gap: .15rem;
-            min-width: 0;
-        }
-        .cw-file__lb {
-            font-size: .62rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            color: var(--m2);
-        }
-        .cw-file__vl {
-            font-size: .86rem;
-            font-weight: 500;
-            color: var(--t);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .cw-file__act {
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            flex-wrap: wrap;
-            padding: .75rem 1.5rem 1.2rem;
-        }
-        .cw-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            padding: .5rem .85rem;
-            border-radius: .5rem;
-            font-size: .81rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: opacity .12s ease, background .12s ease, box-shadow .12s ease;
-        }
-        .cw-btn--primary {
-            background: var(--accent);
-            color: #fff;
-        }
-        .cw-btn--primary:hover {
-            opacity: .88;
-        }
-        .cw-btn--ghost {
-            background: transparent;
-            color: var(--t);
-            box-shadow: inset 0 0 0 1px var(--d);
-        }
-        .cw-btn--ghost:hover {
-            background: var(--soft);
-        }
-        .cw-divider {
-            height: 1px;
-            background: var(--d);
-            margin: 0 1.5rem;
         }
         .cw-contact-group {
             display: flex;
@@ -539,140 +346,20 @@
             max-width: 62%;
             text-align: right;
         }
-
-        .cw-day__hd {
-            display: inline-flex;
-            align-items: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--m);
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            padding: .3rem .7rem;
-            margin: .15rem 0 .75rem;
-            background: var(--soft);
-            border-left: 3px solid var(--accent);
-            border-radius: .35rem;
-        }
-        .cw-day + .cw-day {
-            margin-top: .5rem;
-        }
-        .cw-tl {
-            position: relative;
-            display: flex;
-            gap: .85rem;
-            padding-bottom: 2.1rem;
-        }
-        .cw-tl__time {
-            width: 2.6rem;
-            flex-shrink: 0;
-            text-align: right;
-            font-size: 0.76rem;
-            color: var(--m2);
-            padding-top: .5rem;
-            font-variant-numeric: tabular-nums;
-        }
-        .cw-tl:last-child {
-            padding-bottom: 0;
-        }
-        .cw-tl:not(:last-child)::before {
-            content: '';
-            position: absolute;
-            left: 4.5rem;
-            top: 2.3rem;
-            bottom: -.2rem;
-            width: 2px;
-            background: var(--track);
-            border-radius: 2px;
-        }
-        .cw-tl__ic {
-            width: 2.1rem;
-            height: 2.1rem;
-            border-radius: 999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 0 0 3px var(--s);
-        }
-        .cw-tl__ic--success {
-            background: #d1fae5;
-            color: #059669;
-        }
         .dark .cw-tl__ic--success {
             background: rgba(16,185,129,.18);
-        }
-        .cw-tl__ic--danger {
-            background: #fee2e2;
-            color: #dc2626;
         }
         .dark .cw-tl__ic--danger {
             background: rgba(239,68,68,.18);
         }
-        .cw-tl__ic--warning {
-            background: #ffedd5;
-            color: #c2410c;
-        }
         .dark .cw-tl__ic--warning {
             background: rgba(251,146,60,.18);
-        }
-        .cw-tl__ic--info {
-            background: #dbeafe;
-            color: #2563eb;
         }
         .dark .cw-tl__ic--info {
             background: rgba(59,130,246,.18);
         }
-        .cw-tl__ic--gray {
-            background: #f1f5f9;
-            color: #64748b;
-        }
         .dark .cw-tl__ic--gray {
             background: rgba(255,255,255,.07);
-        }
-        .cw-tl__bd {
-            min-width: 0;
-            padding-top: .15rem;
-        }
-        .cw-tl__ds {
-            font-size: 0.92rem;
-            font-weight: 600;
-            color: var(--t);
-            line-height: 1.35;
-        }
-        .cw-tl__mt {
-            font-size: 0.8rem;
-            color: var(--m2);
-            margin-top: .2rem;
-            display: flex;
-            align-items: center;
-            gap: .4rem;
-            flex-wrap: wrap;
-        }
-        .cw-tl__dot {
-            width: 3px;
-            height: 3px;
-            border-radius: 999px;
-            background: var(--m2);
-            display: inline-block;
-        }
-
-        .cw-kv {
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-            padding: .5rem 0;
-        }
-        .cw-kv__lb {
-            font-size: 0.784rem;
-            color: var(--m);
-            width: 35%;
-            flex-shrink: 0;
-        }
-        .cw-kv__vl {
-            font-size: 0.854rem;
-            font-weight: 600;
-            color: var(--t);
         }
         .cw-sub {
             display: flex;
@@ -777,14 +464,6 @@
             white-space: nowrap;
         }
 
-        /* Per-record table inside the eye-modal — every row this user has on
-           the contract (current + cancelled attempts), newest first. Mirrors
-           the chain modal's table, scoped to one person. */
-        /* The record table scrolls sideways INSIDE this wrapper on a narrow
-           screen — min-width:0 + max-width:100% keep the wrapper at the modal's
-           width so it's the TABLE that scrolls, not the whole modal. Headers
-           stay on one line (white-space:nowrap below), so the columns keep
-           their shape instead of collapsing. */
         .cw-rt-wrap {
             overflow-x: auto;
             min-width: 0;
@@ -822,14 +501,6 @@
         }
         .cw-rt__st .cw-pill {
             font-size: .78rem;
-        }
-        .cw-rt__ord {
-            display: block;
-            margin-top: .3rem;
-            font-size: .68rem;
-            font-weight: 600;
-            color: var(--m2);
-            font-variant-numeric: tabular-nums;
         }
         .cw-rt__tag {
             display: inline-flex;
@@ -870,10 +541,6 @@
             color: #c2410c;
             line-height: 1.38;
         }
-        .cw-rt__sys-lb {
-            font-weight: 700;
-            margin-right: .3rem;
-        }
         .cw-rt__date {
             font-size: .8rem;
             color: var(--m);
@@ -890,7 +557,6 @@
             opacity: .4;
         }
 
-        /* metric tiles strip (step / timing / reminders) */
         .cw-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
@@ -979,15 +645,11 @@
             color: var(--accent-strong);
         }
 
-        /* coloured left accent per record row, set inline by status */
         .cw-rt tbody td:first-child {
             border-left: 3px solid var(--row-accent, transparent);
         }
 
-        /* ─── Mobile (< 640px) ─────────────────────────────────────────── */
         @media (max-width: 640px) {
-            /* Basic-information table keeps its two columns and scrolls
-               sideways (like the index tables) instead of squeezing values. */
             .cw-dets {
                 overflow-x: auto;
             }
@@ -1000,7 +662,5 @@
                 grid-template-columns: 1fr;
                 padding: .85rem 1rem;
             }
-            /* The record table stays a table and scrolls sideways inside its
-               wrapper (see .cw-rt-wrap) rather than stacking into blocks. */
         }
     </style>

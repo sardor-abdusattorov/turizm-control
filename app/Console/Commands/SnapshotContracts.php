@@ -7,11 +7,12 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Requisition;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 
 class SnapshotContracts extends Command
 {
-    protected $signature = 'contracts:snapshot {--path=}';
+    protected $signature = 'contracts:snapshot {--path=} {--force}';
 
     protected $description = 'Save all hand-entered records (contracts, orders, payments, requisitions) to a JSON snapshot the seeder can replay';
 
@@ -126,16 +127,25 @@ class SnapshotContracts extends Command
 
         $path = $this->option('path') ?: database_path('seeders/data/contracts-snapshot.json');
 
+        $payload = [
+            'contracts' => $contracts,
+            'orders' => $orders,
+            'project_payments' => $projectPayments,
+            'requisitions' => $requisitions,
+        ];
+
+        if (($shrunk = $this->shrunkBuckets($path, $payload)) !== []) {
+            $this->components->error(sprintf(
+                'Refusing to overwrite %s: it holds more records than the database (%s). The existing snapshot is kept. If the shrink is intentional, run `php artisan contracts:snapshot --force` first.',
+                $path,
+                implode(', ', $shrunk),
+            ));
+
+            return self::FAILURE;
+        }
+
         File::ensureDirectoryExists(dirname($path));
-        File::put($path, json_encode(
-            [
-                'contracts' => $contracts,
-                'orders' => $orders,
-                'project_payments' => $projectPayments,
-                'requisitions' => $requisitions,
-            ],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
-        ));
+        File::put($path, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
         $this->info(sprintf(
             'Snapshot: %d contracts, %d orders, %d project payments, %d requisitions → %s',
@@ -147,5 +157,34 @@ class SnapshotContracts extends Command
         ));
 
         return self::SUCCESS;
+    }
+
+    /**
+     * @param  array<string, Collection<int, array<string, mixed>>>  $payload
+     * @return list<string>
+     */
+    private function shrunkBuckets(string $path, array $payload): array
+    {
+        if ($this->option('force') || ! File::exists($path)) {
+            return [];
+        }
+
+        $existing = json_decode(File::get($path), true);
+
+        if (! is_array($existing)) {
+            return [];
+        }
+
+        $shrunk = [];
+
+        foreach ($payload as $bucket => $records) {
+            $was = count($existing[$bucket] ?? []);
+
+            if ($records->count() < $was) {
+                $shrunk[] = sprintf('%s %d → %d', $bucket, $was, $records->count());
+            }
+        }
+
+        return $shrunk;
     }
 }

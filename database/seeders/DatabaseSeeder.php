@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             CurrencySeeder::class,
             ContractTypeSeeder::class,
             ContactSeeder::class,
+            RealTourAgentsSeeder::class,
             ForeignPartnerSeeder::class,
             SponsorsSeeder::class,
             RolesAndPermissionsSeeder::class,
@@ -29,6 +30,7 @@ class DatabaseSeeder extends Seeder
             PressTours2026Seeder::class,
 
             HandEnteredContractsSeeder::class,
+            RequisitionSeeder::class,
         ]);
     }
 }

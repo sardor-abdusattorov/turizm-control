@@ -81,7 +81,6 @@
 </div>
 
 <style>
-    /* Palette tokens (--s/--t/--m/--accent/...) live in theme.css. */
     .pv {
         font-size: .875rem;
         color: var(--t);
@@ -90,8 +89,6 @@
         gap: 1rem;
     }
 
-    /* HERO — grounded minimalism: quiet surface + hairline border, no colour
-       stripe (the paid percent on the right is the headline). */
     .pv-hero {
         position: relative;
         display: flex;
@@ -115,7 +112,6 @@
         gap: .55rem;
         flex-wrap: wrap;
     }
-    /* Quiet grey chip — colour is reserved for the paid-percent figure. */
     .pv-chip {
         display: inline-flex;
         align-items: center;
@@ -167,8 +163,6 @@
         align-items: center;
         gap: .4rem;
     }
-    /* The paid percent as a plain headline figure (no filled pill), mirroring
-       the project hero's metric — big, tabular, quietly green for "paid". */
     .pv-amount {
         flex-shrink: 0;
         align-self: center;
@@ -183,7 +177,6 @@
         color: #6ee7b7;
     }
 
-    /* card / hd / dets / row primitives live in theme.css. */
     .pv-row__link {
         font-size: .8125rem;
         font-weight: 500;

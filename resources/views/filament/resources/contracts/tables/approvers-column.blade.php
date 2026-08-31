@@ -71,8 +71,6 @@
             gap: .6rem;
         }
 
-        /* Single continuous track — green fill = approved fraction. Clearer
-           than one ambiguous segment per approver. */
         .ca__bar {
             flex: 1;
             min-width: 4rem;

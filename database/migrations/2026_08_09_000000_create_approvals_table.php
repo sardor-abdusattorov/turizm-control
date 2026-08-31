@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('approvals', function (Blueprint $table) {
             $table->id();
-            $table->morphs('approvable');
+            $table->string('approvable_type');
+            $table->unsignedBigInteger('approvable_id');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
 
             $table->unsignedInteger('order')->default(1);

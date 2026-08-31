@@ -17,6 +17,9 @@ class ListContracts extends ListRecords
 {
     protected static string $resource = ContractResource::class;
 
+    /** @var array<string, Tab>|null */
+    protected ?array $memoizedTabs = null;
+
     protected function getHeaderActions(): array
     {
         return [
@@ -31,6 +34,12 @@ class ListContracts extends ListRecords
     }
 
     public function getTabs(): array
+    {
+        return $this->memoizedTabs ??= $this->buildTabs();
+    }
+
+    /** @return array<string, Tab> */
+    protected function buildTabs(): array
     {
         $user = auth()->user();
 

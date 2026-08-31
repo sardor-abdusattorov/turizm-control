@@ -134,7 +134,6 @@
 </div>
 
 <style>
-    /* Base palette tokens (--s/--t/--m/--accent/...) live in theme.css. */
     .ow {
         --accent-ring: rgba(37, 99, 235, .18);
         --accent-on: #fff;
@@ -149,9 +148,6 @@
         --track: rgba(255, 255, 255, .08);
     }
 
-    /* HERO — grounded minimalism: a quiet surface with a hairline border, no
-       colour stripe (status lives in the pill on the right), matching the
-       project pilot the whole app now follows. */
     .ow-hero {
         position: relative;
         display: flex;
@@ -175,7 +171,6 @@
         gap: .55rem;
         flex-wrap: wrap;
     }
-    /* Quiet grey category chip — colour is reserved for the status pill. */
     .ow-chip {
         display: inline-flex;
         align-items: center;
@@ -228,7 +223,6 @@
         gap: .4rem;
     }
 
-    /* PILL */
     .ow-pill {
         display: inline-flex;
         align-items: center;
@@ -265,9 +259,6 @@
         color: #cbd5e1;
     }
 
-    /* card / hd primitives live in theme.css. */
-
-    /* FILE BLOCK */
     .ow-file {
         display: flex;
         align-items: flex-start;
@@ -285,8 +276,6 @@
         align-items: center;
         justify-content: center;
         box-shadow: inset 0 0 0 1px var(--d);
-        /* The decorative document SVG is sized by width; clip it so it can
-           never spill past the tile regardless of the tile's dimensions. */
         overflow: hidden;
     }
     .ow-file__thumb svg {
@@ -370,8 +359,6 @@
         background: var(--soft);
     }
 
-    /* dets / row primitives (k/ic/lb/v/vl/vl--muted) live in theme.css.
-       Page-specific extensions (--wrap modifier) stay here. */
     .ow-row--wrap .ow-row__k {
         align-items: flex-start;
         padding-top: 1rem;
@@ -400,9 +387,7 @@
         text-decoration: underline;
     }
 
-    /* ───── Mobile (< 640px) ─────────────────────────────────────────────── */
     @media (max-width: 640px) {
-        /* Hero: stack the columns, let dates wrap, dim chip-meta gap. */
         .ow-hero {
             flex-direction: column;
             gap: .9rem;
@@ -425,9 +410,6 @@
             word-break: break-all;
         }
 
-        /* File-card row: keep thumb + body side by side, just a touch tighter.
-           (Stacking the thumb to full width blew the SVG up to ~250px tall and
-           it burst out over the card heading — the row layout stays compact.) */
         .ow-file {
             gap: .9rem;
             padding: 1.1rem 1.1rem .25rem;
