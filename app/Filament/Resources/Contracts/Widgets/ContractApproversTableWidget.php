@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Contracts\Widgets;
 use App\Enums\ContractApproverStatus;
 use App\Models\Contract;
 use App\Models\ContractApprover;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ContractApproversTableWidget extends TableWidget
 {
+    use HasWidgetShield;
+
     public int $contractId;
 
     protected int|string|array $columnSpan = 'full';

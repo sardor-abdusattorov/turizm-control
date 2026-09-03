@@ -2,10 +2,13 @@
 
 namespace App\Filament\Widgets\Logger;
 
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use MrAdder\FilamentLogger\Widgets\ActivityOverviewWidget as BaseWidget;
 
 class ActivityOverviewWidget extends BaseWidget
 {
+    use HasWidgetShield;
+
     public function getHeading(): ?string
     {
         return __('app.activity.overview_heading');

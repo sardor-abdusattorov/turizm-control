@@ -2,11 +2,14 @@
 
 namespace App\Filament\Widgets\Logger;
 
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Illuminate\Contracts\Support\Htmlable;
 use MrAdder\FilamentLogger\Widgets\HighRiskActionsChartWidget as BaseWidget;
 
 class HighRiskActionsChartWidget extends BaseWidget
 {
+    use HasWidgetShield;
+
     public function getHeading(): string|Htmlable|null
     {
         return $this->activityReviewHeadingForPlaybook(__('app.activity.high_risk_actions_heading'), 'high_risk_incidents');

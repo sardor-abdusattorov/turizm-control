@@ -19,7 +19,15 @@ function viewerWithAccess(): User
 {
     $user = User::factory()->create();
 
-    foreach (['view_any_contract', 'view_contract', 'update_contract'] as $ability) {
+    foreach ([
+        'view_any_contract',
+        'view_contract',
+        'update_contract',
+        'view_contract_approval_chain_table_widget',
+        'view_contract_approvers_table_widget',
+        'view_contract_payments_table_widget',
+        'view_document_history_timeline_widget',
+    ] as $ability) {
         Permission::findOrCreate($ability, 'web');
         $user->givePermissionTo($ability);
     }

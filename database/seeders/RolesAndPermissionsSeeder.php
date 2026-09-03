@@ -2,6 +2,17 @@
 
 namespace Database\Seeders;
 
+use App\Filament\Resources\Contacts\Widgets\ContactBankAccountsTableWidget;
+use App\Filament\Resources\Contracts\Widgets\ContractApprovalChainTableWidget;
+use App\Filament\Resources\Contracts\Widgets\ContractApproversTableWidget;
+use App\Filament\Resources\Contracts\Widgets\ContractPaymentsTableWidget;
+use App\Filament\Widgets\ApprovalsTimelineWidget;
+use App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget;
+use App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget;
+use App\Filament\Widgets\Dashboard\ProjectContractsTableWidget;
+use App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget;
+use App\Filament\Widgets\DocumentHistoryTimelineWidget;
+use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
@@ -21,7 +32,27 @@ class RolesAndPermissionsSeeder extends Seeder
         $superAdmin = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
         $superAdmin->syncPermissions(Permission::where('guard_name', 'web')->pluck('name'));
 
+        $contractWidgets = $this->widgetPermissions(
+            ContractApprovalChainTableWidget::class,
+            ContractApproversTableWidget::class,
+            ContractPaymentsTableWidget::class,
+            DocumentHistoryTimelineWidget::class,
+        );
+        $counterpartyWidgets = $this->widgetPermissions(
+            CounterpartyContractsTableWidget::class,
+            CounterpartyProjectsTableWidget::class,
+            ContactBankAccountsTableWidget::class,
+        );
+        $projectWidgets = $this->widgetPermissions(
+            ProjectContractsTableWidget::class,
+            ProjectParticipantsTableWidget::class,
+        );
+        $requisitionWidgets = $this->widgetPermissions(ApprovalsTimelineWidget::class);
+
         $this->syncRole('director', [
+            ...$contractWidgets,
+            ...$projectWidgets,
+            ...$requisitionWidgets,
             'view_all_contracts',
             'approve_contracts',
             'export_contract',
@@ -39,6 +70,10 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
 
         $this->syncRole('manager', [
+            ...$contractWidgets,
+            ...$counterpartyWidgets,
+            ...$projectWidgets,
+            ...$requisitionWidgets,
             'export_contract',
             'export_contact',
             'export_project',
@@ -60,6 +95,8 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
 
         $this->syncRole('legal_officer', [
+            ...$contractWidgets,
+            ...$counterpartyWidgets,
             'view_all_contracts',
             'approve_contracts',
             'export_contract',
@@ -70,6 +107,10 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
 
         $this->syncRole('accountant', [
+            ...$contractWidgets,
+            ...$counterpartyWidgets,
+            ...$projectWidgets,
+            ...$requisitionWidgets,
             'view_all_contracts',
             'approve_contracts',
             'export_contract',
@@ -106,5 +147,19 @@ class RolesAndPermissionsSeeder extends Seeder
     protected function resourcePermissions(string $resource, array $abilities): array
     {
         return array_map(fn (string $ability): string => "{$ability}_{$resource}", $abilities);
+    }
+
+    /**
+     * @param  class-string  ...$widgets
+     * @return list<string>
+     */
+    protected function widgetPermissions(string ...$widgets): array
+    {
+        $registered = FilamentShield::getWidgets() ?? [];
+
+        return array_values(array_filter(array_map(
+            fn (string $widget): ?string => array_key_first($registered[$widget]['permissions'] ?? []),
+            $widgets,
+        )));
     }
 }

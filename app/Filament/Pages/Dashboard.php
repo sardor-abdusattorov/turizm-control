@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
 use App\Models\Project;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard\Actions\FilterAction;
@@ -23,6 +24,12 @@ class Dashboard extends BaseDashboard
         $this->filters['projectId'] ??= Project::dashboardDefault()?->id;
         $this->filters['type'] ??= self::ALL;
         $this->filters['year'] ??= self::ALL;
+    }
+
+    /** @return array<int, class-string> */
+    public function getWidgets(): array
+    {
+        return [DashboardHeaderWidget::class];
     }
 
     protected function getHeaderActions(): array

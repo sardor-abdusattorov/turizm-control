@@ -43,10 +43,12 @@
             <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="tab = 'overview'">
                 {{ __('app.label.basic_information') }}
             </x-filament::tabs.item>
-            <x-filament::tabs.item icon="heroicon-o-user-group" alpine-active="tab === 'approval'" x-on:click="tab = 'approval'"
-                :badge="$total ?: null">
-                {{ __('app.approval.section') }}
-            </x-filament::tabs.item>
+            @if (\App\Filament\Widgets\ApprovalsTimelineWidget::canView())
+                <x-filament::tabs.item icon="heroicon-o-user-group" alpine-active="tab === 'approval'" x-on:click="tab = 'approval'"
+                    :badge="$total ?: null">
+                    {{ __('app.approval.section') }}
+                </x-filament::tabs.item>
+            @endif
             <x-filament::tabs.item icon="heroicon-o-clock" alpine-active="tab === 'history'" x-on:click="tab = 'history'">
                 {{ __('app.label.history') }}
             </x-filament::tabs.item>
@@ -102,7 +104,7 @@
         </section>
     </div>
 
-    <div x-show="tab === 'approval'" x-cloak>
+    <div x-show="tab === 'approval'" x-cloak @if (! \App\Filament\Widgets\ApprovalsTimelineWidget::canView()) hidden @endif>
         <section class="ow-card">
             <div class="ow-hd">
                 <span class="ow-hd__ic">{!! $ic('heroicon-o-user-group') !!}</span>
@@ -128,7 +130,9 @@
                 </div>
             @endif
 
-            @livewire(\App\Filament\Widgets\ApprovalsTimelineWidget::class, ['requisitionId' => $record->id], key('approvals-'.$record->id))
+            @if (\App\Filament\Widgets\ApprovalsTimelineWidget::canView())
+                @livewire(\App\Filament\Widgets\ApprovalsTimelineWidget::class, ['requisitionId' => $record->id], key('approvals-'.$record->id))
+            @endif
         </section>
     </div>
 

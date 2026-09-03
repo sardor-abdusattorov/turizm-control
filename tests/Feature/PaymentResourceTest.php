@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PaymentSubject;
 use App\Filament\Resources\Payments\Pages\CreatePayment;
 use App\Filament\Resources\Payments\Pages\EditPayment;
 use App\Filament\Resources\Payments\Pages\ListPayments;
@@ -7,6 +8,7 @@ use App\Filament\Resources\Payments\Pages\ViewPayment;
 use App\Livewire\MediaLibrary;
 use App\Models\Contract;
 use App\Models\Payment;
+use Filament\Forms\Components\Textarea;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -225,4 +227,18 @@ it('refuses to record a payment against a contract that is not approved', functi
         ])
         ->call('create')
         ->assertHasFormErrors(['contract_id']);
+});
+
+it('takes the purpose of a project payment as a textarea and keeps the amount fields on one row', function () {
+    actingAs(userWithPermission('view_any_payment', 'create_payment'));
+
+    Livewire::test(CreatePayment::class)
+        ->fillForm(['subject' => PaymentSubject::Project->value])
+        ->assertFormFieldExists('purpose', 'form', fn (Textarea $field): bool => $field->getRows() === 2)
+        ->assertFormFieldIsVisible('purpose')
+        ->assertFormFieldIsVisible('amount')
+        ->assertFormFieldIsHidden('percent')
+        ->fillForm(['subject' => PaymentSubject::Contract->value])
+        ->assertFormFieldIsHidden('purpose')
+        ->assertFormFieldIsVisible('percent');
 });

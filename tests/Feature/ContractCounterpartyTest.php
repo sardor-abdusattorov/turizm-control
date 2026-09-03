@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\CounterpartyKind;
 use App\Filament\Resources\Contracts\Pages\CreateContract;
 use App\Models\Contact;
 use App\Models\Contract;
@@ -119,4 +120,22 @@ it('leaves a sponsorship contract without a contact', function () {
         ->and($contract->contact)->toBeNull()
         ->and($contract->sponsor)->not->toBeNull()
         ->and((float) $contract->amount)->toBe(50_000_000.0);
+});
+
+it('lets the author switch between a contact and a sponsor regardless of the contract type', function () {
+    actingAs(userWithPermission('view_any_contract', 'create_contract'));
+
+    $fee = ContractType::factory()->income()->create();
+
+    Livewire::test(CreateContract::class)
+        ->fillForm(['contract_type_id' => $fee->id])
+        ->assertFormFieldIsVisible('counterparty_kind')
+        ->assertFormFieldIsVisible('contact_id')
+        ->assertFormFieldIsHidden('sponsor_id')
+        ->fillForm(['counterparty_kind' => CounterpartyKind::Sponsor->value])
+        ->assertFormFieldIsVisible('sponsor_id')
+        ->assertFormFieldIsHidden('contact_id')
+        ->fillForm(['counterparty_kind' => CounterpartyKind::Contact->value])
+        ->assertFormFieldIsVisible('contact_id')
+        ->assertFormFieldIsHidden('sponsor_id');
 });

@@ -135,8 +135,7 @@ class Settings extends Page implements HasForms
                                     ->maxSize(2048)
                                     ->previewable()
                                     ->downloadable()
-                                    ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/svg+xml'])
-                                    ->helperText(__('app.helper.organization_logo')),
+                                    ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/svg+xml']),
                             ]),
 
                         Tabs\Tab::make(__('app.label.tab_seo'))
@@ -159,7 +158,6 @@ class Settings extends Page implements HasForms
 
                                 Toggle::make('seo.indexing_enabled')
                                     ->label(__('app.label.seo_indexing_enabled'))
-                                    ->helperText(__('app.helper.seo_indexing_enabled'))
                                     ->default(true),
 
                                 FileUpload::make('seo.og_image')
@@ -171,8 +169,7 @@ class Settings extends Page implements HasForms
                                     ->maxSize(2048)
                                     ->previewable()
                                     ->downloadable()
-                                    ->acceptedFileTypes(['image/png', 'image/jpeg'])
-                                    ->helperText(__('app.helper.seo_og_image')),
+                                    ->acceptedFileTypes(['image/png', 'image/jpeg']),
                             ]),
 
                         Tabs\Tab::make(__('app.label.tab_approval_flow'))
@@ -180,13 +177,11 @@ class Settings extends Page implements HasForms
 
                                 Toggle::make('approval.enabled')
                                     ->label(__('app.label.approval_enabled'))
-                                    ->helperText(__('app.helper.approval_enabled'))
                                     ->default(true)
                                     ->live(),
 
                                 Repeater::make('approval.flow')
                                     ->label(__('app.label.approval_flow'))
-                                    ->helperText(__('app.helper.approval_flow'))
                                     ->reorderableWithDragAndDrop()
                                     ->reorderable()
                                     ->addActionLabel(__('app.action.add_department'))
@@ -204,7 +199,6 @@ class Settings extends Page implements HasForms
 
                                 TextInput::make('approval.sla_days')
                                     ->label(__('app.label.approval_sla_days'))
-                                    ->helperText(__('app.helper.approval_sla_days'))
                                     ->numeric()
                                     ->minValue(1)
                                     ->maxValue(60)
@@ -215,7 +209,6 @@ class Settings extends Page implements HasForms
                             ->schema([
                                 Select::make('requisition.approver_ids')
                                     ->label(__('app.label.requisition_default_reviewer'))
-                                    ->helperText(__('app.helper.requisition_default_reviewer'))
                                     ->multiple()
                                     ->options(fn (): array => User::activeOptionsGroupedByDepartment())
                                     ->allowHtml()
@@ -225,7 +218,6 @@ class Settings extends Page implements HasForms
 
                                 TextInput::make('requisition.review_days')
                                     ->label(__('app.label.requisition_review_days'))
-                                    ->helperText(__('app.helper.requisition_review_days'))
                                     ->numeric()
                                     ->minValue(1)
                                     ->maxValue(60)

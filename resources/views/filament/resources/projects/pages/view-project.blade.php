@@ -119,14 +119,18 @@
                 <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
                     {{ __('app.label.overview') }}
                 </x-filament::tabs.item>
-                <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')"
-                    :badge="$visibleContracts->count() ?: null">
-                    {{ __('app.label.contracts') }}
-                </x-filament::tabs.item>
-                <x-filament::tabs.item icon="heroicon-o-user-group" alpine-active="tab === 'participants'" x-on:click="go('participants')"
-                    :badge="$participantCount ?: null">
-                    {{ __('app.label.participants') }}
-                </x-filament::tabs.item>
+                @if (\App\Filament\Widgets\Dashboard\ProjectContractsTableWidget::canView())
+                    <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')"
+                        :badge="$visibleContracts->count() ?: null">
+                        {{ __('app.label.contracts') }}
+                    </x-filament::tabs.item>
+                @endif
+                @if (\App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget::canView())
+                    <x-filament::tabs.item icon="heroicon-o-user-group" alpine-active="tab === 'participants'" x-on:click="go('participants')"
+                        :badge="$participantCount ?: null">
+                        {{ __('app.label.participants') }}
+                    </x-filament::tabs.item>
+                @endif
                 <x-filament::tabs.item icon="heroicon-o-photo" alpine-active="tab === 'gallery'" x-on:click="go('gallery')"
                     :badge="$galleryCount ?: null">
                     {{ __('app.label.gallery') }}
@@ -229,13 +233,17 @@
             @endif
         </div>
 
-        <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
-            @livewire(\App\Filament\Widgets\Dashboard\ProjectContractsTableWidget::class, ['pageFilters' => ['projectId' => $record->id], 'hideHeading' => true], key('project-contracts-'.$record->id))
-        </div>
+        @if (\App\Filament\Widgets\Dashboard\ProjectContractsTableWidget::canView())
+            <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
+                @livewire(\App\Filament\Widgets\Dashboard\ProjectContractsTableWidget::class, ['pageFilters' => ['projectId' => $record->id], 'hideHeading' => true], key('project-contracts-'.$record->id))
+            </div>
+        @endif
 
-        <div x-show="tab === 'participants'" x-cloak class="pj-panel">
-            @livewire(\App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget::class, ['pageFilters' => ['projectId' => $record->id]], key('project-participants-'.$record->id))
-        </div>
+        @if (\App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget::canView())
+            <div x-show="tab === 'participants'" x-cloak class="pj-panel">
+                @livewire(\App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget::class, ['pageFilters' => ['projectId' => $record->id]], key('project-participants-'.$record->id))
+            </div>
+        @endif
 
         <div x-show="tab === 'gallery'" x-cloak class="pj-panel">
             @livewire(\App\Livewire\MediaLibrary::class, ['variant' => 'project-gallery', 'recordId' => $record->id], key('project-gallery-'.$record->id))

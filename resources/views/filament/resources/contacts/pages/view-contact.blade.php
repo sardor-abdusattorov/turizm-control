@@ -39,18 +39,22 @@
             <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
                 {{ __('app.label.overview') }}
             </x-filament::tabs.item>
-            @if ($isLegal)
+            @if ($isLegal && \App\Filament\Resources\Contacts\Widgets\ContactBankAccountsTableWidget::canView())
                 <x-filament::tabs.item icon="heroicon-o-building-library" alpine-active="tab === 'bank'" x-on:click="go('bank')"
                     :badge="$accounts->count() ?: null">
                     {{ __('app.label.bank_requisites') }}
                 </x-filament::tabs.item>
             @endif
-            <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')">
-                {{ __('app.label.contracts') }}
-            </x-filament::tabs.item>
-            <x-filament::tabs.item icon="heroicon-o-presentation-chart-bar" alpine-active="tab === 'projects'" x-on:click="go('projects')">
-                {{ __('app.label.projects') }}
-            </x-filament::tabs.item>
+            @if (\App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget::canView())
+                <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')">
+                    {{ __('app.label.contracts') }}
+                </x-filament::tabs.item>
+            @endif
+            @if (\App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget::canView())
+                <x-filament::tabs.item icon="heroicon-o-presentation-chart-bar" alpine-active="tab === 'projects'" x-on:click="go('projects')">
+                    {{ __('app.label.projects') }}
+                </x-filament::tabs.item>
+            @endif
         </x-filament::tabs>
     </div>
 
@@ -75,18 +79,22 @@
         </section>
     </div>
 
-    @if ($isLegal)
+    @if ($isLegal && \App\Filament\Resources\Contacts\Widgets\ContactBankAccountsTableWidget::canView())
         <div x-show="tab === 'bank'" x-cloak class="pj-panel">
             @livewire(\App\Filament\Resources\Contacts\Widgets\ContactBankAccountsTableWidget::class, ['contactId' => $record->id], key('contact-bank-'.$record->id))
         </div>
     @endif
 
-    <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
-        @livewire(\App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget::class, ['contactId' => $record->id], key('contact-contracts-'.$record->id))
-    </div>
+    @if (\App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget::canView())
+        <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
+            @livewire(\App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget::class, ['contactId' => $record->id], key('contact-contracts-'.$record->id))
+        </div>
+    @endif
 
-    <div x-show="tab === 'projects'" x-cloak class="pj-panel">
-        @livewire(\App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget::class, ['contactId' => $record->id], key('contact-projects-'.$record->id))
-    </div>
+    @if (\App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget::canView())
+        <div x-show="tab === 'projects'" x-cloak class="pj-panel">
+            @livewire(\App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget::class, ['contactId' => $record->id], key('contact-projects-'.$record->id))
+        </div>
+    @endif
 </div>
 </x-filament-panels::page>

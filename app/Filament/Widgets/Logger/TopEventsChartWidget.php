@@ -2,11 +2,14 @@
 
 namespace App\Filament\Widgets\Logger;
 
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Illuminate\Contracts\Support\Htmlable;
 use MrAdder\FilamentLogger\Widgets\TopEventsChartWidget as BaseWidget;
 
 class TopEventsChartWidget extends BaseWidget
 {
+    use HasWidgetShield;
+
     public function getHeading(): string|Htmlable|null
     {
         return $this->activityReviewHeadingForPlaybook(__('app.activity.top_events_heading'), 'all_activity');

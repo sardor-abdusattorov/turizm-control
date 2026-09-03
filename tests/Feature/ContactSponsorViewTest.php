@@ -17,7 +17,14 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class);
 
 it('renders the contact view with all its data', function () {
-    actingAs(userWithPermission('view_any_contact', 'view_contact', 'view_all_contracts'));
+    actingAs(userWithPermission(
+        'view_any_contact',
+        'view_contact',
+        'view_all_contracts',
+        'view_contact_bank_accounts_table_widget',
+        'view_counterparty_contracts_table_widget',
+        'view_counterparty_projects_table_widget',
+    ));
 
     $contact = Contact::factory()->create([
         'type' => Contact::TYPE_LEGAL,
@@ -51,7 +58,12 @@ it('shows a manager only their own contracts on the contact view', function () {
     $project = Project::factory()->international()->create();
     $contact = Contact::factory()->create(['type' => Contact::TYPE_LEGAL]);
 
-    $manager = userWithPermission('view_any_contact', 'view_contact');
+    $manager = userWithPermission(
+        'view_any_contact',
+        'view_contact',
+        'view_counterparty_contracts_table_widget',
+        'view_counterparty_projects_table_widget',
+    );
 
     Contract::factory()->create(['contact_id' => $contact->id, 'responsible_id' => $manager->id, 'number' => 'MINE-CT']);
     Contract::factory()->create(['contact_id' => $contact->id, 'responsible_id' => User::factory()->create()->id, 'number' => 'FOREIGN-CT']);

@@ -17,8 +17,10 @@ uses(RefreshDatabase::class);
 function listOversight(): User
 {
     $user = User::factory()->create(['status' => User::STATUS_ACTIVE]);
-    Permission::findOrCreate('view_any_contract', 'web');
-    $user->givePermissionTo('view_any_contract');
+    foreach (['view_any_contract', 'view_contract_approvers_table_widget'] as $ability) {
+        Permission::findOrCreate($ability, 'web');
+        $user->givePermissionTo($ability);
+    }
     $user->assignRole(Role::findOrCreate('super_admin', 'web'));
     actingAs($user->fresh());
 

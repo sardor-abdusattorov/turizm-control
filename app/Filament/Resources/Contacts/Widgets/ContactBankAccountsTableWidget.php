@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Contacts\Widgets;
 
 use App\Models\BankAccount;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ContactBankAccountsTableWidget extends TableWidget
 {
+    use HasWidgetShield;
+
     public int $contactId;
 
     protected int|string|array $columnSpan = 'full';

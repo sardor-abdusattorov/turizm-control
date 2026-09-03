@@ -28,12 +28,16 @@
             <x-filament::tabs.item icon="heroicon-o-rectangle-group" alpine-active="tab === 'overview'" x-on:click="go('overview')">
                 {{ __('app.label.overview') }}
             </x-filament::tabs.item>
-            <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')">
-                {{ __('app.label.contracts') }}
-            </x-filament::tabs.item>
-            <x-filament::tabs.item icon="heroicon-o-presentation-chart-bar" alpine-active="tab === 'projects'" x-on:click="go('projects')">
-                {{ __('app.label.projects') }}
-            </x-filament::tabs.item>
+            @if (\App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget::canView())
+                <x-filament::tabs.item icon="heroicon-o-document-text" alpine-active="tab === 'contracts'" x-on:click="go('contracts')">
+                    {{ __('app.label.contracts') }}
+                </x-filament::tabs.item>
+            @endif
+            @if (\App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget::canView())
+                <x-filament::tabs.item icon="heroicon-o-presentation-chart-bar" alpine-active="tab === 'projects'" x-on:click="go('projects')">
+                    {{ __('app.label.projects') }}
+                </x-filament::tabs.item>
+            @endif
         </x-filament::tabs>
     </div>
 
@@ -64,12 +68,16 @@
         </section>
     </div>
 
-    <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
-        @livewire(\App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget::class, ['sponsorId' => $record->id], key('sponsor-contracts-'.$record->id))
-    </div>
+    @if (\App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget::canView())
+        <div x-show="tab === 'contracts'" x-cloak class="pj-panel">
+            @livewire(\App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget::class, ['sponsorId' => $record->id], key('sponsor-contracts-'.$record->id))
+        </div>
+    @endif
 
-    <div x-show="tab === 'projects'" x-cloak class="pj-panel">
-        @livewire(\App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget::class, ['sponsorId' => $record->id], key('sponsor-projects-'.$record->id))
-    </div>
+    @if (\App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget::canView())
+        <div x-show="tab === 'projects'" x-cloak class="pj-panel">
+            @livewire(\App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget::class, ['sponsorId' => $record->id], key('sponsor-projects-'.$record->id))
+        </div>
+    @endif
 </div>
 </x-filament-panels::page>

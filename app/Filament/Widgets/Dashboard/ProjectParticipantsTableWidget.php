@@ -8,6 +8,7 @@ use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\Contracts\ContractResource;
 use App\Models\Contract;
 use App\Support\Money;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -16,6 +17,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ProjectParticipantsTableWidget extends TableWidget
 {
+    use HasWidgetShield {
+        canView as shieldCanView;
+    }
     use InteractsWithPageFilters;
 
     public ?string $kind = null;
@@ -24,7 +28,7 @@ class ProjectParticipantsTableWidget extends TableWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->can('view_any_project') ?? false;
+        return static::shieldCanView() && (auth()->user()?->can('view_any_project') ?? false);
     }
 
     public function table(Table $table): Table

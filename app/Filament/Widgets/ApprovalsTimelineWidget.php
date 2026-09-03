@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Enums\ApprovalStatus;
 use App\Models\Approval;
 use App\Models\Requisition;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Actions\Action;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
@@ -16,6 +17,8 @@ use Illuminate\Support\Collection;
 
 class ApprovalsTimelineWidget extends TableWidget
 {
+    use HasWidgetShield;
+
     public int $requisitionId;
 
     protected int|string|array $columnSpan = 'full';

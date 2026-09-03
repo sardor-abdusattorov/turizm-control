@@ -329,8 +329,8 @@ it('renders the chain on the index with each approver and the progress', functio
 
     expect($html)->toContain('fi-approvers-cell')
         ->toContain('fi-state-pill')
-        ->toContain($first->name)
-        ->toContain($second->name)
+        ->toContain(e($first->name))
+        ->toContain(e($second->name))
         ->toContain('0/2');
 });
 

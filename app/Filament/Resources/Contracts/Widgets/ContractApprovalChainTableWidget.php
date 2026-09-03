@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Contracts\Widgets;
 
 use App\Models\Contract;
 use App\Models\ContractApprover;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -15,6 +16,8 @@ use Spatie\Activitylog\Models\Activity;
 
 class ContractApprovalChainTableWidget extends TableWidget
 {
+    use HasWidgetShield;
+
     public int $contractId;
 
     protected int|string|array $columnSpan = 'full';

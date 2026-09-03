@@ -15,7 +15,7 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class);
 
 it('renders the contract history as a timeline with localized workflow labels', function () {
-    $user = User::factory()->create();
+    $user = userWithPermission('view_document_history_timeline_widget');
     actingAs($user);
 
     $contract = Contract::factory()->create();
@@ -36,9 +36,15 @@ it('opens the approver details as a native Filament modal', function () {
     $manager = User::factory()->create();
     $approver = User::factory()->create(['name' => 'Alisher Yuldoshev', 'status' => User::STATUS_ACTIVE]);
 
-    Permission::findOrCreate('view_any_contract', 'web');
-    Permission::findOrCreate('view_contract', 'web');
-    $manager->givePermissionTo(['view_any_contract', 'view_contract']);
+    foreach ([
+        'view_any_contract',
+        'view_contract',
+        'view_contract_approval_chain_table_widget',
+        'view_contract_approvers_table_widget',
+    ] as $ability) {
+        Permission::findOrCreate($ability, 'web');
+        $manager->givePermissionTo($ability);
+    }
     actingAs($manager->fresh());
 
     $contract = Contract::factory()->create([
@@ -66,7 +72,7 @@ it('opens the approver details as a native Filament modal', function () {
 });
 
 it('filters history down to workflow events only', function () {
-    $user = User::factory()->create();
+    $user = userWithPermission('view_document_history_timeline_widget');
     actingAs($user);
 
     $contract = Contract::factory()->create();

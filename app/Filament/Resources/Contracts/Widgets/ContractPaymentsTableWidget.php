@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Contracts\Widgets;
 
 use App\Models\Payment;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Table;
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ContractPaymentsTableWidget extends TableWidget
 {
+    use HasWidgetShield;
+
     public int $contractId;
 
     protected int|string|array $columnSpan = 'full';

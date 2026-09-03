@@ -4,7 +4,22 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ProfileSettings;
+use App\Filament\Resources\Contacts\Widgets\ContactBankAccountsTableWidget;
+use App\Filament\Resources\Contracts\Widgets\ContractApprovalChainTableWidget;
+use App\Filament\Resources\Contracts\Widgets\ContractApproversTableWidget;
+use App\Filament\Resources\Contracts\Widgets\ContractPaymentsTableWidget;
+use App\Filament\Widgets\ApprovalsTimelineWidget;
+use App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget;
+use App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget;
 use App\Filament\Widgets\Dashboard\DashboardHeaderWidget;
+use App\Filament\Widgets\Dashboard\ProjectContractsTableWidget;
+use App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget;
+use App\Filament\Widgets\DocumentHistoryTimelineWidget;
+use App\Filament\Widgets\Logger\ActivityOverviewWidget;
+use App\Filament\Widgets\Logger\ActivityTrendChartWidget;
+use App\Filament\Widgets\Logger\HighRiskActionsChartWidget;
+use App\Filament\Widgets\Logger\TopEventsChartWidget;
+use App\Filament\Widgets\Logger\TopUsersChartWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Caresome\FilamentAuthDesigner\AuthDesignerPlugin;
 use Caresome\FilamentAuthDesigner\Enums\MediaPosition;
@@ -89,8 +104,22 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
-
                 DashboardHeaderWidget::class,
+                ContractApprovalChainTableWidget::class,
+                ContractApproversTableWidget::class,
+                ContractPaymentsTableWidget::class,
+                DocumentHistoryTimelineWidget::class,
+                ApprovalsTimelineWidget::class,
+                ProjectContractsTableWidget::class,
+                ProjectParticipantsTableWidget::class,
+                CounterpartyContractsTableWidget::class,
+                CounterpartyProjectsTableWidget::class,
+                ContactBankAccountsTableWidget::class,
+                ActivityOverviewWidget::class,
+                ActivityTrendChartWidget::class,
+                TopUsersChartWidget::class,
+                TopEventsChartWidget::class,
+                HighRiskActionsChartWidget::class,
             ])
             ->plugins([
 

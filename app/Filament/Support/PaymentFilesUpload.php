@@ -22,7 +22,7 @@ class PaymentFilesUpload
             ->maxSize(10240)
             ->required()
             ->previewable()
-            ->downloadable()
-            ->panelLayout('grid');
+            ->imagePreviewHeight('120')
+            ->downloadable();
     }
 }

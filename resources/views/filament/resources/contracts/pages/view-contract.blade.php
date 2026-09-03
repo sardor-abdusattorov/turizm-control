@@ -51,10 +51,12 @@
                     :badge="$this->attachments()->count() ?: null">
                     {{ __('app.label.attachments') }}
                 </x-filament::tabs.item>
-                <x-filament::tabs.item icon="heroicon-o-clock" alpine-active="tab === 'history'" x-on:click="go('history')"
-                    :badge="$activities->count() ?: null">
-                    {{ __('app.label.history') }}
-                </x-filament::tabs.item>
+                @if (\App\Filament\Widgets\DocumentHistoryTimelineWidget::canView())
+                    <x-filament::tabs.item icon="heroicon-o-clock" alpine-active="tab === 'history'" x-on:click="go('history')"
+                        :badge="$activities->count() ?: null">
+                        {{ __('app.label.history') }}
+                    </x-filament::tabs.item>
+                @endif
             </x-filament::tabs>
             <span class="cw-pill cw-pill--{{ $statusColor }} cw-pill--lg rec-tabs-row__side">{{ $statusLabel }}</span>
         </div>
@@ -63,6 +65,8 @@
 
         @include('filament.resources.contracts.pages.view-contract.attachments')
 
-        @include('filament.resources.contracts.pages.view-contract.history')
+        @if (\App\Filament\Widgets\DocumentHistoryTimelineWidget::canView())
+            @include('filament.resources.contracts.pages.view-contract.history')
+        @endif
     </div>
 </x-filament-panels::page>

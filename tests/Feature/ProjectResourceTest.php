@@ -209,7 +209,12 @@ it('opens the role-scoped breakdown modals from the count badges', function () {
 it('scopes the project contracts badge totals to what the viewer may see', function () {
     $project = Project::factory()->international()->create();
 
-    $manager = userWithPermission('view_any_project', 'view_project');
+    $manager = userWithPermission(
+        'view_any_project',
+        'view_project',
+        'view_project_contracts_table_widget',
+        'view_project_participants_table_widget',
+    );
 
     Contract::factory()->create([
         'project_id' => $project->id,
@@ -279,7 +284,12 @@ it('filters the project list by year', function () {
 it('shows a manager only their own contracts on the project page', function () {
     $project = Project::factory()->international()->create();
 
-    $manager = userWithPermission('view_any_project', 'view_project');
+    $manager = userWithPermission(
+        'view_any_project',
+        'view_project',
+        'view_project_contracts_table_widget',
+        'view_project_participants_table_widget',
+    );
 
     Contract::factory()->create([
         'project_id' => $project->id,

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Contracts\Schemas;
 
+use App\Enums\CounterpartyKind;
 use App\Filament\Resources\Contacts\Schemas\ContactForm;
 use App\Filament\Resources\Sponsors\Schemas\SponsorForm;
 use App\Filament\Support\ContractDossierUpload;
@@ -18,6 +19,7 @@ use App\Services\Contracts\ApprovalChain;
 use App\Services\Contracts\ContractWorkflow;
 use Closure;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -102,18 +104,35 @@ class ContractForm
                                     ->preload()
                                     ->live()
                                     ->afterStateUpdated(function (Set $set, mixed $state): void {
-                                        if (self::typeUsesSponsor($state)) {
-                                            $set('contact_id', null);
-                                        } else {
-                                            $set('sponsor_id', null);
-                                        }
+                                        $kind = self::typeUsesSponsor($state) ? CounterpartyKind::Sponsor : CounterpartyKind::Contact;
+
+                                        $set('counterparty_kind', $kind->value);
+                                        $set($kind === CounterpartyKind::Sponsor ? 'contact_id' : 'sponsor_id', null);
                                     })
+                                    ->columnSpanFull(),
+
+                                Radio::make('counterparty_kind')
+                                    ->label(__('app.label.counterparty_kind'))
+                                    ->options(CounterpartyKind::options())
+                                    ->default(CounterpartyKind::Contact->value)
+                                    ->dehydrated(false)
+                                    ->inline()
+                                    ->inlineLabel(false)
+                                    ->live()
+                                    ->afterStateHydrated(fn (Set $set, ?Contract $record) => $set(
+                                        'counterparty_kind',
+                                        $record?->sponsor_id !== null ? CounterpartyKind::Sponsor->value : CounterpartyKind::Contact->value,
+                                    ))
+                                    ->afterStateUpdated(fn (Set $set, mixed $state) => $set(
+                                        $state === CounterpartyKind::Sponsor->value ? 'contact_id' : 'sponsor_id',
+                                        null,
+                                    ))
                                     ->columnSpanFull(),
 
                                 Select::make('contact_id')
                                     ->label(__('app.label.contact_single'))
-                                    ->visible(fn (Get $get): bool => ! self::typeUsesSponsor($get('contract_type_id')))
-                                    ->required(fn (Get $get): bool => ! self::typeUsesSponsor($get('contract_type_id')))
+                                    ->visible(fn (Get $get): bool => ! self::usesSponsor($get))
+                                    ->required(fn (Get $get): bool => ! self::usesSponsor($get))
                                     ->searchable()
                                     ->getSearchResultsUsing(fn (string $search): array => Contact::searchOptions($search))
                                     ->getOptionLabelUsing(fn ($value): ?string => Contact::find($value)?->optionLabel())
@@ -128,8 +147,8 @@ class ContractForm
 
                                 Select::make('sponsor_id')
                                     ->label(__('app.label.sponsor_single'))
-                                    ->visible(fn (Get $get): bool => self::typeUsesSponsor($get('contract_type_id')))
-                                    ->required(fn (Get $get): bool => self::typeUsesSponsor($get('contract_type_id')))
+                                    ->visible(fn (Get $get): bool => self::usesSponsor($get))
+                                    ->required(fn (Get $get): bool => self::usesSponsor($get))
                                     ->searchable()
                                     ->getSearchResultsUsing(fn (string $search): array => Sponsor::searchOptions($search))
                                     ->getOptionLabelUsing(fn ($value): ?string => Sponsor::find($value)?->optionLabel())
@@ -239,6 +258,11 @@ class ContractForm
                             ]),
                     ]),
             ]);
+    }
+
+    protected static function usesSponsor(Get $get): bool
+    {
+        return $get('counterparty_kind') === CounterpartyKind::Sponsor->value;
     }
 
     protected static function typeUsesSponsor(mixed $contractTypeId): bool

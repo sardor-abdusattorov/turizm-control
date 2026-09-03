@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Support\ContractActivity;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Devletes\FilamentTimelineView\Tables\Columns\TimelineEntry;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
@@ -14,6 +15,8 @@ use Spatie\Activitylog\Models\Activity;
 
 class DocumentHistoryTimelineWidget extends TableWidget
 {
+    use HasWidgetShield;
+
     public string $subjectType;
 
     public int $subjectId;

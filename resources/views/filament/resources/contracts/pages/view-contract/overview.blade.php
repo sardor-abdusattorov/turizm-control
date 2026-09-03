@@ -15,7 +15,7 @@
             @endphp
             <div class="cw-cols">
                 <div class="cw-main">
-                @if ($chainCardVisible)
+                @if ($chainCardVisible && \App\Filament\Resources\Contracts\Widgets\ContractApprovalChainTableWidget::canView())
                 <section class="cw-card">
                     <div class="cw-hd">
                         <span class="cw-hd__ic">{!! $ic('heroicon-o-users') !!}</span>
@@ -62,7 +62,7 @@
                 </section>
                 @endif
 
-                @if ($record->status === Contract::STATUS_APPROVED)
+                @if ($record->status === Contract::STATUS_APPROVED && \App\Filament\Resources\Contracts\Widgets\ContractPaymentsTableWidget::canView())
                 @php
                     $paymentSummary = $this->paymentSummary();
                     $paidPercent = $paymentSummary['paid_percent'];
