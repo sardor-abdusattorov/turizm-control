@@ -4,8 +4,6 @@
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
-    // Every fact of the tour, in the buyruq's own order. The state pill rides
-    // on the tab strip, so it is not repeated as a row here.
     $details = [
         ['heroicon-o-arrows-right-left', __('app.label.press_tour_direction'), $record->direction?->label(), 'chip'],
         ['heroicon-o-map-pin',           __('app.label.press_tour_place'),     $record->place,   null],

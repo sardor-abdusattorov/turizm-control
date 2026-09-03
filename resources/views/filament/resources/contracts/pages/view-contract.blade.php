@@ -7,14 +7,9 @@
     $current = $record->currentApprover();
     $hero = $this->heroContext();
 
-    // The chain rows themselves live in ContractApprovalChainTableWidget;
-    // what stays here is the summary the progress band above it reads.
     $active = $record->activeApprovers;
     $historical = $record->approvers->whereIn('status', [ContractApprover::STATUS_INVALIDATED, ContractApprover::STATUS_SKIPPED]);
     $approvedCount = $active->where('status', ContractApprover::STATUS_APPROVED)->count();
-    // Use the highest `order` in the chain so a "N of M" counter reads
-    // correctly even when an earlier slot was invalidated and removed from
-    // the active rows.
     $totalCount = (int) max($active->max('order') ?? 0, $active->count());
 
     $ic = fn (string $name, int $size = 18) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
@@ -23,7 +18,6 @@
         ->unique(fn ($a) => ($a->description ?? '').'|'.$a->created_at?->format('YmdHi'))
         ->values();
 
-    // Every fact in full — no status row (the pill rides on the tab strip).
     $details = [
         ['heroicon-o-hashtag', __('app.label.contract_number'), $record->number, null],
         ['heroicon-o-building-office-2', __('app.label.contact_single'), $record->contact?->name, $record->contact ? 'contact' : null],

@@ -1,11 +1,11 @@
 <?php
 
 use App\Enums\OrderScope;
+use App\Filament\Resources\Orders\BaseOrderResource;
 use App\Filament\Resources\Orders\Pages\CreateCommitteeOrder;
 use App\Filament\Resources\Orders\Pages\CreatePrCenterOrder;
 use App\Filament\Resources\Orders\Pages\ViewCommitteeOrder;
 use App\Filament\Resources\Orders\Pages\ViewPrCenterOrder;
-use App\Filament\Resources\Orders\Widgets\DerivedOrdersTableWidget;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -127,13 +127,38 @@ it('lists the derived PR centre orders on the committee order page', function ()
     ]);
     $unrelated = Order::factory()->prCenter()->create(['number' => 'ПР-22', 'file_path' => null]);
 
-    Livewire::test(DerivedOrdersTableWidget::class, ['orderId' => $committee->id])
-        ->assertOk()
-        ->assertCanSeeTableRecords([$derived])
-        ->assertCanNotSeeTableRecords([$unrelated]);
+    $html = Livewire::test(ViewCommitteeOrder::class, ['record' => $committee->id])->html();
+
+    expect($html)
+        ->toContain(__('app.label.pr_center_order_plural'))
+        ->toContain('ПР-21')
+        ->toContain(BaseOrderResource::urlFor($derived))
+        ->not->toContain('ПР-22')
+        ->not->toContain(BaseOrderResource::urlFor($unrelated));
+});
+
+it('says so on the committee order page when nothing is derived from it', function () {
+    Storage::fake('local');
+    orderAuthorActing();
+
+    $committee = Order::factory()->committee()->create(['file_path' => null]);
 
     expect(Livewire::test(ViewCommitteeOrder::class, ['record' => $committee->id])->html())
-        ->toContain(__('app.label.pr_center_order_plural'));
+        ->toContain(__('app.message.no_derived_orders'));
+});
+
+it('does not offer the derived orders row on a PR centre order', function () {
+    Storage::fake('local');
+    orderAuthorActing();
+
+    $committee = Order::factory()->committee()->create(['file_path' => null]);
+    $internal = Order::factory()->prCenter()->create([
+        'basis_order_id' => $committee->id,
+        'file_path' => null,
+    ]);
+
+    expect(Livewire::test(ViewPrCenterOrder::class, ['record' => $internal->id])->html())
+        ->not->toContain(__('app.label.pr_center_order_plural'));
 });
 
 it('keeps a PR centre order when its basis is deleted', function () {

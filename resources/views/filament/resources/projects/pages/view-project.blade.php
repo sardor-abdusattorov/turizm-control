@@ -5,9 +5,6 @@
         'areaCurrency', 'standCurrency', 'creator',
     ]);
 
-    // Same visibility rule as the contracts list: a manager without
-    // view_all_contracts only sees the project contracts they are
-    // responsible for.
     $visibleContracts = $record->contracts()
         ->visibleTo()
         ->with(['currency', 'contact', 'contractType'])
@@ -17,9 +14,6 @@
     $fmt = fn ($n) => \App\Support\Money::format($n);
     $money = fn ($amount, ?string $cur) => $amount === null ? __('app.label.not_set') : $fmt($amount).($cur ? ' '.$cur : '');
 
-    // Money the viewer is allowed to see, split by direction and currency —
-    // deliberately built from the visibleTo() set so a manager's tiles never
-    // leak sums of contracts hidden from them.
     $sumByDirection = fn (\App\Enums\ContractDirection $direction) => $visibleContracts
         ->filter(fn ($c) => $c->contractType?->direction === $direction
             && $c->status !== \App\Models\Contract::STATUS_REJECTED)
@@ -35,10 +29,6 @@
         ? $record->starts_on->format('d.m.Y').($record->ends_on ? ' — '.$record->ends_on->format('d.m.Y') : '')
         : __('app.label.not_set');
 
-    // «Участники» / «Спонсоры» are derived from the project's income contracts:
-    // participant-fee contracts (a Contact, no sponsor) vs sponsorship contracts
-    // (a Sponsor). Rejected contracts are dropped and only the visibleTo() set
-    // reaches the viewer, mirroring the contracts list.
     $members = $record->feeContracts()
         ->visibleTo()
         ->where('status', '!=', \App\Models\Contract::STATUS_REJECTED->value)
@@ -54,12 +44,8 @@
     $feesTotal = $record->feesTotal();
     $paidTotal = $record->paidTotal();
 
-    // Per-currency income-contract totals for the finance card and the panel
-    // footers — mixed currencies stay apart, never converted.
     $feeTotalsByCurrency = $record->incomeTotalsByCurrency(false);
 
-    // A single fee currency is shown only when every income contract shares it;
-    // mixed-currency projects drop the suffix rather than mislead.
     $currencies = $members->concat($sponsors)->map(fn ($c) => $c->currency?->short_name)->filter()->unique()->values();
     $feeCurrency = $currencies->count() === 1 ? $currencies->first() : '';
 

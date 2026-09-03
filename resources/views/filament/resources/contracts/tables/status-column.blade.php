@@ -7,8 +7,6 @@
     $status = $record->status;
     $label = $status->label();
 
-    // Solid palette per status — bigger and more readable than the default
-    // Filament badge which renders at ~text-xs in the table.
     $tone = match ($status) {
         Contract::STATUS_APPROVED => ['bg' => 'rgba(16,185,129,.14)', 'fg' => '#047857', 'dot' => '#10b981'],
         Contract::STATUS_IN_REVIEW, Contract::STATUS_IN_REVIEW_DIRECTOR => ['bg' => 'rgba(37,99,235,.14)', 'fg' => '#1d4ed8', 'dot' => '#2563eb'],

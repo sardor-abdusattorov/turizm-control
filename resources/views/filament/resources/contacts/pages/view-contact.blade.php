@@ -13,7 +13,6 @@
 
     $accounts = $record->bankAccounts;
 
-    // Every column the contact carries — «выводим всё, что есть».
     $details = array_values(array_filter([
         ['heroicon-o-identification', __('app.label.contact_type'), $typeLabel],
         ['heroicon-o-tag', __('app.label.legal_form'), $record->legal_form],

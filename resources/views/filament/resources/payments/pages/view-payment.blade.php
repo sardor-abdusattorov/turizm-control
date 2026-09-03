@@ -20,8 +20,6 @@
         ['heroicon-o-clock',         __('app.label.created_at'), $record->created_at?->format('d.m.Y H:i')],
     ];
 
-    // A row that cannot apply to this kind of payment is dropped rather than
-    // shown empty: a direct payment has no percent, a contract one no sum.
     $details = array_values(array_filter($details, fn (array $row) => match ($row[1]) {
         __('app.label.contract') => ! $isDirect,
         __('app.label.project_single'), __('app.label.amount'), __('app.label.payment_purpose') => $isDirect,

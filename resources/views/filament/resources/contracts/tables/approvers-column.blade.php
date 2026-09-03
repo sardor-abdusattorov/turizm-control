@@ -9,9 +9,6 @@
     $total = $active->count();
     $isDraft = $record->status === Contract::STATUS_DRAFT;
 
-    // Indigo-accent palette: green only for approved, indigo for reviewing
-    // (matches Filament's primary), red for rejection, cyan for return,
-    // neutral gray for queued/draft.
     $palette = [
         ContractApprover::STATUS_APPROVED->value => ['solid' => '#059669', 'soft' => 'rgba(5,150,105,.12)', 'icon' => 'heroicon-m-check'],
         ContractApprover::STATUS_REJECTED->value => ['solid' => '#dc2626', 'soft' => 'rgba(220,38,38,.12)', 'icon' => 'heroicon-m-x-mark'],
@@ -23,8 +20,6 @@
     $approved = $active->where('status', ContractApprover::STATUS_APPROVED)->count();
     $hasRejected = $active->contains(fn ($a) => $a->status === ContractApprover::STATUS_REJECTED);
 
-    // Summary semantics differ between draft (nothing submitted) and an
-    // active workflow (X out of Y already approved).
     [$summary, $summaryColor] = match (true) {
         $total === 0 => [__('app.label.not_set'), '#94a3b8'],
         $isDraft => [__('app.label.not_submitted'), '#64748b'],
@@ -197,8 +192,6 @@
                 @php
                     $c = $colorFor($a->status);
                     $av = $a->user?->getFilamentAvatarUrl();
-                    // While the contract is a draft, even PENDING/QUEUED rows
-                    // haven't really started reviewing — keep them quiet.
                     $statusLabel = $isDraft
                         ? __('app.contract_approver.status.not_submitted')
                         : $a->status->label();

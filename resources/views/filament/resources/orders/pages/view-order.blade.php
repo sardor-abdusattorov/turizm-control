@@ -13,15 +13,17 @@
 
     $ic = fn (string $name, int $size = 16) => svg($name, '', ['width' => $size, 'height' => $size])->toHtml();
 
-    // Every field that used to be scattered across Hero / File card / Sidebar
-    // now lives in a single Information table — including the description
-    // (rendered as a wrap row so paragraphs survive intact).
     $isPrCenter = $record->scope === \App\Enums\OrderScope::PrCenter;
     $basis = $record->basisOrder;
+
+    $derived = $isPrCenter
+        ? collect()
+        : $record->derivedOrders()->where('scope', \App\Enums\OrderScope::PrCenter)->get();
 
     $details = [
         ['heroicon-o-hashtag',                __('app.label.order_number'),       $record->number],
         ['heroicon-o-building-library',       __('app.label.committee_order_basis'), $basis?->label(), 'basis'],
+        ['heroicon-o-document-text',          __('app.label.pr_center_order_plural'), $derived, 'derived'],
         ['heroicon-o-document-text',          __('app.label.title'),              $record->title, 'wrap'],
         ['heroicon-o-bolt',                   __('app.label.status'),             $statusLabel, 'status'],
         ['heroicon-o-calendar',               __('app.label.issued_at'),          $record->issued_at?->format('d.m.Y')],
@@ -95,7 +97,8 @@
                     $hasValue = filled($value);
                 @endphp
                 @continue($type === 'basis' && ! $isPrCenter)
-                <div class="ow-row {{ $type === 'wrap' ? 'ow-row--wrap' : '' }}">
+                @continue($type === 'derived' && $isPrCenter)
+                <div class="ow-row {{ in_array($type, ['wrap', 'derived'], true) ? 'ow-row--wrap' : '' }}">
                     <span class="ow-row__k">
                         <span class="ow-row__ic">{!! $ic($icon, 14) !!}</span>
                         <span class="ow-row__lb">{{ $label }}</span>
@@ -106,6 +109,16 @@
                                 <a href="{{ \App\Filament\Resources\Orders\BaseOrderResource::urlFor($basis) }}" class="ow-row__vl ow-row__lnk">{{ $value }} {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}</a>
                             @else
                                 <span class="ow-row__vl ow-row__vl--muted">{{ __('app.label.not_set') }}</span>
+                            @endif
+                        @elseif ($type === 'derived')
+                            @if ($value->isNotEmpty())
+                                <span class="ow-row__lnks">
+                                    @foreach ($value as $one)
+                                        <a href="{{ \App\Filament\Resources\Orders\BaseOrderResource::urlFor($one) }}" class="ow-row__vl ow-row__lnk">{{ $one->label() }} {!! $ic('heroicon-m-arrow-top-right-on-square', 13) !!}</a>
+                                    @endforeach
+                                </span>
+                            @else
+                                <span class="ow-row__vl ow-row__vl--muted">{{ __('app.message.no_derived_orders') }}</span>
                             @endif
                         @elseif ($type === 'status' && $hasValue)
                             <span class="ow-pill ow-pill--{{ $heroVariant }}" style="padding:.2rem .55rem;font-size:.72rem;">{{ $value }}</span>
@@ -122,15 +135,6 @@
         </div>
     </section>
 
-    @unless ($isPrCenter)
-        <section class="ow-card">
-            <div class="ow-hd">
-                <span class="ow-hd__ic">{!! $ic('heroicon-o-document-text') !!}</span>
-                <h2 class="ow-hd__t">{{ __('app.label.pr_center_order_plural') }}</h2>
-            </div>
-            @livewire(\App\Filament\Resources\Orders\Widgets\DerivedOrdersTableWidget::class, ['orderId' => $record->id], key('derived-orders-'.$record->id))
-        </section>
-    @endunless
 </div>
 
 <style>
@@ -385,6 +389,18 @@
     }
     .ow-row__lnk:hover {
         text-decoration: underline;
+    }
+    .ow-row__lnks {
+        display: flex;
+        flex-direction: column;
+        gap: .45rem;
+        min-width: 0;
+    }
+    .ow-row__lnks .ow-row__lnk {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.45;
     }
 
     @media (max-width: 640px) {

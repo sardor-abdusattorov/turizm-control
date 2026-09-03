@@ -77,7 +77,6 @@
                 if (this.overdue) {
                     diff = -diff;
                 }
-                // "Urgent" zone — under 1 hour to deadline.
                 this.urgent = !this.overdue && diff < 3600;
 
                 const d = Math.floor(diff / 86400);
@@ -86,7 +85,6 @@
                 const s = diff % 60;
                 const u = window.slaCountdownUnits;
 
-                // Show seconds only inside the last hour; days+hours otherwise.
                 let pretty;
                 if (d > 0) {
                     pretty = `${d}${u.d} ${h}${u.h} ${m}${u.m}`;

@@ -9,9 +9,6 @@
              x-transition:enter-end="opacity-100 translate-y-0"
              class="cw-panel">
             @php
-                // A legacy (already-signed) contract never had a chain — the
-                // empty card would only take the main column hostage. Filed
-                // approvals keep their history visible.
                 $chainCardVisible = $active->isNotEmpty()
                     || $historical->isNotEmpty()
                     || $record->status !== Contract::STATUS_APPROVED;
