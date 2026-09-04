@@ -12,7 +12,7 @@ class TestUsersSeeder extends Seeder
 {
     public function run(): void
     {
-        $roles = ['manager', 'legal_officer', 'accountant', 'director'];
+        $roles = ['manager', 'legal_officer', 'accountant', 'director', 'supply_manager'];
 
         foreach ($roles as $roleName) {
             Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
@@ -46,6 +46,13 @@ class TestUsersSeeder extends Seeder
                 'department_code' => 'direction',
                 'position_ru' => 'Директор',
                 'role' => 'director',
+            ],
+            [
+                'name' => 'Jasur Karimov',
+                'email' => 'supply@test.uz',
+                'department_code' => 'supply',
+                'position_ru' => 'Завхоз',
+                'role' => 'supply_manager',
             ],
         ];
 

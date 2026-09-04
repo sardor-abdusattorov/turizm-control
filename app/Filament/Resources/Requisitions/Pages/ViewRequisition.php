@@ -10,6 +10,7 @@ use App\Models\Requisition;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Database\Eloquent\Builder;
 
 class ViewRequisition extends ViewRecord
 {
@@ -49,12 +50,15 @@ class ViewRequisition extends ViewRecord
 
     public function rejectionReason(): ?string
     {
-        if ($this->record->status !== RequisitionStatus::Rejected) {
+        if (! in_array($this->record->status, [RequisitionStatus::Rejected, RequisitionStatus::Draft], true)) {
             return null;
         }
 
         return $this->record->approvals()
-            ->where('status', ApprovalStatus::Rejected)
+            ->where('round', (int) $this->record->approvals()->max('round') - ($this->record->status === RequisitionStatus::Draft ? 1 : 0))
+            ->where(fn (Builder $query) => $query
+                ->where('status', ApprovalStatus::Rejected)
+                ->orWhere('original_status', ApprovalStatus::Rejected))
             ->orderByDesc('acted_at')
             ->value('comment');
     }

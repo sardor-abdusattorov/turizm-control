@@ -7,6 +7,7 @@ use App\Models\Requisition;
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\PositionSeeder;
 use Database\Seeders\RequisitionSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SettingsSeeder;
 use Database\Seeders\TestUsersSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,7 +17,7 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->seed([PositionSeeder::class, DepartmentSeeder::class, TestUsersSeeder::class]);
+    $this->seed([PositionSeeder::class, DepartmentSeeder::class, RolesAndPermissionsSeeder::class, TestUsersSeeder::class]);
 });
 
 it('seeds requisitions covering every status with real approval chains', function () {
@@ -47,7 +48,7 @@ it('does not duplicate requisitions when seeded twice', function () {
 it('seeds default requisition approvers so the chain works out of the box', function () {
     $this->seed(SettingsSeeder::class);
 
-    expect(Requisition::defaultApproverIds())->toHaveCount(2);
+    expect(Requisition::defaultApproverIds())->toHaveCount(1);
 });
 
 it('badges requisitions with a total count like every other resource', function () {

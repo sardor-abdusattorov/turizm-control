@@ -49,8 +49,7 @@ class SettingsSeeder extends Seeder
     private function defaultRequisitionApprovers(): array
     {
         return User::query()
-            ->whereIn('email', ['legal@test.uz', 'accounting@test.uz'])
-            ->orderByRaw("case when email = 'legal@test.uz' then 0 else 1 end")
+            ->where('email', 'supply@test.uz')
             ->pluck('id')
             ->all();
     }

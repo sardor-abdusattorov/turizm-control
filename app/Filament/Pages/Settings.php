@@ -210,7 +210,7 @@ class Settings extends Page implements HasForms
                                 Select::make('requisition.approver_ids')
                                     ->label(__('app.label.requisition_default_reviewer'))
                                     ->multiple()
-                                    ->options(fn (): array => User::activeOptionsGroupedByDepartment())
+                                    ->options(fn (): array => User::requisitionApproverOptionsGroupedByDepartment())
                                     ->allowHtml()
                                     ->searchable()
                                     ->preload()

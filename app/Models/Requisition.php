@@ -91,8 +91,22 @@ class Requisition extends Model
         $user ??= auth()->user();
 
         return $user !== null
-            && in_array($this->status, [RequisitionStatus::InReview, RequisitionStatus::Rejected], true)
+            && $this->status === RequisitionStatus::InReview
             && ($this->author_id === $user->id || $user->hasRole('super_admin'));
+    }
+
+    public function canBeReturnedToWorkBy(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        return $user !== null
+            && $this->status === RequisitionStatus::Rejected
+            && ($this->author_id === $user->id || $user->hasRole('super_admin'));
+    }
+
+    public function approvalPermission(): ?string
+    {
+        return 'approve_requisitions';
     }
 
     public function canBeSubmittedBy(?User $user = null): bool
@@ -133,6 +147,10 @@ class Requisition extends Model
     public function scopeAwaiting(Builder $query, ?User $user = null): Builder
     {
         $user ??= auth()->user();
+
+        if (! $this->userMayApprove($user)) {
+            return $query->whereRaw('0 = 1');
+        }
 
         return $query->whereHas('approvals', fn (Builder $approvals) => $approvals
             ->where('user_id', $user?->id)

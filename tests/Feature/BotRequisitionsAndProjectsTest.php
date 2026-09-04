@@ -37,7 +37,7 @@ it('puts requisitions and projects on the main menu only when there is something
         ->not->toContain('pj:1');
 
     $author = botUser(['view_any_project']);
-    $approver = botUser();
+    $approver = botUser(['approve_requisitions']);
     Requisition::factory()->inReview([$approver])->create(['author_id' => $author->id]);
 
     $authorCallbacks = collect($menu->mainMenu($author->fresh())['keyboard'])->flatten(1)->pluck('callback_data');
@@ -48,8 +48,8 @@ it('puts requisitions and projects on the main menu only when there is something
 });
 
 it('lists the requisitions awaiting a given approver and nobody else', function () {
-    $approver = botUser();
-    $other = botUser();
+    $approver = botUser(['approve_requisitions']);
+    $other = botUser(['approve_requisitions']);
 
     $mine = Requisition::factory()->inReview([$approver])->create(['number' => 'ЗВ-2026-100']);
     Requisition::factory()->inReview([$other])->create(['number' => 'ЗВ-2026-200']);
@@ -65,8 +65,8 @@ it('lists the requisitions awaiting a given approver and nobody else', function 
 
 it('renders a requisition card with the chain and the decision buttons', function () {
     $author = botUser();
-    $first = botUser();
-    $second = botUser();
+    $first = botUser(['approve_requisitions']);
+    $second = botUser(['approve_requisitions']);
 
     $requisition = Requisition::factory()->inReview([$first, $second])->create([
         'author_id' => $author->id,
@@ -85,8 +85,8 @@ it('renders a requisition card with the chain and the decision buttons', functio
 });
 
 it('offers only a veto to an approver still waiting their turn', function () {
-    $first = botUser();
-    $second = botUser();
+    $first = botUser(['approve_requisitions']);
+    $second = botUser(['approve_requisitions']);
     $requisition = Requisition::factory()->inReview([$first, $second])->create();
 
     $card = app(BotMenuBuilder::class)->requisitionCard($requisition->fresh()->load('approvals'), $second);
@@ -108,7 +108,7 @@ it('gives an outsider no decision buttons at all', function () {
 });
 
 it('shows a settled requisition without decision buttons', function () {
-    $approver = botUser();
+    $approver = botUser(['approve_requisitions']);
     $requisition = Requisition::factory()->approved([$approver])->create();
 
     $card = app(BotMenuBuilder::class)->requisitionCard($requisition->fresh()->load('approvals'), $approver);
@@ -119,7 +119,7 @@ it('shows a settled requisition without decision buttons', function () {
 });
 
 it('carries an approver comment into the card', function () {
-    $approver = botUser();
+    $approver = botUser(['approve_requisitions']);
     $requisition = Requisition::factory()->inReview([$approver])->create();
 
     $requisition->fresh()->load('approvals')->approvals
@@ -153,7 +153,7 @@ it('lists active projects and opens a card for one', function () {
 });
 
 it('keeps a decided requisition reachable by the approver who decided it', function () {
-    $approver = botUser();
+    $approver = botUser(['approve_requisitions']);
     $requisition = Requisition::factory()->approved([$approver])->create();
 
     $menu = app(BotMenuBuilder::class);
@@ -168,7 +168,7 @@ it('keeps a decided requisition reachable by the approver who decided it', funct
 });
 
 it('paginates a long register rather than sending one wall of text', function () {
-    $approver = botUser();
+    $approver = botUser(['approve_requisitions']);
 
     foreach (range(1, 7) as $i) {
         Requisition::factory()->inReview([$approver])->create(['number' => 'ЗВ-2026-'.(300 + $i)]);

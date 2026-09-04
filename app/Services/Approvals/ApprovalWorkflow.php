@@ -95,6 +95,31 @@ class ApprovalWorkflow
         });
     }
 
+    public function returnToWork(Model $record): void
+    {
+        if ($record->status !== RequisitionStatus::Rejected) {
+            throw new RuntimeException(__('app.approval.error.not_rejected'));
+        }
+
+        DB::transaction(function () use ($record): void {
+            $lastRound = (int) $record->approvals()->max('round');
+
+            $userIds = $record->approvals()
+                ->where('round', $lastRound)
+                ->orderBy('order')
+                ->pluck('user_id')
+                ->all();
+
+            $this->chain->invalidateAll($record);
+            $this->chain->sync($record, $userIds);
+
+            $record->update([
+                'status' => RequisitionStatus::Draft,
+                'submitted_at' => null,
+            ]);
+        });
+    }
+
     public function resetAfterEdit(Model $record): void
     {
         if (! in_array($record->status, [RequisitionStatus::Approved, RequisitionStatus::Rejected], true)) {
@@ -146,6 +171,10 @@ class ApprovalWorkflow
 
         if (! $approval) {
             throw new RuntimeException(__('app.approval.error.not_an_approver'));
+        }
+
+        if (! $record->userMayApprove($user)) {
+            throw new RuntimeException(__('app.approval.error.not_allowed'));
         }
 
         if ($approval->status === ApprovalStatus::Queued && $allowQueued) {

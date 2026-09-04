@@ -111,6 +111,17 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     }
 
     /** @return array<string, array<int, string>> */
+    public static function requisitionApproverOptionsGroupedByDepartment(): array
+    {
+        return static::optionsGroupedByDepartment(
+            null,
+            fn (Builder $query) => $query->where(fn (Builder $holders) => $holders
+                ->whereHas('permissions', fn ($permission) => $permission->where('name', 'approve_requisitions'))
+                ->orWhereHas('roles.permissions', fn ($permission) => $permission->where('name', 'approve_requisitions'))),
+        );
+    }
+
+    /** @return array<string, array<int, string>> */
     public static function activeOptionsGroupedByDepartment(?int $excludeId = null): array
     {
         return static::optionsGroupedByDepartment($excludeId);

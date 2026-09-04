@@ -15,11 +15,9 @@ class RequisitionSeeder extends Seeder
     public function run(): void
     {
         $author = User::firstWhere('email', 'manager@test.uz');
-        $legal = User::firstWhere('email', 'legal@test.uz');
-        $accounting = User::firstWhere('email', 'accounting@test.uz');
-        $director = User::firstWhere('email', 'director@test.uz');
+        $supply = User::firstWhere('email', 'supply@test.uz');
 
-        if (! $author || ! $legal || ! $accounting || ! $director) {
+        if (! $author || ! $supply) {
             $this->command?->warn('RequisitionSeeder skipped: test users are missing.');
 
             return;
@@ -33,11 +31,6 @@ class RequisitionSeeder extends Seeder
                 continue;
             }
 
-            $approvers = match ($data['stage']) {
-                'approved' => [$legal->id, $accounting->id],
-                default => [$legal->id, $accounting->id, $director->id],
-            };
-
             $requisition = Requisition::query()->create([
                 'number' => Requisition::nextNumber(),
                 'title' => $data['title'],
@@ -47,7 +40,7 @@ class RequisitionSeeder extends Seeder
                 'status' => RequisitionStatus::Draft,
             ]);
 
-            $chain->sync($requisition, $approvers);
+            $chain->sync($requisition, [$supply->id]);
 
             if ($data['stage'] === 'draft') {
                 continue;
@@ -56,22 +49,14 @@ class RequisitionSeeder extends Seeder
             $workflow->submit($requisition);
 
             match ($data['stage']) {
-                'approved' => $this->approveAll($workflow, $requisition, [$legal, $accounting]),
+                'approved' => $workflow->approve($requisition->refresh(), $supply, 'Закупка согласована, склад готов принять.'),
                 'rejected' => $workflow->reject(
                     $requisition->refresh(),
-                    $legal,
+                    $supply,
                     'Смета превышает лимит, утверждённый на квартал. Нужен пересчёт по позициям аренды.',
                 ),
-                default => $workflow->approve($requisition->refresh(), $legal, 'Замечаний нет.'),
+                default => null,
             };
-        }
-    }
-
-    /** @param  list<User>  $approvers */
-    private function approveAll(ApprovalWorkflow $workflow, Requisition $requisition, array $approvers): void
-    {
-        foreach ($approvers as $approver) {
-            $workflow->approve($requisition->refresh(), $approver);
         }
     }
 

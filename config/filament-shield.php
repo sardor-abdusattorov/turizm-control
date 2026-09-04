@@ -120,6 +120,7 @@ return [
         'export_press_tour',
 
         'view_all_requisitions',
+        'approve_requisitions',
     ],
 
     'discovery' => [

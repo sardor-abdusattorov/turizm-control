@@ -713,6 +713,7 @@ return [
             'approve' => 'Kelishish',
             'reject' => 'Rad etish',
             'recall' => 'Qaytarib olish',
+            'return_to_work' => 'Ishga qaytarish',
         ],
         'field' => [
             'approvers' => 'Kelishuvchilar',
@@ -724,18 +725,22 @@ return [
         'confirm' => [
             'submit' => 'Ariza birinchi kelishuvchiga ketadi, har bosqichga :days kun. Kelishuv davomida tahrirlab bo‘lmaydi.',
             'recall' => 'Ariza qoralamaga qaytadi, ochiq bosqichlar bekor qilinadi.',
+            'return_to_work' => 'Talabnoma o‘sha kelishuvchilar zanjiri bilan qoralamaga qaytadi. Tuzating va qayta yuboring.',
         ],
         'message' => [
             'submitted' => 'Ariza kelishuvga yuborildi.',
             'approved' => 'Ariza siz tomondan kelishildi.',
             'rejected' => 'Ariza rad etildi.',
             'recalled' => 'Ariza qaytarib olindi.',
+            'returned_to_work' => 'Talabnoma ishga qaytarildi.',
         ],
         'error' => [
             'not_draft' => 'Faqat qoralamani yuborish mumkin.',
             'no_approvers' => 'Avval kelishuvchilarni tayinlang.',
             'not_in_review' => 'Ariza kelishuvda emas.',
             'not_an_approver' => 'Siz bu ariza bo‘yicha kelishuvchi emassiz.',
+            'not_allowed' => 'Sizda talabnomalarni kelishish huquqi yo‘q.',
+            'not_rejected' => 'Faqat rad etilgan talabnomani ishga qaytarish mumkin.',
             'waiting_for_previous' => 'Navbatingiz hali kelmadi.',
             'already_decided' => 'Siz bu ariza bo‘yicha qaror qabul qilgansiz.',
         ],

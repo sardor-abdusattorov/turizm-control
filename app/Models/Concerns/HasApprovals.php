@@ -37,14 +37,27 @@ trait HasApprovals
             : null;
     }
 
+    public function approvalPermission(): ?string
+    {
+        return null;
+    }
+
+    public function userMayApprove(?User $user): bool
+    {
+        $permission = $this->approvalPermission();
+
+        return $user !== null && ($permission === null || $user->can($permission));
+    }
+
     public function awaitsApprovalFrom(?User $user): bool
     {
-        return $this->approvalFor($user)?->status === ApprovalStatus::Pending;
+        return $this->userMayApprove($user)
+            && $this->approvalFor($user)?->status === ApprovalStatus::Pending;
     }
 
     public function acceptsRejectionFrom(?User $user): bool
     {
-        return in_array(
+        return $this->userMayApprove($user) && in_array(
             $this->approvalFor($user)?->status,
             [ApprovalStatus::Pending, ApprovalStatus::Queued],
             true,

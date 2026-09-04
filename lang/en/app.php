@@ -713,6 +713,7 @@ return [
             'approve' => 'Approve',
             'reject' => 'Reject',
             'recall' => 'Recall',
+            'return_to_work' => 'Return to work',
         ],
         'field' => [
             'approvers' => 'Approvers',
@@ -724,18 +725,22 @@ return [
         'confirm' => [
             'submit' => 'It goes to the first approver; each step gets :days day(s). It cannot be edited while under approval.',
             'recall' => 'The requisition returns to draft and the open steps are voided.',
+            'return_to_work' => 'The requisition goes back to draft with the same approvers. Fix it and submit again.',
         ],
         'message' => [
             'submitted' => 'Sent for approval.',
             'approved' => 'You approved this requisition.',
             'rejected' => 'Requisition rejected.',
             'recalled' => 'Requisition recalled.',
+            'returned_to_work' => 'Requisition returned to work.',
         ],
         'error' => [
             'not_draft' => 'Only a draft can be sent.',
             'no_approvers' => 'Assign approvers first.',
             'not_in_review' => 'The requisition is not under approval.',
             'not_an_approver' => 'You are not an approver on this requisition.',
+            'not_allowed' => 'You are not allowed to approve requisitions.',
+            'not_rejected' => 'Only a rejected requisition can be returned to work.',
             'waiting_for_previous' => 'It is not your turn yet.',
             'already_decided' => 'You have already decided on this requisition.',
         ],

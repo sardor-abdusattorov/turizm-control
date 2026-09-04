@@ -4574,11 +4574,18 @@
             "sponsor": null,
             "attachments": [
                 {
-                    "file_path": "uploads/files/contract-attachments/2026/07/01KXZ3DH48KQ9ZMK7RXBAFXAX5.pdf",
-                    "original_name": "SITF-2025  East Star-1.pdf",
-                    "type": null,
-                    "size": 1161652,
+                    "file_path": "uploads/files/contract-attachments/85/scan-74-AF.pdf",
+                    "original_name": "scan-74-AF.pdf",
+                    "type": "contract_scan",
+                    "size": 192,
                     "sort": 1
+                },
+                {
+                    "file_path": "uploads/files/contract-attachments/85/scan-page-2.jpg",
+                    "original_name": "scan-page-2.jpg",
+                    "type": "contract_scan",
+                    "size": 4597,
+                    "sort": 2
                 }
             ],
             "payments": []
@@ -7109,7 +7116,8 @@
                     "percent": "100.00",
                     "paid_at": "2025-04-01",
                     "screenshots": [
-                        "uploads/images/payments/2026/07/01KXZH2DGSGE64WGHZE3YWM33X.pdf"
+                        "uploads/images/payments/2026/09/receipt-01.pdf",
+                        "uploads/images/payments/2026/09/receipt-02.jpg"
                     ],
                     "created_by_email": "mr.silverwind1998@gmail.com"
                 }
@@ -7178,7 +7186,7 @@
         {
             "number": "49-AF",
             "scope": "pr_center",
-            "basis_number": null,
+            "basis_number": "119-AF",
             "title": "Об организации пресс-туров и информационных туров в 2026 году",
             "description": null,
             "issued_at": "2026-01-01",
@@ -7322,30 +7330,20 @@
             "number": "ЗВ-2026-001",
             "title": "Закупка выставочного оборудования для стенда ATM Dubai",
             "description": "Требуется закупить модульные стеновые панели, подсветку и стойку ресепшн для национального стенда.\n\nСмета: 42 800 000 сум. Поставка до 15 марта, монтаж силами подрядчика.",
-            "project": "SITF 2025",
+            "project": "\"OTM Mumbai 2026\" (Outbound Travel Mart 2026)",
             "author_email": "manager@test.uz",
             "status": "approved",
-            "submitted_at": "2026-08-31 20:06:35",
+            "submitted_at": "2026-09-04 06:29:57",
             "approvals": [
                 {
-                    "user_email": "legal@test.uz",
+                    "user_email": "supply@test.uz",
                     "order": 1,
                     "round": 1,
                     "status": "approved",
                     "original_status": null,
-                    "comment": null,
-                    "acted_at": "2026-08-31 20:06:35",
-                    "due_at": "2026-09-03 20:06:35"
-                },
-                {
-                    "user_email": "accounting@test.uz",
-                    "order": 2,
-                    "round": 1,
-                    "status": "approved",
-                    "original_status": null,
-                    "comment": null,
-                    "acted_at": "2026-08-31 20:06:35",
-                    "due_at": "2026-09-03 20:06:35"
+                    "comment": "Закупка согласована, склад готов принять.",
+                    "acted_at": "2026-09-04 06:29:57",
+                    "due_at": "2026-09-07 06:29:57"
                 }
             ]
         },
@@ -7353,40 +7351,20 @@
             "number": "ЗВ-2026-002",
             "title": "Перевод и печать каталога «Узбекистан — открытая страна»",
             "description": "Перевод каталога на английский и арабский, вёрстка и печать тиража 3 000 экземпляров.\n\nТираж делится поровну между выставками ATM Dubai и WTM London.",
-            "project": "MITT-2025",
+            "project": "Первый международный форум «Qoraqalpog‘iston — destinatsiya» и инфотур",
             "author_email": "manager@test.uz",
             "status": "in_review",
-            "submitted_at": "2026-08-31 20:06:35",
+            "submitted_at": "2026-09-04 06:29:57",
             "approvals": [
                 {
-                    "user_email": "legal@test.uz",
+                    "user_email": "supply@test.uz",
                     "order": 1,
-                    "round": 1,
-                    "status": "approved",
-                    "original_status": null,
-                    "comment": "Замечаний нет.",
-                    "acted_at": "2026-08-31 20:06:35",
-                    "due_at": "2026-09-03 20:06:35"
-                },
-                {
-                    "user_email": "accounting@test.uz",
-                    "order": 2,
                     "round": 1,
                     "status": "pending",
                     "original_status": null,
                     "comment": null,
                     "acted_at": null,
-                    "due_at": "2026-09-03 20:06:35"
-                },
-                {
-                    "user_email": "director@test.uz",
-                    "order": 3,
-                    "round": 1,
-                    "status": "queued",
-                    "original_status": null,
-                    "comment": null,
-                    "acted_at": null,
-                    "due_at": null
+                    "due_at": "2026-09-07 06:29:57"
                 }
             ]
         },
@@ -7394,40 +7372,20 @@
             "number": "ЗВ-2026-003",
             "title": "Аренда транспорта для пресс-тура по Самарканду и Бухаре",
             "description": "Два микроавтобуса на 6 дней с водителями, включая топливо и парковку.\n\nГруппа: 14 журналистов из Германии, Франции и Южной Кореи.",
-            "project": "\"KITF-2026\"",
+            "project": "Визит экспертов «Guinness World Records»",
             "author_email": "manager@test.uz",
             "status": "in_review",
-            "submitted_at": "2026-08-31 20:06:35",
+            "submitted_at": "2026-09-04 06:29:57",
             "approvals": [
                 {
-                    "user_email": "legal@test.uz",
+                    "user_email": "supply@test.uz",
                     "order": 1,
-                    "round": 1,
-                    "status": "approved",
-                    "original_status": null,
-                    "comment": "Замечаний нет.",
-                    "acted_at": "2026-08-31 20:06:35",
-                    "due_at": "2026-09-03 20:06:35"
-                },
-                {
-                    "user_email": "accounting@test.uz",
-                    "order": 2,
                     "round": 1,
                     "status": "pending",
                     "original_status": null,
                     "comment": null,
                     "acted_at": null,
-                    "due_at": "2026-09-03 20:06:35"
-                },
-                {
-                    "user_email": "director@test.uz",
-                    "order": 3,
-                    "round": 1,
-                    "status": "queued",
-                    "original_status": null,
-                    "comment": null,
-                    "acted_at": null,
-                    "due_at": null
+                    "due_at": "2026-09-07 06:29:57"
                 }
             ]
         },
@@ -7435,40 +7393,20 @@
             "number": "ЗВ-2026-004",
             "title": "Продление лицензий на фотобанк и видеомонтаж",
             "description": "Годовая подписка на фотобанк и пакет лицензий для монтажа промо-роликов.\n\nТекущие лицензии истекают в конце месяца.",
-            "project": "«Orol baliqlaridan 99 turdagi taomlar» — гастрономический фестиваль",
+            "project": "Форум «Namangan vodiy turizm markazi inflyuenserlar nigohida» и инфотур",
             "author_email": "manager@test.uz",
             "status": "rejected",
-            "submitted_at": "2026-08-31 20:06:35",
+            "submitted_at": "2026-09-04 06:29:57",
             "approvals": [
                 {
-                    "user_email": "legal@test.uz",
+                    "user_email": "supply@test.uz",
                     "order": 1,
                     "round": 1,
                     "status": "rejected",
                     "original_status": null,
                     "comment": "Смета превышает лимит, утверждённый на квартал. Нужен пересчёт по позициям аренды.",
-                    "acted_at": "2026-08-31 20:06:35",
-                    "due_at": "2026-09-03 20:06:35"
-                },
-                {
-                    "user_email": "accounting@test.uz",
-                    "order": 2,
-                    "round": 1,
-                    "status": "invalidated",
-                    "original_status": "queued",
-                    "comment": null,
-                    "acted_at": null,
-                    "due_at": null
-                },
-                {
-                    "user_email": "director@test.uz",
-                    "order": 3,
-                    "round": 1,
-                    "status": "invalidated",
-                    "original_status": "queued",
-                    "comment": null,
-                    "acted_at": null,
-                    "due_at": null
+                    "acted_at": "2026-09-04 06:29:57",
+                    "due_at": "2026-09-07 06:29:57"
                 }
             ]
         },
@@ -7476,34 +7414,14 @@
             "number": "ЗВ-2026-005",
             "title": "Закупка сувенирной продукции к WTM London",
             "description": "Брендированные блокноты, флешки и упаковка для подарочных наборов.\n\nОриентировочный объём — 500 наборов, финальные макеты в работе.",
-            "project": "QTM-2025",
+            "project": "IFTM Top Resa 2025",
             "author_email": "manager@test.uz",
             "status": "draft",
             "submitted_at": null,
             "approvals": [
                 {
-                    "user_email": "legal@test.uz",
+                    "user_email": "supply@test.uz",
                     "order": 1,
-                    "round": 1,
-                    "status": "queued",
-                    "original_status": null,
-                    "comment": null,
-                    "acted_at": null,
-                    "due_at": null
-                },
-                {
-                    "user_email": "accounting@test.uz",
-                    "order": 2,
-                    "round": 1,
-                    "status": "queued",
-                    "original_status": null,
-                    "comment": null,
-                    "acted_at": null,
-                    "due_at": null
-                },
-                {
-                    "user_email": "director@test.uz",
-                    "order": 3,
                     "round": 1,
                     "status": "queued",
                     "original_status": null,

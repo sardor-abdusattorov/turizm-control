@@ -66,6 +66,14 @@ class PositionSeeder extends Seeder
                 ],
                 'sort' => 7,
             ],
+            [
+                'name' => [
+                    'ru' => 'Завхоз',
+                    'uz' => "Xo'jalik mudiri",
+                    'en' => 'Facilities Manager',
+                ],
+                'sort' => 8,
+            ],
         ];
 
         foreach ($positions as $data) {

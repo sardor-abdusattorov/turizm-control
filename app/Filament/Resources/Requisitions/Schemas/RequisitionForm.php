@@ -68,7 +68,7 @@ class RequisitionForm
                             ->label(__('app.approval.field.approvers'))
                             ->helperText(__('app.approval.field.approvers_help'))
                             ->multiple()
-                            ->options(fn (): array => User::activeOptionsGroupedByDepartment())
+                            ->options(fn (): array => User::requisitionApproverOptionsGroupedByDepartment())
                             ->default(fn (): array => Requisition::defaultApproverIds())
                             ->afterStateHydrated(function (Select $component, ?Requisition $record): void {
                                 if ($record) {

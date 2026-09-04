@@ -21,7 +21,7 @@ use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
-function requisitionUser(array $abilities = ['view_any_requisition', 'view_requisition', 'create_requisition', 'update_requisition']): User
+function requisitionUser(array $abilities = ['view_any_requisition', 'view_requisition', 'create_requisition', 'update_requisition', 'approve_requisitions']): User
 {
     $user = User::factory()->create(['status' => User::STATUS_ACTIVE]);
 
@@ -464,4 +464,60 @@ it('lists each approver once in the chain table and keeps earlier rounds behind 
         ->toContain(ApprovalStatus::Rejected->label())
         ->toContain(ApprovalStatus::Queued->label())
         ->toContain(__('app.approval.cancelled_after_edit'));
+});
+
+it('returns a rejected requisition to the author with the same chain queued again', function () {
+    $author = requisitionUser();
+    $first = requisitionUser();
+    $second = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$first, $second])->create(['author_id' => $author->id]);
+
+    actingAs($first);
+    app(ApprovalWorkflow::class)->reject($requisition->fresh()->load('approvals'), $first, 'Уточните смету.');
+
+    actingAs($author);
+    Livewire::test(ViewRequisition::class, ['record' => $requisition->id])
+        ->assertActionVisible('returnToWork')
+        ->assertActionHidden('recall')
+        ->callAction('returnToWork')
+        ->assertNotified(__('app.approval.message.returned_to_work'));
+
+    $requisition = $requisition->fresh()->load('approvals');
+    $live = $requisition->activeApprovals();
+
+    expect($requisition->status)->toBe(RequisitionStatus::Draft)
+        ->and($requisition->submitted_at)->toBeNull()
+        ->and($live->pluck('user_id')->all())->toBe([$first->id, $second->id])
+        ->and($live->pluck('status')->unique()->all())->toBe([ApprovalStatus::Queued])
+        ->and($live->first()->round)->toBe(2)
+        ->and($requisition->approvals->where('round', 1)->firstWhere('user_id', $first->id)->displayStatus())->toBe(ApprovalStatus::Rejected);
+
+    expect(Livewire::test(ViewRequisition::class, ['record' => $requisition->id])->html())
+        ->toContain('Уточните смету.');
+});
+
+it('lets only holders of approve_requisitions approve, reject or see the awaiting queue', function () {
+    $author = requisitionUser();
+    $approver = requisitionUser(['view_any_requisition', 'view_requisition']);
+    $requisition = Requisition::factory()->inReview([$approver])->create(['author_id' => $author->id]);
+
+    actingAs($approver);
+
+    expect(Requisition::query()->awaiting($approver)->count())->toBe(0)
+        ->and($requisition->fresh()->load('approvals')->awaitsApprovalFrom($approver))->toBeFalse()
+        ->and(fn () => app(ApprovalWorkflow::class)->approve($requisition->fresh()->load('approvals'), $approver))
+        ->toThrow(RuntimeException::class, __('app.approval.error.not_allowed'));
+
+    Livewire::test(ViewRequisition::class, ['record' => $requisition->id])
+        ->assertActionHidden('approve')
+        ->assertActionHidden('reject');
+
+    $approver->givePermissionTo(Permission::findOrCreate('approve_requisitions', 'web'));
+    actingAs($approver->fresh());
+
+    expect(Requisition::query()->awaiting($approver->fresh())->count())->toBe(1);
+
+    Livewire::test(ViewRequisition::class, ['record' => $requisition->id])
+        ->assertActionVisible('approve')
+        ->assertActionVisible('reject');
 });

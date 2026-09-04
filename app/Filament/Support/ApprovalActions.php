@@ -21,7 +21,24 @@ class ApprovalActions
             static::approve(),
             static::reject(),
             static::recall(),
+            static::returnToWork(),
         ];
+    }
+
+    public static function returnToWork(): Action
+    {
+        return Action::make('returnToWork')
+            ->label(__('app.approval.action.return_to_work'))
+            ->icon(Heroicon::OutlinedArrowUturnLeft)
+            ->color('warning')
+            ->requiresConfirmation()
+            ->modalHeading(__('app.approval.action.return_to_work'))
+            ->modalDescription(__('app.approval.confirm.return_to_work'))
+            ->visible(fn (Requisition $record): bool => $record->canBeReturnedToWorkBy())
+            ->action(fn (Requisition $record) => static::run(
+                fn () => app(ApprovalWorkflow::class)->returnToWork($record),
+                __('app.approval.message.returned_to_work'),
+            ));
     }
 
     public static function submit(): Action

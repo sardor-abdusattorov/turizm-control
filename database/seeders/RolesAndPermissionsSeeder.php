@@ -124,6 +124,13 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$this->resourcePermissions('project', ['view_any', 'view']),
             ...$this->resourcePermissions('requisition', ['view_any', 'view']),
         ]);
+
+        $this->syncRole('supply_manager', [
+            ...$requisitionWidgets,
+            'approve_requisitions',
+            'view_profile_settings',
+            ...$this->resourcePermissions('requisition', ['view_any', 'view']),
+        ]);
     }
 
     /** @param  list<string>  $permissions */
