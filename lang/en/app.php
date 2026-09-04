@@ -498,8 +498,6 @@ return [
         'counterparty_search' => 'Start typing a name or tax ID',
         'order_file_optional' => 'Optional — the scan can be added later.',
         'already_signed' => 'For legacy (paper) contracts: saved straight away as “Approved”, no approval chain.',
-        'press_tour_documents' => 'Report, media coverage, photos, programme, acts — PDF/Word/Excel/JPG/PNG, several files at once.',
-        'attachment_scans' => 'Contract and document scans — PDF/Word/JPG/PNG, several files at once.',
         'attachment_type_applies_to_new' => 'Applies to the files you are adding now.',
         'inn' => '9 digits for legal entities',
         'pinfl' => '14 digits',

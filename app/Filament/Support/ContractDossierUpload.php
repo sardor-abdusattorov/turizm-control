@@ -10,7 +10,6 @@ class ContractDossierUpload
     {
         return FileUpload::make($field)
             ->label(__('app.label.attachments'))
-            ->helperText(__('app.helper.attachment_scans'))
             ->disk('local')
 
             ->directory(fn (): string => 'uploads/files/contract-attachments/'.now()->format('Y/m'))
@@ -31,7 +30,7 @@ class ContractDossierUpload
             ->openable()
             ->downloadable()
             ->previewable()
-            ->panelLayout('grid');
+            ->imagePreviewHeight('120');
     }
 
     public static function namesField(string $field = 'attachment_files'): string

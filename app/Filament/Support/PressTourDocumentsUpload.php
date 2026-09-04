@@ -10,7 +10,6 @@ class PressTourDocumentsUpload
     {
         return FileUpload::make($field)
             ->label(__('app.label.press_tour_documents'))
-            ->helperText(__('app.helper.press_tour_documents'))
             ->disk('local')
             ->directory(fn (): string => 'uploads/files/press-tours/'.now()->format('Y/m'))
             ->visibility('private')
@@ -32,7 +31,7 @@ class PressTourDocumentsUpload
             ->openable()
             ->downloadable()
             ->previewable()
-            ->panelLayout('grid');
+            ->imagePreviewHeight('120');
     }
 
     public static function namesField(string $field = 'document_files'): string

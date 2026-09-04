@@ -498,8 +498,6 @@ return [
         'counterparty_search' => 'Nom yoki STIR kiriting',
         'order_file_optional' => 'Majburiy emas — skanni keyinroq qo\'shish mumkin.',
         'already_signed' => 'Eski (qog\'oz) shartnomalar uchun: darhol «Kelishilgan» holatida saqlanadi, kelishuv zanjirisiz.',
-        'press_tour_documents' => 'Hisobot, OAVdagi nashrlar, foto, dastur, dalolatnomalar — PDF/Word/Excel/JPG/PNG, bir nechta faylni birdan yuklash mumkin.',
-        'attachment_scans' => 'Shartnoma va hujjatlar skanlari — PDF/Word/JPG/PNG, bir nechta faylni birdan yuklash mumkin.',
         'attachment_type_applies_to_new' => 'Hozir qo‘shayotgan fayllarga qo‘llanadi.',
         'inn' => 'Yuridik shaxslar uchun 9 raqam',
         'pinfl' => '14 raqam',
