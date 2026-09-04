@@ -16,8 +16,6 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          # Match the production server: testing on a newer PHP than we deploy
-          # to lets 8.4-only syntax pass CI and fatal in production.
           php-version: "8.3"
           extensions: pdo_mysql,sqlite3,pdo_sqlite,mbstring,exif,bcmath,gd,zip,intl,pcntl
           coverage: none
@@ -87,11 +85,8 @@ jobs:
 
             chmod -R 775 storage bootstrap/cache || true
 
-            # Tell the running queue workers to finish the current job and
-            # exit; supervisor/systemd starts them again on the new code.
             php artisan queue:restart
 
-            # New code is only picked up once OPcache is dropped.
             sudo systemctl reload php8.3-fpm || true
 
             echo "Deploy complete"
