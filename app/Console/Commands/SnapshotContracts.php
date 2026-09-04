@@ -22,7 +22,7 @@ class SnapshotContracts extends Command
         $contracts = Contract::query()
             ->with([
                 'contact.bankAccounts.currency', 'sponsor', 'contractType', 'currency',
-                'project.order', 'responsible', 'attachments', 'payments.creator',
+                'project.order', 'responsible', 'attachments', 'payments.creator', 'approvers.user',
             ])
             ->orderBy('id')
             ->get()
@@ -71,6 +71,17 @@ class SnapshotContracts extends Command
                         'paid_at' => $payment->paid_at?->toDateString(),
                         'screenshots' => $payment->screenshots ?? [],
                         'created_by_email' => $payment->creator?->email,
+                    ])->all(),
+                'approvers' => $contract->approvers
+                    ->map(fn ($approver): array => [
+                        'user_email' => $approver->user?->email,
+                        'order' => $approver->order,
+                        'status' => $approver->status->value,
+                        'original_status' => $approver->original_status?->value,
+                        'comment' => $approver->comment,
+                        'system_comment' => $approver->system_comment,
+                        'acted_at' => $approver->acted_at?->toDateTimeString(),
+                        'due_at' => $approver->due_at?->toDateTimeString(),
                     ])->all(),
             ]);
 

@@ -112,20 +112,38 @@
             </div>
 
             @if ($total)
-                <div class="rq-progress">
-                    <div class="rq-progress__bar">
-                        <span style="width: {{ $isDraft ? 0 : $fillPct }}%; background: {{ $barColor }};"></span>
-                    </div>
-                    <div class="rq-progress__meta">
-                        <span class="rq-progress__count">{{ $approved }}/{{ $total }}</span>
-                        @if ($isDraft)
-                            <span class="rq-progress__hint">{{ __('app.approval.not_submitted') }}</span>
-                        @elseif ($current)
-                            <span class="rq-progress__hint">
-                                {{ __('app.approval.now_with', ['name' => $current->user?->name ?? __('app.label.not_set')]) }}
+                @php
+                    $rejectedCount = $approvals->where('status', ApprovalStatus::Rejected)->count();
+                    $reviewingCount = $approvals->where('status', ApprovalStatus::Pending)->count();
+                    $queuedCount = max(0, $total - $approved - $rejectedCount - $reviewingCount);
+                @endphp
+                <div class="cw-prog">
+                    <div class="cw-prog__top">
+                        <div class="cw-prog__l">
+                            <span class="cw-prog__count"><b>{{ $approved }}</b> {{ __('app.label.of') }} {{ $total }} {{ __('app.label.approved_lower') }}</span>
+                            @if ($record->submitted_at)
+                                <span class="cw-prog__sub">{!! $ic('heroicon-m-paper-airplane', 12) !!} {{ __('app.label.submitted') }} {{ $record->submitted_at->diffForHumans() }}</span>
+                            @elseif ($isDraft)
+                                <span class="cw-prog__sub">{{ __('app.approval.not_submitted') }}</span>
+                            @endif
+                        </div>
+                        @if ($current && ! $isDraft)
+                            <span class="cw-prog__await">
+                                <span class="cw-prog__await-lb">{{ __('app.label.awaiting') }}</span>
+                                <img src="{{ $current->user?->avatarUrl() }}" alt="{{ $current->user?->name }}">
+                                <span class="cw-prog__await-nm">{{ $current->user?->name }}</span>
                                 @include('filament.components.sla-countdown', ['due' => $current->due_at])
                             </span>
                         @endif
+                    </div>
+                    <div class="cw-prog__track">
+                        <span class="cw-prog__fill" style="width:{{ $isDraft ? 0 : $fillPct }}%;background:{{ $barColor }};"></span>
+                    </div>
+                    <div class="cw-prog__legend">
+                        @if ($approved > 0)<span class="cw-lg"><i style="background:#10b981;"></i>{{ $approved }} {{ ApprovalStatus::Approved->label() }}</span>@endif
+                        @if ($reviewingCount > 0)<span class="cw-lg"><i style="background:#2563eb;"></i>{{ $reviewingCount }} {{ ApprovalStatus::Pending->label() }}</span>@endif
+                        @if ($queuedCount > 0)<span class="cw-lg"><i style="background:#cbd5e1;"></i>{{ $queuedCount }} {{ ApprovalStatus::Queued->label() }}</span>@endif
+                        @if ($rejectedCount > 0)<span class="cw-lg"><i style="background:#ef4444;"></i>{{ $rejectedCount }} {{ ApprovalStatus::Rejected->label() }}</span>@endif
                     </div>
                 </div>
             @endif
@@ -163,43 +181,6 @@
         line-height: 1.55;
         color: var(--t);
         white-space: pre-line;
-    }
-    .rq-progress {
-        display: flex;
-        flex-direction: column;
-        gap: .5rem;
-        padding: .9rem 1.1rem;
-        border-bottom: 1px solid var(--d);
-    }
-    .rq-progress__bar {
-        height: .4rem;
-        border-radius: 999px;
-        background: rgba(127, 127, 127, .16);
-        overflow: hidden;
-    }
-    .rq-progress__bar > span {
-        display: block;
-        height: 100%;
-        border-radius: 999px;
-        transition: width .4s ease-out;
-    }
-    .rq-progress__meta {
-        display: flex;
-        align-items: center;
-        gap: .6rem;
-        flex-wrap: wrap;
-        font-size: .82rem;
-    }
-    .rq-progress__count {
-        font-weight: 700;
-        font-variant-numeric: tabular-nums;
-        color: var(--t);
-    }
-    .rq-progress__hint {
-        display: inline-flex;
-        align-items: center;
-        gap: .4rem;
-        color: var(--m);
     }
 </style>
 </x-filament-panels::page>

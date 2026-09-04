@@ -366,6 +366,8 @@ return [
         'press_tours_sheet' => 'Пресс-туры',
         'payments_title' => 'Реестр платежей :year',
         'payments_sheet' => 'Платежи',
+        'requisitions_title' => 'Реестр заявок :year',
+        'requisitions_sheet' => 'Заявки',
         'sponsors_title' => 'Реестр спонсоров :year',
         'registry_title_international' => 'Реестр Международных выставок :year года',
         'registry_title_internal' => 'Реестр внутренних мероприятий :year года',

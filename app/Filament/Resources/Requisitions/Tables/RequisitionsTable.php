@@ -6,6 +6,7 @@ use App\Enums\ApprovalStatus;
 use App\Enums\RequisitionStatus;
 use App\Filament\Resources\Requisitions\RequisitionResource;
 use App\Filament\Support\ApprovalActions;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Filament\Widgets\ApprovalsTimelineWidget;
 use App\Models\Requisition;
 use App\Models\User;
@@ -35,7 +36,7 @@ class RequisitionsTable
                 'project',
                 'approvals.user',
             ]))
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort('updated_at', 'desc')
             ->columns([
                 TextColumn::make('number')
                     ->label(__('app.label.requisition_number'))
@@ -84,6 +85,8 @@ class RequisitionsTable
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters(static::filters())
             ->filtersFormColumns(2)

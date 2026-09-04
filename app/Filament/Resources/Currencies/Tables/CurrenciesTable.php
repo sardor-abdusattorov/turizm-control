@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Currencies\Tables;
 
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Models\Currency;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -44,6 +45,8 @@ class CurrenciesTable
                     ->sortable(),
 
                 CreatedAtColumn::make(),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('status')

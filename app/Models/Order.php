@@ -119,6 +119,12 @@ class Order extends Model
         return $this->belongsTo(self::class, 'basis_order_id');
     }
 
+    /** @return HasMany<Project, $this> */
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
+
     public function derivedOrders(): HasMany
     {
         return $this->hasMany(self::class, 'basis_order_id')

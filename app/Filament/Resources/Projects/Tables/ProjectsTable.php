@@ -9,6 +9,7 @@ use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\ExportXlsxAction;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Filament\Widgets\Dashboard\ProjectContractsTableWidget;
 use App\Filament\Widgets\Dashboard\ProjectParticipantsTableWidget;
 use App\Models\Contract;
@@ -53,7 +54,7 @@ class ProjectsTable
                     'contracts' => fn (Builder $q) => $q->visibleTo(),
                 ])
                 ->withSum(['incomeContracts as participants_sum_amount' => fn (Builder $q) => $q->visibleTo()->where('status', '!=', Contract::STATUS_REJECTED->value)], 'amount'))
-            ->defaultSort('starts_on', 'desc')
+            ->defaultSort('updated_at', 'desc')
             ->columns([
                 TextColumn::make('name')
                     ->label(__('app.label.project_name'))
@@ -191,6 +192,8 @@ class ProjectsTable
 
                 CreatedAtColumn::make()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('year')

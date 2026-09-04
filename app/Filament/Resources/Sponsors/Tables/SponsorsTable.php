@@ -7,6 +7,7 @@ use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\ExportXlsxAction;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget;
 use App\Models\Contract;
 use App\Models\Sponsor;
@@ -28,7 +29,7 @@ class SponsorsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('name')
+            ->defaultSort('updated_at', 'desc')
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount([
                 'sponsorshipContracts' => fn (Builder $contracts): Builder => $contracts
                     ->visibleTo()
@@ -92,6 +93,8 @@ class SponsorsTable
 
                 CreatedAtColumn::make()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('status')

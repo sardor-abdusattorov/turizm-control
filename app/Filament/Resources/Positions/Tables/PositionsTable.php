@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Positions\Tables;
 
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Models\Position;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -22,6 +23,7 @@ class PositionsTable
         return $table
 
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['departments']))
+            ->defaultSort('updated_at', 'desc')
             ->columns([
                 TextColumn::make('name')
                     ->label(__('app.label.position_name'))
@@ -41,6 +43,8 @@ class PositionsTable
                     ->sortable(),
 
                 CreatedAtColumn::make(),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('status')

@@ -5,6 +5,7 @@ use App\Enums\OrderScope;
 use App\Enums\RequisitionStatus;
 use App\Models\Contact;
 use App\Models\Contract;
+use App\Models\ContractApprover;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Order;
@@ -327,4 +328,57 @@ it('leaves the seeded demo requisitions out of the snapshot so their chain canno
     $titles = array_column(json_decode(File::get($this->snapshotPath), true)['requisitions'], 'title');
 
     expect($titles)->toBe(['Заявка, заведённая руками']);
+});
+
+it('carries the approval chain of a contract that is still under review across a wipe', function () {
+    Storage::fake('local');
+
+    $currency = Currency::factory()->create(['short_name' => 'UZS', 'status' => true]);
+    $legal = User::factory()->create(['email' => 'legal@snap.uz', 'status' => User::STATUS_ACTIVE]);
+    $chief = User::factory()->create(['email' => 'chief@snap.uz', 'status' => User::STATUS_ACTIVE]);
+
+    $contract = Contract::factory()->create(['number' => 'R-1', 'currency_id' => $currency->id]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $legal->id, 'order' => 1,
+        'status' => ContractApprover::STATUS_APPROVED, 'comment' => 'Замечаний нет.', 'acted_at' => now()->subDay(),
+    ]);
+    ContractApprover::factory()->create([
+        'contract_id' => $contract->id, 'user_id' => $chief->id, 'order' => 2,
+        'status' => ContractApprover::STATUS_PENDING, 'due_at' => now()->addDay(),
+    ]);
+    $contract->forceFill(['status' => Contract::STATUS_IN_REVIEW])->saveQuietly();
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
+
+    $contract->approvers()->delete();
+    Contract::query()->delete();
+
+    $this->seed(HandEnteredContractsSeeder::class);
+
+    $restored = Contract::query()->firstWhere('number', 'R-1');
+
+    expect($restored->status)->toBe(Contract::STATUS_IN_REVIEW)
+        ->and($restored->activeApprovers()->count())->toBe(2)
+        ->and($restored->currentApprover()?->user?->email)->toBe('chief@snap.uz')
+        ->and($restored->approvers()->where('order', 1)->value('comment'))->toBe('Замечаний нет.');
+});
+
+it('never leaves a contract stuck under review when the snapshot carries no chain', function () {
+    Storage::fake('local');
+
+    $currency = Currency::factory()->create(['short_name' => 'UZS', 'status' => true]);
+    $contract = Contract::factory()->create(['number' => '959', 'currency_id' => $currency->id]);
+    $contract->forceFill(['status' => Contract::STATUS_IN_REVIEW])->saveQuietly();
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
+
+    $legacy = json_decode(File::get($this->snapshotPath), true);
+    unset($legacy['contracts'][0]['approvers']);
+    File::put($this->snapshotPath, json_encode($legacy));
+
+    Contract::query()->delete();
+
+    $this->seed(HandEnteredContractsSeeder::class);
+
+    expect(Contract::query()->firstWhere('number', '959')->status)->toBe(Contract::STATUS_DRAFT);
 });

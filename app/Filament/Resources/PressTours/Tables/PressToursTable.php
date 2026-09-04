@@ -6,6 +6,7 @@ use App\Enums\PressTourDirection;
 use App\Enums\PressTourState;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Models\PressTour;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -25,7 +26,7 @@ class PressToursTable
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('order'))
-            ->defaultSort('starts_month')
+            ->defaultSort('updated_at', 'desc')
             ->columns([
                 TextColumn::make('direction')
                     ->label(__('app.label.press_tour_direction'))
@@ -115,6 +116,8 @@ class PressToursTable
                 StatusToggleColumn::make()->sortable(),
 
                 CreatedAtColumn::make()->toggleable(isToggledHiddenByDefault: true),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('direction')

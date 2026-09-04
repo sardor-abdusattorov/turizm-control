@@ -7,6 +7,7 @@ use App\Enums\OrderScope;
 use App\Enums\RequisitionStatus;
 use App\Models\Contact;
 use App\Models\Contract;
+use App\Models\ContractApprover;
 use App\Models\ContractType;
 use App\Models\Currency;
 use App\Models\Order;
@@ -64,8 +65,10 @@ class HandEnteredContractsSeeder extends Seeder
                 ],
             );
 
+            $this->restoreApprovers($contract, $data['approvers'] ?? []);
+
             $contract->forceFill([
-                'status' => $data['status'],
+                'status' => $this->contractStatusFor($contract, $data['status']),
                 'signed_at' => $data['signed_at'],
             ])->saveQuietly();
 
@@ -114,6 +117,42 @@ class HandEnteredContractsSeeder extends Seeder
 
         $this->restoreProjectPayments($snapshot['project_payments'] ?? []);
         $this->restoreRequisitions($snapshot['requisitions'] ?? []);
+    }
+
+    /** @param  array<int, array<string, mixed>>  $approvers */
+    protected function restoreApprovers(Contract $contract, array $approvers): void
+    {
+        if ($approvers === [] || $contract->approvers()->exists()) {
+            return;
+        }
+
+        foreach ($approvers as $index => $approver) {
+            $contract->approvers()->create([
+                'user_id' => $this->userId($approver['user_email'] ?? null),
+                'order' => $approver['order'] ?? $index + 1,
+                'status' => $approver['status'] ?? ContractApprover::STATUS_QUEUED->value,
+                'original_status' => $approver['original_status'] ?? null,
+                'comment' => $approver['comment'] ?? null,
+                'system_comment' => $approver['system_comment'] ?? null,
+                'acted_at' => $approver['acted_at'] ?? null,
+                'due_at' => $approver['due_at'] ?? null,
+            ]);
+        }
+    }
+
+    protected function contractStatusFor(Contract $contract, string $status): string
+    {
+        $midFlow = [
+            Contract::STATUS_IN_REVIEW->value,
+            Contract::STATUS_PENDING_DIRECTOR->value,
+            Contract::STATUS_IN_REVIEW_DIRECTOR->value,
+        ];
+
+        if (in_array($status, $midFlow, true) && $contract->activeApprovers()->doesntExist()) {
+            return Contract::STATUS_DRAFT->value;
+        }
+
+        return $status;
     }
 
     /** @param  array<int, array<string, mixed>>  $orders */

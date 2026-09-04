@@ -366,6 +366,8 @@ return [
         'press_tours_sheet' => 'Press-turlar',
         'payments_title' => 'To‘lovlar reestri :year',
         'payments_sheet' => 'To‘lovlar',
+        'requisitions_title' => 'Talabnomalar reyestri :year',
+        'requisitions_sheet' => 'Talabnomalar',
         'sponsors_title' => 'Homiylar reestri :year',
         'registry_title_international' => ':year yilgi Xalqaro ko‘rgazmalar reestri',
         'registry_title_internal' => ':year yilgi ichki tadbirlar reestri',

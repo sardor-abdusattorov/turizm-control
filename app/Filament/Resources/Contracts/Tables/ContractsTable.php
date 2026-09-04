@@ -4,10 +4,12 @@ namespace App\Filament\Resources\Contracts\Tables;
 
 use App\Enums\PaymentStatus;
 use App\Filament\Resources\Contracts\ContractResource;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Models\Contact;
 use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Currency;
+use App\Models\Order;
 use App\Models\User;
 use App\Services\Contracts\ContractWorkflow;
 use App\Support\Money;
@@ -42,7 +44,7 @@ class ContractsTable
                 'responsible',
                 'activeApprovers.user.department',
             ]))
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort('updated_at', 'desc')
             ->columns([
                 TextColumn::make('number')
                     ->label(__('app.label.contract_number'))
@@ -129,6 +131,8 @@ class ContractsTable
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -163,6 +167,21 @@ class ContractsTable
                 SelectFilter::make('payment_status')
                     ->label(__('app.label.payment_status'))
                     ->options(PaymentStatus::options()),
+
+                SelectFilter::make('order_id')
+                    ->label(__('app.label.order_basis'))
+                    ->options(fn (): array => Order::query()
+                        ->whereHas('projects')
+                        ->orderByDesc('issued_at')
+                        ->orderByDesc('id')
+                        ->get()
+                        ->mapWithKeys(fn (Order $order): array => [$order->id => $order->label()])
+                        ->all())
+                    ->searchable()
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['value'] ?? null,
+                        fn (Builder $q, $orderId) => $q->whereHas('project', fn (Builder $p) => $p->where('order_id', $orderId)),
+                    )),
 
                 Filter::make('created_at')
                     ->label(__('app.label.created_at'))

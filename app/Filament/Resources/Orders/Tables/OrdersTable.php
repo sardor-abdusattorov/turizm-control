@@ -6,6 +6,7 @@ use App\Enums\OrderScope;
 use App\Filament\Resources\Orders\BaseOrderResource;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Models\Order;
 use App\Models\User;
 use Filament\Actions\ActionGroup;
@@ -30,7 +31,7 @@ class OrdersTable
             ->modifyQueryUsing(fn (Builder $query): Builder => $query
                 ->with(['creator', 'basisOrder'])
                 ->withCount('derivedOrders'))
-            ->defaultSort('issued_at', 'desc')
+            ->defaultSort('updated_at', 'desc')
             ->columns([
                 TextColumn::make('number')
                     ->label(__('app.label.order_number'))
@@ -93,6 +94,8 @@ class OrdersTable
 
                 CreatedAtColumn::make()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('issued_year')

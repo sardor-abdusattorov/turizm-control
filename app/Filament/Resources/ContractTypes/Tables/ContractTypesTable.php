@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ContractTypes\Tables;
 use App\Enums\ContractDirection;
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Models\ContractType;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -20,7 +21,7 @@ class ContractTypesTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('sort')
+            ->defaultSort('updated_at', 'desc')
             ->columns([
                 TextColumn::make('title')
                     ->label(__('app.label.title'))
@@ -49,6 +50,8 @@ class ContractTypesTable
                     ->sortable(),
 
                 CreatedAtColumn::make(),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('direction')

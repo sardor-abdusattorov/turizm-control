@@ -366,6 +366,8 @@ return [
         'press_tours_sheet' => 'Press tours',
         'payments_title' => 'Payments registry :year',
         'payments_sheet' => 'Payments',
+        'requisitions_title' => 'Requisition register :year',
+        'requisitions_sheet' => 'Requisitions',
         'sponsors_title' => 'Sponsors registry :year',
         'registry_title_international' => 'Registry of International exhibitions :year',
         'registry_title_internal' => 'Registry of internal events :year',

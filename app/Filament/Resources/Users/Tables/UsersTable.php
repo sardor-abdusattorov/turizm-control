@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Users\Tables;
 
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Support\UpdatedAtColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -24,6 +25,7 @@ class UsersTable
         return $table
 
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['department', 'position']))
+            ->defaultSort('updated_at', 'desc')
             ->columns([
                 ImageColumn::make('avatar_url')
                     ->label(__('app.label.profile_image'))
@@ -58,11 +60,7 @@ class UsersTable
                 CreatedAtColumn::make()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('updated_at')
-                    ->label(__('app.label.updated_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('department_id')

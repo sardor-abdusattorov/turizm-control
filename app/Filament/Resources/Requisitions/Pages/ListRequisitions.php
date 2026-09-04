@@ -3,11 +3,15 @@
 namespace App\Filament\Resources\Requisitions\Pages;
 
 use App\Enums\RequisitionStatus;
+use App\Exports\RequisitionsExport;
 use App\Filament\Resources\Requisitions\RequisitionResource;
+use App\Filament\Support\ExportPermission;
+use App\Filament\Support\ExportXlsxAction;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListRequisitions extends ListRecords
 {
@@ -18,6 +22,12 @@ class ListRequisitions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            ExportXlsxAction::make()
+                ->visible(fn (): bool => ExportPermission::allows('export_requisition'))
+                ->action(fn ($livewire) => Excel::download(
+                    new RequisitionsExport($livewire->getFilteredTableQuery()),
+                    'requisitions-'.now()->format('Y-m-d').'.xlsx',
+                )),
             CreateAction::make(),
         ];
     }

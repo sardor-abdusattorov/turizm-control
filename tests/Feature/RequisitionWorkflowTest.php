@@ -351,8 +351,9 @@ it('lays the view page out as designed cards, not a bare field list', function (
 
     expect($html)
 
-        ->toContain('rq-progress__bar')
-        ->toContain('0/2')
+        ->toContain('cw-prog__track')
+        ->toContain('cw-prog__await')
+        ->toContain('0</b> '.__('app.label.of').' 2')
         ->toContain($first->name)
 
         ->toContain('ow-card')

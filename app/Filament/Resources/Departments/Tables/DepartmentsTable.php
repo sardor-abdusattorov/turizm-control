@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Departments\Tables;
 
 use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Models\Department;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -22,6 +23,7 @@ class DepartmentsTable
         return $table
 
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['head', 'positions']))
+            ->defaultSort('updated_at', 'desc')
             ->columns([
                 TextColumn::make('name')
                     ->label(__('app.label.department_name'))
@@ -48,6 +50,8 @@ class DepartmentsTable
                     ->sortable(),
 
                 CreatedAtColumn::make(),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('status')

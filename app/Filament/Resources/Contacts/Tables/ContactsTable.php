@@ -9,6 +9,7 @@ use App\Filament\Support\CreatedAtColumn;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\ExportXlsxAction;
 use App\Filament\Support\StatusToggleColumn;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Filament\Widgets\Counterparty\CounterpartyContractsTableWidget;
 use App\Filament\Widgets\Counterparty\CounterpartyProjectsTableWidget;
 use App\Models\Contact;
@@ -31,7 +32,7 @@ class ContactsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('id', 'desc')
+            ->defaultSort('updated_at', 'desc')
             ->modifyQueryUsing(fn (Builder $query): Builder => $query
                 ->withRoleFlags()
                 ->withCount([
@@ -150,6 +151,8 @@ class ContactsTable
 
                 CreatedAtColumn::make()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('type')

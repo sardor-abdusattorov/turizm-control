@@ -10,6 +10,7 @@ use App\Filament\Resources\Payments\PaymentResource;
 use App\Filament\Resources\Projects\BaseProjectResource;
 use App\Filament\Support\ExportPermission;
 use App\Filament\Support\ExportXlsxAction;
+use App\Filament\Support\UpdatedAtColumn;
 use App\Models\Payment;
 use App\Models\User;
 use App\Support\Money;
@@ -35,7 +36,7 @@ class PaymentsTable
         return $table
 
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['contract', 'project', 'currency', 'creator']))
-            ->defaultSort('paid_at', 'desc')
+            ->defaultSort('updated_at', 'desc')
             ->groups([
                 Group::make('contract.number')
                     ->label(__('app.label.contract'))
@@ -117,6 +118,8 @@ class PaymentsTable
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                UpdatedAtColumn::make(),
             ])
             ->filters([
                 SelectFilter::make('subject')

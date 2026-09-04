@@ -41,13 +41,20 @@ class ApprovalsTimelineWidget extends TableWidget
                     ->label(__('app.approval.column.approver'))
                     ->state(fn (Approval $record): array => [
                         'avatar' => $record->user?->avatarUrl(),
-                        'name' => ($record->user?->name ?? __('app.label.not_set')).($record->isVoided() ? '' : ' · #'.$record->order),
+                        'name' => $record->user?->name ?? __('app.label.not_set'),
                         'sub' => collect([
                             $record->user?->department?->name,
                             $record->user?->position?->name,
                         ])->filter()->implode(' · ') ?: null,
                     ])
                     ->view('filament.tables.columns.person'),
+
+                TextColumn::make('order')
+                    ->label(__('app.label.step'))
+                    ->badge()
+                    ->color('gray')
+                    ->state(fn (Approval $record): ?string => $record->isVoided() ? null : '#'.$record->order)
+                    ->placeholder('—'),
 
                 ViewColumn::make('status')
                     ->label(__('app.label.status'))
@@ -78,11 +85,15 @@ class ApprovalsTimelineWidget extends TableWidget
     protected function detailsAction(): Action
     {
         return Action::make('approverDetails')
-            ->hiddenLabel()
-            ->icon('heroicon-m-eye')
+            ->label(__('app.label.view_history'))
+            ->icon('heroicon-o-eye')
             ->color('gray')
-            ->tooltip(__('app.label.details'))
             ->modalHeading(fn (Approval $record): string => $record->user?->name ?? __('app.label.not_set'))
+            ->modalDescription(fn (Approval $record): ?string => collect([
+                $record->user?->department?->name,
+                $record->user?->position?->name,
+            ])->filter()->implode(' · ') ?: null)
+            ->modalIcon('heroicon-o-user-circle')
             ->modalWidth(Width::TwoExtraLarge)
             ->modalContent(fn (Approval $record) => view('filament.approvals.approver-details', [
                 'approval' => $record,

@@ -121,6 +121,7 @@ return [
 
         'view_all_requisitions',
         'approve_requisitions',
+        'export_requisition',
     ],
 
     'discovery' => [
