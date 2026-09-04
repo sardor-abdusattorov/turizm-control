@@ -6,6 +6,7 @@ use App\Filament\Resources\Requisitions\Pages\CreateRequisition;
 use App\Filament\Resources\Requisitions\Pages\EditRequisition;
 use App\Filament\Resources\Requisitions\Pages\ListRequisitions;
 use App\Filament\Resources\Requisitions\Pages\ViewRequisition;
+use App\Filament\Widgets\ApprovalsTimelineWidget;
 use App\Models\Requisition;
 use App\Models\Settings;
 use App\Models\User;
@@ -420,4 +421,47 @@ it('marks an unmet step as overdue', function () {
     expect($onTime->fresh()->load('approvals')->isOverdue())->toBeFalse()
         ->and($late->fresh()->load('approvals')->isOverdue())->toBeTrue()
         ->and($settled->fresh()->load('approvals')->isOverdue())->toBeFalse();
+});
+
+it('lists each approver once in the chain table and keeps earlier rounds behind the eye', function () {
+    $author = requisitionUser();
+    $first = requisitionUser();
+    $second = requisitionUser();
+    $requisition = Requisition::factory()->inReview([$first, $second])->create(['author_id' => $author->id]);
+
+    actingAs($first);
+    app(ApprovalWorkflow::class)->reject($requisition->fresh()->load('approvals'), $first, 'Уточните смету.');
+
+    actingAs($author);
+    Livewire::test(EditRequisition::class, ['record' => $requisition->id])
+        ->fillForm(['approver_ids' => [$first->id]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $approvals = $requisition->fresh()->approvals;
+    $firstNow = $approvals->where('round', 2)->firstWhere('user_id', $first->id);
+    $firstBefore = $approvals->where('round', 1)->firstWhere('user_id', $first->id);
+    $secondBefore = $approvals->where('round', 1)->firstWhere('user_id', $second->id);
+
+    actingAs(requisitionUser(['view_any_requisition', 'view_requisition', 'view_all_requisitions', 'view_approvals_timeline_widget']));
+
+    Livewire::test(ApprovalsTimelineWidget::class, ['requisitionId' => $requisition->id])
+        ->assertCountTableRecords(2)
+        ->assertCanSeeTableRecords([$firstNow, $secondBefore])
+        ->assertCanNotSeeTableRecords([$firstBefore])
+        ->assertSee(__('app.approval.cancelled_after_edit'))
+        ->mountAction(TestAction::make('approverDetails')->table($firstNow))
+        ->assertActionMounted(TestAction::make('approverDetails')->table($firstNow));
+
+    $history = view('filament.approvals.approver-details', [
+        'approval' => $firstNow,
+        'attempts' => $approvals->where('user_id', $first->id)->sortByDesc('id')->values(),
+        'total' => 1,
+    ])->render();
+
+    expect($history)
+        ->toContain('Уточните смету.')
+        ->toContain(ApprovalStatus::Rejected->label())
+        ->toContain(ApprovalStatus::Queued->label())
+        ->toContain(__('app.approval.cancelled_after_edit'));
 });

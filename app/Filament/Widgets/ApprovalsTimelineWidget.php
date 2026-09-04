@@ -29,21 +29,19 @@ class ApprovalsTimelineWidget extends TableWidget
             ->heading(null)
             ->columnManager(false)
             ->query(fn (): Builder => Approval::query()
-                ->where('approvable_type', (new Requisition)->getMorphClass())
-                ->where('approvable_id', $this->requisitionId)
+                ->whereKey($this->visibleApprovalIds())
                 ->with(['user.department', 'user.position'])
-                ->orderByDesc('round')
+                ->orderByRaw('CASE WHEN status = ? THEN 1 ELSE 0 END', [ApprovalStatus::Invalidated->value])
                 ->orderBy('order')
                 ->orderBy('id'))
             ->description(fn (): string => $this->progressSummary())
-
             ->recordClasses(fn (Approval $record): ?string => $record->isVoided() ? 'fi-approval-voided' : null)
             ->columns([
                 ViewColumn::make('approver')
                     ->label(__('app.approval.column.approver'))
                     ->state(fn (Approval $record): array => [
                         'avatar' => $record->user?->avatarUrl(),
-                        'name' => trim(($record->user?->name ?? __('app.label.not_set')).' · #'.$record->order),
+                        'name' => ($record->user?->name ?? __('app.label.not_set')).($record->isVoided() ? '' : ' · #'.$record->order),
                         'sub' => collect([
                             $record->user?->department?->name,
                             $record->user?->position?->name,
@@ -93,6 +91,25 @@ class ApprovalsTimelineWidget extends TableWidget
             ]))
             ->modalSubmitAction(false)
             ->modalCancelAction(false);
+    }
+
+    /** @return list<int> */
+    protected function visibleApprovalIds(): array
+    {
+        $approvals = $this->record()?->approvals ?? collect();
+
+        $live = $approvals->reject(fn (Approval $approval): bool => $approval->isVoided());
+        $liveUserIds = $live->pluck('user_id')->all();
+
+        $droppedOnly = $approvals
+            ->filter(fn (Approval $approval): bool => $approval->isVoided() && ! in_array($approval->user_id, $liveUserIds, true))
+            ->sortByDesc('id')
+            ->unique('user_id');
+
+        return $live->merge($droppedOnly)
+            ->pluck('id')
+            ->map(fn ($id): int => (int) $id)
+            ->all();
     }
 
     /** @return Collection<int, Approval> */
