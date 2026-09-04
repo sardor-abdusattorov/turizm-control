@@ -17,7 +17,7 @@ return [
         'requisition_number' => 'Ariza №',
         'requisition_title' => 'Ariza sarlavhasi',
         'requisition_default_reviewer' => 'Standart kelishuvchilar',
-        'requisition_review_days' => 'Har bosqichga kun',
+        'requisition_review_days' => 'Ko\'rib chiqish muddati (kun)',
         'author' => 'Muallif',
         'searching' => 'Qidirilmoqda…',
         'swift' => 'SWIFT',

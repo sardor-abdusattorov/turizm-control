@@ -451,19 +451,15 @@ it('lists each approver once in the chain table and keeps earlier rounds behind 
         ->assertCanNotSeeTableRecords([$firstBefore])
         ->assertSee(__('app.approval.cancelled_after_edit'))
         ->mountAction(TestAction::make('approverDetails')->table($firstNow))
-        ->assertActionMounted(TestAction::make('approverDetails')->table($firstNow));
+        ->assertMountedActionModalSee('Уточните смету.')
+        ->assertMountedActionModalSee(ApprovalStatus::Rejected->label())
+        ->assertMountedActionModalSee(ApprovalStatus::Queued->label())
+        ->assertMountedActionModalSee(__('app.approval.step', ['step' => 1, 'total' => 1]));
 
-    $history = view('filament.approvals.approver-details', [
-        'approval' => $firstNow,
-        'attempts' => $approvals->where('user_id', $first->id)->sortByDesc('id')->values(),
-        'total' => 1,
-    ])->render();
-
-    expect($history)
-        ->toContain('Уточните смету.')
-        ->toContain(ApprovalStatus::Rejected->label())
-        ->toContain(ApprovalStatus::Queued->label())
-        ->toContain(__('app.approval.cancelled_after_edit'));
+    Livewire::test(ApprovalsTimelineWidget::class, ['requisitionId' => $requisition->id])
+        ->mountAction(TestAction::make('approverDetails')->table($secondBefore))
+        ->assertMountedActionModalSee(__('app.approval.cancelled_after_edit'))
+        ->assertMountedActionModalDontSee(__('app.approval.step', ['step' => 2, 'total' => 1]));
 });
 
 it('returns a rejected requisition to the author with the same chain queued again', function () {

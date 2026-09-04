@@ -17,7 +17,7 @@ return [
         'requisition_number' => 'Requisition No.',
         'requisition_title' => 'Requisition title',
         'requisition_default_reviewer' => 'Default approvers',
-        'requisition_review_days' => 'Days per step',
+        'requisition_review_days' => 'Review period (days)',
         'author' => 'Author',
         'searching' => 'Searching…',
         'swift' => 'SWIFT',

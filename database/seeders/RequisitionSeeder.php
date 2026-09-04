@@ -12,6 +12,12 @@ use Illuminate\Database\Seeder;
 
 class RequisitionSeeder extends Seeder
 {
+    /** @return list<string> */
+    public static function demoTitles(): array
+    {
+        return array_column((new self)->requisitions(), 'title');
+    }
+
     public function run(): void
     {
         $author = User::firstWhere('email', 'manager@test.uz');
@@ -61,7 +67,7 @@ class RequisitionSeeder extends Seeder
     }
 
     /** @return list<array{title: string, description: string, stage: string}> */
-    private function requisitions(): array
+    protected function requisitions(): array
     {
         return [
             [

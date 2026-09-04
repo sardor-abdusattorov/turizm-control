@@ -153,6 +153,12 @@ class ApprovalsTimelineWidget extends TableWidget
 
     protected function record(): ?Requisition
     {
-        return Requisition::query()->with('approvals')->find($this->requisitionId);
+        if ($this->cachedRecord === null) {
+            $this->cachedRecord = Requisition::query()->with('approvals')->find($this->requisitionId);
+        }
+
+        return $this->cachedRecord;
     }
+
+    private ?Requisition $cachedRecord = null;
 }

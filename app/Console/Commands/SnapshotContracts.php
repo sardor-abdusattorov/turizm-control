@@ -6,6 +6,7 @@ use App\Models\Contract;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Requisition;
+use Database\Seeders\RequisitionSeeder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -101,6 +102,7 @@ class SnapshotContracts extends Command
             ]);
 
         $requisitions = Requisition::query()
+            ->whereNotIn('title', RequisitionSeeder::demoTitles())
             ->with(['project', 'author', 'approvals.user'])
             ->orderBy('id')
             ->get()

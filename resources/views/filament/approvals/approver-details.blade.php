@@ -20,7 +20,9 @@
     $meta = collect([
         $user?->department?->name,
         $user?->position?->name,
-        __('app.approval.step', ['step' => $approval->order, 'total' => $total]),
+        $approval->isVoided()
+            ? null
+            : __('app.approval.step', ['step' => $approval->order, 'total' => $total]),
     ])->filter()->implode(' · ');
 @endphp
 

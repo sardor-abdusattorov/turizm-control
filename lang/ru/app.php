@@ -17,7 +17,7 @@ return [
         'requisition_number' => 'Заявка №',
         'requisition_title' => 'Заголовок заявки',
         'requisition_default_reviewer' => 'Согласующие по умолчанию',
-        'requisition_review_days' => 'Дней на каждый шаг',
+        'requisition_review_days' => 'Срок рассмотрения (дней)',
         'author' => 'Автор',
         'searching' => 'Поиск…',
         'swift' => 'SWIFT',

@@ -13,6 +13,7 @@ use App\Models\Project;
 use App\Models\Requisition;
 use App\Models\User;
 use Database\Seeders\HandEnteredContractsSeeder;
+use Database\Seeders\RequisitionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -312,4 +313,18 @@ it('overwrites a shrinking snapshot when forced', function () {
     $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath, '--force' => true])->assertSuccessful();
 
     expect(json_decode(File::get($this->snapshotPath), true)['contracts'])->toBeEmpty();
+});
+
+it('leaves the seeded demo requisitions out of the snapshot so their chain cannot outlive the seeder', function () {
+    $author = User::factory()->create();
+    $demoTitle = RequisitionSeeder::demoTitles()[0];
+
+    Requisition::factory()->create(['title' => $demoTitle, 'author_id' => $author->id]);
+    Requisition::factory()->create(['title' => 'Заявка, заведённая руками', 'author_id' => $author->id]);
+
+    $this->artisan('contracts:snapshot', ['--path' => $this->snapshotPath])->assertSuccessful();
+
+    $titles = array_column(json_decode(File::get($this->snapshotPath), true)['requisitions'], 'title');
+
+    expect($titles)->toBe(['Заявка, заведённая руками']);
 });
