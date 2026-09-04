@@ -11,6 +11,8 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        $this->withoutVite();
+
         HandEnteredContractsSeeder::$path = storage_path('framework/testing/no-snapshot.json');
     }
 }
